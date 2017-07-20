@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import {TestStoreComponent} from './playpen/test-store/test-store.component';
 
 const routes: Routes = [
   {
-    path: '',
-    children: []
+    path: 'play', component: TestStoreComponent
   }
 ];
 

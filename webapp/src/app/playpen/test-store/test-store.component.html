@@ -1,0 +1,10 @@
+<p>Assignees</p>
+<div>
+  <form #f="ngForm" (ngSubmit)="saveAssignee(f.value)">
+    <label for="name"></label> <input id="name" name="name" placeholder="Name" ngModel="">
+    <button type="submit" class="ui button">Submit</button>
+  </form>
+</div>
+<ul>
+  <li *ngFor="let assignee of assignees | async">{{assignee.initials}} - {{assignee.name}}</li>
+</ul>

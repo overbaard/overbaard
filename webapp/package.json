@@ -20,8 +20,12 @@
     "@angular/platform-browser": "^4.0.0",
     "@angular/platform-browser-dynamic": "^4.0.0",
     "@angular/router": "^4.0.0",
+    "@ngrx/core": "^1.2.0",
+    "@ngrx/store": "^2.2.3",
     "core-js": "^2.4.1",
+    "immutable": "^3.8.1",
     "rxjs": "^5.1.0",
+    "typed-immutable-record": "^0.0.6",
     "zone.js": "^0.8.4"
   },
   "devDependencies": {
