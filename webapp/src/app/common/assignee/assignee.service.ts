@@ -2,7 +2,7 @@ import * as Immutable from 'immutable';
 
 import {Action, ActionReducer, Store} from '@ngrx/store';
 import {Assignee} from './assignee.model';
-import {AppStore} from './app-store.model';
+import {State} from '../../app-store';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 
@@ -11,7 +11,7 @@ export const CLEAR_ASSIGNEES = 'CLEAR_ASSIGNEES';
 
 const initialAssignees = new Array<Assignee>();
 
-export function  assignees(state: Assignee[] = initialAssignees, action: Action): Assignee[] {
+export function reducer(state: Assignee[] = initialAssignees, action: Action): Assignee[] {
 
   switch (action.type) {
     case ADD_ASSIGNEES: {
@@ -31,7 +31,7 @@ export function  assignees(state: Assignee[] = initialAssignees, action: Action)
 
 @Injectable()
 export class AssigneesService {
-  constructor(private store: Store<AppStore>) {
+  constructor(private store: Store<State>) {
   }
 
   getAssignees(): Observable<Assignee[]> {

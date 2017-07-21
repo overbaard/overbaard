@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import {TestStoreComponent} from './playpen/test-store/test-store.component';
+import {TestStoreComponent} from './components/playpen/test-store.component';
 
 const routes: Routes = [
   {

@@ -4,7 +4,7 @@ import {AssigneeRecord, Assignee, AssigneeFactory} from './assignee.model';
 describe('Assignee unit tests', () => {
 
   describe('Deserialize', () => {
-    var input: any = {
+    const input: any = {
       key : 'userA',
       email : 'UserA@examle.com',
       avatar : 'https://example.com/user-A.png',
@@ -54,7 +54,6 @@ describe('Assignee unit tests', () => {
       });
     });
   });
-
 });
 
 

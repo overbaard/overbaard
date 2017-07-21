@@ -1,8 +1,8 @@
 import * as Immutable from 'immutable';
 import {Component, OnInit} from '@angular/core';
-import {ADD_ASSIGNEES, AssigneesService} from '../../board/common/assignee.service';
+import {ADD_ASSIGNEES, AssigneesService} from '../../common/assignee/assignee.service';
 import {Observable} from 'rxjs/Observable';
-import {Assignee, AssigneeFactory} from '../../board/common/assignee.model';
+import {Assignee, AssigneeFactory} from '../../common/assignee/assignee.model';
 
 @Component({
   selector: 'app-test-store',
@@ -18,7 +18,7 @@ export class TestStoreComponent implements OnInit {
   constructor(private assigneesService: AssigneesService) {
     this.assignees = assigneesService.getAssignees();
     this.assignees.subscribe(
-      data => { console.log(data); }
+      data => { console.log('current data' + data); }
     );
   }
 

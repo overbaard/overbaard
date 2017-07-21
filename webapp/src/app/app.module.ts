@@ -6,9 +6,10 @@ import {HttpModule} from '@angular/http';
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {APP_BASE_HREF, HashLocationStrategy, LocationStrategy} from '@angular/common';
-import {TestStoreComponent} from './playpen/test-store/test-store.component';
+import {TestStoreComponent} from './components/playpen/test-store.component';
 import {StoreModule} from '@ngrx/store';
-import {assignees, AssigneesService} from './board/common/assignee.service';
+import {AssigneesService} from './common/assignee/assignee.service';
+import {reducer} from './app-store';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,7 @@ import {assignees, AssigneesService} from './board/common/assignee.service';
     HttpModule,
     ReactiveFormsModule,
     AppRoutingModule,
-    StoreModule.provideStore({assignees: assignees})
+    StoreModule.provideStore(reducer)
   ],
   providers: [
     {provide: APP_BASE_HREF, useValue: '/'},
