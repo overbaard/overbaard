@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 import {Component, OnInit} from '@angular/core';
-import {ADD_ASSIGNEES, AssigneesService} from '../../common/assignee/assignee.service';
+import {AssigneesService} from '../../common/assignee/assignee.service';
 import {Observable} from 'rxjs/Observable';
 import {Assignee, AssigneeFactory} from '../../common/assignee/assignee.model';
 

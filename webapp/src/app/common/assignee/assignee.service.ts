@@ -1,53 +1,79 @@
-import * as Immutable from 'immutable';
-
-import {Action, ActionReducer, Store} from '@ngrx/store';
+import {Action, Store} from '@ngrx/store';
 import {Assignee} from './assignee.model';
-import {State} from '../../app-store';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
+import {AppState} from '../../app-store';
+import {createSelector} from 'reselect';
 
-export const ADD_ASSIGNEES = 'ADD_ASSIGNEES';
-export const CLEAR_ASSIGNEES = 'CLEAR_ASSIGNEES';
+const ADD_ASSIGNEES = 'ADD_ASSIGNEES';
+const CLEAR_ASSIGNEES = 'CLEAR_ASSIGNEES';
 
-const initialAssignees = new Array<Assignee>();
+class AddAssigneesAction implements Action {
+  readonly type = ADD_ASSIGNEES;
+  constructor (readonly payload: Assignee[]) {
+  }
+}
 
-export function reducer(state: Assignee[] = initialAssignees, action: Action): Assignee[] {
+class ClearAssigneesAction implements Action {
+  readonly type = CLEAR_ASSIGNEES;
+}
+
+export interface AssigneeState {
+  assignees: Assignee[];
+}
+
+const initialState = {
+  assignees: []
+};
+
+export function reducer(state: AssigneeState = initialState, action: Action): AssigneeState {
 
   switch (action.type) {
     case ADD_ASSIGNEES: {
-      const payload: Assignee[] = <Assignee[]>action.payload;
+      const payload: Assignee[] = (<AddAssigneesAction>action).payload;
+      let assignees = state.assignees;
       for (const assignee of payload) {
-        state = [...state, assignee];
+        assignees = [...assignees, assignee];
       }
-      return state;
+      return {
+        assignees: assignees
+      };
     }
     case CLEAR_ASSIGNEES: {
-      return [];
+      return initialState;
     }
     default:
       return state;
   }
 };
 
+const getAssigneesState = (state: AppState) => state.assignees;
+const getAssignees = (state: AssigneeState) => state.assignees;
+const assigneesSelector = createSelector(getAssigneesState, getAssignees);
+
 @Injectable()
 export class AssigneesService {
-  constructor(private store: Store<State>) {
+  constructor(private store: Store<AppState>) {
+  }
+
+  getAssigneesState(): Observable<AssigneeState> {
+    return this.store.select(getAssigneesState);
   }
 
   getAssignees(): Observable<Assignee[]> {
-    return this.store.select('assignees');
+    return this.store.select(assigneesSelector);
   }
 
   addAssignee(assignee: Assignee) {
-    this.store.dispatch({type: ADD_ASSIGNEES, payload: [assignee]});
+    this.store.dispatch(new AddAssigneesAction([assignee]));
   }
 
-  addAssignees(...assigneesArr: Assignee[]) {
-    this.store.dispatch({type: ADD_ASSIGNEES, payload: assigneesArr});
+  addAssignees(...assignees: Assignee[]) {
+    this.store.dispatch(new AddAssigneesAction(assignees));
   }
 
   clearAssignees() {
-    this.store.dispatch({type: CLEAR_ASSIGNEES, payload: null});
+    this.store.dispatch(new ClearAssigneesAction());
   }
 }
 

@@ -3,8 +3,8 @@ import * as assignee from './common/assignee/assignee.service';
 import {ActionReducer, combineReducers} from '@ngrx/store';
 import {environment} from '../environments/environment';
 
-export interface State {
-  assignees: Assignee[];
+export interface AppState {
+  assignees: assignee.AssigneeState;
 }
 
 const reducers = {
@@ -13,8 +13,8 @@ const reducers = {
 
 
 // TODO - add some tools
-// const developmentReducer: ActionReducer<State> = compose(combineReducers)(reducers);
-const productionReducer: ActionReducer<State> = combineReducers(reducers);
+// const developmentReducer: ActionReducer<AssigneeState> = compose(combineReducers)(reducers);
+const productionReducer: ActionReducer<AppState> = combineReducers(reducers);
 
 export function reducer(state: any, action: any) {
   // TODO
