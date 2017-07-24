@@ -2,6 +2,7 @@ import * as Immutable from 'immutable';
 import {Component, OnInit} from '@angular/core';
 import {AssigneesService} from '../../common/assignee/assignee.service';
 import {Observable} from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
 import {Assignee, AssigneeFactory} from '../../common/assignee/assignee.model';
 
 @Component({
@@ -16,10 +17,10 @@ export class TestStoreComponent implements OnInit {
   private assignees: Observable<Assignee[]>;
 
   constructor(private assigneesService: AssigneesService) {
-    this.assignees = assigneesService.getAssignees();
-    this.assignees.subscribe(
-      data => { console.log('current data' + data); }
-    );
+    this.assignees = assigneesService.getAssignees()
+      .map((value) => {
+        return value.toArray();
+      });
   }
 
   ngOnInit() {

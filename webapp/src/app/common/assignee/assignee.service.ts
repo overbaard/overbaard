@@ -4,13 +4,15 @@ import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import {AppState} from '../../app-store';
 import {createSelector} from 'reselect';
+import * as Immutable from 'immutable';
 
 const ADD_ASSIGNEES = 'ADD_ASSIGNEES';
 const CLEAR_ASSIGNEES = 'CLEAR_ASSIGNEES';
 
 class AddAssigneesAction implements Action {
   readonly type = ADD_ASSIGNEES;
-  constructor (readonly payload: Assignee[]) {
+
+  constructor(readonly payload: Assignee[]) {
   }
 }
 
@@ -19,11 +21,11 @@ class ClearAssigneesAction implements Action {
 }
 
 export interface AssigneeState {
-  assignees: Assignee[];
+  assignees: Immutable.OrderedMap<string, Assignee>;
 }
 
 const initialState = {
-  assignees: []
+  assignees: Immutable.OrderedMap<string, Assignee>()
 };
 
 export function reducer(state: AssigneeState = initialState, action: Action): AssigneeState {
@@ -33,8 +35,10 @@ export function reducer(state: AssigneeState = initialState, action: Action): As
       const payload: Assignee[] = (<AddAssigneesAction>action).payload;
       let assignees = state.assignees;
       for (const assignee of payload) {
-        assignees = [...assignees, assignee];
+        assignees = assignees.set(assignee.key, assignee);
       }
+      assignees = <Immutable.OrderedMap<string, Assignee>>assignees.sort(
+        (valueA, valueB) => valueA.name.toLocaleLowerCase().localeCompare(valueB.name.toLocaleLowerCase()));
       return {
         assignees: assignees
       };
@@ -60,7 +64,7 @@ export class AssigneesService {
     return this.store.select(getAssigneesState);
   }
 
-  getAssignees(): Observable<Assignee[]> {
+  getAssignees(): Observable<Immutable.OrderedMap<string, Assignee>> {
     return this.store.select(assigneesSelector);
   }
 
