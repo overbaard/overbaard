@@ -39,23 +39,24 @@ const LINKED_ISSUE_TYPED_FACTORY = makeTypedFactory<Issue, LinkedIssueRecord>(DE
 export class IssueFactory {
 
   static fromJS(input: any): BoardIssue {
-    // TODO Try to make this work with a reviver function (I was unsuccessful so far in making it do this eagerly)
-    IssueFactory.convertLinkedIssues(input);
+    // Rename fields before deserializing
+    if (input['linked-issues']) {
+      input['linkedIssues'] = input['linked-issues'];
+    }
+    delete input['linked-issues'];
 
-    const temp: any = Immutable.fromJS(input);
+    const temp: any = Immutable.fromJS(input, (key, value) => {
+      if (key === 'linkedIssues') {
+        const tmp: Immutable.List<any> = value.toList();
+        return tmp.withMutations(mutable => {
+          tmp.forEach((li, i) => {
+            mutable.set(i, LINKED_ISSUE_TYPED_FACTORY(<any>li));
+          });
+        });
+      }
+      return value;
+    });
     return ISSUE_TYPED_FACTORY(temp);
   }
-
-  static convertLinkedIssues(input: any) {
-    const linkedIssues: any[] = input['linked-issues'];
-    delete input['linked-issues'];
-    if (linkedIssues) {
-      linkedIssues.forEach((li, i, arr) => {
-        arr[i] = LINKED_ISSUE_TYPED_FACTORY(<any>li);
-      });
-    }
-    input['linkedIssues'] = linkedIssues;
-  }
-
 };
 
