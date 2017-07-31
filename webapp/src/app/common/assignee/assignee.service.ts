@@ -6,10 +6,19 @@ import {AppState} from '../../app-store';
 import {createSelector} from 'reselect';
 import * as Immutable from 'immutable';
 
+const ADD_INITAL_ASSIGNEES = 'ADD_INITIAL_ASSIGNEES';
 const ADD_ASSIGNEES = 'ADD_ASSIGNEES';
 const CLEAR_ASSIGNEES = 'CLEAR_ASSIGNEES';
 // TODO remove this. We should not be modifying assignees, I just want something simple to play with while finding my way around
 const TMP_MODIFY_ASSIGNEE = 'MODIFY_ASSIGNEE';
+
+
+class AddInitialAssignees implements Action {
+  readonly type = ADD_INITAL_ASSIGNEES;
+
+  constructor(readonly payload: Assignee[]) {
+  }
+}
 
 class AddAssigneesAction implements Action {
   readonly type = ADD_ASSIGNEES;
@@ -39,19 +48,10 @@ const initialState = {
 export function reducer(state: AssigneeState = initialState, action: Action): AssigneeState {
 
   switch (action.type) {
+    case ADD_INITAL_ASSIGNEES:
+      return addAssignees(initialState, (<AddInitialAssignees>action).payload);
     case ADD_ASSIGNEES: {
-      const payload: Assignee[] = (<AddAssigneesAction>action).payload;
-      let assignees = state.assignees;
-      assignees = assignees.withMutations(mutable => {
-        for (const assignee of payload) {
-          mutable.set(assignee.key, assignee);
-        }
-      });
-      assignees = <Immutable.OrderedMap<string, Assignee>>assignees.sort(
-        (valueA, valueB) => valueA.name.toLocaleLowerCase().localeCompare(valueB.name.toLocaleLowerCase()));
-      return {
-        assignees: assignees
-      };
+      return addAssignees(state, (<AddAssigneesAction>action).payload);
     }
     case CLEAR_ASSIGNEES: {
       return initialState;
@@ -68,9 +68,24 @@ export function reducer(state: AssigneeState = initialState, action: Action): As
   }
 };
 
+function addAssignees(state: AssigneeState, added: Assignee[]): AssigneeState {
+  let assignees = state.assignees;
+  assignees = assignees.withMutations(mutable => {
+    for (const assignee of added) {
+      mutable.set(assignee.key, assignee);
+    }
+  });
+  assignees = <Immutable.OrderedMap<string, Assignee>>assignees.sort(
+    (valueA, valueB) => valueA.name.toLocaleLowerCase().localeCompare(valueB.name.toLocaleLowerCase()));
+  return {
+    assignees: assignees
+  };
+
+}
+
 const getAssigneesState = (state: AppState) => state.assignees;
 const getAssignees = (state: AssigneeState) => state.assignees;
-const assigneesSelector = createSelector(getAssigneesState, getAssignees);
+export const assigneesSelector = createSelector(getAssigneesState, getAssignees);
 const makeAssigneeSelector = (key: string) => createSelector(assigneesSelector, (assignees) => assignees.get(key));
 
 @Injectable()
@@ -92,18 +107,35 @@ export class AssigneesService {
     return this.store.select(makeAssigneeSelector(key));
   }
 
-  deserializeAssignees(input: any) {
+  /**
+   * Call when populating a new board
+   *
+   * @param input
+   */
+  deserializeInitialAssignees(input: any) {
+    this.store.dispatch(new AddInitialAssignees(this.deserialize(input)));
+  }
+
+  /**
+   * Call when adding assigness to a board from the server changes
+   * @param input
+   */
+  deserializeAddedAssignees(input: any) {
+    this.store.dispatch(new AddAssigneesAction(this.deserialize(input)));
+  }
+
+  private deserialize(input: any) {
     const inputArray: any[] = input ? input : [];
     const assignees = new Array<Assignee>(inputArray.length);
     inputArray.forEach((a, i) => {
       assignees[i] = AssigneeFactory.fromJS(a);
     });
-    this.store.dispatch(new AddAssigneesAction(assignees));
+    return assignees;
   }
 
-  // TODO remove this once we're done playing
-  addAssignee(assignee: Assignee) {
-    this.store.dispatch(new AddAssigneesAction([assignee]));
+  //
+  addAssignees(assignees: Assignee[]) {
+    this.store.dispatch(new AddAssigneesAction(assignees));
   }
 
   clearAssignees() {

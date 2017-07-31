@@ -37,7 +37,7 @@ describe('Assignee service tests', () => {
         assignees = map;});
 
     expect(assignees.size).toEqual(0);
-    service.deserializeAssignees(input);
+    service.deserializeInitialAssignees(input);
   }));
 
   it('Deserialize initial state', () => {
@@ -52,7 +52,7 @@ describe('Assignee service tests', () => {
   });
 
   it('Add new assignee', () => {
-    service.deserializeAssignees([{
+    service.deserializeAddedAssignees([{
       key: 'z-fun',
       name: 'Fun Freddy Fox',
       email: 'fun@example.com',

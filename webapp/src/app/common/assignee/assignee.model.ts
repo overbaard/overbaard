@@ -23,6 +23,14 @@ const DEFAULT: Assignee = {
  */
 const TYPED_FACTORY = makeTypedFactory<Assignee, AssigneeRecord>(DEFAULT);
 
+export const NO_ASSIGNEE: Assignee = TYPED_FACTORY({
+  key: '_____N$O$N$E____',
+  email: '-',
+  avatar: null,
+  name: 'None',
+  initials: '-'
+});
+
 export class AssigneeFactory {
 
   static fromJS(input: any): AssigneeRecord {

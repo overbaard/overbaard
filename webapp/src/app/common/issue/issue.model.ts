@@ -1,5 +1,5 @@
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
-import {Assignee} from '../assignee/assignee.model';
+import {Assignee, NO_ASSIGNEE} from '../assignee/assignee.model';
 import * as Immutable from 'immutable';
 
 export interface BoardIssueRecord extends TypedRecord<BoardIssueRecord>, BoardIssue {
@@ -38,12 +38,18 @@ const LINKED_ISSUE_TYPED_FACTORY = makeTypedFactory<Issue, LinkedIssueRecord>(DE
 
 export class IssueFactory {
 
-  static fromJS(input: any): BoardIssue {
-    // Rename fields before deserializing
+  static fromJS(input: any, assignees: Assignee[]): BoardIssue {
+    // Rework the data as needed before deserializing
     if (input['linked-issues']) {
       input['linkedIssues'] = input['linked-issues'];
     }
     delete input['linked-issues'];
+
+    if (input['assignee'] || input['assignee'] === 0) {
+      input['assignee'] = assignees[input['assignee']];
+    } else {
+      input['assignee'] = NO_ASSIGNEE;
+    }
 
     const temp: any = Immutable.fromJS(input, (key, value) => {
       if (key === 'linkedIssues') {
