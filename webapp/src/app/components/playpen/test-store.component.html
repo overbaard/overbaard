@@ -6,5 +6,5 @@
   </form>
 </div>
 <ul>
-  <li *ngFor="let assignee of assignees | async">{{assignee.initials}} - {{assignee.name}}</li>
+  <li *ngFor="let assignee of assignees | async">{{assignee.initials}} - {{assignee.name}} <a href="reverse" (click)="reverseName($event, assignee)">reverse</a></li>
 </ul>

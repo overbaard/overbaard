@@ -54,5 +54,10 @@ export class AssigneeFactory {
   }
 };
 
+export class AssigneeUpdater {
+  static update(assignee: Assignee, updater: (updated: Assignee) => void) {
+    return (<AssigneeRecord>assignee).withMutations(updater);
+  }
+}
 
 
