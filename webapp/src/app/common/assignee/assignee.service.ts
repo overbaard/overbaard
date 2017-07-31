@@ -1,5 +1,5 @@
 import {Action, Store} from '@ngrx/store';
-import {Assignee} from './assignee.model';
+import {Assignee, AssigneeFactory} from './assignee.model';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import {AppState} from '../../app-store';
@@ -86,23 +86,31 @@ export class AssigneesService {
     return this.store.select(assigneesSelector);
   }
 
+  // TODO remove this it is just POC
   getAssignee(key: string): Observable<Assignee> {
     // Taken from https://medium.com/@parkerdan/react-reselect-and-redux-b34017f8194c and https://github.com/reactjs/reselect/issues/18
     return this.store.select(makeAssigneeSelector(key));
   }
 
-  addAssignee(assignee: Assignee) {
-    this.store.dispatch(new AddAssigneesAction([assignee]));
+  deserializeAssignees(input: any) {
+    const inputArray: any[] = input ? input : [];
+    const assignees = new Array<Assignee>(inputArray.length);
+    inputArray.forEach((a, i) => {
+      assignees[i] = AssigneeFactory.fromJS(a);
+    });
+    this.store.dispatch(new AddAssigneesAction(assignees));
   }
 
-  addAssignees(...assignees: Assignee[]) {
-    this.store.dispatch(new AddAssigneesAction(assignees));
+  // TODO remove this once we're done playing
+  addAssignee(assignee: Assignee) {
+    this.store.dispatch(new AddAssigneesAction([assignee]));
   }
 
   clearAssignees() {
     this.store.dispatch(new ClearAssigneesAction());
   }
 
+  // TODO remove this it is just POC
   tmpUpdateAssignee(assignee: Assignee) {
     this.store.dispatch(new TmpModifyAssigneeAction(assignee));
   }
