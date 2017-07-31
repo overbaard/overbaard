@@ -11,19 +11,10 @@ const reducers = {
   assignees: assignee.reducer,
 };
 
-
-// TODO - add some tools
-// const developmentReducer: ActionReducer<AssigneeState> = compose(combineReducers)(reducers);
-const productionReducer: ActionReducer<AppState> = combineReducers(reducers);
+const reducerInstance: ActionReducer<AppState> = combineReducers(reducers);
 
 export function reducer(state: any, action: any) {
-  // TODO
-  /*if (environment.production) {
-    return productionReducer(state, action);
-  } else {
-    return developmentReducer(state, action);
-  }*/
-  return productionReducer(state, action);
+  return reducerInstance(state, action);
 }
 
 

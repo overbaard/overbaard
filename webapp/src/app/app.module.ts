@@ -10,6 +10,9 @@ import {TestStoreComponent} from './components/playpen/test-store.component';
 import {StoreModule} from '@ngrx/store';
 import {AssigneesService} from './common/assignee/assignee.service';
 import {reducer} from './app-store';
+import {StoreDevtoolsModule} from '@ngrx/store-devtools';
+import { environment } from '../environments/environment';
+
 
 @NgModule({
   declarations: [
@@ -22,7 +25,8 @@ import {reducer} from './app-store';
     HttpModule,
     ReactiveFormsModule,
     AppRoutingModule,
-    StoreModule.provideStore(reducer)
+    StoreModule.provideStore(reducer),
+    !environment.production ? StoreDevtoolsModule.instrumentOnlyWithExtension() : []
   ],
   providers: [
     {provide: APP_BASE_HREF, useValue: '/'},
