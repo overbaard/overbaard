@@ -6,7 +6,7 @@ import {environment} from '../environments/environment';
 
 export interface AppState {
   assignees: assignee.AssigneeState;
-  issues: issue.IssuesState;
+  issues: issue.IssueState;
 }
 
 const reducers = {

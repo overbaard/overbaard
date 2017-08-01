@@ -53,12 +53,12 @@ export class TestStoreComponent implements OnInit, OnDestroy {
   }
 
   saveAssignee(form: any) {
-    this.assigneesService.addAssignee(AssigneeFactory.fromJS({
+    this.assigneesService.addAssignees([AssigneeFactory.fromJS({
       key: 'k' + ++this.id,
       name: form['name'],
       email: 'x@example.com',
       avatar: 'blah'
-    }));
+    })]);
   }
 
   reverseName(event: MouseEvent, assignee: Assignee): boolean {

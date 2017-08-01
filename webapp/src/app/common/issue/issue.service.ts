@@ -5,18 +5,19 @@ import {BoardIssue, IssueFactory} from './issue.model';
 import * as Immutable from 'immutable';
 import {Assignee} from '../assignee/assignee.model';
 import {assigneesSelector} from '../assignee/assignee.service';
+import {createSelector} from 'reselect';
 
 
-const DESERIALIZE_ISSUES = 'ADD_ASSIGNEES';
+const DESERIALIZE_INITIAL_ISSUES = 'ADD_ASSIGNEES';
 
 class DeserializeIssuesAction implements Action {
-  readonly type = DESERIALIZE_ISSUES;
+  readonly type = DESERIALIZE_INITIAL_ISSUES;
 
   constructor(readonly payload: BoardIssue[]) {
   }
 }
 
-export interface IssuesState {
+export interface IssueState {
   issues: Immutable.OrderedMap<string, BoardIssue>;
 }
 
@@ -24,10 +25,10 @@ const initialState = {
   issues: Immutable.OrderedMap<string, BoardIssue>()
 };
 
-export function reducer(state: IssuesState = initialState, action: Action): IssuesState {
+export function reducer(state: IssueState = initialState, action: Action): IssueState {
 
   switch (action.type) {
-    case DESERIALIZE_ISSUES: {
+    case DESERIALIZE_INITIAL_ISSUES: {
       const payload: BoardIssue[] = (<DeserializeIssuesAction>action).payload;
       let issues = state.issues;
       issues = issues.withMutations(mutable => {
@@ -43,6 +44,10 @@ export function reducer(state: IssuesState = initialState, action: Action): Issu
       return state;
   }
 };
+
+const getIssuesState = (state: AppState) => state.issues;
+const getIssues = (state: IssueState) => state.issues;
+export const issuesSelector = createSelector(getIssuesState, getIssues);
 
 
 @Injectable()
