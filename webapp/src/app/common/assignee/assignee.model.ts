@@ -18,9 +18,6 @@ const DEFAULT: Assignee = {
   initials: null
 };
 
-/*
- make the factory to enable the generation of animal records
- */
 const TYPED_FACTORY = makeTypedFactory<Assignee, AssigneeRecord>(DEFAULT);
 
 export const NO_ASSIGNEE: Assignee = TYPED_FACTORY({

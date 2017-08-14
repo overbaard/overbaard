@@ -1,8 +1,8 @@
-import {async, fakeAsync, getTestBed, inject, TestBed, tick} from '@angular/core/testing';
-import {AssigneeRecord, Assignee, AssigneeFactory} from './assignee.model';
+import {async, getTestBed, TestBed} from '@angular/core/testing';
+import {Assignee} from './assignee.model';
 import {AssigneesService} from './assignee.service';
-import {Store, StoreModule} from '@ngrx/store';
-import {AppState, reducer} from '../../app-store';
+import {StoreModule} from '@ngrx/store';
+import {reducer} from '../../app-store';
 import * as Immutable from 'immutable';
 
 describe('Assignee service tests', () => {
@@ -34,7 +34,7 @@ describe('Assignee service tests', () => {
 
     service.getAssignees().subscribe(
       map => {
-        assignees = map;});
+        assignees = map; });
 
     expect(assignees.size).toEqual(0);
     service.deserializeInitialAssignees(input);

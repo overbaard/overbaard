@@ -30,9 +30,6 @@ const DEFAULT_LINKED_ISSUE: Issue = {
   summary: null
 };
 
-/*
- make the factory to enable the generation of animal records
- */
 const ISSUE_TYPED_FACTORY = makeTypedFactory<BoardIssue, BoardIssueRecord>(DEFAULT_ISSUE);
 const LINKED_ISSUE_TYPED_FACTORY = makeTypedFactory<Issue, LinkedIssueRecord>(DEFAULT_LINKED_ISSUE);
 
