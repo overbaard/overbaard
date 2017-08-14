@@ -1,36 +1,38 @@
 import {async, getTestBed, TestBed} from '@angular/core/testing';
 import {Assignee} from './assignee.model';
-import {AssigneesService} from './assignee.service';
+import {AssigneeService} from './assignee.service';
 import {StoreModule} from '@ngrx/store';
 import {reducer} from '../../app-store';
 import * as Immutable from 'immutable';
 
+export const ASSIGNEES_INPUT: any = [
+  {
+    key: 'bob',
+    name: 'Bob Brent Barlow',
+    email: 'bob@example.com',
+    avatar: 'https://example.com/bob.png'
+  },
+  {
+    key: 'kabir',
+    name: 'Kabir Khan',
+    email: 'kabir@example.com',
+    avatar: 'https://example.com/kabir.png'
+  }
+];
+
 describe('Assignee service tests', () => {
-  let service: AssigneesService;
+  let service: AssigneeService;
   let assignees: Immutable.OrderedMap<string, Assignee>;
   beforeEach(async(() => {
-    const input = [
-      {
-        key: 'bob',
-        name: 'Bob Brent Barlow',
-        email: 'bob@example.com',
-        avatar: 'https://example.com/bob.png'
-      },
-      {
-        key: 'kabir',
-        name: 'Kabir Khan',
-        email: 'kabir@example.com',
-        avatar: 'https://example.com/kabir.png'
-      }
-    ];
+    const input = ASSIGNEES_INPUT;
 
     TestBed.configureTestingModule({
       imports: [StoreModule.provideStore(reducer)],
-      providers: [AssigneesService]
+      providers: [AssigneeService]
     });
 
     const testBed = getTestBed();
-    service = testBed.get(AssigneesService);
+    service = testBed.get(AssigneeService);
 
     service.getAssignees().subscribe(
       map => {

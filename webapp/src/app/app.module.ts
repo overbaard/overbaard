@@ -8,7 +8,7 @@ import {AppComponent} from './app.component';
 import {APP_BASE_HREF, HashLocationStrategy, LocationStrategy} from '@angular/common';
 import {TestStoreComponent} from './components/playpen/test-store.component';
 import {StoreModule} from '@ngrx/store';
-import {AssigneesService} from './common/assignee/assignee.service';
+import {AssigneeService} from './common/assignee/assignee.service';
 import {reducer} from './app-store';
 import {StoreDevtoolsModule} from '@ngrx/store-devtools';
 import { environment } from '../environments/environment';
@@ -31,7 +31,7 @@ import { environment } from '../environments/environment';
   providers: [
     {provide: APP_BASE_HREF, useValue: '/'},
     {provide: LocationStrategy, useClass: HashLocationStrategy},
-    AssigneesService
+    AssigneeService
   ],
   bootstrap: [AppComponent]
 })

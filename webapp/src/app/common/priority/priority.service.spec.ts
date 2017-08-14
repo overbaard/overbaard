@@ -5,20 +5,22 @@ import * as Immutable from 'immutable';
 import {Priority} from './priority.model';
 import {PriorityService} from './priority.service';
 
+export const PRIORITIES_INPUT = [
+  {
+    name: 'Blocker',
+    icon: '/priorities/blocker.png'
+  },
+  {
+    name: 'Major',
+    icon: '/priorities/major.png'
+  }
+];
+
 describe('Priority service tests', () => {
   let service: PriorityService;
   let priorities: Immutable.OrderedMap<string, Priority>;
   beforeEach(async(() => {
-    const input = [
-      {
-        name: 'Blocker',
-        icon: '/priorities/blocker.png'
-      },
-      {
-        name: 'Major',
-        icon: '/priorities/major.png'
-      }
-    ];
+    const input = PRIORITIES_INPUT;
 
     TestBed.configureTestingModule({
       imports: [StoreModule.provideStore(reducer)],

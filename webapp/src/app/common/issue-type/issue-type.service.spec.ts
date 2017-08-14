@@ -5,20 +5,22 @@ import * as Immutable from 'immutable';
 import {IssueType} from './issue-type.model';
 import {IssueTypeService} from './issue-type.service';
 
+export const ISSUE_TYPES_INPUT = [
+  {
+    name: 'task',
+    icon: '/types/task.png'
+  },
+  {
+    name: 'bug',
+    icon: '/types/bug.png'
+  }
+];
+
 describe('Issue Type service tests', () => {
   let service: IssueTypeService;
   let issueTypes: Immutable.OrderedMap<string, IssueType>;
   beforeEach(async(() => {
-    const input = [
-      {
-        name: 'task',
-        icon: '/types/task.png'
-      },
-      {
-        name: 'bug',
-        icon: '/types/bug.png'
-      }
-    ];
+    const input = ISSUE_TYPES_INPUT;
 
     TestBed.configureTestingModule({
       imports: [StoreModule.provideStore(reducer)],

@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {AssigneesService} from '../../common/assignee/assignee.service';
+import {AssigneeService} from '../../common/assignee/assignee.service';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import {Assignee, AssigneeFactory, AssigneeUpdater} from '../../common/assignee/assignee.model';
@@ -17,7 +17,7 @@ export class TestStoreComponent implements OnInit, OnDestroy {
 
   private assignees: Observable<Assignee[]>;
   private assigneeSubscriptions: Map<string, Subscription> = new Map<string, Subscription>();
-  constructor(private assigneesService: AssigneesService) {
+  constructor(private assigneesService: AssigneeService) {
     this.assignees = assigneesService.getAssignees()
       .map((value) => {
         return value.toArray();

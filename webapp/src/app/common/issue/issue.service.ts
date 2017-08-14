@@ -9,9 +9,11 @@ import {createSelector} from 'reselect';
 import {issuesTypesSelector} from '../issue-type/issue-type.service';
 import {IssueType} from '../issue-type/issue-type.model';
 import {prioritiesSelector} from '../priority/priority.service';
+import {Observable} from 'rxjs/Observable';
+import {Priority} from '../priority/priority.model';
 
 
-const DESERIALIZE_INITIAL_ISSUES = 'ADD_ASSIGNEES';
+const DESERIALIZE_INITIAL_ISSUES = 'DESERIALIZE_INITIAL_ISSUES';
 
 class DeserializeIssuesAction implements Action {
   readonly type = DESERIALIZE_INITIAL_ISSUES;
@@ -21,11 +23,11 @@ class DeserializeIssuesAction implements Action {
 }
 
 export interface IssueState {
-  issues: Immutable.OrderedMap<string, BoardIssue>;
+  issues: Immutable.Map<string, BoardIssue>;
 }
 
 const initialState = {
-  issues: Immutable.OrderedMap<string, BoardIssue>()
+  issues: Immutable.Map<string, BoardIssue>()
 };
 
 export function reducer(state: IssueState = initialState, action: Action): IssueState {
@@ -59,6 +61,10 @@ export class IssueService {
   constructor(private store: Store<AppState>) {
   }
 
+  getIssues(): Observable<Immutable.Map<string, BoardIssue>> {
+    return this.store.select(issuesSelector);
+  }
+
   deserializeIssues(input: any) {
     let assignees: Assignee[];
     this.store.select(assigneesSelector).subscribe(
@@ -68,7 +74,7 @@ export class IssueService {
     this.store.select(issuesTypesSelector).subscribe(
       map => {issueTypes = map.toArray(); }
     );
-    let priorities: IssueType[];
+    let priorities: Priority[];
     this.store.select(prioritiesSelector).subscribe(
       map => {priorities = map.toArray(); }
     );

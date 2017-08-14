@@ -89,7 +89,7 @@ export const assigneesSelector = createSelector(getAssigneesState, getAssignees)
 const makeAssigneeSelector = (key: string) => createSelector(assigneesSelector, (assignees) => assignees.get(key));
 
 @Injectable()
-export class AssigneesService {
+export class AssigneeService {
   constructor(private store: Store<AppState>) {
   }
 

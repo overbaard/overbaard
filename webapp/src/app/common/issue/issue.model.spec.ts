@@ -131,7 +131,7 @@ describe('Issue unit tests', () => {
   });
 });
 
-class IssueChecker {
+export class IssueChecker {
   private _issue: BoardIssue;
   private _key: string;
   private _type: IssueType;
