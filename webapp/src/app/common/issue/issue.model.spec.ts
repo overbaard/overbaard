@@ -1,15 +1,21 @@
 import {BoardIssue, Issue, IssueFactory} from './issue.model';
 import {Assignee, AssigneeFactory, NO_ASSIGNEE} from '../assignee/assignee.model';
+import {Priority, PriorityFactory} from '../priority/priority.model';
+import {IssueType, IssueTypeFactory} from '../issue-type/issue-type.model';
 
 describe('Issue unit tests', () => {
 
   describe('Deserialize', () => {
     let input: any;
     let assignees: Assignee[];
+    let priorities: Priority[];
+    let issueTypes: IssueType[];
 
     beforeEach(() => {
       input = {
         key: 'ISSUE-1',
+        type: 0,
+        priority: 0,
         summary: 'Issue summary',
         assignee: 0,
         'linked-issues' : [
@@ -38,11 +44,35 @@ describe('Issue unit tests', () => {
           avatar : 'https://example.com/userB.png',
           name : 'userB Jones'
         }));
+
+      priorities = [];
+      priorities.push(PriorityFactory.fromJS(
+        {
+          name: 'Blocker',
+          icon: '/priorities/blocker.png'
+        }));
+      priorities.push(PriorityFactory.fromJS(
+        {
+          name: 'Major',
+          icon: '/priorities/major.png'
+        }));
+
+      issueTypes = [];
+      issueTypes.push(IssueTypeFactory.fromJS(
+        {
+          name : 'Task',
+          icon : 'https://example.com/task.png'
+        }));
+      issueTypes.push(IssueTypeFactory.fromJS(
+        {
+          name : 'Blocker',
+          icon : 'https://example.com/blocker.png'
+        }));
     });
 
     it('Full record', () => {
-      const issue: BoardIssue = IssueFactory.fromJS(input, assignees);
-      new IssueChecker(issue, assignees[0], 'Issue summary')
+      const issue: BoardIssue = IssueFactory.fromJS(input, assignees, priorities, issueTypes);
+      new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
         .key('ISSUE-1')
         .addLinkedIssue('LNK-1', 'Linked 1')
         .addLinkedIssue('LNK-2', 'Linked 2')
@@ -51,27 +81,51 @@ describe('Issue unit tests', () => {
 
     it('Assignee > 0', () => {
       input['assignee'] = 1;
-      const issue: BoardIssue = IssueFactory.fromJS(input, assignees);
-      expect(issue.assignee).toBe(assignees[1]);
+      const issue: BoardIssue = IssueFactory.fromJS(input, assignees, priorities, issueTypes);
+      new IssueChecker(issue, issueTypes[0], priorities[0], assignees[1], 'Issue summary')
+        .key('ISSUE-1')
+        .addLinkedIssue('LNK-1', 'Linked 1')
+        .addLinkedIssue('LNK-2', 'Linked 2')
+        .check();
+    });
+
+    it ('Priority > 0', () => {
+      input['priority'] = 1;
+      const issue: BoardIssue = IssueFactory.fromJS(input, assignees, priorities, issueTypes);
+      new IssueChecker(issue, issueTypes[0], priorities[1], assignees[0], 'Issue summary')
+        .key('ISSUE-1')
+        .addLinkedIssue('LNK-1', 'Linked 1')
+        .addLinkedIssue('LNK-2', 'Linked 2')
+        .check();
+    });
+
+    it ('Type > 0', () => {
+      input['type'] = 1;
+      const issue: BoardIssue = IssueFactory.fromJS(input, assignees, priorities, issueTypes);
+      new IssueChecker(issue, issueTypes[1], priorities[0], assignees[0], 'Issue summary')
+        .key('ISSUE-1')
+        .addLinkedIssue('LNK-1', 'Linked 1')
+        .addLinkedIssue('LNK-2', 'Linked 2')
+        .check();
     });
 
     it ('No assignee', () => {
       delete input['assignee'];
-      const issue: BoardIssue = IssueFactory.fromJS(input, assignees);
-      expect(issue.assignee).toBe(NO_ASSIGNEE);
+      const issue: BoardIssue = IssueFactory.fromJS(input, assignees, priorities, issueTypes);
+      new IssueChecker(issue, issueTypes[0], priorities[0], NO_ASSIGNEE, 'Issue summary')
+        .key('ISSUE-1')
+        .addLinkedIssue('LNK-1', 'Linked 1')
+        .addLinkedIssue('LNK-2', 'Linked 2')
+        .check();
     });
 
 
     it('No linked issues', () => {
       delete input['linked-issues'];
-      const issue: BoardIssue = IssueFactory.fromJS(input, assignees);
-      console.log('read record');
-      expect(issue.key).toEqual('ISSUE-1');
-      expect(issue.summary).toEqual('Issue summary');
-      // TODO assignee from registry
-
-      expect(issue.linkedIssues).toBeTruthy();
-      expect(issue.linkedIssues.size).toEqual(0);
+      const issue: BoardIssue = IssueFactory.fromJS(input, assignees, priorities, issueTypes);
+      new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
+        .key('ISSUE-1')
+        .check();
     });
 
   });
@@ -80,9 +134,9 @@ describe('Issue unit tests', () => {
 class IssueChecker {
   private _issue: BoardIssue;
   private _key: string;
-  // private _type: string;
-  // private _priority: string;
-  private _assignee: string | Assignee;
+  private _type: IssueType;
+  private _priority: Priority;
+  private _assignee: Assignee;
   private _summary: string;
   private _linkedIssues: LinkedIssueChecker[];
   // private _components: string[];
@@ -93,11 +147,11 @@ class IssueChecker {
 
 
 
-  constructor(issue: BoardIssue/*, type: string, priority: string*/, assignee: string | Assignee, summary: string) {
+  constructor(issue: BoardIssue, type: IssueType, priority: Priority, assignee: Assignee, summary: string) {
     this._issue = issue;
     this._key = issue.key;
-    // this._type = type;
-    // this._priority = priority;
+    this._type = type;
+    this._priority = priority;
     this._assignee = assignee;
     this._summary = summary;
   }
@@ -145,17 +199,14 @@ class IssueChecker {
   */
   check() {
     expect(this._issue.key).toEqual(this._key);
-    // DataChecker.checkIssueType(this._issue.type, this._type);
-    // DataChecker.checkPriority(this._issue.priority, this._priority);
     if (this._assignee) {
-      if (typeof this._assignee === 'string') {
-        DataChecker.checkAssignee(this._issue.assignee, <string>this._assignee);
-      } else {
-        expect(this._issue.assignee).toBe(this._assignee);
-      }
+      expect(this._issue.assignee).toBe(this._assignee);
     } else {
       expect(this._issue.assignee).not.toEqual(jasmine.anything());
     }
+
+    expect(this._issue.priority).toBe(this._priority);
+    expect(this._issue.type).toBe(this._type);
 
     /*
     if (this._components) {
@@ -234,24 +285,6 @@ class IssueChecker {
   */
 }
 
-class DataChecker {
-  static checkAssignee(assignee: Assignee, key: string) {
-    expect(assignee.key).toEqual(key);
-    expect(assignee.avatar).toEqual('https://example.com/' + key + '.png');
-    expect(assignee.email).toEqual(key + '@example.com');
-    expect(assignee.name.toLowerCase()).toContain(key.toLowerCase());
-  }
-
-/*  static checkPriority(priority:Priority, name:string) {
-    expect(priority.name).toEqual(name);
-    expect(priority.icon).toEqual("/icons/priorities/" + name + ".png");
-  }
-
-  static checkIssueType(type:IssueType, name:string) {
-    expect(type.name).toEqual(name);
-    expect(type.icon).toEqual("/icons/issue-types/" + name + ".png");
-  }*/
-}
 
 class LinkedIssueChecker {
   private _key: string;

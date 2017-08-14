@@ -1,6 +1,8 @@
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {Assignee, NO_ASSIGNEE} from '../assignee/assignee.model';
 import * as Immutable from 'immutable';
+import {Priority} from '../priority/priority.model';
+import {IssueType} from '../issue-type/issue-type.model';
 
 export interface BoardIssueRecord extends TypedRecord<BoardIssueRecord>, BoardIssue {
 }
@@ -15,11 +17,15 @@ export interface Issue {
 
 export interface BoardIssue extends Issue {
   assignee: Assignee;
+  priority: Priority;
+  type: IssueType;
   linkedIssues: Immutable.List<Issue>;
 }
 
 const DEFAULT_ISSUE: BoardIssue = {
   key: null,
+  priority: null,
+  type: null,
   summary: null,
   assignee: null,
   linkedIssues: Immutable.List<Issue>()
@@ -35,7 +41,7 @@ const LINKED_ISSUE_TYPED_FACTORY = makeTypedFactory<Issue, LinkedIssueRecord>(DE
 
 export class IssueFactory {
 
-  static fromJS(input: any, assignees: Assignee[]): BoardIssue {
+  static fromJS(input: any, assignees: Assignee[], priorities: Priority[], issueTypes: IssueType[]): BoardIssue {
     // Rework the data as needed before deserializing
     if (input['linked-issues']) {
       input['linkedIssues'] = input['linked-issues'];
@@ -47,6 +53,10 @@ export class IssueFactory {
     } else {
       input['assignee'] = NO_ASSIGNEE;
     }
+
+    // priority and issue-type will never be null
+    input['priority'] = priorities[input['priority']];
+    input['type'] = issueTypes[input['type']];
 
     const temp: any = Immutable.fromJS(input, (key, value) => {
       if (key === 'linkedIssues') {

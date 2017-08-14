@@ -6,6 +6,9 @@ import * as Immutable from 'immutable';
 import {Assignee} from '../assignee/assignee.model';
 import {assigneesSelector} from '../assignee/assignee.service';
 import {createSelector} from 'reselect';
+import {issuesTypesSelector} from '../issue-type/issue-type.service';
+import {IssueType} from '../issue-type/issue-type.model';
+import {prioritiesSelector} from '../priority/priority.service';
 
 
 const DESERIALIZE_INITIAL_ISSUES = 'ADD_ASSIGNEES';
@@ -59,13 +62,21 @@ export class IssueService {
   deserializeIssues(input: any) {
     let assignees: Assignee[];
     this.store.select(assigneesSelector).subscribe(
-      assigneeMap => {assignees = assigneeMap.toArray(); }
+      map => {assignees = map.toArray(); }
+    );
+    let issueTypes: IssueType[];
+    this.store.select(issuesTypesSelector).subscribe(
+      map => {issueTypes = map.toArray(); }
+    );
+    let priorities: IssueType[];
+    this.store.select(prioritiesSelector).subscribe(
+      map => {priorities = map.toArray(); }
     );
 
     const inputArray: any[] = input ? input : [];
     const issues = new Array<BoardIssue>(inputArray.length);
     inputArray.forEach((issue, i) => {
-      issues[i] = IssueFactory.fromJS(issue, assignees);
+      issues[i] = IssueFactory.fromJS(issue, assignees, priorities, issueTypes);
     });
 
 
