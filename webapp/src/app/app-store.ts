@@ -1,4 +1,4 @@
-import * as board from './common/board/board.service';
+import * as board from './common/board/board.reducer';
 import {ActionReducer, combineReducers} from '@ngrx/store';
 
 export interface AppState {

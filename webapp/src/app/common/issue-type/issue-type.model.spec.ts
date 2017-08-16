@@ -1,4 +1,3 @@
-
 import {IssueType, IssueTypeFactory} from './issue-type.model';
 
 describe('Issue Type unit tests', () => {

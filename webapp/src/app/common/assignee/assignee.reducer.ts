@@ -1,7 +1,5 @@
-import {Action, Store} from '@ngrx/store';
+import {Action} from '@ngrx/store';
 import {Assignee, AssigneeFactory} from './assignee.model';
-import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
 import {AppState} from '../../app-store';
 import {createSelector} from 'reselect';
 import * as Immutable from 'immutable';
@@ -37,24 +35,45 @@ class TmpModifyAssigneeAction implements Action {
   constructor(readonly payload: Assignee) {
   }
 }
+
+export class AssigneeActions {
+  static createAddInitialAssignees(input: any): Action {
+    return new AddInitialAssignees(this.deserialize(input));
+  }
+
+  static createAddAssignees(input: any): Action {
+    return new AddAssigneesAction(this.deserialize(input));
+  }
+
+  private static deserialize(input: any) {
+    const inputArray: any[] = input ? input : [];
+    const assignees = new Array<Assignee>(inputArray.length);
+    inputArray.forEach((a, i) => {
+      assignees[i] = AssigneeFactory.fromJS(a);
+    });
+    return assignees;
+  }
+}
+
+
 export interface AssigneeState {
   assignees: Immutable.OrderedMap<string, Assignee>;
 }
 
-export const initialState = {
+export const initialAssigneeState = {
   assignees: Immutable.OrderedMap<string, Assignee>()
 };
 
-export function reducer(state: AssigneeState = initialState, action: Action): AssigneeState {
+export function assigneeReducer(state: AssigneeState = initialAssigneeState, action: Action): AssigneeState {
 
   switch (action.type) {
     case ADD_INITAL_ASSIGNEES:
-      return addAssignees(initialState, (<AddInitialAssignees>action).payload);
+      return addAssignees(initialAssigneeState, (<AddInitialAssignees>action).payload);
     case ADD_ASSIGNEES: {
       return addAssignees(state, (<AddAssigneesAction>action).payload);
     }
     case CLEAR_ASSIGNEES: {
-      return initialState;
+      return initialAssigneeState;
     }
     case TMP_MODIFY_ASSIGNEE: {
       const assignee: Assignee = (<TmpModifyAssigneeAction>action).payload;
@@ -80,71 +99,8 @@ function addAssignees(state: AssigneeState, added: Assignee[]): AssigneeState {
   return {
     assignees: assignees
   };
-
 }
 
 const getAssigneesState = (state: AppState) => state.board.assignees;
 const getAssignees = (state: AssigneeState) => state.assignees;
 export const assigneesSelector = createSelector(getAssigneesState, getAssignees);
-const makeAssigneeSelector = (key: string) => createSelector(assigneesSelector, (assignees) => assignees.get(key));
-
-@Injectable()
-export class AssigneeService {
-  constructor(private store: Store<AppState>) {
-  }
-
-  getAssigneesState(): Observable<AssigneeState> {
-    return this.store.select(getAssigneesState);
-  }
-
-  getAssignees(): Observable<Immutable.OrderedMap<string, Assignee>> {
-    return this.store.select(assigneesSelector);
-  }
-
-  // TODO remove this it is just POC
-  getAssignee(key: string): Observable<Assignee> {
-    // Taken from https://medium.com/@parkerdan/react-reselect-and-redux-b34017f8194c and https://github.com/reactjs/reselect/issues/18
-    return this.store.select(makeAssigneeSelector(key));
-  }
-
-  /**
-   * Call when populating a new board
-   *
-   * @param input
-   */
-  deserializeInitialAssignees(input: any) {
-    this.store.dispatch(new AddInitialAssignees(this.deserialize(input)));
-  }
-
-  /**
-   * Call when adding assigness to a board from the server changes
-   * @param input
-   */
-  deserializeAddedAssignees(input: any) {
-    this.store.dispatch(new AddAssigneesAction(this.deserialize(input)));
-  }
-
-  private deserialize(input: any) {
-    const inputArray: any[] = input ? input : [];
-    const assignees = new Array<Assignee>(inputArray.length);
-    inputArray.forEach((a, i) => {
-      assignees[i] = AssigneeFactory.fromJS(a);
-    });
-    return assignees;
-  }
-
-  //
-  addAssignees(assignees: Assignee[]) {
-    this.store.dispatch(new AddAssigneesAction(assignees));
-  }
-
-  clearAssignees() {
-    this.store.dispatch(new ClearAssigneesAction());
-  }
-
-  // TODO remove this it is just POC
-  tmpUpdateAssignee(assignee: Assignee) {
-    this.store.dispatch(new TmpModifyAssigneeAction(assignee));
-  }
-
-}

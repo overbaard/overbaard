@@ -1,10 +1,8 @@
-import {Injectable} from '@angular/core';
 import {AppState} from '../../app-store';
-import {Action, Store} from '@ngrx/store';
+import {Action} from '@ngrx/store';
 import {IssueType, IssueTypeFactory} from './issue-type.model';
 import * as Immutable from 'immutable';
 import {createSelector} from 'reselect';
-import {Observable} from 'rxjs/Observable';
 
 
 const DESERIALIZE_ALL_ISSUE_TYPES = 'DESERIALIZE_ALL_ISSUE_TYPES';
@@ -16,15 +14,27 @@ class DeserializeIssueTypesAction implements Action {
   }
 }
 
+export class IssueTypeActions {
+  static createDeserializeIssueTypes(input: any): Action {
+    const inputArray: any[] = input ? input : [];
+    const issueTypes = new Array<IssueType>(inputArray.length);
+    inputArray.forEach((type, i) => {
+      issueTypes[i] = IssueTypeFactory.fromJS(type);
+    });
+
+    return new DeserializeIssueTypesAction(issueTypes);
+  }
+}
+
 export interface IssueTypeState {
   types: Immutable.OrderedMap<string, IssueType>;
 }
 
-export const initialState = {
+export const initialIssueTypeState = {
   types: Immutable.OrderedMap<string, IssueType>()
 };
 
-export function reducer(state: IssueTypeState = initialState, action: Action): IssueTypeState {
+export function issueTypeReducer(state: IssueTypeState = initialIssueTypeState, action: Action): IssueTypeState {
 
   switch (action.type) {
     case DESERIALIZE_ALL_ISSUE_TYPES: {
@@ -47,27 +57,4 @@ export function reducer(state: IssueTypeState = initialState, action: Action): I
 const getIssueTypesState = (state: AppState) => state.board.issueTypes;
 const getTypes = (state: IssueTypeState) => state.types;
 export const issuesTypesSelector = createSelector(getIssueTypesState, getTypes);
-
-
-@Injectable()
-export class IssueTypeService {
-
-  constructor(private store: Store<AppState>) {
-  }
-
-  getIssueTypes(): Observable<Immutable.OrderedMap<string, IssueType>> {
-    return this.store.select(issuesTypesSelector);
-  }
-
-  deserializeIssueTypes(input: any) {
-    const inputArray: any[] = input ? input : [];
-    const issueTypes = new Array<IssueType>(inputArray.length);
-    inputArray.forEach((type, i) => {
-      issueTypes[i] = IssueTypeFactory.fromJS(type);
-    });
-
-
-    this.store.dispatch(new DeserializeIssueTypesAction(issueTypes));
-  }
-}
 

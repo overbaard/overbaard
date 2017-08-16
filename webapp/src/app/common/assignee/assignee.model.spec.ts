@@ -1,5 +1,4 @@
-import {async} from '@angular/core/testing';
-import {AssigneeRecord, Assignee, AssigneeFactory} from './assignee.model';
+import {Assignee, AssigneeFactory} from './assignee.model';
 
 describe('Assignee unit tests', () => {
 

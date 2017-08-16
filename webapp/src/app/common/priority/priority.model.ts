@@ -1,6 +1,4 @@
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
-import {Assignee, NO_ASSIGNEE} from '../assignee/assignee.model';
-import * as Immutable from 'immutable';
 
 export interface PriorityRecord extends TypedRecord<PriorityRecord>, Priority {
 }

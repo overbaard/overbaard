@@ -1,10 +1,8 @@
-import {Injectable} from '@angular/core';
 import {AppState} from '../../app-store';
-import {Action, Store} from '@ngrx/store';
+import {Action} from '@ngrx/store';
 import {Priority, PriorityFactory} from './priority.model';
 import * as Immutable from 'immutable';
 import {createSelector} from 'reselect';
-import {Observable} from 'rxjs/Observable';
 
 
 const DESERIALIZE_ALL_PRIORITIES = 'DESERIALIZE_ALL_PRIORITIES';
@@ -16,15 +14,27 @@ class DeserializePrioritiesAction implements Action {
   }
 }
 
+export class PriorityActions {
+  static createDeserializePriorities(input: any): Action {
+    const inputArray: any[] = input ? input : [];
+    const priorities = new Array<Priority>(inputArray.length);
+    inputArray.forEach((type, i) => {
+      priorities[i] = PriorityFactory.fromJS(type);
+    });
+
+    return new DeserializePrioritiesAction(priorities);
+  }
+}
+
 export interface PriorityState {
   priorities: Immutable.OrderedMap<string, Priority>;
 }
 
-export const initialState = {
+export const initialPriorityState = {
   priorities: Immutable.OrderedMap<string, Priority>()
 };
 
-export function reducer(state: PriorityState = initialState, action: Action): PriorityState {
+export function priorityReducer(state: PriorityState = initialPriorityState, action: Action): PriorityState {
 
   switch (action.type) {
     case DESERIALIZE_ALL_PRIORITIES: {
@@ -47,27 +57,3 @@ export function reducer(state: PriorityState = initialState, action: Action): Pr
 const getPrioritiesState = (state: AppState) => state.board.priorities;
 const getPriorities = (state: PriorityState) => state.priorities;
 export const prioritiesSelector = createSelector(getPrioritiesState, getPriorities);
-
-
-@Injectable()
-export class PriorityService {
-
-  constructor(private store: Store<AppState>) {
-  }
-
-  getPriorities(): Observable<Immutable.OrderedMap<string, Priority>> {
-    return this.store.select(prioritiesSelector);
-  }
-
-  deserializePriorities(input: any) {
-    const inputArray: any[] = input ? input : [];
-    const priorities = new Array<Priority>(inputArray.length);
-    inputArray.forEach((type, i) => {
-      priorities[i] = PriorityFactory.fromJS(type);
-    });
-
-
-    this.store.dispatch(new DeserializePrioritiesAction(priorities));
-  }
-}
-
