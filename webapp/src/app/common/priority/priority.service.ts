@@ -20,7 +20,7 @@ export interface PriorityState {
   priorities: Immutable.OrderedMap<string, Priority>;
 }
 
-const initialState = {
+export const initialState = {
   priorities: Immutable.OrderedMap<string, Priority>()
 };
 
@@ -44,7 +44,7 @@ export function reducer(state: PriorityState = initialState, action: Action): Pr
   }
 };
 
-const getPrioritiesState = (state: AppState) => state.priorities;
+const getPrioritiesState = (state: AppState) => state.board.priorities;
 const getPriorities = (state: PriorityState) => state.priorities;
 export const prioritiesSelector = createSelector(getPrioritiesState, getPriorities);
 

@@ -26,7 +26,7 @@ export interface IssueState {
   issues: Immutable.Map<string, BoardIssue>;
 }
 
-const initialState = {
+export const initialState = {
   issues: Immutable.Map<string, BoardIssue>()
 };
 
@@ -50,7 +50,7 @@ export function reducer(state: IssueState = initialState, action: Action): Issue
   }
 };
 
-const getIssuesState = (state: AppState) => state.issues;
+const getIssuesState = (state: AppState) => state.board.issues;
 const getIssues = (state: IssueState) => state.issues;
 export const issuesSelector = createSelector(getIssuesState, getIssues);
 

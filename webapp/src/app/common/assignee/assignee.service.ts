@@ -41,7 +41,7 @@ export interface AssigneeState {
   assignees: Immutable.OrderedMap<string, Assignee>;
 }
 
-const initialState = {
+export const initialState = {
   assignees: Immutable.OrderedMap<string, Assignee>()
 };
 
@@ -83,7 +83,7 @@ function addAssignees(state: AssigneeState, added: Assignee[]): AssigneeState {
 
 }
 
-const getAssigneesState = (state: AppState) => state.assignees;
+const getAssigneesState = (state: AppState) => state.board.assignees;
 const getAssignees = (state: AssigneeState) => state.assignees;
 export const assigneesSelector = createSelector(getAssigneesState, getAssignees);
 const makeAssigneeSelector = (key: string) => createSelector(assigneesSelector, (assignees) => assignees.get(key));

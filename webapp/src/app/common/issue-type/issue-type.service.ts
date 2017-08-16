@@ -20,7 +20,7 @@ export interface IssueTypeState {
   types: Immutable.OrderedMap<string, IssueType>;
 }
 
-const initialState = {
+export const initialState = {
   types: Immutable.OrderedMap<string, IssueType>()
 };
 
@@ -44,7 +44,7 @@ export function reducer(state: IssueTypeState = initialState, action: Action): I
   }
 };
 
-const getIssueTypesState = (state: AppState) => state.issueTypes;
+const getIssueTypesState = (state: AppState) => state.board.issueTypes;
 const getTypes = (state: IssueTypeState) => state.types;
 export const issuesTypesSelector = createSelector(getIssueTypesState, getTypes);
 

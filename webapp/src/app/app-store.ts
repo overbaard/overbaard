@@ -1,22 +1,12 @@
-import  {Assignee} from './common/assignee/assignee.model';
-import * as assignee from './common/assignee/assignee.service';
-import * as issue from './common/issue/issue.service';
-import * as issueType from './common/issue-type/issue-type.service';
-import * as priority from './common/priority/priority.service';
+import * as board from './common/board/board.service';
 import {ActionReducer, combineReducers} from '@ngrx/store';
 
 export interface AppState {
-  assignees: assignee.AssigneeState;
-  issues: issue.IssueState;
-  issueTypes: issueType.IssueTypeState;
-  priorities: priority.PriorityState;
+  board: board.BoardState;
 }
 
 const reducers = {
-  assignees: assignee.reducer,
-  issues: issue.reducer,
-  issueTypes: issueType.reducer,
-  priorities: priority.reducer
+  board: board.reducer
 };
 
 const reducerInstance: ActionReducer<AppState> = combineReducers(reducers);
