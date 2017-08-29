@@ -6,10 +6,6 @@ import * as Immutable from 'immutable';
 
 const ADD_INITAL_ASSIGNEES = 'ADD_INITIAL_ASSIGNEES';
 const ADD_ASSIGNEES = 'ADD_ASSIGNEES';
-const CLEAR_ASSIGNEES = 'CLEAR_ASSIGNEES';
-// TODO remove this. We should not be modifying assignees, I just want something simple to play with while finding my way around
-const TMP_MODIFY_ASSIGNEE = 'MODIFY_ASSIGNEE';
-
 
 class AddInitialAssignees implements Action {
   readonly type = ADD_INITAL_ASSIGNEES;
@@ -22,17 +18,6 @@ class AddAssigneesAction implements Action {
   readonly type = ADD_ASSIGNEES;
 
   constructor(readonly payload: Assignee[]) {
-  }
-}
-
-class ClearAssigneesAction implements Action {
-  readonly type = CLEAR_ASSIGNEES;
-}
-
-class TmpModifyAssigneeAction implements Action {
-  readonly type = TMP_MODIFY_ASSIGNEE;
-
-  constructor(readonly payload: Assignee) {
   }
 }
 
@@ -71,16 +56,6 @@ export function assigneeReducer(state: AssigneeState = initialAssigneeState, act
       return addAssignees(initialAssigneeState, (<AddInitialAssignees>action).payload);
     case ADD_ASSIGNEES: {
       return addAssignees(state, (<AddAssigneesAction>action).payload);
-    }
-    case CLEAR_ASSIGNEES: {
-      return initialAssigneeState;
-    }
-    case TMP_MODIFY_ASSIGNEE: {
-      const assignee: Assignee = (<TmpModifyAssigneeAction>action).payload;
-      const assignees = state.assignees.set(assignee.key, assignee);
-      return {
-        assignees: assignees
-      };
     }
     default:
       return state;

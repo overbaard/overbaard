@@ -28,7 +28,6 @@ describe('Assignee reducer tests', () => {
 
   it('Deserialize initial state', () => {
     expect(assigneeState.assignees.size).toEqual(2);
-
     const keys: string[] = assigneeState.assignees.keySeq().toArray();
     expect(keys[0]).toEqual('bob');
     expect(keys[1]).toEqual('kabir');
