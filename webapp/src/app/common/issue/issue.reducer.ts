@@ -32,7 +32,7 @@ export interface IssueState {
   issues: Immutable.Map<string, BoardIssue>;
 }
 
-export const initialIssueState = {
+export const initialIssueState: IssueState = {
   issues: Immutable.Map<string, BoardIssue>()
 };
 

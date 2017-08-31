@@ -45,7 +45,7 @@ export interface AssigneeState {
   assignees: Immutable.OrderedMap<string, Assignee>;
 }
 
-export const initialAssigneeState = {
+export const initialAssigneeState: AssigneeState = {
   assignees: Immutable.OrderedMap<string, Assignee>()
 };
 

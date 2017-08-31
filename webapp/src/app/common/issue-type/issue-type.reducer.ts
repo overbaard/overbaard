@@ -30,7 +30,7 @@ export interface IssueTypeState {
   types: Immutable.OrderedMap<string, IssueType>;
 }
 
-export const initialIssueTypeState = {
+export const initialIssueTypeState: IssueTypeState = {
   types: Immutable.OrderedMap<string, IssueType>()
 };
 

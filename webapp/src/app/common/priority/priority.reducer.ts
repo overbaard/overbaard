@@ -30,7 +30,7 @@ export interface PriorityState {
   priorities: Immutable.OrderedMap<string, Priority>;
 }
 
-export const initialPriorityState = {
+export const initialPriorityState: PriorityState = {
   priorities: Immutable.OrderedMap<string, Priority>()
 };
 

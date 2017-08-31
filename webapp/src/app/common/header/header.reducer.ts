@@ -154,7 +154,7 @@ export interface HeaderState {
   headers: List<List<Header>>;
 }
 
-export const initialHeaderState = {
+export const initialHeaderState: HeaderState = {
   headers: List<List<Header>>().push(List<Header>())
 };
 
