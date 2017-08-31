@@ -9,10 +9,12 @@ import {
 import {initialIssueState, issueReducer, IssueState} from '../issue/issue.reducer';
 import {AssigneeActions, assigneeReducer, AssigneeState, initialAssigneeState} from '../assignee/assignee.reducer';
 import {initialPriorityState, PriorityActions, priorityReducer, PriorityState} from '../priority/priority.reducer';
+import {HeaderActions, headerReducer, HeaderState, initialHeaderState} from '../header/header.reducer';
 
 export interface BoardState {
   viewId: number;
   rankCustomFieldId: number;
+  headers: HeaderState;
   assignees: AssigneeState;
   issueTypes: IssueTypeState;
   priorities: PriorityState;
@@ -22,6 +24,7 @@ export interface BoardState {
 const initialState: BoardState = {
   viewId: 0,
   rankCustomFieldId: 0,
+  headers: initialHeaderState,
   assignees: initialAssigneeState,
   issueTypes: initialIssueTypeState,
   priorities: initialPriorityState,
@@ -30,6 +33,7 @@ const initialState: BoardState = {
 
 const reducers = {
   board: boardReducer,
+  headers: headerReducer,
   assignees: assigneeReducer,
   issues: issueReducer,
   issueTypes: issueTypeReducer,
@@ -92,6 +96,12 @@ export function boardReducer(state: BoardState = initialState, action: Action): 
       const input = action.payload;
       const viewId: number = input['view'];
       const rankCustomFieldId = input['rank-custom-field-id'];
+      const headers =
+        reducers.headers(state.headers, HeaderActions.createDeserializeHeaders(
+          input['states'],
+          input['headers'],
+          input['backlog'] ? input['backlog'] : 0,
+          input['done'] ? input['done'] : 0));
       const assigneeState =
         reducers.assignees(state.assignees, AssigneeActions.createAddInitialAssignees(input['assignees']));
       const priorityState =
@@ -104,6 +114,7 @@ export function boardReducer(state: BoardState = initialState, action: Action): 
       return {
         viewId: viewId,
         rankCustomFieldId: rankCustomFieldId,
+        headers: headers,
         assignees: assigneeState,
         issueTypes: issueTypeState,
         priorities: priorityState,
