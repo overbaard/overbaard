@@ -1,5 +1,8 @@
 import * as board from './common/board/board.reducer';
 import {ActionReducer, combineReducers} from '@ngrx/store';
+import {environment} from '../environments/environment';
+import {compose} from '@ngrx/core/compose';
+import {storeFreeze} from 'ngrx-store-freeze';
 
 export interface AppState {
   board: board.BoardState;
@@ -9,10 +12,14 @@ const reducers = {
   board: board.reducer
 };
 
-const reducerInstance: ActionReducer<AppState> = combineReducers(reducers);
+const developmentReducer: ActionReducer<AppState> = compose(storeFreeze, combineReducers)(reducers);
+const productionReducer: ActionReducer<AppState> = combineReducers(reducers);
 
 export function reducer(state: any, action: any) {
-  return reducerInstance(state, action);
+  if (environment.production) {
+    return productionReducer(state, action);
+  } else {
+    return developmentReducer(state, action);
+  }
 }
-
 
