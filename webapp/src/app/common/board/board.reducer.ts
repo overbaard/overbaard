@@ -6,10 +6,11 @@ import {
   issueTypeReducer,
   IssueTypeState
 } from '../issue-type/issue-type.reducer';
-import {initialIssueState, issueReducer, IssueState} from '../issue/issue.reducer';
+import {initialIssueState, IssueActions, issueReducer, IssueState} from '../issue/issue.reducer';
 import {AssigneeActions, assigneeReducer, AssigneeState, initialAssigneeState} from '../assignee/assignee.reducer';
 import {initialPriorityState, PriorityActions, priorityReducer, PriorityState} from '../priority/priority.reducer';
 import {HeaderActions, headerReducer, HeaderState, initialHeaderState} from '../header/header.reducer';
+import {initialProjectState, ProjectActions, projectReducer, ProjectState} from '../project/project.reducer';
 
 export interface BoardState {
   viewId: number;
@@ -18,6 +19,7 @@ export interface BoardState {
   assignees: AssigneeState;
   issueTypes: IssueTypeState;
   priorities: PriorityState;
+  projects: ProjectState;
   issues: IssueState;
 }
 
@@ -28,6 +30,7 @@ const initialState: BoardState = {
   assignees: initialAssigneeState,
   issueTypes: initialIssueTypeState,
   priorities: initialPriorityState,
+  projects: initialProjectState,
   issues: initialIssueState
 };
 
@@ -35,9 +38,10 @@ const reducers = {
   board: boardReducer,
   headers: headerReducer,
   assignees: assigneeReducer,
-  issues: issueReducer,
   issueTypes: issueTypeReducer,
-  priorities: priorityReducer
+  priorities: priorityReducer,
+  projects: projectReducer,
+  issues: issueReducer
 };
 
 const reducerInstance: ActionReducer<BoardState> = combineReducers(reducers);
@@ -108,8 +112,11 @@ export function boardReducer(state: BoardState = initialState, action: Action): 
         reducers.priorities(state.priorities, PriorityActions.createDeserializePriorities(input['priorities']));
       const issueTypeState =
         reducers.issueTypes(state.issueTypes, IssueTypeActions.createDeserializeIssueTypes(input['issue-types']));
+      const projectState =
+        reducers.projects(state.projects, ProjectActions.createDeserializeProjects(input['projects']));
       const issueState =
-        reducers.issues(state.issues, IssueTypeActions.createDeserializeIssueTypes(input['issues']));
+        reducers.issues(state.issues, IssueActions.createDeserializeIssuesAction(input['issues'],
+          assigneeState.assignees.toArray(), issueTypeState.types.toArray(), priorityState.priorities.toArray()));
 
       return {
         viewId: viewId,
@@ -118,6 +125,7 @@ export function boardReducer(state: BoardState = initialState, action: Action): 
         assignees: assigneeState,
         issueTypes: issueTypeState,
         priorities: priorityState,
+        projects: projectState,
         issues: issueState
       };
     }
