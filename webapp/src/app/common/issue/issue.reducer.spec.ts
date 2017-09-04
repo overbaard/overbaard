@@ -1,24 +1,24 @@
-import * as Immutable from 'immutable';
-import {initialIssueState, IssueActions, issueReducer} from './issue.reducer';
-import {BoardIssue} from './issue.model';
+import {IssueActions, issueReducer} from './issue.reducer';
+import {BoardIssue, initialIssueState} from './issue.model';
 import {async} from '@angular/core/testing';
-import {initialIssueTypeState, IssueTypeActions, issueTypeReducer} from '../issue-type/issue-type.reducer';
-import {initialPriorityState, PriorityActions, priorityReducer} from '../priority/priority.reducer';
+import {IssueTypeActions, issueTypeReducer} from '../issue-type/issue-type.reducer';
+import {PriorityActions, priorityReducer} from '../priority/priority.reducer';
 import {ASSIGNEES_INPUT} from '../assignee/assignee.reducer.spec';
 import {ISSUE_TYPES_INPUT} from '../issue-type/issue-type.reducer.spec';
 import {PRIORITIES_INPUT} from '../priority/priority.reducer.spec';
 import {IssueChecker} from './issue.model.spec';
-import {Assignee, NO_ASSIGNEE} from '../assignee/assignee.model';
-import {IssueType} from '../issue-type/issue-type.model';
-import {Priority} from '../priority/priority.model';
-import {AssigneeActions, assigneeReducer, initialAssigneeState} from '../assignee/assignee.reducer';
+import {Assignee, initialAssigneeState, NO_ASSIGNEE} from '../assignee/assignee.model';
+import {initialIssueTypeState, IssueType} from '../issue-type/issue-type.model';
+import {initialPriorityState, Priority} from '../priority/priority.model';
+import {AssigneeActions, assigneeReducer} from '../assignee/assignee.reducer';
+import {Map} from 'immutable';
 
 describe('Issue reducer tests', () => {
 
   let types: Array<IssueType>;
   let priorities: Array<Priority>;
   let assignees: Array<Assignee>;
-  let issues: Immutable.Map<string, BoardIssue>;
+  let issues: Map<string, BoardIssue>;
   beforeEach(async(() => {
 
     const input = [

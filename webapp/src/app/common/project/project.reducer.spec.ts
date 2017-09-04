@@ -1,6 +1,6 @@
-import {initialProjectState, ProjectActions, projectReducer, ProjectState} from './project.reducer';
+import {ProjectActions, projectReducer} from './project.reducer';
 import {List, Map} from 'immutable';
-import {LinkedProject} from './project.model';
+import {initialProjectState, LinkedProject, ProjectState} from './project.model';
 
 describe('Projects reducer tests', () => {
 

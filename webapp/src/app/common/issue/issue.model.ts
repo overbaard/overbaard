@@ -1,14 +1,13 @@
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {Assignee, NO_ASSIGNEE} from '../assignee/assignee.model';
-import * as Immutable from 'immutable';
 import {Priority} from '../priority/priority.model';
 import {IssueType} from '../issue-type/issue-type.model';
+import {fromJS, List, Map} from 'immutable';
 
-export interface BoardIssueRecord extends TypedRecord<BoardIssueRecord>, BoardIssue {
+export interface IssueState {
+  issues: Map<string, BoardIssue>;
 }
 
-export interface LinkedIssueRecord extends TypedRecord<LinkedIssueRecord>, Issue {
-}
 
 export interface Issue {
   key: string;
@@ -19,8 +18,12 @@ export interface BoardIssue extends Issue {
   assignee: Assignee;
   priority: Priority;
   type: IssueType;
-  linkedIssues: Immutable.List<Issue>;
+  linkedIssues: List<Issue>;
 }
+
+const DEFAULT_STATE: IssueState = {
+  issues: Map<string, BoardIssue>()
+};
 
 const DEFAULT_ISSUE: BoardIssue = {
   key: null,
@@ -28,7 +31,7 @@ const DEFAULT_ISSUE: BoardIssue = {
   type: null,
   summary: null,
   assignee: null,
-  linkedIssues: Immutable.List<Issue>()
+  linkedIssues: List<Issue>()
 };
 
 const DEFAULT_LINKED_ISSUE: Issue = {
@@ -36,8 +39,21 @@ const DEFAULT_LINKED_ISSUE: Issue = {
   summary: null
 };
 
-const ISSUE_TYPED_FACTORY = makeTypedFactory<BoardIssue, BoardIssueRecord>(DEFAULT_ISSUE);
-const LINKED_ISSUE_TYPED_FACTORY = makeTypedFactory<Issue, LinkedIssueRecord>(DEFAULT_LINKED_ISSUE);
+
+
+interface BoardIssueRecord extends TypedRecord<BoardIssueRecord>, BoardIssue {
+}
+
+interface LinkedIssueRecord extends TypedRecord<LinkedIssueRecord>, Issue {
+}
+
+interface IssueStateRecord extends TypedRecord<IssueStateRecord>, IssueState {
+}
+
+const ISSUE_FACTORY = makeTypedFactory<BoardIssue, BoardIssueRecord>(DEFAULT_ISSUE);
+const LINKED_ISSUE_FACTORY = makeTypedFactory<Issue, LinkedIssueRecord>(DEFAULT_LINKED_ISSUE);
+const STATE_FACTORY = makeTypedFactory<IssueState, IssueStateRecord>(DEFAULT_STATE);
+export const initialIssueState: IssueState = STATE_FACTORY(DEFAULT_STATE);
 
 export class IssueFactory {
 
@@ -58,18 +74,24 @@ export class IssueFactory {
     input['priority'] = priorities[input['priority']];
     input['type'] = issueTypes[input['type']];
 
-    const temp: any = Immutable.fromJS(input, (key, value) => {
+    const temp: any = fromJS(input, (key, value) => {
       if (key === 'linkedIssues') {
-        const tmp: Immutable.List<any> = value.toList();
+        const tmp: List<any> = value.toList();
         return tmp.withMutations(mutable => {
           tmp.forEach((li, i) => {
-            mutable.set(i, LINKED_ISSUE_TYPED_FACTORY(<any>li));
+            mutable.set(i, LINKED_ISSUE_FACTORY(<any>li));
           });
         });
       }
       return value;
     });
-    return ISSUE_TYPED_FACTORY(temp);
+    return ISSUE_FACTORY(temp);
   }
 };
 
+
+export class IssueStateModifier {
+  static update(state: IssueState, updater: (copy: IssueState) => void) {
+    return (<IssueStateRecord>state).withMutations(updater);
+  }
+}

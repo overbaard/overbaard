@@ -1,6 +1,9 @@
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
+import {OrderedMap} from 'immutable';
 
-export interface AssigneeRecord extends TypedRecord<AssigneeRecord>, Assignee {}  {}
+export interface AssigneeState {
+  assignees: OrderedMap<string, Assignee>;
+}
 
 export interface Assignee {
   key: string;
@@ -10,7 +13,11 @@ export interface Assignee {
   initials: string;
 }
 
-const DEFAULT: Assignee = {
+const DEFAULT_STATE: AssigneeState = {
+  assignees: OrderedMap<string, Assignee>()
+};
+
+const DEFAULT_ASSIGNEE: Assignee = {
   key: null,
   email: null,
   avatar: null,
@@ -18,9 +25,17 @@ const DEFAULT: Assignee = {
   initials: null
 };
 
-const TYPED_FACTORY = makeTypedFactory<Assignee, AssigneeRecord>(DEFAULT);
+interface AssigneeStateRecord extends TypedRecord<AssigneeStateRecord>, AssigneeState {
+}
 
-export const NO_ASSIGNEE: Assignee = TYPED_FACTORY({
+interface AssigneeRecord extends TypedRecord<AssigneeRecord>, Assignee {
+}
+
+const STATE_FACTORY = makeTypedFactory<AssigneeState, AssigneeStateRecord>(DEFAULT_STATE);
+const ASSIGNEE_FACTORY = makeTypedFactory<Assignee, AssigneeRecord>(DEFAULT_ASSIGNEE);
+export const initialAssigneeState: AssigneeState = STATE_FACTORY(DEFAULT_STATE);
+
+export const NO_ASSIGNEE: Assignee = ASSIGNEE_FACTORY({
   key: '_____N$O$N$E____',
   email: '-',
   avatar: null,
@@ -32,7 +47,7 @@ export class AssigneeFactory {
 
   static fromJS(input: any): AssigneeRecord {
     input['initials'] = AssigneeFactory.calculateInitials(input['name']);
-    return TYPED_FACTORY(input);
+    return ASSIGNEE_FACTORY(input);
   }
 
   private static calculateInitials(name: string): string {
@@ -59,10 +74,11 @@ export class AssigneeFactory {
   }
 };
 
-export class AssigneeUpdater {
-  static update(assignee: Assignee, updater: (updated: Assignee) => void) {
-    return (<AssigneeRecord>assignee).withMutations(updater);
+export class AssigneeStateModifier {
+  static update(state: AssigneeState, updater: (copy: AssigneeState) => void) {
+    return (<AssigneeStateRecord>state).withMutations(updater);
   }
 }
+
 
 

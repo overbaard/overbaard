@@ -1,6 +1,6 @@
 import {async, getTestBed} from '@angular/core/testing';
-import {Assignee} from './assignee.model';
-import {AssigneeActions, assigneeReducer, AssigneeState, initialAssigneeState} from './assignee.reducer';
+import {Assignee, AssigneeState, initialAssigneeState} from './assignee.model';
+import {AssigneeActions, assigneeReducer} from './assignee.reducer';
 
 export const ASSIGNEES_INPUT: any = [
   {

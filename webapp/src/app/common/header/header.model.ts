@@ -1,7 +1,8 @@
 import {List} from 'immutable';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 
-export interface HeaderRecord extends TypedRecord<HeaderRecord>, Header {
+export interface HeaderState {
+  headers: List<List<Header>>;
 }
 
 export interface Header {
@@ -13,6 +14,10 @@ export interface Header {
   states: List<number>;
 }
 
+const DEFAULT_STATE: HeaderState = {
+  headers: List<List<Header>>()
+};
+
 const DEFAULT_HEADER: Header = {
   name: '',
   rows: 1,
@@ -22,10 +27,25 @@ const DEFAULT_HEADER: Header = {
   states: List<number>()
 };
 
-const HEADER_TYPED_FACTORY = makeTypedFactory<Header, HeaderRecord>(DEFAULT_HEADER);
+interface HeaderStateRecord extends TypedRecord<HeaderStateRecord>, HeaderState {
+}
+
+interface HeaderRecord extends TypedRecord<HeaderRecord>, Header {
+}
+
+const STATE_FACTORY = makeTypedFactory<HeaderState, HeaderStateRecord>(DEFAULT_STATE);
+const HEADER_FACTORY = makeTypedFactory<Header, HeaderRecord>(DEFAULT_HEADER);
+export const initialHeaderState: HeaderState = STATE_FACTORY(DEFAULT_STATE);
 
 export class HeaderFactory {
   static fromObject(input: Header): Header {
-    return HEADER_TYPED_FACTORY(input);
+    return HEADER_FACTORY(input);
   }
 }
+
+export class HeaderStateModifier {
+  static update(state: HeaderState, updater: (copy: HeaderState) => void) {
+    return (<HeaderStateRecord>state).withMutations(updater);
+  }
+}
+

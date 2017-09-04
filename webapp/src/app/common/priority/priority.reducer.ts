@@ -1,7 +1,6 @@
 import {AppState} from '../../app-store';
 import {Action} from '@ngrx/store';
-import {Priority, PriorityFactory} from './priority.model';
-import * as Immutable from 'immutable';
+import {initialPriorityState, Priority, PriorityFactory, PriorityState, PriorityStateModifier} from './priority.model';
 import {createSelector} from 'reselect';
 
 
@@ -26,14 +25,6 @@ export class PriorityActions {
   }
 }
 
-export interface PriorityState {
-  priorities: Immutable.OrderedMap<string, Priority>;
-}
-
-export const initialPriorityState: PriorityState = {
-  priorities: Immutable.OrderedMap<string, Priority>()
-};
-
 export function priorityReducer(state: PriorityState = initialPriorityState, action: Action): PriorityState {
 
   switch (action.type) {
@@ -45,9 +36,9 @@ export function priorityReducer(state: PriorityState = initialPriorityState, act
           mutable.set(type.name, type);
         }
       });
-      return {
-        priorities: priorities
-      };
+      return PriorityStateModifier.update(state, copy => {
+        copy.priorities = priorities;
+      });
     }
     default:
       return state;

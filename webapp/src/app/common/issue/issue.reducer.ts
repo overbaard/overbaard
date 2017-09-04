@@ -1,7 +1,6 @@
 import {AppState} from '../../app-store';
 import {Action} from '@ngrx/store';
-import {BoardIssue, IssueFactory} from './issue.model';
-import * as Immutable from 'immutable';
+import {BoardIssue, initialIssueState, IssueFactory, IssueState, IssueStateModifier} from './issue.model';
 import {Assignee} from '../assignee/assignee.model';
 import {createSelector} from 'reselect';
 import {IssueType} from '../issue-type/issue-type.model';
@@ -28,14 +27,6 @@ export class IssueActions {
   }
 }
 
-export interface IssueState {
-  issues: Immutable.Map<string, BoardIssue>;
-}
-
-export const initialIssueState: IssueState = {
-  issues: Immutable.Map<string, BoardIssue>()
-};
-
 export function issueReducer(state: IssueState = initialIssueState, action: Action): IssueState {
 
   switch (action.type) {
@@ -47,9 +38,9 @@ export function issueReducer(state: IssueState = initialIssueState, action: Acti
           mutable.set(issue.key, issue);
         }
       });
-      return {
-        issues: issues
-      };
+      return IssueStateModifier.update(state, copy => {
+        copy.issues = issues;
+      });
     }
     default:
       return state;

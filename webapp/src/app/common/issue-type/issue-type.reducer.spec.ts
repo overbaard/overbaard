@@ -1,6 +1,6 @@
 import {async} from '@angular/core/testing';
-import {IssueType} from './issue-type.model';
-import {initialIssueTypeState, IssueTypeActions, issueTypeReducer, IssueTypeState} from './issue-type.reducer';
+import {initialIssueTypeState, IssueType, IssueTypeState} from './issue-type.model';
+import {IssueTypeActions, issueTypeReducer} from './issue-type.reducer';
 
 export const ISSUE_TYPES_INPUT = [
   {

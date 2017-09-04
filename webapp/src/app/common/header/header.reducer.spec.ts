@@ -1,5 +1,5 @@
-import {HeaderActions, headerReducer, HeaderState, initialHeaderState} from './header.reducer';
-import {Header} from './header.model';
+import {HeaderActions, headerReducer} from './header.reducer';
+import {Header, HeaderState, initialHeaderState} from './header.model';
 import {List} from 'immutable';
 
 describe('Header reducer tests', () => {

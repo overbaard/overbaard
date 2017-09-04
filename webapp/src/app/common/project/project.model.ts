@@ -1,11 +1,15 @@
 import {List, Map} from 'immutable';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 
-export interface BaseProject {
-  key: string;
+export interface ProjectState {
+  owner: string;
+  boardProjects: Map<string, BoardProject>;
+  rankedIssueKeys: Map<string, List<string>>;
+  linkedProjects: Map<string, LinkedProject>;
 }
 
-export interface BoardProjectRecord extends TypedRecord<BoardProjectRecord>, BoardProject {
+export interface BaseProject {
+  key: string;
 }
 
 export interface BoardProject extends BaseProject {
@@ -14,14 +18,16 @@ export interface BoardProject extends BaseProject {
   boardStateNameToOwnStateName: Map<string, string>;
 }
 
-export interface LinkedProjectRecord extends TypedRecord<LinkedProjectRecord>, LinkedProject {
-}
-
-
 export interface LinkedProject extends BaseProject {
   states: List<string>;
 }
 
+const DEFAULT_STATE: ProjectState = {
+  owner: null,
+  boardProjects: Map<string, BoardProject>(),
+  rankedIssueKeys: Map<string, List<string>>(),
+  linkedProjects: Map<string, LinkedProject>()
+};
 
 const DEFAULT_BOARD_PROJECT: BoardProject = {
   key: null,
@@ -35,8 +41,19 @@ const DEFAULT_LINKED_PROJECT: LinkedProject = {
   states: List<string>()
 };
 
-const BOARD_PROJECT_TYPED_FACTORY = makeTypedFactory<BoardProject, BoardProjectRecord>(DEFAULT_BOARD_PROJECT);
-const LINKED_PROJECT_TYPED_FACTORY = makeTypedFactory<LinkedProject, LinkedProjectRecord>(DEFAULT_LINKED_PROJECT);
+interface ProjectStateRecord extends TypedRecord<ProjectStateRecord>, ProjectState {
+}
+
+interface BoardProjectRecord extends TypedRecord<BoardProjectRecord>, BoardProject {
+}
+
+interface LinkedProjectRecord extends TypedRecord<LinkedProjectRecord>, LinkedProject {
+}
+
+const STATE_FACTORY = makeTypedFactory<ProjectState, ProjectStateRecord>(DEFAULT_STATE);
+const BOARD_PROJECT_FACTORY = makeTypedFactory<BoardProject, BoardProjectRecord>(DEFAULT_BOARD_PROJECT);
+const LINKED_PROJECT_FACTORY = makeTypedFactory<LinkedProject, LinkedProjectRecord>(DEFAULT_LINKED_PROJECT);
+export const initialProjectState: ProjectState = STATE_FACTORY(DEFAULT_STATE);
 
 export class ProjectFactory {
   static boardProjectFromJs(key: string, input: any): BoardProject {
@@ -47,14 +64,20 @@ export class ProjectFactory {
       canRank: input['rank'] ? input['rank'] : false,
       boardStateNameToOwnStateName: boardStateNameToOwnStateName
     };
-    return BOARD_PROJECT_TYPED_FACTORY(projectInput);
+    return BOARD_PROJECT_FACTORY(projectInput);
   }
 
   static linkedProjectFromJs(key: string, input: any) {
     const projectInput: LinkedProject = {
       key: key,
       states: List<string>(input['states'])
-    }
-    return LINKED_PROJECT_TYPED_FACTORY(projectInput);
+    };
+    return LINKED_PROJECT_FACTORY(projectInput);
+  }
+}
+
+export class ProjectStateModifier {
+  static update(state: ProjectState, updater: (copy: ProjectState) => void) {
+    return (<ProjectStateRecord>state).withMutations(updater);
   }
 }

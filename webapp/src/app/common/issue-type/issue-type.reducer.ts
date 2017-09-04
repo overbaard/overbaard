@@ -1,7 +1,12 @@
 import {AppState} from '../../app-store';
 import {Action} from '@ngrx/store';
-import {IssueType, IssueTypeFactory} from './issue-type.model';
-import * as Immutable from 'immutable';
+import {
+  initialIssueTypeState,
+  IssueType,
+  IssueTypeFactory,
+  IssueTypeState,
+  IssueTypeStateModifier
+} from './issue-type.model';
 import {createSelector} from 'reselect';
 
 
@@ -26,13 +31,7 @@ export class IssueTypeActions {
   }
 }
 
-export interface IssueTypeState {
-  types: Immutable.OrderedMap<string, IssueType>;
-}
 
-export const initialIssueTypeState: IssueTypeState = {
-  types: Immutable.OrderedMap<string, IssueType>()
-};
 
 export function issueTypeReducer(state: IssueTypeState = initialIssueTypeState, action: Action): IssueTypeState {
 
@@ -45,9 +44,9 @@ export function issueTypeReducer(state: IssueTypeState = initialIssueTypeState, 
           mutable.set(type.name, type);
         }
       });
-      return {
-        types: types
-      };
+      return IssueTypeStateModifier.update(state, copy => {
+        copy.types = types;
+      });
     }
     default:
       return state;

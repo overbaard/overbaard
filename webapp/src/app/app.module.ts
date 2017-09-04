@@ -9,7 +9,7 @@ import {APP_BASE_HREF, HashLocationStrategy, LocationStrategy} from '@angular/co
 import {StoreModule} from '@ngrx/store';
 import {reducer} from './app-store';
 import {StoreDevtoolsModule} from '@ngrx/store-devtools';
-import { environment } from '../environments/environment';
+import {environment} from '../environments/environment';
 
 
 @NgModule({

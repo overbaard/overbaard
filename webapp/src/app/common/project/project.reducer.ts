@@ -1,7 +1,9 @@
 import {Action} from '@ngrx/store';
-import {BoardProject, LinkedProject, ProjectFactory} from './project.model';
+import {
+  BoardProject, initialProjectState, LinkedProject, ProjectFactory, ProjectState,
+  ProjectStateModifier
+} from './project.model';
 import {List, Map} from 'immutable';
-import {TypedRecord} from 'typed-immutable-record';
 
 const DESERIALIZE_PROJECTS = 'DESERIALIZE_PROJECTS';
 
@@ -48,26 +50,17 @@ export class ProjectActions {
   }
 }
 
-export interface ProjectState {
-  owner: string;
-  boardProjects: Map<string, BoardProject>;
-  rankedIssueKeys: Map<string, List<string>>;
-  linkedProjects: Map<string, LinkedProject>;
-}
-
-export const initialProjectState: ProjectState = {
-  owner: null,
-  boardProjects: Map<string, BoardProject>(),
-  rankedIssueKeys: Map<string, List<string>>(),
-  linkedProjects: Map<string, LinkedProject>()
-};
-
 export function projectReducer(state: ProjectState = initialProjectState, action: Action): ProjectState {
   switch (action.type) {
     case DESERIALIZE_PROJECTS: {
       const newState: ProjectState = (<DeserializeProjectsAction>action).payload;
       // TODO check if they equal each other and return the original if that is the case
-      return newState;
+      return ProjectStateModifier.update(state, copy => {
+        copy.owner = newState.owner;
+        copy.boardProjects = newState.boardProjects;
+        copy.rankedIssueKeys = newState.rankedIssueKeys;
+        copy.linkedProjects = newState.linkedProjects;
+      });
     }
   }
   return state;

@@ -1,16 +1,17 @@
 import {Action, ActionReducer, combineReducers} from '@ngrx/store';
 import {AppState} from '../../app-store';
-import {
-  initialIssueTypeState,
-  IssueTypeActions,
-  issueTypeReducer,
-  IssueTypeState
-} from '../issue-type/issue-type.reducer';
-import {initialIssueState, IssueActions, issueReducer, IssueState} from '../issue/issue.reducer';
-import {AssigneeActions, assigneeReducer, AssigneeState, initialAssigneeState} from '../assignee/assignee.reducer';
-import {initialPriorityState, PriorityActions, priorityReducer, PriorityState} from '../priority/priority.reducer';
-import {HeaderActions, headerReducer, HeaderState, initialHeaderState} from '../header/header.reducer';
-import {initialProjectState, ProjectActions, projectReducer, ProjectState} from '../project/project.reducer';
+import {IssueTypeActions, issueTypeReducer} from '../issue-type/issue-type.reducer';
+import {IssueActions, issueReducer} from '../issue/issue.reducer';
+import {AssigneeActions, assigneeReducer} from '../assignee/assignee.reducer';
+import {PriorityActions, priorityReducer} from '../priority/priority.reducer';
+import {HeaderActions, headerReducer} from '../header/header.reducer';
+import {ProjectActions, projectReducer} from '../project/project.reducer';
+import {AssigneeState, initialAssigneeState} from '../assignee/assignee.model';
+import {HeaderState, initialHeaderState} from '../header/header.model';
+import {initialIssueState, IssueState} from '../issue/issue.model';
+import {initialIssueTypeState, IssueTypeState} from '../issue-type/issue-type.model';
+import {initialPriorityState, PriorityState} from '../priority/priority.model';
+import {initialProjectState, ProjectState} from '../project/project.model';
 
 export interface BoardState {
   viewId: number;

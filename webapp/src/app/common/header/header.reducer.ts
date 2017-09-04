@@ -1,5 +1,5 @@
-import {List, Map} from 'immutable';
-import {Header, HeaderFactory} from './header.model';
+import {List} from 'immutable';
+import {Header, HeaderFactory, HeaderState, HeaderStateModifier, initialHeaderState} from './header.model';
 import {Action} from '@ngrx/store';
 import {Dictionary} from '../utils/dictionary';
 
@@ -148,16 +148,6 @@ class HeaderTableCreator {
   }
 }
 
-
-
-export interface HeaderState {
-  headers: List<List<Header>>;
-}
-
-export const initialHeaderState: HeaderState = {
-  headers: List<List<Header>>().push(List<Header>())
-};
-
 export function headerReducer(state: HeaderState = initialHeaderState, action: Action): HeaderState {
   switch (action.type) {
     case DESERIALIZE_PRIORITIES: {
@@ -166,9 +156,9 @@ export function headerReducer(state: HeaderState = initialHeaderState, action: A
       if (headers.equals(payload)) {
         return state;
       }
-      return {
-        headers: payload
-      };
+      return HeaderStateModifier.update(state, copy => {
+        copy.headers = payload;
+      });
     }
     default:
       return state;

@@ -1,6 +1,6 @@
 import {async} from '@angular/core/testing';
-import {Priority} from './priority.model';
-import {initialPriorityState, PriorityActions, priorityReducer, PriorityState} from './priority.reducer';
+import {initialPriorityState, Priority, PriorityState} from './priority.model';
+import {PriorityActions, priorityReducer} from './priority.reducer';
 
 export const PRIORITIES_INPUT = [
   {

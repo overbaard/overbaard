@@ -1,8 +1,8 @@
 import {Action} from '@ngrx/store';
-import {Assignee, AssigneeFactory} from './assignee.model';
+import {Assignee, AssigneeFactory, AssigneeState, AssigneeStateModifier, initialAssigneeState} from './assignee.model';
 import {AppState} from '../../app-store';
 import {createSelector} from 'reselect';
-import * as Immutable from 'immutable';
+import {OrderedMap} from 'immutable';
 
 const ADD_INITAL_ASSIGNEES = 'ADD_INITIAL_ASSIGNEES';
 const ADD_ASSIGNEES = 'ADD_ASSIGNEES';
@@ -41,13 +41,7 @@ export class AssigneeActions {
 }
 
 
-export interface AssigneeState {
-  assignees: Immutable.OrderedMap<string, Assignee>;
-}
 
-export const initialAssigneeState: AssigneeState = {
-  assignees: Immutable.OrderedMap<string, Assignee>()
-};
 
 export function assigneeReducer(state: AssigneeState = initialAssigneeState, action: Action): AssigneeState {
 
@@ -69,11 +63,11 @@ function addAssignees(state: AssigneeState, added: Assignee[]): AssigneeState {
       mutable.set(assignee.key, assignee);
     }
   });
-  assignees = <Immutable.OrderedMap<string, Assignee>>assignees.sort(
+  assignees = <OrderedMap<string, Assignee>>assignees.sort(
     (valueA, valueB) => valueA.name.toLocaleLowerCase().localeCompare(valueB.name.toLocaleLowerCase()));
-  return {
-    assignees: assignees
-  };
+  return AssigneeStateModifier.update(state, copy => {
+    copy.assignees = assignees;
+  });
 }
 
 const getAssigneesState = (state: AppState) => state.board.assignees;
