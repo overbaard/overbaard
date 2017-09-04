@@ -20,6 +20,7 @@ export interface BoardIssue extends Issue {
   type: IssueType;
   components: List<string>;
   labels: List<string>;
+  fixVersions: List<string>;
   linkedIssues: List<Issue>;
 }
 
@@ -35,6 +36,7 @@ const DEFAULT_ISSUE: BoardIssue = {
   type: null,
   components: null,
   labels: null,
+  fixVersions: null,
   linkedIssues: List<Issue>()
 };
 
@@ -62,7 +64,7 @@ export const initialIssueState: IssueState = STATE_FACTORY(DEFAULT_STATE);
 export class IssueFactory {
 
   static fromJS(input: any, assignees: Assignee[], priorities: Priority[], issueTypes: IssueType[],
-                components: List<string>, labels: List<string>): BoardIssue {
+                components: List<string>, labels: List<string>, fixVersions: List<string>): BoardIssue {
     // Rework the data as needed before deserializing
     if (input['linked-issues']) {
       input['linkedIssues'] = input['linked-issues'];
@@ -84,6 +86,10 @@ export class IssueFactory {
     }
     if (input['labels']) {
       input['labels'] = IssueFactory.lookupStringsFromIndex(input['labels'], labels);
+    }
+    if (input['fix-versions']) {
+      input['fixVersions'] = IssueFactory.lookupStringsFromIndex(input['fix-versions'], fixVersions);
+      delete input['fix-versions'];
     }
     const temp: any = fromJS(input, (key, value) => {
       if (key === 'linkedIssues') {

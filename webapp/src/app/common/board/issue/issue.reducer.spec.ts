@@ -18,6 +18,9 @@ import {COMPONENTS_INPUT} from '../component/component.reducer.spec';
 import {LabelActions, labelReducer} from '../label/label.reducer';
 import {initialLabelState} from '../label/label.model';
 import {LABELS_INPUT} from '../label/label.reducer.spec';
+import {FixVersionActions, fixVersionReducer} from '../fix-version/fix-version.reducer';
+import {initialFixVersionState} from '../fix-version/fix-version.model';
+import {FIX_VERSIONS_INPUT} from '../fix-version/fix-version.reducer.spec';
 
 describe('Issue reducer tests', () => {
 
@@ -26,6 +29,7 @@ describe('Issue reducer tests', () => {
   let assignees: Array<Assignee>;
   let components: List<string>;
   let labels: List<string>;
+  let fixVersions: List<string>;
   let issues: Map<string, BoardIssue>;
   beforeEach(async(() => {
 
@@ -79,9 +83,13 @@ describe('Issue reducer tests', () => {
     labels = labelReducer(
       initialLabelState,
       LabelActions.createDeserializeLabels(LABELS_INPUT)).labels;
+    fixVersions = fixVersionReducer(
+      initialFixVersionState,
+      FixVersionActions.createDeserializeFixVersions(FIX_VERSIONS_INPUT)).versions;
+
     issues = issueReducer(
       initialIssueState,
-      IssueActions.createDeserializeIssuesAction(input, assignees, types, priorities, components, labels)).issues;
+      IssueActions.createDeserializeIssuesAction(input, assignees, types, priorities, components, labels, fixVersions)).issues;
   }));
 
 

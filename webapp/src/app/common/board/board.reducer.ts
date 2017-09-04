@@ -16,6 +16,8 @@ import {ComponentState, initialComponentState} from './component/component.model
 import {ComponentActions, componentReducer} from './component/component.reducer';
 import {initialLabelState, LabelState} from './label/label.model';
 import {LabelActions, labelReducer} from './label/label.reducer';
+import {FixVersionState, initialFixVersionState} from './fix-version/fix-version.model';
+import {FixVersionActions, fixVersionReducer} from './fix-version/fix-version.reducer';
 
 export interface BoardState {
   viewId: number;
@@ -26,6 +28,7 @@ export interface BoardState {
   priorities: PriorityState;
   components: ComponentState;
   labels: LabelState;
+  fixVersions: FixVersionState,
   projects: ProjectState;
   issues: IssueState;
 }
@@ -39,6 +42,7 @@ const initialState: BoardState = {
   priorities: initialPriorityState,
   components: initialComponentState,
   labels: initialLabelState,
+  fixVersions: initialFixVersionState,
   projects: initialProjectState,
   issues: initialIssueState
 };
@@ -51,6 +55,7 @@ const reducers = {
   priorities: priorityReducer,
   components: componentReducer,
   labels: labelReducer,
+  fixVersions: fixVersionReducer,
   projects: projectReducer,
   issues: issueReducer
 };
@@ -127,6 +132,8 @@ export function boardReducer(state: BoardState = initialState, action: Action): 
         reducers.components(state.components, ComponentActions.createDeserializeComponents(input['components']));
       const labelState =
         reducers.labels(state.labels, LabelActions.createDeserializeLabels(input['labels']));
+      const fixVersionState =
+        reducers.fixVersions(state.fixVersions, FixVersionActions.createDeserializeFixVersions(input['fix-versions']));
       const projectState =
         reducers.projects(state.projects, ProjectActions.createDeserializeProjects(input['projects']));
       const issueState =
@@ -142,6 +149,7 @@ export function boardReducer(state: BoardState = initialState, action: Action): 
         issueTypes: issueTypeState,
         priorities: priorityState,
         components: componentState,
+        fixVersions: fixVersionState,
         labels: labelState,
         projects: projectState,
         issues: issueState
