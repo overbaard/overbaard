@@ -19,6 +19,7 @@ export interface BoardIssue extends Issue {
   priority: Priority;
   type: IssueType;
   components: List<string>;
+  labels: List<string>;
   linkedIssues: List<Issue>;
 }
 
@@ -33,6 +34,7 @@ const DEFAULT_ISSUE: BoardIssue = {
   priority: null,
   type: null,
   components: null,
+  labels: null,
   linkedIssues: List<Issue>()
 };
 
@@ -59,7 +61,8 @@ export const initialIssueState: IssueState = STATE_FACTORY(DEFAULT_STATE);
 
 export class IssueFactory {
 
-  static fromJS(input: any, assignees: Assignee[], priorities: Priority[], issueTypes: IssueType[], components: List<string>): BoardIssue {
+  static fromJS(input: any, assignees: Assignee[], priorities: Priority[], issueTypes: IssueType[],
+                components: List<string>, labels: List<string>): BoardIssue {
     // Rework the data as needed before deserializing
     if (input['linked-issues']) {
       input['linkedIssues'] = input['linked-issues'];
@@ -77,12 +80,11 @@ export class IssueFactory {
     input['type'] = issueTypes[input['type']];
 
     if (input['components']) {
-      const componentIndices: number[] = input['components'];
-      const componentNames: string[] = new Array<string>(componentIndices.length);
-      componentIndices.forEach((c, i) => componentNames[i] = components.get(c));
-      input['components'] = componentNames;
+      input['components'] = IssueFactory.lookupStringsFromIndex(input['components'], components);
     }
-
+    if (input['labels']) {
+      input['labels'] = IssueFactory.lookupStringsFromIndex(input['labels'], labels);
+    }
     const temp: any = fromJS(input, (key, value) => {
       if (key === 'linkedIssues') {
         const tmp: List<any> = value.toList();
@@ -95,6 +97,12 @@ export class IssueFactory {
       return value;
     });
     return ISSUE_FACTORY(temp);
+  }
+
+  private static lookupStringsFromIndex(input: number[], lookup: List<string>): string[] {
+    const strings: string[] = new Array<string>(input.length);
+    input.forEach((c, i) => strings[i] = lookup.get(c));
+    return strings;
   }
 };
 

@@ -15,6 +15,9 @@ import {List, Map} from 'immutable';
 import {ComponentActions, componentReducer} from '../component/component.reducer';
 import {initialComponentState} from '../component/component.model';
 import {COMPONENTS_INPUT} from '../component/component.reducer.spec';
+import {LabelActions, labelReducer} from '../label/label.reducer';
+import {initialLabelState} from '../label/label.model';
+import {LABELS_INPUT} from '../label/label.reducer.spec';
 
 describe('Issue reducer tests', () => {
 
@@ -22,6 +25,7 @@ describe('Issue reducer tests', () => {
   let priorities: Array<Priority>;
   let assignees: Array<Assignee>;
   let components: List<string>;
+  let labels: List<string>;
   let issues: Map<string, BoardIssue>;
   beforeEach(async(() => {
 
@@ -72,9 +76,12 @@ describe('Issue reducer tests', () => {
     components = componentReducer(
       initialComponentState,
       ComponentActions.createDeserializeComponents(COMPONENTS_INPUT)).components;
+    labels = labelReducer(
+      initialLabelState,
+      LabelActions.createDeserializeLabels(LABELS_INPUT)).labels;
     issues = issueReducer(
       initialIssueState,
-      IssueActions.createDeserializeIssuesAction(input, assignees, types, priorities, components)).issues;
+      IssueActions.createDeserializeIssuesAction(input, assignees, types, priorities, components, labels)).issues;
   }));
 
 

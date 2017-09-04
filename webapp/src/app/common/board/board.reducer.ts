@@ -14,6 +14,8 @@ import {initialPriorityState, PriorityState} from './priority/priority.model';
 import {initialProjectState, ProjectState} from './project/project.model';
 import {ComponentState, initialComponentState} from './component/component.model';
 import {ComponentActions, componentReducer} from './component/component.reducer';
+import {initialLabelState, LabelState} from './label/label.model';
+import {LabelActions, labelReducer} from './label/label.reducer';
 
 export interface BoardState {
   viewId: number;
@@ -23,6 +25,7 @@ export interface BoardState {
   issueTypes: IssueTypeState;
   priorities: PriorityState;
   components: ComponentState;
+  labels: LabelState;
   projects: ProjectState;
   issues: IssueState;
 }
@@ -35,6 +38,7 @@ const initialState: BoardState = {
   issueTypes: initialIssueTypeState,
   priorities: initialPriorityState,
   components: initialComponentState,
+  labels: initialLabelState,
   projects: initialProjectState,
   issues: initialIssueState
 };
@@ -46,6 +50,7 @@ const reducers = {
   issueTypes: issueTypeReducer,
   priorities: priorityReducer,
   components: componentReducer,
+  labels: labelReducer,
   projects: projectReducer,
   issues: issueReducer
 };
@@ -120,12 +125,14 @@ export function boardReducer(state: BoardState = initialState, action: Action): 
         reducers.issueTypes(state.issueTypes, IssueTypeActions.createDeserializeIssueTypes(input['issue-types']));
       const componentState =
         reducers.components(state.components, ComponentActions.createDeserializeComponents(input['components']));
+      const labelState =
+        reducers.labels(state.labels, LabelActions.createDeserializeLabels(input['labels']));
       const projectState =
         reducers.projects(state.projects, ProjectActions.createDeserializeProjects(input['projects']));
       const issueState =
         reducers.issues(state.issues, IssueActions.createDeserializeIssuesAction(input['issues'],
           assigneeState.assignees.toArray(), issueTypeState.types.toArray(), priorityState.priorities.toArray(),
-          componentState.components));
+          componentState.components, labelState.labels));
 
       return {
         viewId: viewId,
@@ -135,6 +142,7 @@ export function boardReducer(state: BoardState = initialState, action: Action): 
         issueTypes: issueTypeState,
         priorities: priorityState,
         components: componentState,
+        labels: labelState,
         projects: projectState,
         issues: issueState
       };

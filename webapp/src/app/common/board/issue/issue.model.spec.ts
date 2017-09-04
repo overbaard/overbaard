@@ -4,6 +4,7 @@ import {Priority, PriorityFactory} from '../priority/priority.model';
 import {IssueType, IssueTypeFactory} from '../issue-type/issue-type.model';
 import {List} from 'immutable';
 import {COMPONENTS_INPUT} from '../component/component.reducer.spec';
+import {LABELS_INPUT} from '../label/label.reducer.spec';
 
 describe('Issue unit tests', () => {
 
@@ -13,6 +14,7 @@ describe('Issue unit tests', () => {
     let priorities: Priority[];
     let issueTypes: IssueType[];
     let components: List<string>;
+    let labels: List<string>;
 
     beforeEach(() => {
       input = {
@@ -64,10 +66,11 @@ describe('Issue unit tests', () => {
         }));
 
       components = List<string>(COMPONENTS_INPUT);
+      labels = List<string>(LABELS_INPUT);
     });
 
     it('Full record - standard fields', () => {
-      const issue: BoardIssue = IssueFactory.fromJS(input, assignees, priorities, issueTypes, components);
+      const issue: BoardIssue = IssueFactory.fromJS(input, assignees, priorities, issueTypes, components, labels);
       new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
         .key('ISSUE-1')
         .check();
@@ -75,7 +78,7 @@ describe('Issue unit tests', () => {
 
     it('Assignee > 0', () => {
       input['assignee'] = 1;
-      const issue: BoardIssue = IssueFactory.fromJS(input, assignees, priorities, issueTypes, components);
+      const issue: BoardIssue = IssueFactory.fromJS(input, assignees, priorities, issueTypes, components, labels);
       new IssueChecker(issue, issueTypes[0], priorities[0], assignees[1], 'Issue summary')
         .key('ISSUE-1')
         .check();
@@ -83,7 +86,7 @@ describe('Issue unit tests', () => {
 
     it ('Priority > 0', () => {
       input['priority'] = 1;
-      const issue: BoardIssue = IssueFactory.fromJS(input, assignees, priorities, issueTypes, components);
+      const issue: BoardIssue = IssueFactory.fromJS(input, assignees, priorities, issueTypes, components, labels);
       new IssueChecker(issue, issueTypes[0], priorities[1], assignees[0], 'Issue summary')
         .key('ISSUE-1')
         .check();
@@ -91,7 +94,7 @@ describe('Issue unit tests', () => {
 
     it ('Type > 0', () => {
       input['type'] = 1;
-      const issue: BoardIssue = IssueFactory.fromJS(input, assignees, priorities, issueTypes, components);
+      const issue: BoardIssue = IssueFactory.fromJS(input, assignees, priorities, issueTypes, components, labels);
       new IssueChecker(issue, issueTypes[1], priorities[0], assignees[0], 'Issue summary')
         .key('ISSUE-1')
         .check();
@@ -99,7 +102,7 @@ describe('Issue unit tests', () => {
 
     it ('No assignee', () => {
       delete input['assignee'];
-      const issue: BoardIssue = IssueFactory.fromJS(input, assignees, priorities, issueTypes, components);
+      const issue: BoardIssue = IssueFactory.fromJS(input, assignees, priorities, issueTypes, components, labels);
       new IssueChecker(issue, issueTypes[0], priorities[0], NO_ASSIGNEE, 'Issue summary')
         .key('ISSUE-1')
         .check();
@@ -117,7 +120,7 @@ describe('Issue unit tests', () => {
           summary : 'Linked 2',
         }];
 
-      const issue: BoardIssue = IssueFactory.fromJS(input, assignees, priorities, issueTypes, components);
+      const issue: BoardIssue = IssueFactory.fromJS(input, assignees, priorities, issueTypes, components, labels);
       new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
         .key('ISSUE-1')
         .addLinkedIssue('LNK-1', 'Linked 1')
@@ -127,10 +130,19 @@ describe('Issue unit tests', () => {
 
     it('Full record - components', () => {
       input['components'] = [0, 2];
-      const issue: BoardIssue = IssueFactory.fromJS(input, assignees, priorities, issueTypes, components);
+      const issue: BoardIssue = IssueFactory.fromJS(input, assignees, priorities, issueTypes, components, labels);
       new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
         .key('ISSUE-1')
         .components('C-1', 'C-3')
+        .check();
+    });
+
+    it('Full record - labels', () => {
+      input['labels'] = [1, 2];
+      const issue: BoardIssue = IssueFactory.fromJS(input, assignees, priorities, issueTypes, components, labels);
+      new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
+        .key('ISSUE-1')
+        .labels('L-2', 'L-3')
         .check();
     });
 
@@ -146,7 +158,7 @@ export class IssueChecker {
   private _summary: string;
   private _linkedIssues: LinkedIssueChecker[];
   private _components: string[];
-  // private _labels: string[];
+  private _labels: string[];
   // private _fixVersions: string[];
   // private _customFields: IMap<CustomFieldValue>;
   // private _selectedParallelTaskOptions:string[]
@@ -178,12 +190,13 @@ export class IssueChecker {
     this._components = components;
     return this;
   }
-  /*
-  labels(...labels:string[]) : IssueChecker {
+
+  labels(...labels: string[]): IssueChecker {
     this._labels = labels;
     return this;
   }
 
+  /*
   fixVersions(...fixVersions:string[]) : IssueChecker {
     this._fixVersions = fixVersions;
     return this;
@@ -218,18 +231,19 @@ export class IssueChecker {
     } else {
       expect(this._issue.components).not.toEqual(jasmine.anything());
     }
-/*
+
     if (this._labels) {
-      this.checkMultiSelectFieldValues(this._issue.labels.array, this._labels);
+      this.checkMultiSelectStringFieldValues(this._issue.labels.toArray(), this._labels);
     } else {
       expect(this._issue.labels).not.toEqual(jasmine.anything());
     }
 
-    if (this._fixVersions) {
-      this.checkMultiSelectFieldValues(this._issue.fixVersions.array, this._fixVersions);
-    } else {
-      expect(this._issue.fixVersions).not.toEqual(jasmine.anything(), this._issue.key);
-    }*/
+    /*
+        if (this._fixVersions) {
+          this.checkMultiSelectFieldValues(this._issue.fixVersions.array, this._fixVersions);
+        } else {
+          expect(this._issue.fixVersions).not.toEqual(jasmine.anything(), this._issue.key);
+        }*/
 
     if (this._summary) {
       expect(this._issue.summary).toEqual(this._summary);

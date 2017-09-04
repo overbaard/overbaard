@@ -19,11 +19,12 @@ class DeserializeIssuesAction implements Action {
 
 export class IssueActions {
   static createDeserializeIssuesAction(input: any, assignees: Assignee[], issueTypes: IssueType[],
-                                       priorities: Priority[], components: List<string>): Action {
+                                       priorities: Priority[], components: List<string>,
+                                       labels: List<string>): Action {
     const inputArray: any[] = input ? input : [];
     const issues = new Array<BoardIssue>(inputArray.length);
     inputArray.forEach((issue, i) => {
-      issues[i] = IssueFactory.fromJS(issue, assignees, priorities, issueTypes, components);
+      issues[i] = IssueFactory.fromJS(issue, assignees, priorities, issueTypes, components, labels);
     });
     return new DeserializeIssuesAction(issues);
   }
