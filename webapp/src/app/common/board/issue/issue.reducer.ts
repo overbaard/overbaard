@@ -1,4 +1,4 @@
-import {AppState} from '../../app-store';
+import {AppState} from '../../../app-store';
 import {Action} from '@ngrx/store';
 import {BoardIssue, initialIssueState, IssueFactory, IssueState, IssueStateModifier} from './issue.model';
 import {Assignee} from '../assignee/assignee.model';

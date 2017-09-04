@@ -1,4 +1,4 @@
-import {AppState} from '../../app-store';
+import {AppState} from '../../../app-store';
 import {Action} from '@ngrx/store';
 import {
   initialIssueTypeState,
