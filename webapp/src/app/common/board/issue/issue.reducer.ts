@@ -5,6 +5,7 @@ import {Assignee} from '../assignee/assignee.model';
 import {createSelector} from 'reselect';
 import {IssueType} from '../issue-type/issue-type.model';
 import {Priority} from '../priority/priority.model';
+import {List} from 'immutable';
 
 
 const DESERIALIZE_INITIAL_ISSUES = 'DESERIALIZE_INITIAL_ISSUES';
@@ -17,11 +18,12 @@ class DeserializeIssuesAction implements Action {
 }
 
 export class IssueActions {
-  static createDeserializeIssuesAction(input: any, assignees: Assignee[], issueTypes: IssueType[], priorities: Priority[]): Action {
+  static createDeserializeIssuesAction(input: any, assignees: Assignee[], issueTypes: IssueType[],
+                                       priorities: Priority[], components: List<string>): Action {
     const inputArray: any[] = input ? input : [];
     const issues = new Array<BoardIssue>(inputArray.length);
     inputArray.forEach((issue, i) => {
-      issues[i] = IssueFactory.fromJS(issue, assignees, priorities, issueTypes);
+      issues[i] = IssueFactory.fromJS(issue, assignees, priorities, issueTypes, components);
     });
     return new DeserializeIssuesAction(issues);
   }

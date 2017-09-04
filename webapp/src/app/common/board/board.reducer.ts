@@ -124,7 +124,8 @@ export function boardReducer(state: BoardState = initialState, action: Action): 
         reducers.projects(state.projects, ProjectActions.createDeserializeProjects(input['projects']));
       const issueState =
         reducers.issues(state.issues, IssueActions.createDeserializeIssuesAction(input['issues'],
-          assigneeState.assignees.toArray(), issueTypeState.types.toArray(), priorityState.priorities.toArray()));
+          assigneeState.assignees.toArray(), issueTypeState.types.toArray(), priorityState.priorities.toArray(),
+          componentState.components));
 
       return {
         viewId: viewId,

@@ -11,13 +11,17 @@ import {Assignee, initialAssigneeState, NO_ASSIGNEE} from '../assignee/assignee.
 import {initialIssueTypeState, IssueType} from '../issue-type/issue-type.model';
 import {initialPriorityState, Priority} from '../priority/priority.model';
 import {AssigneeActions, assigneeReducer} from '../assignee/assignee.reducer';
-import {Map} from 'immutable';
+import {List, Map} from 'immutable';
+import {ComponentActions, componentReducer} from '../component/component.reducer';
+import {initialComponentState} from '../component/component.model';
+import {COMPONENTS_INPUT} from '../component/component.reducer.spec';
 
 describe('Issue reducer tests', () => {
 
   let types: Array<IssueType>;
   let priorities: Array<Priority>;
   let assignees: Array<Assignee>;
+  let components: List<string>;
   let issues: Map<string, BoardIssue>;
   beforeEach(async(() => {
 
@@ -65,10 +69,12 @@ describe('Issue reducer tests', () => {
     types = issueTypeReducer(
       initialIssueTypeState,
       IssueTypeActions.createDeserializeIssueTypes(ISSUE_TYPES_INPUT)).types.toArray();
-
+    components = componentReducer(
+      initialComponentState,
+      ComponentActions.createDeserializeComponents(COMPONENTS_INPUT)).components;
     issues = issueReducer(
       initialIssueState,
-      IssueActions.createDeserializeIssuesAction(input, assignees, types, priorities)).issues;
+      IssueActions.createDeserializeIssuesAction(input, assignees, types, priorities, components)).issues;
   }));
 
 
