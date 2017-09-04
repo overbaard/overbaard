@@ -41,7 +41,7 @@ const DEFAULT_LINKED_PROJECT: LinkedProject = {
   states: List<string>()
 };
 
-interface ProjectStateRecord extends TypedRecord<ProjectStateRecord>, ProjectState {
+export interface ProjectStateRecord extends TypedRecord<ProjectStateRecord>, ProjectState {
 }
 
 interface BoardProjectRecord extends TypedRecord<BoardProjectRecord>, BoardProject {

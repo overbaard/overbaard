@@ -1,7 +1,7 @@
 import {Action} from '@ngrx/store';
 import {
   BoardProject, initialProjectState, LinkedProject, ProjectFactory, ProjectState,
-  ProjectStateModifier
+  ProjectStateModifier, ProjectStateRecord
 } from './project.model';
 import {List, Map} from 'immutable';
 
@@ -17,9 +17,9 @@ class DeserializeProjectsAction implements Action {
 
 export class ProjectActions {
   static createDeserializeProjects(input: any): DeserializeProjectsAction {
-    let boardProjects: Map<string, BoardProject> = Map<string, BoardProject>().asMutable();
-    let rankedIssueKeys: Map<string, List<string>> = Map<string, List<string>>().asMutable();
-    let linkedProjects: Map<string, LinkedProject> = Map<string, LinkedProject>().asMutable();
+    const boardProjects: Map<string, BoardProject> = Map<string, BoardProject>().asMutable();
+    const rankedIssueKeys: Map<string, List<string>> = Map<string, List<string>>().asMutable();
+    const linkedProjects: Map<string, LinkedProject> = Map<string, LinkedProject>().asMutable();
 
     const owner: string = input['owner'];
     const mainInput: any = input['main'];
@@ -36,15 +36,11 @@ export class ProjectActions {
       linkedProjects.set(key, ProjectFactory.linkedProjectFromJs(key, projectInput));
     }
 
-    boardProjects = boardProjects.asImmutable();
-    rankedIssueKeys = rankedIssueKeys.asImmutable();
-    linkedProjects = linkedProjects.asImmutable();
-
     const payload: ProjectState = {
       owner: owner,
-      boardProjects: boardProjects,
-      rankedIssueKeys: rankedIssueKeys,
-      linkedProjects: linkedProjects
+      boardProjects: boardProjects.asImmutable(),
+      rankedIssueKeys: rankedIssueKeys.asImmutable(),
+      linkedProjects: linkedProjects.asImmutable()
     };
     return new DeserializeProjectsAction(payload);
   }
@@ -53,14 +49,14 @@ export class ProjectActions {
 export function projectReducer(state: ProjectState = initialProjectState, action: Action): ProjectState {
   switch (action.type) {
     case DESERIALIZE_PROJECTS: {
-      const newState: ProjectState = (<DeserializeProjectsAction>action).payload;
-      // TODO check if they equal each other and return the original if that is the case
-      return ProjectStateModifier.update(state, copy => {
-        copy.owner = newState.owner;
-        copy.boardProjects = newState.boardProjects;
-        copy.rankedIssueKeys = newState.rankedIssueKeys;
-        copy.linkedProjects = newState.linkedProjects;
+      const payload: ProjectState = (<DeserializeProjectsAction>action).payload;
+      const newState: ProjectState = ProjectStateModifier.update(state, copy => {
+        copy.owner = payload.owner;
+        copy.boardProjects = payload.boardProjects;
+        copy.rankedIssueKeys = payload.rankedIssueKeys;
+        copy.linkedProjects = payload.linkedProjects;
       });
+      return (<ProjectStateRecord>newState).equals(<ProjectStateRecord>state) ? state : newState;
     }
   }
   return state;
