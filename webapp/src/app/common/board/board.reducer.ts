@@ -28,7 +28,7 @@ export interface BoardState {
   priorities: PriorityState;
   components: ComponentState;
   labels: LabelState;
-  fixVersions: FixVersionState,
+  fixVersions: FixVersionState;
   projects: ProjectState;
   issues: IssueState;
 }
@@ -139,7 +139,7 @@ export function boardReducer(state: BoardState = initialState, action: Action): 
       const issueState =
         reducers.issues(state.issues, IssueActions.createDeserializeIssuesAction(input['issues'],
           assigneeState.assignees.toArray(), issueTypeState.types.toArray(), priorityState.priorities.toArray(),
-          componentState.components, labelState.labels));
+          componentState.components, labelState.labels, fixVersionState.versions));
 
       return {
         viewId: viewId,

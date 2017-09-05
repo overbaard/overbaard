@@ -1,6 +1,6 @@
 import {Action} from '@ngrx/store';
 import {List} from 'immutable';
-import {ComponentState, ComponentStateModifier, ComponentStateRecord, initialComponentState} from './component.model';
+import {ComponentState, ComponentUtil, initialComponentState} from './component.model';
 
 
 const DESERIALIZE_ALL_COMPONENTS = 'DESERIALIZE_ALL_COMPONENTS';
@@ -24,10 +24,10 @@ export function componentReducer(state: ComponentState = initialComponentState, 
   switch (action.type) {
     case DESERIALIZE_ALL_COMPONENTS: {
       const payload: List<string> = (<DeserializeComponentsAction>action).payload;
-      const newState: ComponentState = ComponentStateModifier.update(state, copy => {
-        copy.components = payload;
+      const newState: ComponentState = ComponentUtil.toStateRecord(state).withMutations(mutable => {
+        mutable.components = payload;
       });
-      if ((<ComponentStateRecord>newState).equals(<ComponentStateRecord>state)) {
+      if ((ComponentUtil.toStateRecord(newState)).equals(ComponentUtil.toStateRecord(state))) {
         return state;
       }
       return newState;

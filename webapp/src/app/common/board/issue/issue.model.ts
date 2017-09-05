@@ -61,7 +61,8 @@ const LINKED_ISSUE_FACTORY = makeTypedFactory<Issue, LinkedIssueRecord>(DEFAULT_
 const STATE_FACTORY = makeTypedFactory<IssueState, IssueStateRecord>(DEFAULT_STATE);
 export const initialIssueState: IssueState = STATE_FACTORY(DEFAULT_STATE);
 
-export class IssueFactory {
+
+export class IssueUtil {
 
   static fromJS(input: any, assignees: Assignee[], priorities: Priority[], issueTypes: IssueType[],
                 components: List<string>, labels: List<string>, fixVersions: List<string>): BoardIssue {
@@ -82,13 +83,13 @@ export class IssueFactory {
     input['type'] = issueTypes[input['type']];
 
     if (input['components']) {
-      input['components'] = IssueFactory.lookupStringsFromIndex(input['components'], components);
+      input['components'] = IssueUtil.lookupStringsFromIndex(input['components'], components);
     }
     if (input['labels']) {
-      input['labels'] = IssueFactory.lookupStringsFromIndex(input['labels'], labels);
+      input['labels'] = IssueUtil.lookupStringsFromIndex(input['labels'], labels);
     }
     if (input['fix-versions']) {
-      input['fixVersions'] = IssueFactory.lookupStringsFromIndex(input['fix-versions'], fixVersions);
+      input['fixVersions'] = IssueUtil.lookupStringsFromIndex(input['fix-versions'], fixVersions);
       delete input['fix-versions'];
     }
     const temp: any = fromJS(input, (key, value) => {
@@ -105,16 +106,15 @@ export class IssueFactory {
     return ISSUE_FACTORY(temp);
   }
 
+  static toStateRecord(s: IssueState): IssueStateRecord {
+    // TODO do some checks. TS does not allow use of instanceof when the type is an interface (since they are compiled away)
+    return <IssueStateRecord>s;
+  }
+
   private static lookupStringsFromIndex(input: number[], lookup: List<string>): string[] {
     const strings: string[] = new Array<string>(input.length);
     input.forEach((c, i) => strings[i] = lookup.get(c));
     return strings;
   }
+
 };
-
-
-export class IssueStateModifier {
-  static update(state: IssueState, updater: (copy: IssueState) => void) {
-    return (<IssueStateRecord>state).withMutations(updater);
-  }
-}

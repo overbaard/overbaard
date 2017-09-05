@@ -1,6 +1,6 @@
 import {Action} from '@ngrx/store';
 import {List} from 'immutable';
-import {FixVersionState, FixVersionStateModifier, FixVersionStateRecord, initialFixVersionState} from './fix-version.model';
+import {FixVersionState, FixVersionUtil, initialFixVersionState} from './fix-version.model';
 
 
 const DESERIALIZE_ALL_FIX_VERSIONS = 'DESERIALIZE_ALL_FIX_VERSIONS';
@@ -24,10 +24,10 @@ export function fixVersionReducer(state: FixVersionState = initialFixVersionStat
   switch (action.type) {
     case DESERIALIZE_ALL_FIX_VERSIONS: {
       const payload: List<string> = (<DeserializeFixVersionsAction>action).payload;
-      const newState: FixVersionState = FixVersionStateModifier.update(state, copy => {
-        copy.versions = payload;
+      const newState: FixVersionState = FixVersionUtil.toStateRecord(state).withMutations(mutable => {
+        mutable.versions = payload;
       });
-      if ((<FixVersionStateRecord>newState).equals(<FixVersionStateRecord>state)) {
+      if ((FixVersionUtil.toStateRecord(newState)).equals(FixVersionUtil.toStateRecord(state))) {
         return state;
       }
       return newState;

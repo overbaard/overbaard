@@ -1,4 +1,4 @@
-import {Assignee, AssigneeFactory} from './assignee.model';
+import {Assignee, AssigneeUtil} from './assignee.model';
 
 describe('Assignee unit tests', () => {
 
@@ -12,7 +12,7 @@ describe('Assignee unit tests', () => {
 
     it('full record', () => {
       // Check the full record here. Other tests will check the initials calculated
-      const assignee: Assignee = AssigneeFactory.fromJS(input);
+      const assignee: Assignee = AssigneeUtil.fromJS(input);
       expect(assignee).toEqual(jasmine.anything());
       expect(assignee.key).toEqual('userA');
       expect(assignee.email).toEqual('UserA@examle.com');
@@ -24,31 +24,31 @@ describe('Assignee unit tests', () => {
     describe('initials', () => {
       it('4 word name', () => {
         input['name'] = 'Kabir Middle Khan Ignored';
-        const assignee: Assignee = AssigneeFactory.fromJS(input);
+        const assignee: Assignee = AssigneeUtil.fromJS(input);
         expect(assignee.initials).toEqual('KMK');
       });
 
       it('3 word name', () => {
         input['name'] = 'Kabir Middle Khan';
-        const assignee: Assignee = AssigneeFactory.fromJS(input);
+        const assignee: Assignee = AssigneeUtil.fromJS(input);
         expect(assignee.initials).toEqual('KMK');
       });
 
       it('2 word name', () => {
         input['name'] = 'Kabir Khan';
-        const assignee: Assignee = AssigneeFactory.fromJS(input);
+        const assignee: Assignee = AssigneeUtil.fromJS(input);
         expect(assignee.initials).toEqual('KK');
       });
 
       it ('1 word name - lower case', () => {
         input['name'] = 'admin';
-        const assignee: Assignee = AssigneeFactory.fromJS(input);
+        const assignee: Assignee = AssigneeUtil.fromJS(input);
         expect(assignee.initials).toEqual('Adm');
       });
 
       it ('1 word name - upper case', () => {
         input['name'] = 'ADMIN';
-        const assignee: Assignee = AssigneeFactory.fromJS(input);
+        const assignee: Assignee = AssigneeUtil.fromJS(input);
         expect(assignee.initials).toEqual('Adm');
       });
     });

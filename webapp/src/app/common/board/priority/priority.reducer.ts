@@ -1,6 +1,6 @@
 import {AppState} from '../../../app-store';
 import {Action} from '@ngrx/store';
-import {initialPriorityState, Priority, PriorityFactory, PriorityState, PriorityStateModifier} from './priority.model';
+import {initialPriorityState, Priority, PriorityUtil, PriorityState} from './priority.model';
 import {createSelector} from 'reselect';
 
 
@@ -18,7 +18,7 @@ export class PriorityActions {
     const inputArray: any[] = input ? input : [];
     const priorities = new Array<Priority>(inputArray.length);
     inputArray.forEach((type, i) => {
-      priorities[i] = PriorityFactory.fromJS(type);
+      priorities[i] = PriorityUtil.fromJS(type);
     });
 
     return new DeserializePrioritiesAction(priorities);
@@ -36,8 +36,8 @@ export function priorityReducer(state: PriorityState = initialPriorityState, act
           mutable.set(type.name, type);
         }
       });
-      return PriorityStateModifier.update(state, copy => {
-        copy.priorities = priorities;
+      return PriorityUtil.toStateRecord(state).withMutations(mutable => {
+        mutable.priorities = priorities;
       });
     }
     default:

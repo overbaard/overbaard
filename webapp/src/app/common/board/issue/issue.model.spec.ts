@@ -1,7 +1,7 @@
-import {BoardIssue, Issue, IssueFactory} from './issue.model';
-import {Assignee, AssigneeFactory, NO_ASSIGNEE} from '../assignee/assignee.model';
-import {Priority, PriorityFactory} from '../priority/priority.model';
-import {IssueType, IssueTypeFactory} from '../issue-type/issue-type.model';
+import {BoardIssue, Issue, IssueUtil} from './issue.model';
+import {Assignee, AssigneeUtil, NO_ASSIGNEE} from '../assignee/assignee.model';
+import {Priority, PriorityUtil} from '../priority/priority.model';
+import {IssueType, IssueTypeUtil} from '../issue-type/issue-type.model';
 import {List} from 'immutable';
 import {COMPONENTS_INPUT} from '../component/component.reducer.spec';
 import {LABELS_INPUT} from '../label/label.reducer.spec';
@@ -28,14 +28,14 @@ describe('Issue unit tests', () => {
       };
 
       assignees = [];
-      assignees.push(AssigneeFactory.fromJS(
+      assignees.push(AssigneeUtil.fromJS(
         {
           key : 'userA',
           email : 'userA@examle.com',
           avatar : 'https://example.com/userA.png',
           name : 'UserA Smith'
         }));
-      assignees.push(AssigneeFactory.fromJS(
+      assignees.push(AssigneeUtil.fromJS(
         {
           key : 'userB',
           email : 'userB@examle.com',
@@ -44,24 +44,24 @@ describe('Issue unit tests', () => {
         }));
 
       priorities = [];
-      priorities.push(PriorityFactory.fromJS(
+      priorities.push(PriorityUtil.fromJS(
         {
           name: 'Blocker',
           icon: '/priorities/blocker.png'
         }));
-      priorities.push(PriorityFactory.fromJS(
+      priorities.push(PriorityUtil.fromJS(
         {
           name: 'Major',
           icon: '/priorities/major.png'
         }));
 
       issueTypes = [];
-      issueTypes.push(IssueTypeFactory.fromJS(
+      issueTypes.push(IssueTypeUtil.fromJS(
         {
           name : 'Task',
           icon : 'https://example.com/task.png'
         }));
-      issueTypes.push(IssueTypeFactory.fromJS(
+      issueTypes.push(IssueTypeUtil.fromJS(
         {
           name : 'Blocker',
           icon : 'https://example.com/blocker.png'
@@ -73,7 +73,7 @@ describe('Issue unit tests', () => {
     });
 
     it('Standard fields', () => {
-      const issue: BoardIssue = IssueFactory.fromJS(input, assignees, priorities, issueTypes,
+      const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
         components, labels, fixVersions);
       new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
         .key('ISSUE-1')
@@ -82,7 +82,7 @@ describe('Issue unit tests', () => {
 
     it('Assignee > 0', () => {
       input['assignee'] = 1;
-      const issue: BoardIssue = IssueFactory.fromJS(input, assignees, priorities, issueTypes,
+      const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
         components, labels, fixVersions);
       new IssueChecker(issue, issueTypes[0], priorities[0], assignees[1], 'Issue summary')
         .key('ISSUE-1')
@@ -91,7 +91,7 @@ describe('Issue unit tests', () => {
 
     it ('Priority > 0', () => {
       input['priority'] = 1;
-      const issue: BoardIssue = IssueFactory.fromJS(input, assignees, priorities, issueTypes,
+      const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
         components, labels, fixVersions);
       new IssueChecker(issue, issueTypes[0], priorities[1], assignees[0], 'Issue summary')
         .key('ISSUE-1')
@@ -100,7 +100,7 @@ describe('Issue unit tests', () => {
 
     it ('Type > 0', () => {
       input['type'] = 1;
-      const issue: BoardIssue = IssueFactory.fromJS(input, assignees, priorities, issueTypes,
+      const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
         components, labels, fixVersions);
       new IssueChecker(issue, issueTypes[1], priorities[0], assignees[0], 'Issue summary')
         .key('ISSUE-1')
@@ -109,7 +109,7 @@ describe('Issue unit tests', () => {
 
     it ('No assignee', () => {
       delete input['assignee'];
-      const issue: BoardIssue = IssueFactory.fromJS(input, assignees, priorities, issueTypes,
+      const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
         components, labels, fixVersions);
       new IssueChecker(issue, issueTypes[0], priorities[0], NO_ASSIGNEE, 'Issue summary')
         .key('ISSUE-1')
@@ -128,7 +128,7 @@ describe('Issue unit tests', () => {
           summary : 'Linked 2',
         }];
 
-      const issue: BoardIssue = IssueFactory.fromJS(input, assignees, priorities, issueTypes,
+      const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
         components, labels, fixVersions);
       new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
         .key('ISSUE-1')
@@ -139,7 +139,7 @@ describe('Issue unit tests', () => {
 
     it('Components', () => {
       input['components'] = [0, 2];
-      const issue: BoardIssue = IssueFactory.fromJS(input, assignees, priorities, issueTypes,
+      const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
         components, labels, fixVersions);
       new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
         .key('ISSUE-1')
@@ -149,7 +149,7 @@ describe('Issue unit tests', () => {
 
     it('Labels', () => {
       input['labels'] = [1, 2];
-      const issue: BoardIssue = IssueFactory.fromJS(input, assignees, priorities, issueTypes,
+      const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
         components, labels, fixVersions);
       new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
         .key('ISSUE-1')
@@ -160,7 +160,7 @@ describe('Issue unit tests', () => {
 
     it('Fix Versions', () => {
       input['fix-versions'] = [0, 1];
-      const issue: BoardIssue = IssueFactory.fromJS(input, assignees, priorities, issueTypes,
+      const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
         components, labels, fixVersions);
       new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
         .key('ISSUE-1')

@@ -1,4 +1,4 @@
-import {Priority, PriorityFactory} from './priority.model';
+import {Priority, PriorityUtil} from './priority.model';
 
 describe('Priority unit tests', () => {
 
@@ -10,7 +10,7 @@ describe('Priority unit tests', () => {
 
     it('Deserialize', () => {
       // Check the full record here. Other tests will check the initials calculated
-      const priority: Priority = PriorityFactory.fromJS(input);
+      const priority: Priority = PriorityUtil.fromJS(input);
       expect(priority).toEqual(jasmine.anything());
       expect(priority.name).toEqual('Blocker');
       expect(priority.icon).toEqual('https://example.com/blocker.png');

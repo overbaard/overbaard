@@ -1,7 +1,6 @@
 import {Action} from '@ngrx/store';
 import {
-  BoardProject, initialProjectState, LinkedProject, ProjectFactory, ProjectState,
-  ProjectStateModifier, ProjectStateRecord
+  BoardProject, initialProjectState, LinkedProject, ProjectUtil, ProjectState, ProjectStateRecord
 } from './project.model';
 import {List, Map} from 'immutable';
 
@@ -26,14 +25,14 @@ export class ProjectActions {
 
     for (const key of Object.keys(mainInput)) {
       const projectInput: any = mainInput[key];
-      boardProjects.set(key, ProjectFactory.boardProjectFromJs(key, projectInput));
+      boardProjects.set(key, ProjectUtil.boardProjectFromJs(key, projectInput));
       rankedIssueKeys.set(key, List<string>(projectInput['ranked']));
     }
 
     const linkedInput = input['linked'];
     for (const key of Object.keys(linkedInput)) {
       const projectInput: any = linkedInput[key];
-      linkedProjects.set(key, ProjectFactory.linkedProjectFromJs(key, projectInput));
+      linkedProjects.set(key, ProjectUtil.linkedProjectFromJs(key, projectInput));
     }
 
     const payload: ProjectState = {
@@ -50,11 +49,11 @@ export function projectReducer(state: ProjectState = initialProjectState, action
   switch (action.type) {
     case DESERIALIZE_PROJECTS: {
       const payload: ProjectState = (<DeserializeProjectsAction>action).payload;
-      const newState: ProjectState = ProjectStateModifier.update(state, copy => {
-        copy.owner = payload.owner;
-        copy.boardProjects = payload.boardProjects;
-        copy.rankedIssueKeys = payload.rankedIssueKeys;
-        copy.linkedProjects = payload.linkedProjects;
+      const newState: ProjectState = ProjectUtil.toStateRecord(state).withMutations(mutable => {
+        mutable.owner = payload.owner;
+        mutable.boardProjects = payload.boardProjects;
+        mutable.rankedIssueKeys = payload.rankedIssueKeys;
+        mutable.linkedProjects = payload.linkedProjects;
       });
       return (<ProjectStateRecord>newState).equals(<ProjectStateRecord>state) ? state : newState;
     }

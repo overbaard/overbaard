@@ -1,6 +1,6 @@
 import {Action} from '@ngrx/store';
 import {List} from 'immutable';
-import {LabelState, LabelStateModifier, LabelStateRecord, initialLabelState} from './label.model';
+import {LabelState, LabelUtil, initialLabelState} from './label.model';
 
 
 const DESERIALIZE_ALL_LABELS = 'DESERIALIZE_ALL_LABELS';
@@ -24,10 +24,10 @@ export function labelReducer(state: LabelState = initialLabelState, action: Acti
   switch (action.type) {
     case DESERIALIZE_ALL_LABELS: {
       const payload: List<string> = (<DeserializeLabelsAction>action).payload;
-      const newState: LabelState = LabelStateModifier.update(state, copy => {
-        copy.labels = payload;
+      const newState: LabelState = LabelUtil.toStateRecord(state).withMutations(mutable => {
+        mutable.labels = payload;
       });
-      if ((<LabelStateRecord>newState).equals(<LabelStateRecord>state)) {
+      if ((LabelUtil.toStateRecord(newState)).equals(LabelUtil.toStateRecord(state))) {
         return state;
       }
       return newState;

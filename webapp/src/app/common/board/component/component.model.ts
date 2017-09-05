@@ -10,15 +10,16 @@ const DEFAULT_STATE: ComponentState = {
   components: List<string>()
 };
 
-export interface ComponentStateRecord extends TypedRecord<ComponentStateRecord>, ComponentState {
+interface ComponentStateRecord extends TypedRecord<ComponentStateRecord>, ComponentState {
 }
 
 const STATE_FACTORY = makeTypedFactory<ComponentState, ComponentStateRecord>(DEFAULT_STATE);
 export const initialComponentState: ComponentState = STATE_FACTORY(DEFAULT_STATE);
 
-export class ComponentStateModifier {
-  static update(state: ComponentState, updater: (copy: ComponentState) => void) {
-    return (<ComponentStateRecord>state).withMutations(updater);
+export class ComponentUtil {
+  static toStateRecord(s: ComponentState): ComponentStateRecord {
+    // TODO do some checks. TS does not allow use of instanceof when the type is an interface (since they are compiled away)
+    return <ComponentStateRecord>s;
   }
 }
 

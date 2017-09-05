@@ -32,16 +32,15 @@ const STATE_FACTORY = makeTypedFactory<IssueTypeState, IssueTypeStateRecord>(DEF
 const ISSUE_FACTORY = makeTypedFactory<IssueType, IssueTypeRecord>(DEFAULT_ISSUE);
 export const initialIssueTypeState: IssueTypeState = STATE_FACTORY(DEFAULT_STATE);
 
-export class IssueTypeFactory {
+export class IssueTypeUtil {
   static fromJS(input: any): IssueType {
     return ISSUE_FACTORY(input);
   }
-};
 
-export class IssueTypeStateModifier {
-  static update(state: IssueTypeState, updater: (copy: IssueTypeState) => void) {
-    return (<IssueTypeStateRecord>state).withMutations(updater);
+  static toStateRecord(s: IssueTypeState): IssueTypeStateRecord {
+    // TODO do some checks. TS does not allow use of instanceof when the type is an interface (since they are compiled away)
+    return <IssueTypeStateRecord>s;
   }
-}
+};
 
 

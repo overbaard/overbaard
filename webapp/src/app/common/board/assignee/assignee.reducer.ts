@@ -1,5 +1,5 @@
 import {Action} from '@ngrx/store';
-import {Assignee, AssigneeFactory, AssigneeState, AssigneeStateModifier, initialAssigneeState} from './assignee.model';
+import {Assignee, AssigneeUtil, AssigneeState, initialAssigneeState} from './assignee.model';
 import {AppState} from '../../../app-store';
 import {createSelector} from 'reselect';
 import {OrderedMap} from 'immutable';
@@ -34,7 +34,7 @@ export class AssigneeActions {
     const inputArray: any[] = input ? input : [];
     const assignees = new Array<Assignee>(inputArray.length);
     inputArray.forEach((a, i) => {
-      assignees[i] = AssigneeFactory.fromJS(a);
+      assignees[i] = AssigneeUtil.fromJS(a);
     });
     return assignees;
   }
@@ -65,8 +65,9 @@ function addAssignees(state: AssigneeState, added: Assignee[]): AssigneeState {
   });
   assignees = <OrderedMap<string, Assignee>>assignees.sort(
     (valueA, valueB) => valueA.name.toLocaleLowerCase().localeCompare(valueB.name.toLocaleLowerCase()));
-  return AssigneeStateModifier.update(state, copy => {
-    copy.assignees = assignees;
+
+  return AssigneeUtil.toStateRecord(state).withMutations(mutable => {
+    mutable.assignees = assignees;
   });
 }
 

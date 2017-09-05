@@ -30,15 +30,14 @@ const STATE_FACTORY = makeTypedFactory<PriorityState, PriorityStateRecord>(DEFAU
 const PRIORITY_FACTORY = makeTypedFactory<Priority, PriorityRecord>(DEFAULT_PRIORITY);
 export const initialPriorityState: PriorityState = STATE_FACTORY(DEFAULT_STATE);
 
-export class PriorityFactory {
+export class PriorityUtil {
   static fromJS(input: any): Priority {
     return PRIORITY_FACTORY(input);
   }
-};
 
-export class PriorityStateModifier {
-  static update(state: PriorityState, updater: (copy: PriorityState) => void) {
-    return (<PriorityStateRecord>state).withMutations(updater);
+  static toStateRecord(s: PriorityState): PriorityStateRecord {
+    // TODO do some checks. TS does not allow use of instanceof when the type is an interface (since they are compiled away)
+    return <PriorityStateRecord>s;
   }
-}
+};
 

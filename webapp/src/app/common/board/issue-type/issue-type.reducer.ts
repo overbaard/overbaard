@@ -3,9 +3,8 @@ import {Action} from '@ngrx/store';
 import {
   initialIssueTypeState,
   IssueType,
-  IssueTypeFactory,
-  IssueTypeState,
-  IssueTypeStateModifier
+  IssueTypeUtil,
+  IssueTypeState
 } from './issue-type.model';
 import {createSelector} from 'reselect';
 
@@ -24,7 +23,7 @@ export class IssueTypeActions {
     const inputArray: any[] = input ? input : [];
     const issueTypes = new Array<IssueType>(inputArray.length);
     inputArray.forEach((type, i) => {
-      issueTypes[i] = IssueTypeFactory.fromJS(type);
+      issueTypes[i] = IssueTypeUtil.fromJS(type);
     });
 
     return new DeserializeIssueTypesAction(issueTypes);
@@ -44,8 +43,8 @@ export function issueTypeReducer(state: IssueTypeState = initialIssueTypeState, 
           mutable.set(type.name, type);
         }
       });
-      return IssueTypeStateModifier.update(state, copy => {
-        copy.types = types;
+      return IssueTypeUtil.toStateRecord(state).withMutations(mutable => {
+        mutable.types = types;
       });
     }
     default:

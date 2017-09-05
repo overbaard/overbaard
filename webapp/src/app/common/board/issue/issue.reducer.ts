@@ -1,6 +1,6 @@
 import {AppState} from '../../../app-store';
 import {Action} from '@ngrx/store';
-import {BoardIssue, initialIssueState, IssueFactory, IssueState, IssueStateModifier} from './issue.model';
+import {BoardIssue, initialIssueState, IssueUtil, IssueState} from './issue.model';
 import {Assignee} from '../assignee/assignee.model';
 import {createSelector} from 'reselect';
 import {IssueType} from '../issue-type/issue-type.model';
@@ -24,7 +24,7 @@ export class IssueActions {
     const inputArray: any[] = input ? input : [];
     const issues = new Array<BoardIssue>(inputArray.length);
     inputArray.forEach((issue, i) => {
-      issues[i] = IssueFactory.fromJS(issue, assignees, priorities, issueTypes, components, labels, fixVersions);
+      issues[i] = IssueUtil.fromJS(issue, assignees, priorities, issueTypes, components, labels, fixVersions);
     });
     return new DeserializeIssuesAction(issues);
   }
@@ -41,8 +41,8 @@ export function issueReducer(state: IssueState = initialIssueState, action: Acti
           mutable.set(issue.key, issue);
         }
       });
-      return IssueStateModifier.update(state, copy => {
-        copy.issues = issues;
+      return IssueUtil.toStateRecord(state).withMutations(mutable => {
+        mutable.issues = issues;
       });
     }
     default:

@@ -1,5 +1,5 @@
 import {List} from 'immutable';
-import {Header, HeaderFactory, HeaderState, HeaderStateModifier, initialHeaderState} from './header.model';
+import {Header, HeaderState, HeaderUtil, initialHeaderState} from './header.model';
 import {Action} from '@ngrx/store';
 import {Dictionary} from '../../utils/dictionary';
 
@@ -142,7 +142,7 @@ class HeaderTableCreator {
   private makeImmutable(headers: TempHeader[]): List<Header> {
     return List<Header>().withMutations(list => {
       headers.forEach(header => {
-        list.push(HeaderFactory.fromObject(header));
+        list.push(HeaderUtil.fromObject(header));
       });
     });
   }
@@ -156,8 +156,8 @@ export function headerReducer(state: HeaderState = initialHeaderState, action: A
       if (headers.equals(payload)) {
         return state;
       }
-      return HeaderStateModifier.update(state, copy => {
-        copy.headers = payload;
+      return HeaderUtil.toStateRecord(state).withMutations( mutable => {
+        mutable.headers = payload;
       });
     }
     default:

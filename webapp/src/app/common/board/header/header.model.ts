@@ -37,15 +37,14 @@ const STATE_FACTORY = makeTypedFactory<HeaderState, HeaderStateRecord>(DEFAULT_S
 const HEADER_FACTORY = makeTypedFactory<Header, HeaderRecord>(DEFAULT_HEADER);
 export const initialHeaderState: HeaderState = STATE_FACTORY(DEFAULT_STATE);
 
-export class HeaderFactory {
+export class HeaderUtil {
   static fromObject(input: Header): Header {
     return HEADER_FACTORY(input);
   }
-}
 
-export class HeaderStateModifier {
-  static update(state: HeaderState, updater: (copy: HeaderState) => void) {
-    return (<HeaderStateRecord>state).withMutations(updater);
+  static toStateRecord(s: HeaderState): HeaderStateRecord {
+    // TODO do some checks. TS does not allow use of instanceof when the type is an interface (since they are compiled away)
+    return <HeaderStateRecord>s;
   }
 }
 

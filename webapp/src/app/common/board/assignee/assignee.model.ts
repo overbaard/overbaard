@@ -25,15 +25,16 @@ const DEFAULT_ASSIGNEE: Assignee = {
   initials: null
 };
 
-interface AssigneeStateRecord extends TypedRecord<AssigneeStateRecord>, AssigneeState {
+export interface AssigneeStateRecord extends TypedRecord<AssigneeStateRecord>, AssigneeState {
 }
 
-interface AssigneeRecord extends TypedRecord<AssigneeRecord>, Assignee {
+export interface AssigneeRecord extends TypedRecord<AssigneeRecord>, Assignee {
 }
 
 const STATE_FACTORY = makeTypedFactory<AssigneeState, AssigneeStateRecord>(DEFAULT_STATE);
 const ASSIGNEE_FACTORY = makeTypedFactory<Assignee, AssigneeRecord>(DEFAULT_ASSIGNEE);
-export const initialAssigneeState: AssigneeState = STATE_FACTORY(DEFAULT_STATE);
+const assigneeStateCaster: AssigneeStateRecord = STATE_FACTORY(DEFAULT_STATE);
+export const initialAssigneeState: AssigneeState = assigneeStateCaster;
 
 export const NO_ASSIGNEE: Assignee = ASSIGNEE_FACTORY({
   key: '_____N$O$N$E____',
@@ -43,11 +44,16 @@ export const NO_ASSIGNEE: Assignee = ASSIGNEE_FACTORY({
   initials: '-'
 });
 
-export class AssigneeFactory {
+export class AssigneeUtil {
 
   static fromJS(input: any): AssigneeRecord {
-    input['initials'] = AssigneeFactory.calculateInitials(input['name']);
+    input['initials'] = AssigneeUtil.calculateInitials(input['name']);
     return ASSIGNEE_FACTORY(input);
+  }
+
+  static toStateRecord(s: AssigneeState): AssigneeStateRecord {
+    // TODO do some checks. TS does not allow use of instanceof when the type is an interface (since they are compiled away)
+    return <AssigneeStateRecord>s;
   }
 
   private static calculateInitials(name: string): string {
@@ -73,12 +79,5 @@ export class AssigneeFactory {
     return ret.toUpperCase();
   }
 };
-
-export class AssigneeStateModifier {
-  static update(state: AssigneeState, updater: (copy: AssigneeState) => void) {
-    return (<AssigneeStateRecord>state).withMutations(updater);
-  }
-}
-
 
 

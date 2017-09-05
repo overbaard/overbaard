@@ -55,7 +55,7 @@ const BOARD_PROJECT_FACTORY = makeTypedFactory<BoardProject, BoardProjectRecord>
 const LINKED_PROJECT_FACTORY = makeTypedFactory<LinkedProject, LinkedProjectRecord>(DEFAULT_LINKED_PROJECT);
 export const initialProjectState: ProjectState = STATE_FACTORY(DEFAULT_STATE);
 
-export class ProjectFactory {
+export class ProjectUtil {
   static boardProjectFromJs(key: string, input: any): BoardProject {
     const boardStateNameToOwnStateName: Map<string, string> = Map<string, string>(input['state-links']);
     const projectInput: BoardProject = {
@@ -74,10 +74,10 @@ export class ProjectFactory {
     };
     return LINKED_PROJECT_FACTORY(projectInput);
   }
-}
 
-export class ProjectStateModifier {
-  static update(state: ProjectState, updater: (copy: ProjectState) => void) {
-    return (<ProjectStateRecord>state).withMutations(updater);
+
+  static toStateRecord(s: ProjectState): ProjectStateRecord {
+    // TODO do some checks. TS does not allow use of instanceof when the type is an interface (since they are compiled away)
+    return <ProjectStateRecord>s;
   }
 }

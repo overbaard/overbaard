@@ -10,15 +10,16 @@ const DEFAULT_STATE: FixVersionState = {
   versions: List<string>()
 };
 
-export interface FixVersionStateRecord extends TypedRecord<FixVersionStateRecord>, FixVersionState {
+interface FixVersionStateRecord extends TypedRecord<FixVersionStateRecord>, FixVersionState {
 }
 
 const STATE_FACTORY = makeTypedFactory<FixVersionState, FixVersionStateRecord>(DEFAULT_STATE);
 export const initialFixVersionState: FixVersionState = STATE_FACTORY(DEFAULT_STATE);
 
-export class FixVersionStateModifier {
-  static update(state: FixVersionState, updater: (copy: FixVersionState) => void) {
-    return (<FixVersionStateRecord>state).withMutations(updater);
+export class FixVersionUtil {
+  static toStateRecord(s: FixVersionState): FixVersionStateRecord {
+    // TODO do some checks. TS does not allow use of instanceof when the type is an interface (since they are compiled away)
+    return <FixVersionStateRecord>s;
   }
 }
 
