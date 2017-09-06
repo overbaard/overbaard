@@ -2,7 +2,8 @@ import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {Assignee, NO_ASSIGNEE} from '../assignee/assignee.model';
 import {Priority} from '../priority/priority.model';
 import {IssueType} from '../issue-type/issue-type.model';
-import {fromJS, List, Map} from 'immutable';
+import {fromJS, List, Map, OrderedMap} from 'immutable';
+import {CustomField} from '../custom-field/custom-field.model';
 
 export interface IssueState {
   issues: Map<string, BoardIssue>;
@@ -21,9 +22,14 @@ export interface BoardIssue extends Issue {
   components: List<string>;
   labels: List<string>;
   fixVersions: List<string>;
+  customFields: Map<string, CustomFieldValue>;
   linkedIssues: List<Issue>;
 }
 
+export interface CustomFieldValue {
+  key: string;
+  value: string;
+}
 const DEFAULT_STATE: IssueState = {
   issues: Map<string, BoardIssue>()
 };
@@ -37,6 +43,7 @@ const DEFAULT_ISSUE: BoardIssue = {
   components: null,
   labels: null,
   fixVersions: null,
+  customFields: null,
   linkedIssues: List<Issue>()
 };
 
@@ -45,6 +52,10 @@ const DEFAULT_LINKED_ISSUE: Issue = {
   summary: null
 };
 
+const DEFAULT_CUSTOM_FIELD_VALUE: CustomFieldValue = {
+  key: null,
+  value: null
+};
 
 
 interface BoardIssueRecord extends TypedRecord<BoardIssueRecord>, BoardIssue {
@@ -56,16 +67,21 @@ interface LinkedIssueRecord extends TypedRecord<LinkedIssueRecord>, Issue {
 interface IssueStateRecord extends TypedRecord<IssueStateRecord>, IssueState {
 }
 
+interface CustomFieldValueRecord extends TypedRecord<CustomFieldValueRecord>, CustomFieldValue {
+}
+
 const ISSUE_FACTORY = makeTypedFactory<BoardIssue, BoardIssueRecord>(DEFAULT_ISSUE);
 const LINKED_ISSUE_FACTORY = makeTypedFactory<Issue, LinkedIssueRecord>(DEFAULT_LINKED_ISSUE);
 const STATE_FACTORY = makeTypedFactory<IssueState, IssueStateRecord>(DEFAULT_STATE);
+const CUSTOM_FIELD_FACTORY = makeTypedFactory<CustomFieldValue, CustomFieldValueRecord>(DEFAULT_CUSTOM_FIELD_VALUE);
 export const initialIssueState: IssueState = STATE_FACTORY(DEFAULT_STATE);
 
 
 export class IssueUtil {
 
   static fromJS(input: any, assignees: Assignee[], priorities: Priority[], issueTypes: IssueType[],
-                components: List<string>, labels: List<string>, fixVersions: List<string>): BoardIssue {
+                components: List<string>, labels: List<string>, fixVersions: List<string>,
+                customFields: OrderedMap<string, List<CustomField>>): BoardIssue {
     // Rework the data as needed before deserializing
     if (input['linked-issues']) {
       input['linkedIssues'] = input['linked-issues'];
@@ -83,14 +99,24 @@ export class IssueUtil {
     input['type'] = issueTypes[input['type']];
 
     if (input['components']) {
-      input['components'] = IssueUtil.lookupStringsFromIndex(input['components'], components);
+      input['components'] = IssueUtil.lookupStringsFromIndexArray(input['components'], components);
     }
     if (input['labels']) {
-      input['labels'] = IssueUtil.lookupStringsFromIndex(input['labels'], labels);
+      input['labels'] = IssueUtil.lookupStringsFromIndexArray(input['labels'], labels);
     }
     if (input['fix-versions']) {
-      input['fixVersions'] = IssueUtil.lookupStringsFromIndex(input['fix-versions'], fixVersions);
+      input['fixVersions'] = IssueUtil.lookupStringsFromIndexArray(input['fix-versions'], fixVersions);
       delete input['fix-versions'];
+    }
+    if (input['custom']) {
+      const custom = input['custom'];
+      for (const key of Object.keys(custom)) {
+        custom[key] = customFields.get(key).get(custom[key]);
+      }
+      input['customFields'] = custom;
+      delete input['custom'];
+    } else {
+      input['customFields'] = Map<string, CustomFieldValue>();
     }
     const temp: any = fromJS(input, (key, value) => {
       if (key === 'linkedIssues') {
@@ -111,7 +137,7 @@ export class IssueUtil {
     return <IssueStateRecord>s;
   }
 
-  private static lookupStringsFromIndex(input: number[], lookup: List<string>): string[] {
+  private static lookupStringsFromIndexArray(input: number[], lookup: List<string>): string[] {
     const strings: string[] = new Array<string>(input.length);
     input.forEach((c, i) => strings[i] = lookup.get(c));
     return strings;

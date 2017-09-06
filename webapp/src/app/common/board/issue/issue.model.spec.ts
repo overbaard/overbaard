@@ -1,11 +1,15 @@
-import {BoardIssue, Issue, IssueUtil} from './issue.model';
+import {BoardIssue, CustomFieldValue, Issue, IssueUtil} from './issue.model';
 import {Assignee, AssigneeUtil, NO_ASSIGNEE} from '../assignee/assignee.model';
 import {Priority, PriorityUtil} from '../priority/priority.model';
 import {IssueType, IssueTypeUtil} from '../issue-type/issue-type.model';
-import {List} from 'immutable';
+import {List, Map, OrderedMap} from 'immutable';
 import {COMPONENTS_INPUT} from '../component/component.reducer.spec';
 import {LABELS_INPUT} from '../label/label.reducer.spec';
 import {FIX_VERSIONS_INPUT} from '../fix-version/fix-version.reducer.spec';
+import {CustomField, initialCustomFieldState} from '../custom-field/custom-field.model';
+import {CustomFieldActions, customFieldReducer} from '../custom-field/custom-field.reducer';
+import {CUSTOM_FIELDS_INPUT} from '../custom-field/custom-field.reducer.spec';
+import {Dictionary} from '../../utils/dictionary';
 
 describe('Issue unit tests', () => {
 
@@ -17,6 +21,7 @@ describe('Issue unit tests', () => {
     let components: List<string>;
     let labels: List<string>;
     let fixVersions: List<string>;
+    let customFields: OrderedMap<string, List<CustomField>>;
 
     beforeEach(() => {
       input = {
@@ -70,11 +75,15 @@ describe('Issue unit tests', () => {
       components = List<string>(COMPONENTS_INPUT);
       labels = List<string>(LABELS_INPUT);
       fixVersions = List<string>(FIX_VERSIONS_INPUT);
+      customFields =
+        customFieldReducer(
+          initialCustomFieldState,
+          CustomFieldActions.createDeserializeCustomFields(CUSTOM_FIELDS_INPUT)).fields;
     });
 
     it('Standard fields', () => {
       const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions);
+        components, labels, fixVersions, customFields);
       new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
         .key('ISSUE-1')
         .check();
@@ -83,7 +92,7 @@ describe('Issue unit tests', () => {
     it('Assignee > 0', () => {
       input['assignee'] = 1;
       const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions);
+        components, labels, fixVersions, customFields);
       new IssueChecker(issue, issueTypes[0], priorities[0], assignees[1], 'Issue summary')
         .key('ISSUE-1')
         .check();
@@ -92,7 +101,7 @@ describe('Issue unit tests', () => {
     it ('Priority > 0', () => {
       input['priority'] = 1;
       const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions);
+        components, labels, fixVersions, customFields);
       new IssueChecker(issue, issueTypes[0], priorities[1], assignees[0], 'Issue summary')
         .key('ISSUE-1')
         .check();
@@ -101,7 +110,7 @@ describe('Issue unit tests', () => {
     it ('Type > 0', () => {
       input['type'] = 1;
       const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions);
+        components, labels, fixVersions, customFields);
       new IssueChecker(issue, issueTypes[1], priorities[0], assignees[0], 'Issue summary')
         .key('ISSUE-1')
         .check();
@@ -110,7 +119,7 @@ describe('Issue unit tests', () => {
     it ('No assignee', () => {
       delete input['assignee'];
       const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions);
+        components, labels, fixVersions, customFields);
       new IssueChecker(issue, issueTypes[0], priorities[0], NO_ASSIGNEE, 'Issue summary')
         .key('ISSUE-1')
         .check();
@@ -129,7 +138,7 @@ describe('Issue unit tests', () => {
         }];
 
       const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions);
+        components, labels, fixVersions, customFields);
       new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
         .key('ISSUE-1')
         .addLinkedIssue('LNK-1', 'Linked 1')
@@ -140,7 +149,7 @@ describe('Issue unit tests', () => {
     it('Components', () => {
       input['components'] = [0, 2];
       const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions);
+        components, labels, fixVersions, customFields);
       new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
         .key('ISSUE-1')
         .components('C-1', 'C-3')
@@ -150,7 +159,7 @@ describe('Issue unit tests', () => {
     it('Labels', () => {
       input['labels'] = [1, 2];
       const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions);
+        components, labels, fixVersions, customFields);
       new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
         .key('ISSUE-1')
         .labels('L-2', 'L-3')
@@ -161,10 +170,32 @@ describe('Issue unit tests', () => {
     it('Fix Versions', () => {
       input['fix-versions'] = [0, 1];
       const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions);
+        components, labels, fixVersions, customFields);
       new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
         .key('ISSUE-1')
         .fixVersions('F-1', 'F-2')
+        .check();
+    });
+
+    it('Custom Fields (all)', () => {
+      input['custom'] = {'Custom-1': 2, 'Custom-2': 1};
+      const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
+        components, labels, fixVersions, customFields);
+      new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
+        .key('ISSUE-1')
+        .customField('Custom-1', 'c1-C', 'Third C1')
+        .customField('Custom-2', 'c2-B', 'Second C2')
+        .check();
+    });
+
+
+    it('Custom Fields (one)', () => {
+      input['custom'] = {'Custom-2': 0};
+      const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
+        components, labels, fixVersions, customFields);
+      new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
+        .key('ISSUE-1')
+        .customField('Custom-2', 'c2-A', 'First C2')
         .check();
     });
 
@@ -182,7 +213,7 @@ export class IssueChecker {
   private _components: string[];
   private _labels: string[];
   private _fixVersions: string[];
-  // private _customFields: IMap<CustomFieldValue>;
+  private _customFields: Dictionary<CustomFieldValue>;
   // private _selectedParallelTaskOptions:string[]
 
 
@@ -223,15 +254,18 @@ export class IssueChecker {
     return this;
   }
 
-  /*
-  customField(field:string, key:string, displayValue:string) : IssueChecker {
+  customField(field: string, key: string, value: string): IssueChecker {
     if (!this._customFields) {
       this._customFields = {};
     }
-    this._customFields[field] = new CustomFieldValue(key, displayValue);
+    this._customFields[field] = {
+      key: key,
+      value: value
+    };
     return this;
   }
 
+  /*
   selectedParallelTaskOptions(...selectedOptions:string[]) : IssueChecker {
     this._selectedParallelTaskOptions = selectedOptions;
     return this;
@@ -280,23 +314,23 @@ export class IssueChecker {
       expect(this._issue.linkedIssues).toBeTruthy();
       expect(this._issue.linkedIssues.size).toEqual(0);
     }
-    /*
+
     if (this._customFields) {
-      let issueFieldNames:string[] = this._issue.customFieldNames;
-      let expectedFieldNames:string[] = IMapUtil.getSortedKeys(this._customFields);
+      const issueFieldNames: string[] = this._issue.customFields.keySeq().toArray().sort();
+      const expectedFieldNames: string[] = Object.keys(this._customFields);
       expect(expectedFieldNames).toEqual(issueFieldNames);
 
-      for (let fieldName of issueFieldNames) {
-        let customField:CustomFieldValue = this._issue.getCustomFieldValue(fieldName);
-        let expectedField:CustomFieldValue = this._customFields[fieldName];
+      for (const fieldName of issueFieldNames) {
+        const customField: CustomFieldValue = this._issue.customFields.get(fieldName);
+        const expectedField: CustomFieldValue = this._customFields[fieldName];
         expect(customField).toEqual(jasmine.anything());
         expect(customField.key).toEqual(expectedField.key);
-        expect(customField.displayValue).toEqual(expectedField.displayValue);
+        expect(customField.value).toEqual(expectedField.value);
       }
     } else {
-      expect(this._issue.customFieldNames).toEqual(jasmine.anything());
+      expect(this._issue.customFields).toEqual(Map<string, CustomFieldValue>());
     }
-
+/*
     if (this._selectedParallelTaskOptions) {
       let options:Indexed<string> = this._issue.parallelTaskOptions;
       expect(options).toEqual(jasmine.anything());

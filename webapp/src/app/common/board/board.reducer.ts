@@ -18,6 +18,8 @@ import {initialLabelState, LabelState} from './label/label.model';
 import {LabelActions, labelReducer} from './label/label.reducer';
 import {FixVersionState, initialFixVersionState} from './fix-version/fix-version.model';
 import {FixVersionActions, fixVersionReducer} from './fix-version/fix-version.reducer';
+import {CustomFieldState, initialCustomFieldState} from './custom-field/custom-field.model';
+import {CustomFieldActions, customFieldReducer} from './custom-field/custom-field.reducer';
 
 export interface BoardState {
   viewId: number;
@@ -29,6 +31,7 @@ export interface BoardState {
   components: ComponentState;
   labels: LabelState;
   fixVersions: FixVersionState;
+  customFields: CustomFieldState;
   projects: ProjectState;
   issues: IssueState;
 }
@@ -43,6 +46,7 @@ const initialState: BoardState = {
   components: initialComponentState,
   labels: initialLabelState,
   fixVersions: initialFixVersionState,
+  customFields: initialCustomFieldState,
   projects: initialProjectState,
   issues: initialIssueState
 };
@@ -56,6 +60,7 @@ const reducers = {
   components: componentReducer,
   labels: labelReducer,
   fixVersions: fixVersionReducer,
+  customFields: customFieldReducer,
   projects: projectReducer,
   issues: issueReducer
 };
@@ -134,12 +139,14 @@ export function boardReducer(state: BoardState = initialState, action: Action): 
         reducers.labels(state.labels, LabelActions.createDeserializeLabels(input['labels']));
       const fixVersionState =
         reducers.fixVersions(state.fixVersions, FixVersionActions.createDeserializeFixVersions(input['fix-versions']));
+      const customFieldState =
+        reducers.customFields(state.customFields, CustomFieldActions.createDeserializeCustomFields(input['custom']));
       const projectState =
         reducers.projects(state.projects, ProjectActions.createDeserializeProjects(input['projects']));
       const issueState =
         reducers.issues(state.issues, IssueActions.createDeserializeIssuesAction(input['issues'],
           assigneeState.assignees.toArray(), issueTypeState.types.toArray(), priorityState.priorities.toArray(),
-          componentState.components, labelState.labels, fixVersionState.versions));
+          componentState.components, labelState.labels, fixVersionState.versions, customFieldState.fields));
 
       return {
         viewId: viewId,
@@ -151,6 +158,7 @@ export function boardReducer(state: BoardState = initialState, action: Action): 
         components: componentState,
         fixVersions: fixVersionState,
         labels: labelState,
+        customFields: customFieldState,
         projects: projectState,
         issues: issueState
       };

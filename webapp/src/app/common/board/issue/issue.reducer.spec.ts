@@ -11,7 +11,7 @@ import {Assignee, initialAssigneeState, NO_ASSIGNEE} from '../assignee/assignee.
 import {initialIssueTypeState, IssueType} from '../issue-type/issue-type.model';
 import {initialPriorityState, Priority} from '../priority/priority.model';
 import {AssigneeActions, assigneeReducer} from '../assignee/assignee.reducer';
-import {List, Map} from 'immutable';
+import {List, Map, OrderedMap} from 'immutable';
 import {ComponentActions, componentReducer} from '../component/component.reducer';
 import {initialComponentState} from '../component/component.model';
 import {COMPONENTS_INPUT} from '../component/component.reducer.spec';
@@ -21,6 +21,7 @@ import {LABELS_INPUT} from '../label/label.reducer.spec';
 import {FixVersionActions, fixVersionReducer} from '../fix-version/fix-version.reducer';
 import {initialFixVersionState} from '../fix-version/fix-version.model';
 import {FIX_VERSIONS_INPUT} from '../fix-version/fix-version.reducer.spec';
+import {CustomField} from '../custom-field/custom-field.model';
 
 describe('Issue reducer tests', () => {
 
@@ -30,6 +31,7 @@ describe('Issue reducer tests', () => {
   let components: List<string>;
   let labels: List<string>;
   let fixVersions: List<string>;
+  const customFields: OrderedMap<string, List<CustomField>> = OrderedMap<string, List<CustomField>>();
   let issues: Map<string, BoardIssue>;
   beforeEach(async(() => {
 
@@ -89,7 +91,8 @@ describe('Issue reducer tests', () => {
 
     issues = issueReducer(
       initialIssueState,
-      IssueActions.createDeserializeIssuesAction(input, assignees, types, priorities, components, labels, fixVersions)).issues;
+      IssueActions.createDeserializeIssuesAction(
+        input, assignees, types, priorities, components, labels, fixVersions, customFields)).issues;
   }));
 
 
