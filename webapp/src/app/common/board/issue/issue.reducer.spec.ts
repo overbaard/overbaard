@@ -3,9 +3,9 @@ import {BoardIssue, initialIssueState} from './issue.model';
 import {async} from '@angular/core/testing';
 import {IssueTypeActions, issueTypeReducer} from '../issue-type/issue-type.reducer';
 import {PriorityActions, priorityReducer} from '../priority/priority.reducer';
-import {ASSIGNEES_INPUT} from '../assignee/assignee.reducer.spec';
-import {ISSUE_TYPES_INPUT} from '../issue-type/issue-type.reducer.spec';
-import {PRIORITIES_INPUT} from '../priority/priority.reducer.spec';
+import {getTestAssigneesInput} from '../assignee/assignee.reducer.spec';
+import {getTestIssueTypesInput} from '../issue-type/issue-type.reducer.spec';
+import {getTestPrioritiesInput} from '../priority/priority.reducer.spec';
 import {IssueChecker} from './issue.model.spec';
 import {Assignee, initialAssigneeState, NO_ASSIGNEE} from '../assignee/assignee.model';
 import {initialIssueTypeState, IssueType} from '../issue-type/issue-type.model';
@@ -14,13 +14,13 @@ import {AssigneeActions, assigneeReducer} from '../assignee/assignee.reducer';
 import {List, Map, OrderedMap} from 'immutable';
 import {ComponentActions, componentReducer} from '../component/component.reducer';
 import {initialComponentState} from '../component/component.model';
-import {COMPONENTS_INPUT} from '../component/component.reducer.spec';
+import {getTestComponentsInput} from '../component/component.reducer.spec';
 import {LabelActions, labelReducer} from '../label/label.reducer';
 import {initialLabelState} from '../label/label.model';
-import {LABELS_INPUT} from '../label/label.reducer.spec';
+import {getTestLabelsInput} from '../label/label.reducer.spec';
 import {FixVersionActions, fixVersionReducer} from '../fix-version/fix-version.reducer';
 import {initialFixVersionState} from '../fix-version/fix-version.model';
-import {FIX_VERSIONS_INPUT} from '../fix-version/fix-version.reducer.spec';
+import {getTestFixVersionsInput} from '../fix-version/fix-version.reducer.spec';
 import {CustomField} from '../custom-field/custom-field.model';
 
 describe('Issue reducer tests', () => {
@@ -72,22 +72,22 @@ describe('Issue reducer tests', () => {
 
     assignees = assigneeReducer(
       initialAssigneeState,
-      AssigneeActions.createAddInitialAssignees(ASSIGNEES_INPUT)).assignees.toArray();
+      AssigneeActions.createAddInitialAssignees(getTestAssigneesInput())).assignees.toArray();
     priorities = priorityReducer(
       initialPriorityState,
-      PriorityActions.createDeserializePriorities(PRIORITIES_INPUT)).priorities.toArray();
+      PriorityActions.createDeserializePriorities(getTestPrioritiesInput())).priorities.toArray();
     types = issueTypeReducer(
       initialIssueTypeState,
-      IssueTypeActions.createDeserializeIssueTypes(ISSUE_TYPES_INPUT)).types.toArray();
+      IssueTypeActions.createDeserializeIssueTypes(getTestIssueTypesInput())).types.toArray();
     components = componentReducer(
       initialComponentState,
-      ComponentActions.createDeserializeComponents(COMPONENTS_INPUT)).components;
+      ComponentActions.createDeserializeComponents(getTestComponentsInput())).components;
     labels = labelReducer(
       initialLabelState,
-      LabelActions.createDeserializeLabels(LABELS_INPUT)).labels;
+      LabelActions.createDeserializeLabels(getTestLabelsInput())).labels;
     fixVersions = fixVersionReducer(
       initialFixVersionState,
-      FixVersionActions.createDeserializeFixVersions(FIX_VERSIONS_INPUT)).versions;
+      FixVersionActions.createDeserializeFixVersions(getTestFixVersionsInput())).versions;
 
     issues = issueReducer(
       initialIssueState,

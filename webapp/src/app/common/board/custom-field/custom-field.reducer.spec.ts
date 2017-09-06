@@ -1,38 +1,41 @@
 import {CustomField, CustomFieldState, initialCustomFieldState} from './custom-field.model';
 import {CustomFieldActions, customFieldReducer} from './custom-field.reducer';
 import {List, OrderedMap} from 'immutable';
+import {cloneObject} from '../../utils/test-util.spec';
 
-export const CUSTOM_FIELDS_INPUT = {
-  'Custom-1': [
-    {
-      key: 'c1-A',
-      value: 'First C1'
-    },
-    {
-      key: 'c1-B',
-      value: 'Second C1'
-    },
-    {
-      key: 'c1-C',
-      value: 'Third C1'
-    }
-  ],
-  'Custom-2': [
-    {
-      key: 'c2-A',
-      value: 'First C2'
-    },
-    {
-      key: 'c2-B',
-      value: 'Second C2'
-    }
-  ]
-};
+export function getTestCustomFieldsInput() {
+  return cloneObject({
+    'Custom-1': [
+      {
+        key: 'c1-A',
+        value: 'First C1'
+      },
+      {
+        key: 'c1-B',
+        value: 'Second C1'
+      },
+      {
+        key: 'c1-C',
+        value: 'Third C1'
+      }
+    ],
+    'Custom-2': [
+      {
+        key: 'c2-A',
+        value: 'First C2'
+      },
+      {
+        key: 'c2-B',
+        value: 'Second C2'
+      }
+    ]
+  });
+}
 
 describe('CustomField reducer tests', () => {
   it('Deserialize initial state', () => {
     const state: CustomFieldState =
-      customFieldReducer(initialCustomFieldState, CustomFieldActions.createDeserializeCustomFields(CUSTOM_FIELDS_INPUT));
+      customFieldReducer(initialCustomFieldState, CustomFieldActions.createDeserializeCustomFields(getTestCustomFieldsInput()));
     const map: OrderedMap<string, List<CustomField>> = state.fields;
     expect(map.size).toBe(2);
     const l1 = map.get('Custom-1');
@@ -54,9 +57,9 @@ describe('CustomField reducer tests', () => {
 
   it ('Deserialize same state', () => {
     const stateA: CustomFieldState =
-      customFieldReducer(initialCustomFieldState, CustomFieldActions.createDeserializeCustomFields(CUSTOM_FIELDS_INPUT));
+      customFieldReducer(initialCustomFieldState, CustomFieldActions.createDeserializeCustomFields(getTestCustomFieldsInput()));
     const stateB: CustomFieldState =
-      customFieldReducer(stateA, CustomFieldActions.createDeserializeCustomFields(CUSTOM_FIELDS_INPUT));
+      customFieldReducer(stateA, CustomFieldActions.createDeserializeCustomFields(getTestCustomFieldsInput()));
     expect(stateA).toBe(stateB);
   });
 });

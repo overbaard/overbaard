@@ -1,26 +1,29 @@
 import {async, getTestBed} from '@angular/core/testing';
 import {Assignee, AssigneeState, initialAssigneeState} from './assignee.model';
 import {AssigneeActions, assigneeReducer} from './assignee.reducer';
+import {cloneObject} from '../../utils/test-util.spec';
 
-export const ASSIGNEES_INPUT: any = [
-  {
-    key: 'bob',
-    name: 'Bob Brent Barlow',
-    email: 'bob@example.com',
-    avatar: 'https://example.com/bob.png'
-  },
-  {
-    key: 'kabir',
-    name: 'Kabir Khan',
-    email: 'kabir@example.com',
-    avatar: 'https://example.com/kabir.png'
-  }
-];
+export function getTestAssigneesInput(): any {
+  return cloneObject([
+    {
+      key: 'bob',
+      name: 'Bob Brent Barlow',
+      email: 'bob@example.com',
+      avatar: 'https://example.com/bob.png'
+    },
+    {
+      key: 'kabir',
+      name: 'Kabir Khan',
+      email: 'kabir@example.com',
+      avatar: 'https://example.com/kabir.png'
+    }
+  ]);
+}
 
 describe('Assignee reducer tests', () => {
   let assigneeState: AssigneeState;
   beforeEach(async(() => {
-    const input = ASSIGNEES_INPUT;
+    const input = getTestAssigneesInput();
 
     const testBed = getTestBed();
     assigneeState = assigneeReducer(initialAssigneeState, AssigneeActions.createAddInitialAssignees(input));

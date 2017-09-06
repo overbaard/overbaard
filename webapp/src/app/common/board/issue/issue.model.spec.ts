@@ -3,13 +3,14 @@ import {Assignee, AssigneeUtil, NO_ASSIGNEE} from '../assignee/assignee.model';
 import {Priority, PriorityUtil} from '../priority/priority.model';
 import {IssueType, IssueTypeUtil} from '../issue-type/issue-type.model';
 import {List, Map, OrderedMap} from 'immutable';
-import {COMPONENTS_INPUT} from '../component/component.reducer.spec';
-import {LABELS_INPUT} from '../label/label.reducer.spec';
-import {FIX_VERSIONS_INPUT} from '../fix-version/fix-version.reducer.spec';
+import {getTestComponentsInput} from '../component/component.reducer.spec';
+import {getTestLabelsInput} from '../label/label.reducer.spec';
+import {getTestFixVersionsInput} from '../fix-version/fix-version.reducer.spec';
 import {CustomField, initialCustomFieldState} from '../custom-field/custom-field.model';
 import {CustomFieldActions, customFieldReducer} from '../custom-field/custom-field.reducer';
-import {CUSTOM_FIELDS_INPUT} from '../custom-field/custom-field.reducer.spec';
+import {getTestCustomFieldsInput} from '../custom-field/custom-field.reducer.spec';
 import {Dictionary} from '../../utils/dictionary';
+import {cloneObject} from '../../utils/test-util.spec';
 
 describe('Issue unit tests', () => {
 
@@ -24,13 +25,13 @@ describe('Issue unit tests', () => {
     let customFields: OrderedMap<string, List<CustomField>>;
 
     beforeEach(() => {
-      input = {
+      input = cloneObject({
         key: 'ISSUE-1',
         type: 0,
         priority: 0,
         summary: 'Issue summary',
         assignee: 0
-      };
+      });
 
       assignees = [];
       assignees.push(AssigneeUtil.fromJS(
@@ -72,13 +73,13 @@ describe('Issue unit tests', () => {
           icon : 'https://example.com/blocker.png'
         }));
 
-      components = List<string>(COMPONENTS_INPUT);
-      labels = List<string>(LABELS_INPUT);
-      fixVersions = List<string>(FIX_VERSIONS_INPUT);
+      components = List<string>(getTestComponentsInput());
+      labels = List<string>(getTestLabelsInput());
+      fixVersions = List<string>(getTestFixVersionsInput());
       customFields =
         customFieldReducer(
           initialCustomFieldState,
-          CustomFieldActions.createDeserializeCustomFields(CUSTOM_FIELDS_INPUT)).fields;
+          CustomFieldActions.createDeserializeCustomFields(getTestCustomFieldsInput())).fields;
     });
 
     it('Standard fields', () => {

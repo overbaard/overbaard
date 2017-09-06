@@ -1,22 +1,24 @@
 import {async} from '@angular/core/testing';
 import {initialPriorityState, Priority, PriorityState} from './priority.model';
 import {PriorityActions, priorityReducer} from './priority.reducer';
+import {cloneObject} from '../../utils/test-util.spec';
 
-export const PRIORITIES_INPUT = [
-  {
-    name: 'Blocker',
-    icon: '/priorities/blocker.png'
-  },
-  {
-    name: 'Major',
-    icon: '/priorities/major.png'
-  }
-];
+export function getTestPrioritiesInput(): any {
+  return cloneObject([{
+      name: 'Blocker',
+      icon: '/priorities/blocker.png'
+    },
+    {
+      name: 'Major',
+      icon: '/priorities/major.png'
+    }
+  ]);
+}
 
 describe('Priority reducer tests', () => {
   let state: PriorityState;
   beforeEach(async(() => {
-    const input = PRIORITIES_INPUT;
+    const input = getTestPrioritiesInput();
     state = priorityReducer(initialPriorityState, PriorityActions.createDeserializePriorities(input));
   }));
 

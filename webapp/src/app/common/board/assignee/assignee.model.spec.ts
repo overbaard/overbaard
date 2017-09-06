@@ -1,14 +1,15 @@
 import {Assignee, AssigneeUtil} from './assignee.model';
+import {cloneObject} from '../../utils/test-util.spec';
 
 describe('Assignee unit tests', () => {
 
   describe('Deserialize', () => {
-    const input: any = {
+    const input: any = cloneObject({
       key : 'userA',
       email : 'UserA@examle.com',
       avatar : 'https://example.com/user-A.png',
       name : 'User A'
-    };
+    });
 
     it('full record', () => {
       // Check the full record here. Other tests will check the initials calculated

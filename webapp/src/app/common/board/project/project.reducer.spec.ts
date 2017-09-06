@@ -3,7 +3,7 @@ import {List, Map} from 'immutable';
 import {BoardProject, initialProjectState, LinkedProject, ParallelTask, ProjectState} from './project.model';
 import {cloneObject} from '../../utils/test-util.spec';
 
-function getTestProjectInput(): any {
+function getTestProjectsInput(): any {
   return cloneObject(
     {
       owner: 'P1',
@@ -82,7 +82,7 @@ describe('Projects reducer tests', () => {
   describe('Deserialization tests', () => {
     it('Deserialize', () => {
       const projectState: ProjectState = projectReducer(
-        initialProjectState, ProjectActions.createDeserializeProjects(getTestProjectInput()));
+        initialProjectState, ProjectActions.createDeserializeProjects(getTestProjectsInput()));
       expect(projectState.owner).toBe('P1');
 
       // Board projects
@@ -135,9 +135,9 @@ describe('Projects reducer tests', () => {
 
     it('Deserialize same', () => {
       const projectStateA: ProjectState = projectReducer(
-        initialProjectState, ProjectActions.createDeserializeProjects(getTestProjectInput()));
+        initialProjectState, ProjectActions.createDeserializeProjects(getTestProjectsInput()));
       const projectStateB: ProjectState = projectReducer(
-        projectStateA, ProjectActions.createDeserializeProjects((getTestProjectInput())));
+        projectStateA, ProjectActions.createDeserializeProjects((getTestProjectsInput())));
       expect(projectStateB).toBe(projectStateA);
     });
   });

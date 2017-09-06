@@ -1,22 +1,25 @@
 import {async} from '@angular/core/testing';
 import {initialIssueTypeState, IssueType, IssueTypeState} from './issue-type.model';
 import {IssueTypeActions, issueTypeReducer} from './issue-type.reducer';
+import {cloneObject} from '../../utils/test-util.spec';
 
-export const ISSUE_TYPES_INPUT = [
-  {
-    name: 'task',
-    icon: '/types/task.png'
-  },
-  {
-    name: 'bug',
-    icon: '/types/bug.png'
-  }
-];
+export function getTestIssueTypesInput(): any {
+  return cloneObject([
+    {
+      name: 'task',
+      icon: '/types/task.png'
+    },
+    {
+      name: 'bug',
+      icon: '/types/bug.png'
+    }
+  ]);
+}
 
 describe('IssueType reducer tests', () => {
   let state: IssueTypeState;
   beforeEach(async(() => {
-    const input = ISSUE_TYPES_INPUT;
+    const input = getTestIssueTypesInput();
     state = issueTypeReducer(initialIssueTypeState, IssueTypeActions.createDeserializeIssueTypes(input));
   }));
 

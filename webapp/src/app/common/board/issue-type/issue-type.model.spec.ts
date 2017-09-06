@@ -1,12 +1,13 @@
 import {IssueType, IssueTypeUtil} from './issue-type.model';
+import {cloneObject} from '../../utils/test-util.spec';
 
 describe('Issue Type unit tests', () => {
 
   describe('Deserialize', () => {
-    const input: any = {
+    const input: any = cloneObject({
       name : 'Task',
       icon : 'https://example.com/task.png'
-    };
+    });
 
     it('Deserialize', () => {
       // Check the full record here. Other tests will check the initials calculated
