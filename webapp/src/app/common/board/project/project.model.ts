@@ -1,4 +1,4 @@
-import {List, Map} from 'immutable';
+import {List, Map, OrderedMap} from 'immutable';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 
 export interface ProjectState {
@@ -6,6 +6,7 @@ export interface ProjectState {
   boardProjects: Map<string, BoardProject>;
   rankedIssueKeys: Map<string, List<string>>;
   linkedProjects: Map<string, LinkedProject>;
+  parallelTasks: Map<string, List<ParallelTask>>;
 }
 
 export interface BaseProject {
@@ -22,11 +23,18 @@ export interface LinkedProject extends BaseProject {
   states: List<string>;
 }
 
+export interface ParallelTask {
+  name: string;
+  display: string;
+  options: List<string>;
+}
+
 const DEFAULT_STATE: ProjectState = {
   owner: null,
   boardProjects: Map<string, BoardProject>(),
   rankedIssueKeys: Map<string, List<string>>(),
-  linkedProjects: Map<string, LinkedProject>()
+  linkedProjects: Map<string, LinkedProject>(),
+  parallelTasks: Map<string, List<ParallelTask>>()
 };
 
 const DEFAULT_BOARD_PROJECT: BoardProject = {
@@ -41,6 +49,13 @@ const DEFAULT_LINKED_PROJECT: LinkedProject = {
   states: List<string>()
 };
 
+const DEFAULT_PARALLEL_TASK: ParallelTask = {
+  name: null,
+  display: null,
+  options: null
+};
+
+
 export interface ProjectStateRecord extends TypedRecord<ProjectStateRecord>, ProjectState {
 }
 
@@ -50,9 +65,13 @@ interface BoardProjectRecord extends TypedRecord<BoardProjectRecord>, BoardProje
 interface LinkedProjectRecord extends TypedRecord<LinkedProjectRecord>, LinkedProject {
 }
 
+interface ParallelTaskRecord extends TypedRecord<ParallelTaskRecord>, ParallelTask {
+}
+
 const STATE_FACTORY = makeTypedFactory<ProjectState, ProjectStateRecord>(DEFAULT_STATE);
 const BOARD_PROJECT_FACTORY = makeTypedFactory<BoardProject, BoardProjectRecord>(DEFAULT_BOARD_PROJECT);
 const LINKED_PROJECT_FACTORY = makeTypedFactory<LinkedProject, LinkedProjectRecord>(DEFAULT_LINKED_PROJECT);
+const PARALLEL_TASK_FACTORY = makeTypedFactory<ParallelTask, ParallelTaskRecord>(DEFAULT_PARALLEL_TASK);
 export const initialProjectState: ProjectState = STATE_FACTORY(DEFAULT_STATE);
 
 export class ProjectUtil {
@@ -67,7 +86,7 @@ export class ProjectUtil {
     return BOARD_PROJECT_FACTORY(projectInput);
   }
 
-  static linkedProjectFromJs(key: string, input: any) {
+  static linkedProjectFromJs(key: string, input: any): LinkedProject {
     const projectInput: LinkedProject = {
       key: key,
       states: List<string>(input['states'])
@@ -75,7 +94,10 @@ export class ProjectUtil {
     return LINKED_PROJECT_FACTORY(projectInput);
   }
 
-
+  static parallelTaskFromJs(input: any): ParallelTask {
+    input['options'] = List<string>(input['options']);
+    return PARALLEL_TASK_FACTORY(input);
+  }
   static toStateRecord(s: ProjectState): ProjectStateRecord {
     // TODO do some checks. TS does not allow use of instanceof when the type is an interface (since they are compiled away)
     return <ProjectStateRecord>s;

@@ -1,8 +1,8 @@
 import {Action} from '@ngrx/store';
 import {
-  BoardProject, initialProjectState, LinkedProject, ProjectUtil, ProjectState, ProjectStateRecord
+  BoardProject, initialProjectState, LinkedProject, ProjectUtil, ProjectState, ProjectStateRecord, ParallelTask
 } from './project.model';
-import {List, Map} from 'immutable';
+import {List, Map, OrderedMap} from 'immutable';
 
 const DESERIALIZE_PROJECTS = 'DESERIALIZE_PROJECTS';
 
@@ -19,6 +19,7 @@ export class ProjectActions {
     const boardProjects: Map<string, BoardProject> = Map<string, BoardProject>().asMutable();
     const rankedIssueKeys: Map<string, List<string>> = Map<string, List<string>>().asMutable();
     const linkedProjects: Map<string, LinkedProject> = Map<string, LinkedProject>().asMutable();
+    const parallelTasks: Map<string, List<ParallelTask>> = Map<string, List<ParallelTask>>().asMutable();
 
     const owner: string = input['owner'];
     const mainInput: any = input['main'];
@@ -27,6 +28,14 @@ export class ProjectActions {
       const projectInput: any = mainInput[key];
       boardProjects.set(key, ProjectUtil.boardProjectFromJs(key, projectInput));
       rankedIssueKeys.set(key, List<string>(projectInput['ranked']));
+      const parallelTasksInput: any[] = projectInput['parallel-tasks'];
+      if (parallelTasksInput) {
+        for (let i = 0 ; i < parallelTasksInput.length ; i++) {
+          const task: ParallelTask = ProjectUtil.parallelTaskFromJs(parallelTasksInput[i]);
+          parallelTasksInput[i] = task;
+          parallelTasks.set(key, List<ParallelTask>(parallelTasksInput));
+        }
+      }
     }
 
     const linkedInput = input['linked'];
@@ -35,12 +44,15 @@ export class ProjectActions {
       linkedProjects.set(key, ProjectUtil.linkedProjectFromJs(key, projectInput));
     }
 
+
     const payload: ProjectState = {
       owner: owner,
       boardProjects: boardProjects.asImmutable(),
       rankedIssueKeys: rankedIssueKeys.asImmutable(),
-      linkedProjects: linkedProjects.asImmutable()
+      linkedProjects: linkedProjects.asImmutable(),
+      parallelTasks: parallelTasks.asImmutable()
     };
+
     return new DeserializeProjectsAction(payload);
   }
 }
@@ -54,6 +66,7 @@ export function projectReducer(state: ProjectState = initialProjectState, action
         mutable.boardProjects = payload.boardProjects;
         mutable.rankedIssueKeys = payload.rankedIssueKeys;
         mutable.linkedProjects = payload.linkedProjects;
+        mutable.parallelTasks = payload.parallelTasks;
       });
       return (<ProjectStateRecord>newState).equals(<ProjectStateRecord>state) ? state : newState;
     }
