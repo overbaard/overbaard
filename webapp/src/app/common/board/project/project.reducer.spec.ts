@@ -3,7 +3,7 @@ import {List, Map} from 'immutable';
 import {BoardProject, initialProjectState, LinkedProject, ParallelTask, ProjectState} from './project.model';
 import {cloneObject} from '../../utils/test-util.spec';
 
-function getTestProjectsInput(): any {
+export function getTestProjectsInput(): any {
   return cloneObject(
     {
       owner: 'P1',

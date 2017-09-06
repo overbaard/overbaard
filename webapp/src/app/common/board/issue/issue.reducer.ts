@@ -5,8 +5,9 @@ import {Assignee} from '../assignee/assignee.model';
 import {createSelector} from 'reselect';
 import {IssueType} from '../issue-type/issue-type.model';
 import {Priority} from '../priority/priority.model';
-import {List, OrderedMap} from 'immutable';
+import {List, Map, OrderedMap} from 'immutable';
 import {CustomField} from '../custom-field/custom-field.model';
+import {ParallelTask} from '../project/project.model';
 
 
 const DESERIALIZE_INITIAL_ISSUES = 'DESERIALIZE_INITIAL_ISSUES';
@@ -22,11 +23,13 @@ export class IssueActions {
   static createDeserializeIssuesAction(input: any, assignees: Assignee[], issueTypes: IssueType[],
                                        priorities: Priority[], components: List<string>,
                                        labels: List<string>, fixVersions: List<string>,
-                                       customFields: OrderedMap<string, List<CustomField>>): Action {
+                                       customFields: OrderedMap<string, List<CustomField>>,
+                                       parallelTasks: Map<string, List<ParallelTask>>): Action {
     const inputArray: any[] = input ? input : [];
     const issues = new Array<BoardIssue>(inputArray.length);
     inputArray.forEach((issue, i) => {
-      issues[i] = IssueUtil.fromJS(issue, assignees, priorities, issueTypes, components, labels, fixVersions, customFields);
+      issues[i] = IssueUtil.fromJS(issue, assignees, priorities, issueTypes, components,
+        labels, fixVersions, customFields, parallelTasks);
     });
     return new DeserializeIssuesAction(issues);
   }

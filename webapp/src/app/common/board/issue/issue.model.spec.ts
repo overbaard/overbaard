@@ -11,6 +11,9 @@ import {CustomFieldActions, customFieldReducer} from '../custom-field/custom-fie
 import {getTestCustomFieldsInput} from '../custom-field/custom-field.reducer.spec';
 import {Dictionary} from '../../utils/dictionary';
 import {cloneObject} from '../../utils/test-util.spec';
+import {initialProjectState, ParallelTask, ProjectState} from '../project/project.model';
+import {ProjectActions, projectReducer} from '../project/project.reducer';
+import {getTestProjectsInput} from '../project/project.reducer.spec';
 
 describe('Issue unit tests', () => {
 
@@ -23,6 +26,7 @@ describe('Issue unit tests', () => {
     let labels: List<string>;
     let fixVersions: List<string>;
     let customFields: OrderedMap<string, List<CustomField>>;
+    let parallelTasks: Map<string, List<ParallelTask>>;
 
     beforeEach(() => {
       input = cloneObject({
@@ -80,11 +84,17 @@ describe('Issue unit tests', () => {
         customFieldReducer(
           initialCustomFieldState,
           CustomFieldActions.createDeserializeCustomFields(getTestCustomFieldsInput())).fields;
+
+      const projectState: ProjectState =
+        projectReducer(
+          initialProjectState,
+          ProjectActions.createDeserializeProjects(getTestProjectsInput()));
+      parallelTasks = projectState.parallelTasks;
     });
 
     it('Standard fields', () => {
       const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions, customFields);
+        components, labels, fixVersions, customFields, parallelTasks);
       new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
         .key('ISSUE-1')
         .check();
@@ -93,7 +103,7 @@ describe('Issue unit tests', () => {
     it('Assignee > 0', () => {
       input['assignee'] = 1;
       const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions, customFields);
+        components, labels, fixVersions, customFields, parallelTasks);
       new IssueChecker(issue, issueTypes[0], priorities[0], assignees[1], 'Issue summary')
         .key('ISSUE-1')
         .check();
@@ -102,7 +112,7 @@ describe('Issue unit tests', () => {
     it ('Priority > 0', () => {
       input['priority'] = 1;
       const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions, customFields);
+        components, labels, fixVersions, customFields, parallelTasks);
       new IssueChecker(issue, issueTypes[0], priorities[1], assignees[0], 'Issue summary')
         .key('ISSUE-1')
         .check();
@@ -111,7 +121,7 @@ describe('Issue unit tests', () => {
     it ('Type > 0', () => {
       input['type'] = 1;
       const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions, customFields);
+        components, labels, fixVersions, customFields, parallelTasks);
       new IssueChecker(issue, issueTypes[1], priorities[0], assignees[0], 'Issue summary')
         .key('ISSUE-1')
         .check();
@@ -120,7 +130,7 @@ describe('Issue unit tests', () => {
     it ('No assignee', () => {
       delete input['assignee'];
       const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions, customFields);
+        components, labels, fixVersions, customFields, parallelTasks);
       new IssueChecker(issue, issueTypes[0], priorities[0], NO_ASSIGNEE, 'Issue summary')
         .key('ISSUE-1')
         .check();
@@ -139,7 +149,7 @@ describe('Issue unit tests', () => {
         }];
 
       const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions, customFields);
+        components, labels, fixVersions, customFields, parallelTasks);
       new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
         .key('ISSUE-1')
         .addLinkedIssue('LNK-1', 'Linked 1')
@@ -150,7 +160,7 @@ describe('Issue unit tests', () => {
     it('Components', () => {
       input['components'] = [0, 2];
       const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions, customFields);
+        components, labels, fixVersions, customFields, parallelTasks);
       new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
         .key('ISSUE-1')
         .components('C-1', 'C-3')
@@ -160,7 +170,7 @@ describe('Issue unit tests', () => {
     it('Labels', () => {
       input['labels'] = [1, 2];
       const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions, customFields);
+        components, labels, fixVersions, customFields, parallelTasks);
       new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
         .key('ISSUE-1')
         .labels('L-2', 'L-3')
@@ -171,7 +181,7 @@ describe('Issue unit tests', () => {
     it('Fix Versions', () => {
       input['fix-versions'] = [0, 1];
       const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions, customFields);
+        components, labels, fixVersions, customFields, parallelTasks);
       new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
         .key('ISSUE-1')
         .fixVersions('F-1', 'F-2')
@@ -181,7 +191,7 @@ describe('Issue unit tests', () => {
     it('Custom Fields (all)', () => {
       input['custom'] = {'Custom-1': 2, 'Custom-2': 1};
       const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions, customFields);
+        components, labels, fixVersions, customFields, parallelTasks);
       new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
         .key('ISSUE-1')
         .customField('Custom-1', 'c1-C', 'Third C1')
@@ -189,17 +199,27 @@ describe('Issue unit tests', () => {
         .check();
     });
 
-
     it('Custom Fields (one)', () => {
       input['custom'] = {'Custom-2': 0};
       const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions, customFields);
+        components, labels, fixVersions, customFields, parallelTasks);
       new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
         .key('ISSUE-1')
         .customField('Custom-2', 'c2-A', 'First C2')
         .check();
     });
 
+
+    it('Parallel Tasks', () => {
+      input['key'] = 'P2-100'; // The parallel tasks are set up in the 'P2' project
+      input['parallel-tasks'] = [2, 1];
+      const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
+        components, labels, fixVersions, customFields, parallelTasks);
+      new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
+        .key('P2-100')
+        .selectedParallelTaskOptions('Three', 'Dos')
+        .check();
+    });
   });
 });
 
@@ -215,7 +235,7 @@ export class IssueChecker {
   private _labels: string[];
   private _fixVersions: string[];
   private _customFields: Dictionary<CustomFieldValue>;
-  // private _selectedParallelTaskOptions:string[]
+  private _parallelTasks: string[];
 
 
 
@@ -266,12 +286,11 @@ export class IssueChecker {
     return this;
   }
 
-  /*
-  selectedParallelTaskOptions(...selectedOptions:string[]) : IssueChecker {
-    this._selectedParallelTaskOptions = selectedOptions;
+  selectedParallelTaskOptions(...selectedOptions: string[]): IssueChecker {
+    this._parallelTasks = selectedOptions;
     return this;
   }
-  */
+
   check() {
     expect(this._issue.key).toEqual(this._key);
     if (this._assignee) {
@@ -331,18 +350,13 @@ export class IssueChecker {
     } else {
       expect(this._issue.customFields).toEqual(Map<string, CustomFieldValue>());
     }
-/*
-    if (this._selectedParallelTaskOptions) {
-      let options:Indexed<string> = this._issue.parallelTaskOptions;
-      expect(options).toEqual(jasmine.anything());
-      expect(options.array.length).toEqual(this._selectedParallelTaskOptions.length);
-      for (let i = 0 ; i < this._selectedParallelTaskOptions.length ; i++) {
-        expect(options.array[i]).toEqual(this._selectedParallelTaskOptions[i]);
-      }
+
+    if (this._parallelTasks) {
+      const options: List<string> = this._issue.parallelTasks;
+      expect(options.toArray()).toEqual(this._parallelTasks);
     } else {
-      expect(this._selectedParallelTaskOptions).not.toEqual(jasmine.anything());
+      expect(this._issue.parallelTasks).not.toEqual(jasmine.anything());
     }
-    */
 
     // checkIssueConvenienceMethods(this._issue);
   }

@@ -22,6 +22,7 @@ import {FixVersionActions, fixVersionReducer} from '../fix-version/fix-version.r
 import {initialFixVersionState} from '../fix-version/fix-version.model';
 import {getTestFixVersionsInput} from '../fix-version/fix-version.reducer.spec';
 import {CustomField} from '../custom-field/custom-field.model';
+import {ParallelTask} from '../project/project.model';
 
 describe('Issue reducer tests', () => {
 
@@ -32,6 +33,7 @@ describe('Issue reducer tests', () => {
   let labels: List<string>;
   let fixVersions: List<string>;
   const customFields: OrderedMap<string, List<CustomField>> = OrderedMap<string, List<CustomField>>();
+  const parallelTasks: Map<string, List<ParallelTask>> = Map<string, List<ParallelTask>>();
   let issues: Map<string, BoardIssue>;
   beforeEach(async(() => {
 
@@ -89,10 +91,11 @@ describe('Issue reducer tests', () => {
       initialFixVersionState,
       FixVersionActions.createDeserializeFixVersions(getTestFixVersionsInput())).versions;
 
+
     issues = issueReducer(
       initialIssueState,
       IssueActions.createDeserializeIssuesAction(
-        input, assignees, types, priorities, components, labels, fixVersions, customFields)).issues;
+        input, assignees, types, priorities, components, labels, fixVersions, customFields, parallelTasks)).issues;
   }));
 
 

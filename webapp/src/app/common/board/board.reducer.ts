@@ -146,7 +146,8 @@ export function boardReducer(state: BoardState = initialState, action: Action): 
       const issueState =
         reducers.issues(state.issues, IssueActions.createDeserializeIssuesAction(input['issues'],
           assigneeState.assignees.toArray(), issueTypeState.types.toArray(), priorityState.priorities.toArray(),
-          componentState.components, labelState.labels, fixVersionState.versions, customFieldState.fields));
+          componentState.components, labelState.labels, fixVersionState.versions, customFieldState.fields,
+          projectState.parallelTasks));
 
       return {
         viewId: viewId,

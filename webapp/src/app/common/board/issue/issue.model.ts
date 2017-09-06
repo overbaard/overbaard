@@ -4,6 +4,7 @@ import {Priority} from '../priority/priority.model';
 import {IssueType} from '../issue-type/issue-type.model';
 import {fromJS, List, Map, OrderedMap} from 'immutable';
 import {CustomField} from '../custom-field/custom-field.model';
+import {ParallelTask} from '../project/project.model';
 
 export interface IssueState {
   issues: Map<string, BoardIssue>;
@@ -23,6 +24,7 @@ export interface BoardIssue extends Issue {
   labels: List<string>;
   fixVersions: List<string>;
   customFields: Map<string, CustomFieldValue>;
+  parallelTasks: List<string>;
   linkedIssues: List<Issue>;
 }
 
@@ -44,6 +46,7 @@ const DEFAULT_ISSUE: BoardIssue = {
   labels: null,
   fixVersions: null,
   customFields: null,
+  parallelTasks: null,
   linkedIssues: List<Issue>()
 };
 
@@ -81,7 +84,10 @@ export class IssueUtil {
 
   static fromJS(input: any, assignees: Assignee[], priorities: Priority[], issueTypes: IssueType[],
                 components: List<string>, labels: List<string>, fixVersions: List<string>,
-                customFields: OrderedMap<string, List<CustomField>>): BoardIssue {
+                customFields: OrderedMap<string, List<CustomField>>,
+                parallelTasks: Map<string, List<ParallelTask>>): BoardIssue {
+    const projectKey: string = IssueUtil.productCodeFromKey(input['key']);
+
     // Rework the data as needed before deserializing
     if (input['linked-issues']) {
       input['linkedIssues'] = input['linked-issues'];
@@ -118,6 +124,18 @@ export class IssueUtil {
     } else {
       input['customFields'] = Map<string, CustomFieldValue>();
     }
+
+    if (input['parallel-tasks']) {
+      const ptList: List<ParallelTask> = parallelTasks.get(projectKey);
+      const parallelTasksInput: any[] = input['parallel-tasks'];
+      for (let i = 0 ; i < parallelTasksInput.length ; i++) {
+        const parallelTask: ParallelTask = ptList.get(i);
+        parallelTasksInput[i] = parallelTask.options.get(parallelTasksInput[i]);
+      }
+      input['parallelTasks'] = List<string>(parallelTasksInput);
+      delete input['parallel-tasks'];
+    }
+
     const temp: any = fromJS(input, (key, value) => {
       if (key === 'linkedIssues') {
         const tmp: List<any> = value.toList();
@@ -143,4 +161,8 @@ export class IssueUtil {
     return strings;
   }
 
+  static productCodeFromKey(key: string): string {
+    const index: number = key.lastIndexOf('-');
+    return key.substring(0, index);
+  }
 };
