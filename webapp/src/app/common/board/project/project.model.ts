@@ -56,7 +56,7 @@ const DEFAULT_PARALLEL_TASK: ParallelTask = {
 };
 
 
-export interface ProjectStateRecord extends TypedRecord<ProjectStateRecord>, ProjectState {
+interface ProjectStateRecord extends TypedRecord<ProjectStateRecord>, ProjectState {
 }
 
 interface BoardProjectRecord extends TypedRecord<BoardProjectRecord>, BoardProject {

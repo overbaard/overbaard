@@ -20,6 +20,14 @@ describe('Label reducer tests', () => {
       labelReducer(stateA, LabelActions.createDeserializeLabels(getTestLabelsInput()));
     expect(stateA).toBe(stateB);
   });
+
+  it ('Deserialize same state', () => {
+    const stateA: LabelState =
+      labelReducer(initialLabelState, LabelActions.createDeserializeLabels(getTestLabelsInput()));
+    const stateB: LabelState =
+      labelReducer(stateA, LabelActions.createDeserializeLabels(getTestLabelsInput()));
+    expect(stateA).toBe(stateB);
+  });
 });
 
 

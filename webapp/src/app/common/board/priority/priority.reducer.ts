@@ -36,9 +36,13 @@ export function priorityReducer(state: PriorityState = initialPriorityState, act
           mutable.set(type.name, type);
         }
       });
-      return PriorityUtil.toStateRecord(state).withMutations(mutable => {
+      const newState: PriorityState = PriorityUtil.toStateRecord(state).withMutations(mutable => {
         mutable.priorities = priorities;
       });
+      if (PriorityUtil.toStateRecord(newState).equals(PriorityUtil.toStateRecord(state))) {
+        return state;
+      }
+      return newState;
     }
     default:
       return state;

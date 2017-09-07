@@ -2,6 +2,9 @@ import {async} from '@angular/core/testing';
 import {initialPriorityState, Priority, PriorityState} from './priority.model';
 import {PriorityActions, priorityReducer} from './priority.reducer';
 import {cloneObject} from '../../utils/test-util.spec';
+import {initialLabelState, LabelState} from '../label/label.model';
+import {LabelActions, labelReducer} from '../label/label.reducer';
+import {getTestLabelsInput} from '../label/label.reducer.spec';
 
 export function getTestPrioritiesInput(): any {
   return cloneObject([{
@@ -31,6 +34,14 @@ describe('Priority reducer tests', () => {
 
     checkPriority(state.priorities.get('Blocker'), 'Blocker', '/priorities/blocker.png');
     checkPriority(state.priorities.get('Major'), 'Major', '/priorities/major.png');
+  });
+
+  it ('Deserialize same state', () => {
+    const stateA: LabelState =
+      labelReducer(initialLabelState, LabelActions.createDeserializeLabels(getTestLabelsInput()));
+    const stateB: LabelState =
+      labelReducer(stateA, LabelActions.createDeserializeLabels(getTestLabelsInput()));
+    expect(stateA).toBe(stateB);
   });
 
   function checkPriority(priority: Priority, name: string, icon: string) {

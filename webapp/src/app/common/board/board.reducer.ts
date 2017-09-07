@@ -22,6 +22,7 @@ import {CustomFieldState, initialCustomFieldState} from './custom-field/custom-f
 import {CustomFieldActions, customFieldReducer} from './custom-field/custom-field.reducer';
 import {BlacklistState, initialBlacklistState} from './blacklist/blacklist.model';
 import {BlacklistActions, blacklistReducer} from './blacklist/blacklist.reducer';
+import {Map} from 'immutable';
 
 export interface BoardState {
   viewId: number;
@@ -39,7 +40,7 @@ export interface BoardState {
   blacklist: BlacklistState;
 }
 
-const initialState: BoardState = {
+export const initialBoardState: BoardState = {
   viewId: 0,
   rankCustomFieldId: 0,
   headers: initialHeaderState,
@@ -106,7 +107,7 @@ class ProcessBoardFullRefreshAction extends BoardDataAction {
 
 export class BoardActions {
 
-  static deserializeBoard(input: any) {
+  static createDeserializeBoard(input: any) {
     return new DeserializeBoardAction(input);
   }
 
@@ -119,7 +120,7 @@ export class BoardActions {
   }
 }
 
-export function boardReducer(state: BoardState = initialState, action: Action): BoardState {
+export function boardReducer(state: BoardState = initialBoardState, action: Action): BoardState {
 
   switch (action.type) {
     case DESERIALIZE_BOARD: {
@@ -132,20 +133,30 @@ export function boardReducer(state: BoardState = initialState, action: Action): 
           input['headers'],
           input['backlog'] ? input['backlog'] : 0,
           input['done'] ? input['done'] : 0));
+
+      // These will always be present
       const assigneeState: AssigneeState =
           reducers.assignees(state.assignees, AssigneeActions.createAddInitialAssignees(input['assignees']));
       const priorityState: PriorityState =
         reducers.priorities(state.priorities, PriorityActions.createDeserializePriorities(input['priorities']));
       const issueTypeState: IssueTypeState =
         reducers.issueTypes(state.issueTypes, IssueTypeActions.createDeserializeIssueTypes(input['issue-types']));
-      const componentState: ComponentState =
-        reducers.components(state.components, ComponentActions.createDeserializeComponents(input['components']));
-      const labelState: LabelState =
-        reducers.labels(state.labels, LabelActions.createDeserializeLabels(input['labels']));
-      const fixVersionState: FixVersionState =
-        reducers.fixVersions(state.fixVersions, FixVersionActions.createDeserializeFixVersions(input['fix-versions']));
-      const customFieldState: CustomFieldState =
-        reducers.customFields(state.customFields, CustomFieldActions.createDeserializeCustomFields(input['custom']));
+
+      // These might not be there
+      const componentState: ComponentState = input['components'] ?
+        reducers.components(state.components, ComponentActions.createDeserializeComponents(input['components']))
+        : initialComponentState;
+      const labelState: LabelState = input['labels'] ?
+        reducers.labels(state.labels, LabelActions.createDeserializeLabels(input['labels']))
+        : initialLabelState;
+      const fixVersionState: FixVersionState = input['labels'] ?
+        reducers.fixVersions(state.fixVersions, FixVersionActions.createDeserializeFixVersions(input['labels']))
+        : initialFixVersionState;
+      const customFieldState: CustomFieldState = input['custom'] ?
+        reducers.customFields(state.customFields, CustomFieldActions.createDeserializeCustomFields(input['custom']))
+        : initialCustomFieldState;
+
+      // This will always be present
       const projectState: ProjectState =
         reducers.projects(state.projects, ProjectActions.createDeserializeProjects(input['projects']));
 
@@ -165,7 +176,7 @@ export function boardReducer(state: BoardState = initialState, action: Action): 
       const blacklistState: BlacklistState =
         reducers.blacklist(state.blacklist, BlacklistActions.createDeserializeBlacklist(input['blacklist']));
 
-      return {
+      const newState: BoardState = {
         viewId: viewId,
         rankCustomFieldId: rankCustomFieldId,
         headers: headers,
@@ -180,6 +191,15 @@ export function boardReducer(state: BoardState = initialState, action: Action): 
         issues: issueState,
         blacklist: blacklistState
       };
+
+      // Since BoardState is not an immutable Record it does not have the equals method so do some custom checking here.
+      // It is not a record since I think the redux store cannot deal with 'parents' being immutable
+
+      if (Map<any>(state).equals(Map<any>(newState))) {
+        return state;
+      }
+
+      return newState;
     }
     // TODO the others
     default:

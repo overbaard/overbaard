@@ -1,6 +1,6 @@
 import {Action} from '@ngrx/store';
 import {
-  BoardProject, initialProjectState, LinkedProject, ProjectUtil, ProjectState, ProjectStateRecord, ParallelTask
+  BoardProject, initialProjectState, LinkedProject, ProjectUtil, ProjectState, ParallelTask
 } from './project.model';
 import {List, Map, OrderedMap} from 'immutable';
 
@@ -68,7 +68,8 @@ export function projectReducer(state: ProjectState = initialProjectState, action
         mutable.linkedProjects = payload.linkedProjects;
         mutable.parallelTasks = payload.parallelTasks;
       });
-      return (<ProjectStateRecord>newState).equals(<ProjectStateRecord>state) ? state : newState;
+
+      return ProjectUtil.toStateRecord(newState).equals(ProjectUtil.toStateRecord(state)) ? state : newState;
     }
   }
   return state;

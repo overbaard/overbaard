@@ -156,9 +156,13 @@ export function headerReducer(state: HeaderState = initialHeaderState, action: A
       if (headers.equals(payload)) {
         return state;
       }
-      return HeaderUtil.toStateRecord(state).withMutations( mutable => {
+      const newState: HeaderState = HeaderUtil.toStateRecord(state).withMutations( mutable => {
         mutable.headers = payload;
       });
+      if (HeaderUtil.toStateRecord(newState).equals(HeaderUtil.toStateRecord(state))) {
+        return state;
+      }
+      return newState;
     }
     default:
       return state;

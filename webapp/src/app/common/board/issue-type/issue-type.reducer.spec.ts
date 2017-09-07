@@ -34,6 +34,14 @@ describe('IssueType reducer tests', () => {
     checkIssueType(state.types.get('bug'), 'bug', '/types/bug.png');
   });
 
+  it ('Deserialize same state', () => {
+    const stateA: IssueTypeState =
+      issueTypeReducer(initialIssueTypeState, IssueTypeActions.createDeserializeIssueTypes(getTestIssueTypesInput()));
+    const stateB: IssueTypeState =
+      issueTypeReducer(stateA, IssueTypeActions.createDeserializeIssueTypes(getTestIssueTypesInput()));
+    expect(stateA).toBe(stateB);
+  });
+
   function checkIssueType(issueType: IssueType, name: string, icon: string) {
     expect(issueType).toEqual(jasmine.anything());
     expect(issueType.name).toEqual(name);

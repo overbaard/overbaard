@@ -1,5 +1,5 @@
 import {IssueActions, issueReducer} from './issue.reducer';
-import {BoardIssue, DeserializeIssueLookupParams, initialIssueState} from './issue.model';
+import {BoardIssue, DeserializeIssueLookupParams, initialIssueState, IssueState} from './issue.model';
 import {async} from '@angular/core/testing';
 import {IssueTypeActions, issueTypeReducer} from '../issue-type/issue-type.reducer';
 import {PriorityActions, priorityReducer} from '../priority/priority.reducer';
@@ -23,48 +23,50 @@ import {initialFixVersionState} from '../fix-version/fix-version.model';
 import {getTestFixVersionsInput} from '../fix-version/fix-version.reducer.spec';
 import {CustomField} from '../custom-field/custom-field.model';
 import {ParallelTask} from '../project/project.model';
+import {cloneObject} from '../../utils/test-util.spec';
 
+function getTestIssuesInput() {
+  return cloneObject({
+    'ISSUE-1': {
+      key: 'ISSUE-1',
+      type: 0,
+      priority: 0,
+      summary: 'One',
+      assignee: 0,
+      'linked-issues' : [
+        {
+          key : 'LNK-1',
+          summary : 'Linked 1',
+        }]
+    },
+    'ISSUE-2': {
+      key: 'ISSUE-2',
+      type: 1,
+      priority: 1,
+      summary: 'Two',
+      assignee: 1
+    },
+    'ISSUE-3': {
+      key: 'ISSUE-3',
+      type: 0,
+      priority: 0,
+      summary: 'Three',
+      assignee: 0
+    },
+    'ISSUE-4': {
+      key: 'ISSUE-4',
+      type: 0,
+      priority: 1,
+      summary: 'Four'
+    }
+  });
+}
 describe('Issue reducer tests', () => {
 
+  let issueState: IssueState;
   let issues: Map<string, BoardIssue>;
   let lookupParams: DeserializeIssueLookupParams;
   beforeEach(async(() => {
-
-    const input = [
-      {
-        key: 'ISSUE-1',
-        type: 0,
-        priority: 0,
-        summary: 'One',
-        assignee: 0,
-        'linked-issues' : [
-          {
-            key : 'LNK-1',
-            summary : 'Linked 1',
-          }]
-      },
-      {
-        key: 'ISSUE-2',
-        type: 1,
-        priority: 1,
-        summary: 'Two',
-        assignee: 1
-      },
-      {
-        key: 'ISSUE-3',
-        type: 0,
-        priority: 0,
-        summary: 'Three',
-        assignee: 0
-      },
-      {
-        key: 'ISSUE-4',
-        type: 0,
-        priority: 1,
-        summary: 'Four'
-      }
-    ];
-
 
     lookupParams = new DeserializeIssueLookupParams()
       .setAssignees(
@@ -86,9 +88,10 @@ describe('Issue reducer tests', () => {
         fixVersionReducer(
           initialFixVersionState, FixVersionActions.createDeserializeFixVersions(getTestFixVersionsInput())).versions);
 
-    issues = issueReducer(
+    issueState = issueReducer(
       initialIssueState,
-      IssueActions.createDeserializeIssuesAction(input, lookupParams)).issues;
+      IssueActions.createDeserializeIssuesAction(getTestIssuesInput(), lookupParams));
+    issues = issueState.issues;
   }));
 
 
@@ -109,4 +112,12 @@ describe('Issue reducer tests', () => {
       .key('ISSUE-4')
       .check();
   });
+
+  it('Deserialize same state', () => {
+    const state = issueReducer(
+      issueState,
+      IssueActions.createDeserializeIssuesAction(getTestIssuesInput(), lookupParams));
+    expect(state).toBe(issueState);
+  });
+
 });

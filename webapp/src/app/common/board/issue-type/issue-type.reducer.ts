@@ -43,9 +43,13 @@ export function issueTypeReducer(state: IssueTypeState = initialIssueTypeState, 
           mutable.set(type.name, type);
         }
       });
-      return IssueTypeUtil.toStateRecord(state).withMutations(mutable => {
+      const newState: IssueTypeState = IssueTypeUtil.toStateRecord(state).withMutations(mutable => {
         mutable.types = types;
       });
+      if (IssueTypeUtil.toStateRecord(newState).equals(IssueTypeUtil.toStateRecord(state))) {
+        return state;
+      }
+      return newState;
     }
     default:
       return state;

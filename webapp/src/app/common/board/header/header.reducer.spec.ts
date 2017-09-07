@@ -224,6 +224,23 @@ describe('Header reducer tests', () => {
 
     expect(headerStateB).toBe(headerState);
   });
+
+  it ('Deserialize same state', () => {
+    const states = [
+      {name: 'S1', header: 0, wip: 3},
+      {name: 'S2', header: 0, wip: 4},
+      {name: 'S3', header: 1},
+      {name: 'S4', header: 1}
+    ];
+
+    const stateA: HeaderState = headerReducer(
+      initialHeaderState,
+      HeaderActions.createDeserializeHeaders(states, ['H1', 'H2'], 0, 0));
+    const stateB: HeaderState = headerReducer(
+      stateA,
+      HeaderActions.createDeserializeHeaders(states, ['H1', 'H2'], 0, 0));
+    expect(stateB).toBe(stateA);
+  });
 });
 
 class HeaderChecker {

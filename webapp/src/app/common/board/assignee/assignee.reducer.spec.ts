@@ -63,6 +63,12 @@ describe('Assignee reducer tests', () => {
       'kabir', 'Kabir Khan', 'KK', 'kabir@example.com', 'https://example.com/kabir.png');
   });
 
+  it ('Deserialize same', () => {
+    const stateA: AssigneeState = assigneeReducer(initialAssigneeState, AssigneeActions.createAddInitialAssignees(getTestAssigneesInput()));
+    const stateB: AssigneeState = assigneeReducer(stateA, AssigneeActions.createAddInitialAssignees(getTestAssigneesInput()));
+    expect(stateB).toBe(stateA);
+  });
+
   function checkAssignee(assignee: Assignee, key: string, name: string, initials: string, email: string, avatar: string) {
     expect(assignee).toEqual(jasmine.anything());
     expect(assignee.key).toEqual(key);

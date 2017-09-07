@@ -47,7 +47,7 @@ export function assigneeReducer(state: AssigneeState = initialAssigneeState, act
 
   switch (action.type) {
     case ADD_INITAL_ASSIGNEES:
-      return addAssignees(initialAssigneeState, (<AddInitialAssignees>action).payload);
+      return addAssignees(state, (<AddInitialAssignees>action).payload);
     case ADD_ASSIGNEES: {
       return addAssignees(state, (<AddAssigneesAction>action).payload);
     }
@@ -66,9 +66,14 @@ function addAssignees(state: AssigneeState, added: Assignee[]): AssigneeState {
   assignees = <OrderedMap<string, Assignee>>assignees.sort(
     (valueA, valueB) => valueA.name.toLocaleLowerCase().localeCompare(valueB.name.toLocaleLowerCase()));
 
-  return AssigneeUtil.toStateRecord(state).withMutations(mutable => {
+  const newState: AssigneeState = AssigneeUtil.toStateRecord(state).withMutations(mutable => {
     mutable.assignees = assignees;
   });
+
+  if (AssigneeUtil.toStateRecord(newState).equals(AssigneeUtil.toStateRecord(state))) {
+    return state;
+  }
+  return newState;
 }
 
 const getAssigneesState = (state: AppState) => state.board.assignees;
