@@ -20,6 +20,8 @@ import {FixVersionState, initialFixVersionState} from './fix-version/fix-version
 import {FixVersionActions, fixVersionReducer} from './fix-version/fix-version.reducer';
 import {CustomFieldState, initialCustomFieldState} from './custom-field/custom-field.model';
 import {CustomFieldActions, customFieldReducer} from './custom-field/custom-field.reducer';
+import {BlacklistState, initialBlacklistState} from './blacklist/blacklist.model';
+import {BlacklistActions, blacklistReducer} from './blacklist/blacklist.reducer';
 
 export interface BoardState {
   viewId: number;
@@ -34,6 +36,7 @@ export interface BoardState {
   customFields: CustomFieldState;
   projects: ProjectState;
   issues: IssueState;
+  blacklist: BlacklistState;
 }
 
 const initialState: BoardState = {
@@ -48,7 +51,8 @@ const initialState: BoardState = {
   fixVersions: initialFixVersionState,
   customFields: initialCustomFieldState,
   projects: initialProjectState,
-  issues: initialIssueState
+  issues: initialIssueState,
+  blacklist: initialBlacklistState
 };
 
 const reducers = {
@@ -62,7 +66,8 @@ const reducers = {
   fixVersions: fixVersionReducer,
   customFields: customFieldReducer,
   projects: projectReducer,
-  issues: issueReducer
+  issues: issueReducer,
+  blacklist: blacklistReducer
 };
 
 const reducerInstance: ActionReducer<BoardState> = combineReducers(reducers);
@@ -157,6 +162,9 @@ export function boardReducer(state: BoardState = initialState, action: Action): 
       const issueState: IssueState =
         reducers.issues(state.issues, IssueActions.createDeserializeIssuesAction(input['issues'], lookupParams));
 
+      const blacklistState: BlacklistState =
+        reducers.blacklist(state.blacklist, BlacklistActions.createDeserializeBlacklist(input['blacklist']));
+
       return {
         viewId: viewId,
         rankCustomFieldId: rankCustomFieldId,
@@ -169,7 +177,8 @@ export function boardReducer(state: BoardState = initialState, action: Action): 
         labels: labelState,
         customFields: customFieldState,
         projects: projectState,
-        issues: issueState
+        issues: issueState,
+        blacklist: blacklistState
       };
     }
     // TODO the others
