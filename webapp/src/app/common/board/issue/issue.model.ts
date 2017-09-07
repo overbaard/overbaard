@@ -23,15 +23,11 @@ export interface BoardIssue extends Issue {
   components: List<string>;
   labels: List<string>;
   fixVersions: List<string>;
-  customFields: Map<string, CustomFieldValue>;
+  customFields: Map<string, CustomField>;
   parallelTasks: List<string>;
   linkedIssues: List<Issue>;
 }
 
-export interface CustomFieldValue {
-  key: string;
-  value: string;
-}
 const DEFAULT_STATE: IssueState = {
   issues: Map<string, BoardIssue>()
 };
@@ -55,12 +51,6 @@ const DEFAULT_LINKED_ISSUE: Issue = {
   summary: null
 };
 
-const DEFAULT_CUSTOM_FIELD_VALUE: CustomFieldValue = {
-  key: null,
-  value: null
-};
-
-
 interface BoardIssueRecord extends TypedRecord<BoardIssueRecord>, BoardIssue {
 }
 
@@ -70,13 +60,9 @@ interface LinkedIssueRecord extends TypedRecord<LinkedIssueRecord>, Issue {
 interface IssueStateRecord extends TypedRecord<IssueStateRecord>, IssueState {
 }
 
-interface CustomFieldValueRecord extends TypedRecord<CustomFieldValueRecord>, CustomFieldValue {
-}
-
 const ISSUE_FACTORY = makeTypedFactory<BoardIssue, BoardIssueRecord>(DEFAULT_ISSUE);
 const LINKED_ISSUE_FACTORY = makeTypedFactory<Issue, LinkedIssueRecord>(DEFAULT_LINKED_ISSUE);
 const STATE_FACTORY = makeTypedFactory<IssueState, IssueStateRecord>(DEFAULT_STATE);
-const CUSTOM_FIELD_FACTORY = makeTypedFactory<CustomFieldValue, CustomFieldValueRecord>(DEFAULT_CUSTOM_FIELD_VALUE);
 export const initialIssueState: IssueState = STATE_FACTORY(DEFAULT_STATE);
 
 /**
@@ -205,7 +191,7 @@ export class IssueUtil {
       input['customFields'] = custom;
       delete input['custom'];
     } else {
-      input['customFields'] = Map<string, CustomFieldValue>();
+      input['customFields'] = Map<string, CustomField>();
     }
 
     if (input['parallel-tasks']) {

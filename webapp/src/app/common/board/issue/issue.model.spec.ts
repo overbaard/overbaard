@@ -1,4 +1,4 @@
-import {BoardIssue, CustomFieldValue, DeserializeIssueLookupParams, Issue, IssueUtil} from './issue.model';
+import {BoardIssue, DeserializeIssueLookupParams, Issue, IssueUtil} from './issue.model';
 import {Assignee, AssigneeUtil, NO_ASSIGNEE} from '../assignee/assignee.model';
 import {Priority, PriorityUtil} from '../priority/priority.model';
 import {IssueType, IssueTypeUtil} from '../issue-type/issue-type.model';
@@ -242,7 +242,7 @@ export class IssueChecker {
   private _components: string[];
   private _labels: string[];
   private _fixVersions: string[];
-  private _customFields: Dictionary<CustomFieldValue>;
+  private _customFields: Dictionary<CustomField>;
   private _parallelTasks: string[];
 
 
@@ -349,14 +349,14 @@ export class IssueChecker {
       expect(expectedFieldNames).toEqual(issueFieldNames);
 
       for (const fieldName of issueFieldNames) {
-        const customField: CustomFieldValue = this._issue.customFields.get(fieldName);
-        const expectedField: CustomFieldValue = this._customFields[fieldName];
+        const customField: CustomField = this._issue.customFields.get(fieldName);
+        const expectedField: CustomField = this._customFields[fieldName];
         expect(customField).toEqual(jasmine.anything());
         expect(customField.key).toEqual(expectedField.key);
         expect(customField.value).toEqual(expectedField.value);
       }
     } else {
-      expect(this._issue.customFields).toEqual(Map<string, CustomFieldValue>());
+      expect(this._issue.customFields).toEqual(Map<string, CustomField>());
     }
 
     if (this._parallelTasks) {
