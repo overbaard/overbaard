@@ -1,13 +1,7 @@
 import {AppState} from '../../../app-store';
 import {Action} from '@ngrx/store';
-import {BoardIssue, initialIssueState, IssueUtil, IssueState} from './issue.model';
-import {Assignee} from '../assignee/assignee.model';
+import {BoardIssue, DeserializeIssueLookupParams, initialIssueState, IssueState, IssueUtil} from './issue.model';
 import {createSelector} from 'reselect';
-import {IssueType} from '../issue-type/issue-type.model';
-import {Priority} from '../priority/priority.model';
-import {List, Map, OrderedMap} from 'immutable';
-import {CustomField} from '../custom-field/custom-field.model';
-import {ParallelTask} from '../project/project.model';
 
 
 const DESERIALIZE_INITIAL_ISSUES = 'DESERIALIZE_INITIAL_ISSUES';
@@ -20,16 +14,11 @@ class DeserializeIssuesAction implements Action {
 }
 
 export class IssueActions {
-  static createDeserializeIssuesAction(input: any, assignees: Assignee[], issueTypes: IssueType[],
-                                       priorities: Priority[], components: List<string>,
-                                       labels: List<string>, fixVersions: List<string>,
-                                       customFields: OrderedMap<string, List<CustomField>>,
-                                       parallelTasks: Map<string, List<ParallelTask>>): Action {
+  static createDeserializeIssuesAction(input: any, params: DeserializeIssueLookupParams): Action {
     const inputArray: any[] = input ? input : [];
     const issues = new Array<BoardIssue>(inputArray.length);
     inputArray.forEach((issue, i) => {
-      issues[i] = IssueUtil.fromJS(issue, assignees, priorities, issueTypes, components,
-        labels, fixVersions, customFields, parallelTasks);
+      issues[i] = IssueUtil.fromJS(issue, params);
     });
     return new DeserializeIssuesAction(issues);
   }

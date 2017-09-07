@@ -8,7 +8,7 @@ import {HeaderActions, headerReducer} from './header/header.reducer';
 import {ProjectActions, projectReducer} from './project/project.reducer';
 import {AssigneeState, initialAssigneeState} from './assignee/assignee.model';
 import {HeaderState, initialHeaderState} from './header/header.model';
-import {initialIssueState, IssueState} from './issue/issue.model';
+import {DeserializeIssueLookupParams, initialIssueState, IssueState} from './issue/issue.model';
 import {initialIssueTypeState, IssueTypeState} from './issue-type/issue-type.model';
 import {initialPriorityState, PriorityState} from './priority/priority.model';
 import {initialProjectState, ProjectState} from './project/project.model';
@@ -127,27 +127,35 @@ export function boardReducer(state: BoardState = initialState, action: Action): 
           input['headers'],
           input['backlog'] ? input['backlog'] : 0,
           input['done'] ? input['done'] : 0));
-      const assigneeState =
-        reducers.assignees(state.assignees, AssigneeActions.createAddInitialAssignees(input['assignees']));
-      const priorityState =
+      const assigneeState: AssigneeState =
+          reducers.assignees(state.assignees, AssigneeActions.createAddInitialAssignees(input['assignees']));
+      const priorityState: PriorityState =
         reducers.priorities(state.priorities, PriorityActions.createDeserializePriorities(input['priorities']));
-      const issueTypeState =
+      const issueTypeState: IssueTypeState =
         reducers.issueTypes(state.issueTypes, IssueTypeActions.createDeserializeIssueTypes(input['issue-types']));
-      const componentState =
+      const componentState: ComponentState =
         reducers.components(state.components, ComponentActions.createDeserializeComponents(input['components']));
-      const labelState =
+      const labelState: LabelState =
         reducers.labels(state.labels, LabelActions.createDeserializeLabels(input['labels']));
-      const fixVersionState =
+      const fixVersionState: FixVersionState =
         reducers.fixVersions(state.fixVersions, FixVersionActions.createDeserializeFixVersions(input['fix-versions']));
-      const customFieldState =
+      const customFieldState: CustomFieldState =
         reducers.customFields(state.customFields, CustomFieldActions.createDeserializeCustomFields(input['custom']));
-      const projectState =
+      const projectState: ProjectState =
         reducers.projects(state.projects, ProjectActions.createDeserializeProjects(input['projects']));
-      const issueState =
-        reducers.issues(state.issues, IssueActions.createDeserializeIssuesAction(input['issues'],
-          assigneeState.assignees.toArray(), issueTypeState.types.toArray(), priorityState.priorities.toArray(),
-          componentState.components, labelState.labels, fixVersionState.versions, customFieldState.fields,
-          projectState.parallelTasks));
+
+      const lookupParams: DeserializeIssueLookupParams = new DeserializeIssueLookupParams()
+        .setAssignees(assigneeState.assignees.toList())
+        .setPriorities(priorityState.priorities.toList())
+        .setIssueTypes(issueTypeState.types.toList())
+        .setComponents(componentState.components)
+        .setLabels(labelState.labels)
+        .setFixVersions(fixVersionState.versions)
+        .setCustomFields(customFieldState.fields)
+        .setParallelTasks(projectState.parallelTasks);
+
+      const issueState: IssueState =
+        reducers.issues(state.issues, IssueActions.createDeserializeIssuesAction(input['issues'], lookupParams));
 
       return {
         viewId: viewId,

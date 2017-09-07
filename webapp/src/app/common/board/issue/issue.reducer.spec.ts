@@ -1,5 +1,5 @@
 import {IssueActions, issueReducer} from './issue.reducer';
-import {BoardIssue, initialIssueState} from './issue.model';
+import {BoardIssue, DeserializeIssueLookupParams, initialIssueState} from './issue.model';
 import {async} from '@angular/core/testing';
 import {IssueTypeActions, issueTypeReducer} from '../issue-type/issue-type.reducer';
 import {PriorityActions, priorityReducer} from '../priority/priority.reducer';
@@ -26,15 +26,8 @@ import {ParallelTask} from '../project/project.model';
 
 describe('Issue reducer tests', () => {
 
-  let types: Array<IssueType>;
-  let priorities: Array<Priority>;
-  let assignees: Array<Assignee>;
-  let components: List<string>;
-  let labels: List<string>;
-  let fixVersions: List<string>;
-  const customFields: OrderedMap<string, List<CustomField>> = OrderedMap<string, List<CustomField>>();
-  const parallelTasks: Map<string, List<ParallelTask>> = Map<string, List<ParallelTask>>();
   let issues: Map<string, BoardIssue>;
+  let lookupParams: DeserializeIssueLookupParams;
   beforeEach(async(() => {
 
     const input = [
@@ -72,47 +65,47 @@ describe('Issue reducer tests', () => {
       }
     ];
 
-    assignees = assigneeReducer(
-      initialAssigneeState,
-      AssigneeActions.createAddInitialAssignees(getTestAssigneesInput())).assignees.toArray();
-    priorities = priorityReducer(
-      initialPriorityState,
-      PriorityActions.createDeserializePriorities(getTestPrioritiesInput())).priorities.toArray();
-    types = issueTypeReducer(
-      initialIssueTypeState,
-      IssueTypeActions.createDeserializeIssueTypes(getTestIssueTypesInput())).types.toArray();
-    components = componentReducer(
-      initialComponentState,
-      ComponentActions.createDeserializeComponents(getTestComponentsInput())).components;
-    labels = labelReducer(
-      initialLabelState,
-      LabelActions.createDeserializeLabels(getTestLabelsInput())).labels;
-    fixVersions = fixVersionReducer(
-      initialFixVersionState,
-      FixVersionActions.createDeserializeFixVersions(getTestFixVersionsInput())).versions;
 
+    lookupParams = new DeserializeIssueLookupParams()
+      .setAssignees(
+        assigneeReducer(
+          initialAssigneeState, AssigneeActions.createAddInitialAssignees(getTestAssigneesInput())).assignees.toList())
+      .setPriorities(
+        priorityReducer(
+          initialPriorityState, PriorityActions.createDeserializePriorities(getTestPrioritiesInput())).priorities.toList())
+      .setIssueTypes(
+        issueTypeReducer(
+          initialIssueTypeState, IssueTypeActions.createDeserializeIssueTypes(getTestIssueTypesInput())).types.toList())
+      .setComponents(
+        componentReducer(
+          initialComponentState, ComponentActions.createDeserializeComponents(getTestComponentsInput())).components)
+      .setLabels(
+        labelReducer(
+          initialLabelState, LabelActions.createDeserializeLabels(getTestLabelsInput())).labels)
+      .setFixVersions(
+        fixVersionReducer(
+          initialFixVersionState, FixVersionActions.createDeserializeFixVersions(getTestFixVersionsInput())).versions);
 
     issues = issueReducer(
       initialIssueState,
-      IssueActions.createDeserializeIssuesAction(
-        input, assignees, types, priorities, components, labels, fixVersions, customFields, parallelTasks)).issues;
+      IssueActions.createDeserializeIssuesAction(input, lookupParams)).issues;
   }));
 
 
   it('Deserialize', () => {
     expect(issues.size).toEqual(4);
     const issueArray: BoardIssue[] = issues.toArray();
-    new IssueChecker(issueArray[0], types[0], priorities[0], assignees[0], 'One')
+    new IssueChecker(issueArray[0], lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'One')
       .key('ISSUE-1')
       .addLinkedIssue('LNK-1', 'Linked 1')
       .check();
-    new IssueChecker(issueArray[1], types[1], priorities[1], assignees[1], 'Two')
+    new IssueChecker(issueArray[1], lookupParams.issueTypes.get(1), lookupParams.priorities.get(1), lookupParams.assignees.get(1), 'Two')
       .key('ISSUE-2')
       .check();
-    new IssueChecker(issueArray[2], types[0], priorities[0], assignees[0], 'Three')
+    new IssueChecker(issueArray[2], lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Three')
       .key('ISSUE-3')
       .check();
-    new IssueChecker(issueArray[3], types[0], priorities[1], NO_ASSIGNEE, 'Four')
+    new IssueChecker(issueArray[3], lookupParams.issueTypes.get(0), lookupParams.priorities.get(1), NO_ASSIGNEE, 'Four')
       .key('ISSUE-4')
       .check();
   });

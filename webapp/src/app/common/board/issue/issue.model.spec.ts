@@ -1,4 +1,4 @@
-import {BoardIssue, CustomFieldValue, Issue, IssueUtil} from './issue.model';
+import {BoardIssue, CustomFieldValue, DeserializeIssueLookupParams, Issue, IssueUtil} from './issue.model';
 import {Assignee, AssigneeUtil, NO_ASSIGNEE} from '../assignee/assignee.model';
 import {Priority, PriorityUtil} from '../priority/priority.model';
 import {IssueType, IssueTypeUtil} from '../issue-type/issue-type.model';
@@ -19,15 +19,7 @@ describe('Issue unit tests', () => {
 
   describe('Deserialize', () => {
     let input: any;
-    let assignees: Assignee[];
-    let priorities: Priority[];
-    let issueTypes: IssueType[];
-    let components: List<string>;
-    let labels: List<string>;
-    let fixVersions: List<string>;
-    let customFields: OrderedMap<string, List<CustomField>>;
-    let parallelTasks: Map<string, List<ParallelTask>>;
-
+    let lookupParams: DeserializeIssueLookupParams;
     beforeEach(() => {
       input = cloneObject({
         key: 'ISSUE-1',
@@ -37,50 +29,53 @@ describe('Issue unit tests', () => {
         assignee: 0
       });
 
-      assignees = [];
-      assignees.push(AssigneeUtil.fromJS(
-        {
-          key : 'userA',
-          email : 'userA@examle.com',
-          avatar : 'https://example.com/userA.png',
-          name : 'UserA Smith'
-        }));
-      assignees.push(AssigneeUtil.fromJS(
-        {
-          key : 'userB',
-          email : 'userB@examle.com',
-          avatar : 'https://example.com/userB.png',
-          name : 'userB Jones'
-        }));
+      const assignees: List<Assignee> = List<Assignee>().withMutations(mutable => {
+        mutable.push(AssigneeUtil.fromJS(
+          {
+            key : 'userA',
+            email : 'userA@examle.com',
+            avatar : 'https://example.com/userA.png',
+            name : 'UserA Smith'
+          }));
+        mutable.push(AssigneeUtil.fromJS(
+          {
+            key : 'userB',
+            email : 'userB@examle.com',
+            avatar : 'https://example.com/userB.png',
+            name : 'userB Jones'
+          }));
+      });
 
-      priorities = [];
-      priorities.push(PriorityUtil.fromJS(
-        {
-          name: 'Blocker',
-          icon: '/priorities/blocker.png'
-        }));
-      priorities.push(PriorityUtil.fromJS(
-        {
-          name: 'Major',
-          icon: '/priorities/major.png'
-        }));
+      const priorities: List<Priority> = List<Priority>().withMutations(mutable => {
+        mutable.push(PriorityUtil.fromJS(
+          {
+            name: 'Blocker',
+            icon: '/priorities/blocker.png'
+          }));
+        mutable.push(PriorityUtil.fromJS(
+          {
+            name: 'Major',
+            icon: '/priorities/major.png'
+          }));
+      });
 
-      issueTypes = [];
-      issueTypes.push(IssueTypeUtil.fromJS(
-        {
-          name : 'Task',
-          icon : 'https://example.com/task.png'
-        }));
-      issueTypes.push(IssueTypeUtil.fromJS(
-        {
-          name : 'Blocker',
-          icon : 'https://example.com/blocker.png'
-        }));
+      const issueTypes: List<IssueType> = List<IssueType>().withMutations(mutable => {
+        mutable.push(IssueTypeUtil.fromJS(
+          {
+            name : 'Task',
+            icon : 'https://example.com/task.png'
+          }));
+        mutable.push(IssueTypeUtil.fromJS(
+          {
+            name : 'Blocker',
+            icon : 'https://example.com/blocker.png'
+          }));
+      });
 
-      components = List<string>(getTestComponentsInput());
-      labels = List<string>(getTestLabelsInput());
-      fixVersions = List<string>(getTestFixVersionsInput());
-      customFields =
+      const components = List<string>(getTestComponentsInput());
+      const labels = List<string>(getTestLabelsInput());
+      const fixVersions = List<string>(getTestFixVersionsInput());
+      const customFields =
         customFieldReducer(
           initialCustomFieldState,
           CustomFieldActions.createDeserializeCustomFields(getTestCustomFieldsInput())).fields;
@@ -89,49 +84,62 @@ describe('Issue unit tests', () => {
         projectReducer(
           initialProjectState,
           ProjectActions.createDeserializeProjects(getTestProjectsInput()));
-      parallelTasks = projectState.parallelTasks;
+      const parallelTasks = projectState.parallelTasks;
+
+      lookupParams = new DeserializeIssueLookupParams();
+
+      lookupParams
+        .setAssignees(assignees)
+        .setPriorities(priorities)
+        .setIssueTypes(issueTypes)
+        .setComponents(components)
+        .setLabels(labels)
+        .setFixVersions(fixVersions)
+        .setCustomFields(customFields)
+        .setParallelTasks(parallelTasks);
     });
 
     it('Standard fields', () => {
-      const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions, customFields, parallelTasks);
-      new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
+      const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
+      new IssueChecker(issue,
+        lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Issue summary')
         .key('ISSUE-1')
         .check();
     });
 
     it('Assignee > 0', () => {
       input['assignee'] = 1;
-      const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions, customFields, parallelTasks);
-      new IssueChecker(issue, issueTypes[0], priorities[0], assignees[1], 'Issue summary')
+      const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
+      new IssueChecker(issue,
+        lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(1), 'Issue summary')
         .key('ISSUE-1')
         .check();
     });
 
     it ('Priority > 0', () => {
       input['priority'] = 1;
-      const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions, customFields, parallelTasks);
-      new IssueChecker(issue, issueTypes[0], priorities[1], assignees[0], 'Issue summary')
+      const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
+      new IssueChecker(
+        issue,
+        lookupParams.issueTypes.get(0), lookupParams.priorities.get(1), lookupParams.assignees.get(0), 'Issue summary')
         .key('ISSUE-1')
         .check();
     });
 
     it ('Type > 0', () => {
       input['type'] = 1;
-      const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions, customFields, parallelTasks);
-      new IssueChecker(issue, issueTypes[1], priorities[0], assignees[0], 'Issue summary')
+      const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
+      new IssueChecker(issue,
+        lookupParams.issueTypes.get(1), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Issue summary')
         .key('ISSUE-1')
         .check();
     });
 
     it ('No assignee', () => {
       delete input['assignee'];
-      const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions, customFields, parallelTasks);
-      new IssueChecker(issue, issueTypes[0], priorities[0], NO_ASSIGNEE, 'Issue summary')
+      const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
+      new IssueChecker(issue,
+        lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), NO_ASSIGNEE, 'Issue summary')
         .key('ISSUE-1')
         .check();
     });
@@ -148,9 +156,9 @@ describe('Issue unit tests', () => {
           summary : 'Linked 2',
         }];
 
-      const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions, customFields, parallelTasks);
-      new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
+      const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
+      new IssueChecker(issue,
+        lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Issue summary')
         .key('ISSUE-1')
         .addLinkedIssue('LNK-1', 'Linked 1')
         .addLinkedIssue('LNK-2', 'Linked 2')
@@ -159,9 +167,9 @@ describe('Issue unit tests', () => {
 
     it('Components', () => {
       input['components'] = [0, 2];
-      const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions, customFields, parallelTasks);
-      new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
+      const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
+      new IssueChecker(issue,
+        lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Issue summary')
         .key('ISSUE-1')
         .components('C-1', 'C-3')
         .check();
@@ -169,9 +177,9 @@ describe('Issue unit tests', () => {
 
     it('Labels', () => {
       input['labels'] = [1, 2];
-      const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions, customFields, parallelTasks);
-      new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
+      const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
+      new IssueChecker(issue,
+        lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Issue summary')
         .key('ISSUE-1')
         .labels('L-2', 'L-3')
         .check();
@@ -180,9 +188,9 @@ describe('Issue unit tests', () => {
 
     it('Fix Versions', () => {
       input['fix-versions'] = [0, 1];
-      const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions, customFields, parallelTasks);
-      new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
+      const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
+      new IssueChecker(issue,
+        lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Issue summary')
         .key('ISSUE-1')
         .fixVersions('F-1', 'F-2')
         .check();
@@ -190,9 +198,9 @@ describe('Issue unit tests', () => {
 
     it('Custom Fields (all)', () => {
       input['custom'] = {'Custom-1': 2, 'Custom-2': 1};
-      const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions, customFields, parallelTasks);
-      new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
+      const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
+      new IssueChecker(issue,
+        lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Issue summary')
         .key('ISSUE-1')
         .customField('Custom-1', 'c1-C', 'Third C1')
         .customField('Custom-2', 'c2-B', 'Second C2')
@@ -201,9 +209,9 @@ describe('Issue unit tests', () => {
 
     it('Custom Fields (one)', () => {
       input['custom'] = {'Custom-2': 0};
-      const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions, customFields, parallelTasks);
-      new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
+      const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
+      new IssueChecker(issue,
+        lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Issue summary')
         .key('ISSUE-1')
         .customField('Custom-2', 'c2-A', 'First C2')
         .check();
@@ -213,9 +221,9 @@ describe('Issue unit tests', () => {
     it('Parallel Tasks', () => {
       input['key'] = 'P2-100'; // The parallel tasks are set up in the 'P2' project
       input['parallel-tasks'] = [2, 1];
-      const issue: BoardIssue = IssueUtil.fromJS(input, assignees, priorities, issueTypes,
-        components, labels, fixVersions, customFields, parallelTasks);
-      new IssueChecker(issue, issueTypes[0], priorities[0], assignees[0], 'Issue summary')
+      const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
+      new IssueChecker(issue,
+        lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Issue summary')
         .key('P2-100')
         .selectedParallelTaskOptions('Three', 'Dos')
         .check();
