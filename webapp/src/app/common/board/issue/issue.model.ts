@@ -26,6 +26,7 @@ export interface BoardIssue extends Issue {
   customFields: Map<string, CustomField>;
   parallelTasks: List<string>;
   linkedIssues: List<Issue>;
+  ownState: number;
 }
 
 const DEFAULT_STATE: IssueState = {
@@ -43,7 +44,8 @@ const DEFAULT_ISSUE: BoardIssue = {
   fixVersions: null,
   customFields: null,
   parallelTasks: null,
-  linkedIssues: List<Issue>()
+  linkedIssues: List<Issue>(),
+  ownState: 0
 };
 
 const DEFAULT_LINKED_ISSUE: Issue = {
@@ -168,6 +170,9 @@ export class IssueUtil {
     } else {
       input['assignee'] = NO_ASSIGNEE;
     }
+
+    input['ownState'] = input['state'];
+    delete input['state'];
 
     // priority and issue-type will never be null
     input['priority'] = params.priorities.get(input['priority']);

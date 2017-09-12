@@ -7,20 +7,19 @@ const DESERIALIZE_PRIORITIES = 'DESERIALIZE_HEADERS';
 
 class DeserializeHeadersAction implements Action {
   readonly type = DESERIALIZE_PRIORITIES;
-  constructor(readonly payload: List<List<Header>>) {
+  constructor(readonly payload: HeaderTableCreator) {
   }
 }
 
 export class HeaderActions {
   static createDeserializeHeaders(states: any[], headers: string[], backlog: number, done: number): Action {
-    const table: List<List<Header>> = new HeaderTableCreator(states, headers, backlog, done).createHeaderTable();
-    return new DeserializeHeadersAction(table);
+    return new DeserializeHeadersAction(new HeaderTableCreator(states, headers, backlog, done));
   }
 }
 
 class HeaderTableCreator {
   // The raw input
-  private states: any[];
+  private _states: any[];
   private headers: string[];
   private backlog: number;
   private done: number;
@@ -33,7 +32,7 @@ class HeaderTableCreator {
 
   constructor(states: any[], headers: string[], backlog: number, done: number) {
     // Only use the visible states
-    this.states = states.slice(0, states.length - done);
+    this._states = states.slice(0, states.length - done);
     this.headers = headers;
     this.backlog = backlog;
     this.done = done;
@@ -43,6 +42,10 @@ class HeaderTableCreator {
     if (this.headerStates) {
       headers.forEach(v => this.headerStates[v] = [] );
     }
+  }
+
+  get states(): any[] {
+    return this._states;
   }
 
   private hasHeaders(): boolean {
@@ -60,10 +63,10 @@ class HeaderTableCreator {
   }
 
   private createStateHeaders(): TempHeader[] {
-    const stateHeaders: TempHeader[] = new Array<TempHeader>(this.states.length);
+    const stateHeaders: TempHeader[] = new Array<TempHeader>(this._states.length);
 
-    for (let i = 0; i < this.states.length ; i++) {
-      const state: any = this.states[i];
+    for (let i = 0; i < this._states.length ; i++) {
+      const state: any = this._states[i];
       const header: number = state['header'];
       const rows = this.calculateRows(i, header);
       const stateHeader = new TempHeader(state['name'], i < this.backlog, rows, state['wip']);
@@ -114,7 +117,7 @@ class HeaderTableCreator {
     const bottomRow: TempHeader[] = [];
     for (let i = 0 ; i < stateHeaders.length ; i++) {
       const header = stateHeaders[i];
-      if (isNaN(this.states[i]['header']) && !header.backlog) {
+      if (isNaN(this._states[i]['header']) && !header.backlog) {
         topRow.push(header);
       } else {
         bottomRow.push(header);
@@ -151,13 +154,17 @@ class HeaderTableCreator {
 export function headerReducer(state: HeaderState = initialHeaderState, action: Action): HeaderState {
   switch (action.type) {
     case DESERIALIZE_PRIORITIES: {
-      const payload: List<List<Header>> = (<DeserializeHeadersAction>action).payload;
-      const headers = state.headers;
-      if (headers.equals(payload)) {
+      const payload: HeaderTableCreator = (<DeserializeHeadersAction>action).payload;
+
+      const exisitingHeaders = state.headers;
+      const headers: List<List<Header>> = payload.createHeaderTable();
+
+      if (exisitingHeaders.equals(headers)) {
         return state;
       }
       const newState: HeaderState = HeaderUtil.toStateRecord(state).withMutations( mutable => {
-        mutable.headers = payload;
+        mutable.states = List<string>(payload.states.map(value => value['name']));
+        mutable.headers = headers;
       });
       if (HeaderUtil.toStateRecord(newState).equals(HeaderUtil.toStateRecord(state))) {
         return state;

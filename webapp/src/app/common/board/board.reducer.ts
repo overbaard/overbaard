@@ -23,6 +23,8 @@ import {CustomFieldActions, customFieldReducer} from './custom-field/custom-fiel
 import {BlacklistState, initialBlacklistState} from './blacklist/blacklist.model';
 import {BlacklistActions, blacklistReducer} from './blacklist/blacklist.reducer';
 import {Map} from 'immutable';
+import {issueTableReducer} from './calculated/issue-table/issue-table.reducer';
+import {initialIssueTableState, IssueTableState} from './calculated/issue-table/issue-table.model';
 
 export interface BoardState {
   viewId: number;
@@ -39,6 +41,7 @@ export interface BoardState {
   issues: IssueState;
   blacklist: BlacklistState;
 }
+
 
 export const initialBoardState: BoardState = {
   viewId: 0,

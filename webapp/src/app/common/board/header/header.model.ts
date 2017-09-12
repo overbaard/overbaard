@@ -3,6 +3,7 @@ import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 
 export interface HeaderState {
   headers: List<List<Header>>;
+  states: List<string>;
 }
 
 export interface Header {
@@ -15,7 +16,8 @@ export interface Header {
 }
 
 const DEFAULT_STATE: HeaderState = {
-  headers: List<List<Header>>()
+  headers: List<List<Header>>(),
+  states: List<string>()
 };
 
 const DEFAULT_HEADER: Header = {

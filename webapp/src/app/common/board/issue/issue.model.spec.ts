@@ -26,7 +26,8 @@ describe('Issue unit tests', () => {
         type: 0,
         priority: 0,
         summary: 'Issue summary',
-        assignee: 0
+        assignee: 0,
+        state: 4
       });
 
       const assignees: List<Assignee> = List<Assignee>().withMutations(mutable => {
@@ -102,7 +103,7 @@ describe('Issue unit tests', () => {
     it('Standard fields', () => {
       const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
       new IssueChecker(issue,
-        lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Issue summary')
+        lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Issue summary', 4)
         .key('ISSUE-1')
         .check();
     });
@@ -111,7 +112,7 @@ describe('Issue unit tests', () => {
       input['assignee'] = 1;
       const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
       new IssueChecker(issue,
-        lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(1), 'Issue summary')
+        lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(1), 'Issue summary', 4)
         .key('ISSUE-1')
         .check();
     });
@@ -121,7 +122,7 @@ describe('Issue unit tests', () => {
       const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
       new IssueChecker(
         issue,
-        lookupParams.issueTypes.get(0), lookupParams.priorities.get(1), lookupParams.assignees.get(0), 'Issue summary')
+        lookupParams.issueTypes.get(0), lookupParams.priorities.get(1), lookupParams.assignees.get(0), 'Issue summary', 4)
         .key('ISSUE-1')
         .check();
     });
@@ -130,7 +131,7 @@ describe('Issue unit tests', () => {
       input['type'] = 1;
       const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
       new IssueChecker(issue,
-        lookupParams.issueTypes.get(1), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Issue summary')
+        lookupParams.issueTypes.get(1), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Issue summary', 4)
         .key('ISSUE-1')
         .check();
     });
@@ -139,7 +140,7 @@ describe('Issue unit tests', () => {
       delete input['assignee'];
       const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
       new IssueChecker(issue,
-        lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), NO_ASSIGNEE, 'Issue summary')
+        lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), NO_ASSIGNEE, 'Issue summary', 4)
         .key('ISSUE-1')
         .check();
     });
@@ -158,7 +159,7 @@ describe('Issue unit tests', () => {
 
       const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
       new IssueChecker(issue,
-        lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Issue summary')
+        lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Issue summary', 4)
         .key('ISSUE-1')
         .addLinkedIssue('LNK-1', 'Linked 1')
         .addLinkedIssue('LNK-2', 'Linked 2')
@@ -169,7 +170,7 @@ describe('Issue unit tests', () => {
       input['components'] = [0, 2];
       const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
       new IssueChecker(issue,
-        lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Issue summary')
+        lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Issue summary', 4)
         .key('ISSUE-1')
         .components('C-1', 'C-3')
         .check();
@@ -179,7 +180,7 @@ describe('Issue unit tests', () => {
       input['labels'] = [1, 2];
       const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
       new IssueChecker(issue,
-        lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Issue summary')
+        lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Issue summary', 4)
         .key('ISSUE-1')
         .labels('L-2', 'L-3')
         .check();
@@ -190,7 +191,7 @@ describe('Issue unit tests', () => {
       input['fix-versions'] = [0, 1];
       const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
       new IssueChecker(issue,
-        lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Issue summary')
+        lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Issue summary', 4)
         .key('ISSUE-1')
         .fixVersions('F-1', 'F-2')
         .check();
@@ -200,7 +201,7 @@ describe('Issue unit tests', () => {
       input['custom'] = {'Custom-1': 2, 'Custom-2': 1};
       const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
       new IssueChecker(issue,
-        lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Issue summary')
+        lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Issue summary', 4)
         .key('ISSUE-1')
         .customField('Custom-1', 'c1-C', 'Third C1')
         .customField('Custom-2', 'c2-B', 'Second C2')
@@ -211,7 +212,7 @@ describe('Issue unit tests', () => {
       input['custom'] = {'Custom-2': 0};
       const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
       new IssueChecker(issue,
-        lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Issue summary')
+        lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Issue summary', 4)
         .key('ISSUE-1')
         .customField('Custom-2', 'c2-A', 'First C2')
         .check();
@@ -223,7 +224,7 @@ describe('Issue unit tests', () => {
       input['parallel-tasks'] = [2, 1];
       const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
       new IssueChecker(issue,
-        lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Issue summary')
+        lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Issue summary', 4)
         .key('P2-100')
         .selectedParallelTaskOptions('Three', 'Dos')
         .check();
@@ -238,6 +239,7 @@ export class IssueChecker {
   private _priority: Priority;
   private _assignee: Assignee;
   private _summary: string;
+  private _ownState: number;
   private _linkedIssues: LinkedIssueChecker[];
   private _components: string[];
   private _labels: string[];
@@ -247,13 +249,14 @@ export class IssueChecker {
 
 
 
-  constructor(issue: BoardIssue, type: IssueType, priority: Priority, assignee: Assignee, summary: string) {
+  constructor(issue: BoardIssue, type: IssueType, priority: Priority, assignee: Assignee, summary: string, ownState: number) {
     this._issue = issue;
     this._key = issue.key;
     this._type = type;
     this._priority = priority;
     this._assignee = assignee;
     this._summary = summary;
+    this._ownState = ownState;
   }
 
   key(key: string): IssueChecker {
@@ -331,6 +334,8 @@ export class IssueChecker {
     if (this._summary) {
       expect(this._issue.summary).toEqual(this._summary);
     }
+
+    expect(this._issue.ownState).toBe(this._ownState);
 
     if (this._linkedIssues) {
       expect(this._issue.linkedIssues).toBeTruthy();
