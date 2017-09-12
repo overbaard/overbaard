@@ -1,5 +1,6 @@
 import {List, Map, OrderedMap} from 'immutable';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
+import {HeaderState} from '../header/header.model';
 
 export interface ProjectState {
   owner: string;
@@ -98,8 +99,24 @@ export class ProjectUtil {
     input['options'] = List<string>(input['options']);
     return PARALLEL_TASK_FACTORY(input);
   }
+
   static toStateRecord(s: ProjectState): ProjectStateRecord {
     // TODO do some checks. TS does not allow use of instanceof when the type is an interface (since they are compiled away)
     return <ProjectStateRecord>s;
   }
+
+  // TOOD store this as a field in the project? It would mean more stuff to compare if doing the plain equals of the state in the reducer
+  static getOwnIndexToBoardIndex(headerState: HeaderState, project: BoardProject): number[] {
+    const ownToBoard: number[] = new Array<number>(headerState.states.size);
+    let currentOwn = 0;
+    headerState.states.forEach((name, index) => {
+      const ownState: string = project.boardStateNameToOwnStateName.get(name);
+      if (ownState) {
+        ownToBoard[currentOwn++] = index;
+      }
+    });
+
+    return ownToBoard;
+  }
+
 }

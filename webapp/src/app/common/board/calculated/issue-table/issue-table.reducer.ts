@@ -1,5 +1,5 @@
 import {Action} from '@ngrx/store';
-import {BoardProject, ProjectState} from '../../project/project.model';
+import {BoardProject, ProjectState, ProjectUtil} from '../../project/project.model';
 import {BoardIssue, IssueState} from '../../issue/issue.model';
 import {initialIssueTableState, IssueTableState, IssueTableUtil} from './issue-table.model';
 import {HeaderState} from '../../header/header.model';
@@ -74,7 +74,7 @@ class IssueTableCreator {
   }
 
   private addProjectIssues(list: List<BoardIssue>[], project: BoardProject) {
-    const ownToBoardIndex: number[] = this.getOwnIndexToBoardIndex(project);
+    const ownToBoardIndex: number[] = ProjectUtil.getOwnIndexToBoardIndex(this.headerState, project);
     this.projectState.rankedIssueKeys.get(project.key).forEach((key) => {
       const issue: BoardIssue = this._issueState.issues.get(key);
       // find the index and add the issue
@@ -83,17 +83,5 @@ class IssueTableCreator {
     });
   }
 
-  private getOwnIndexToBoardIndex(project: BoardProject): number[] {
-    const ownToBoard: number[] = new Array<number>(this._headerState.states.size);
-    let currentOwn = 0;
-    this._headerState.states.forEach((name, index) => {
-      const ownState: string = project.boardStateNameToOwnStateName.get(name);
-      if (ownState) {
-        ownToBoard[currentOwn++] = index;
-      }
-    });
-
-    return ownToBoard;
-  }
 }
 
