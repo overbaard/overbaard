@@ -127,18 +127,13 @@ describe('Issue Table reducer tests', () => {
 });
 
 function checkTable(table: List<List<BoardIssue>>, expected: string[][]) {
-  const actualTable: List<List<string>> = table.map(
-    issues => issues.map(
-      issue => issue.key).toList()
-  ).toList();
-  const expectedTable: List<List<string>> = List<List<string>>().withMutations(mutable => {
-    expected.forEach(value => mutable.push(List<string>(value)));
+  const actualTable: string[][] = [];
+  table.forEach((v, i) => {
+    actualTable.push(table.get(i).map(issue => issue.key).toArray());
   });
-
-  // This does not work as expected, so do the equals check myself
-  // expect(actualTable).toEqual(expectedTable);
-  expect(actualTable.equals(expectedTable)).toBe(true, 'Expected: ' + actualTable + ' to equal: ' + expectedTable);
+  expect(actualTable).toEqual(expected);
 }
+
 
 
 class CreateIssueTableBuilder {

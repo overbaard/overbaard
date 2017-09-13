@@ -34,6 +34,10 @@ export class BlacklistUtil {
     return STATE_FACTORY(state);
   }
 
+  static createStateRecord(nonRecord: BlacklistState) {
+    return STATE_FACTORY(nonRecord);
+  }
+
   static toStateRecord(s: BlacklistState): BlacklistStateRecord {
     // TODO do some checks. TS does not allow use of instanceof when the type is an interface (since they are compiled away)
     return <BlacklistStateRecord>s;

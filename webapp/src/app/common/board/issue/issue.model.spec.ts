@@ -2,7 +2,7 @@ import {BoardIssue, DeserializeIssueLookupParams, Issue, IssueUtil} from './issu
 import {Assignee, AssigneeUtil, NO_ASSIGNEE} from '../assignee/assignee.model';
 import {Priority, PriorityUtil} from '../priority/priority.model';
 import {IssueType, IssueTypeUtil} from '../issue-type/issue-type.model';
-import {List, Map, OrderedMap} from 'immutable';
+import {List, Map} from 'immutable';
 import {getTestComponentsInput} from '../component/component.reducer.spec';
 import {getTestLabelsInput} from '../label/label.reducer.spec';
 import {getTestFixVersionsInput} from '../fix-version/fix-version.reducer.spec';
@@ -172,7 +172,7 @@ describe('Issue unit tests', () => {
       new IssueChecker(issue,
         lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Issue summary', 4)
         .key('ISSUE-1')
-        .components('C-1', 'C-3')
+        .components('C-10', 'C-30')
         .check();
     });
 
@@ -182,7 +182,7 @@ describe('Issue unit tests', () => {
       new IssueChecker(issue,
         lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Issue summary', 4)
         .key('ISSUE-1')
-        .labels('L-2', 'L-3')
+        .labels('L-20', 'L-30')
         .check();
     });
 
@@ -193,7 +193,7 @@ describe('Issue unit tests', () => {
       new IssueChecker(issue,
         lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Issue summary', 4)
         .key('ISSUE-1')
-        .fixVersions('F-1', 'F-2')
+        .fixVersions('F-10', 'F-20')
         .check();
     });
 

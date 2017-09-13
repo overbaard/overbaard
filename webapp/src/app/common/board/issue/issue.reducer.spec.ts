@@ -7,11 +7,11 @@ import {getTestAssigneesInput} from '../assignee/assignee.reducer.spec';
 import {getTestIssueTypesInput} from '../issue-type/issue-type.reducer.spec';
 import {getTestPrioritiesInput} from '../priority/priority.reducer.spec';
 import {IssueChecker} from './issue.model.spec';
-import {Assignee, initialAssigneeState, NO_ASSIGNEE} from '../assignee/assignee.model';
-import {initialIssueTypeState, IssueType} from '../issue-type/issue-type.model';
-import {initialPriorityState, Priority} from '../priority/priority.model';
+import {initialAssigneeState, NO_ASSIGNEE} from '../assignee/assignee.model';
+import {initialIssueTypeState} from '../issue-type/issue-type.model';
+import {initialPriorityState} from '../priority/priority.model';
 import {AssigneeActions, assigneeReducer} from '../assignee/assignee.reducer';
-import {List, Map, OrderedMap} from 'immutable';
+import {Map} from 'immutable';
 import {ComponentActions, componentReducer} from '../component/component.reducer';
 import {initialComponentState} from '../component/component.model';
 import {getTestComponentsInput} from '../component/component.reducer.spec';
@@ -21,8 +21,6 @@ import {getTestLabelsInput} from '../label/label.reducer.spec';
 import {FixVersionActions, fixVersionReducer} from '../fix-version/fix-version.reducer';
 import {initialFixVersionState} from '../fix-version/fix-version.model';
 import {getTestFixVersionsInput} from '../fix-version/fix-version.reducer.spec';
-import {CustomField} from '../custom-field/custom-field.model';
-import {ParallelTask} from '../project/project.model';
 import {cloneObject} from '../../utils/test-util.spec';
 
 function getTestIssuesInput() {

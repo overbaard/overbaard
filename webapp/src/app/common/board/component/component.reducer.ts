@@ -4,9 +4,17 @@ import {ComponentState, ComponentUtil, initialComponentState} from './component.
 
 
 const DESERIALIZE_ALL_COMPONENTS = 'DESERIALIZE_ALL_COMPONENTS';
+const ADD_COMPONENTS = 'ADD_COMPONENTS';
 
 class DeserializeComponentsAction implements Action {
   readonly type = DESERIALIZE_ALL_COMPONENTS;
+
+  constructor(readonly payload: List<string>) {
+  }
+}
+
+class AddComponentsAction implements Action {
+  readonly type = ADD_COMPONENTS;
 
   constructor(readonly payload: List<string>) {
   }
@@ -16,6 +24,11 @@ export class ComponentActions {
   static createDeserializeComponents(input: any): Action {
     const inputArray: string[] = input ? input : [];
     return new DeserializeComponentsAction(List<string>(inputArray));
+  }
+
+  static createAddComponents(input: any): Action {
+    const inputArray: string[] = input ? input : [];
+    return new AddComponentsAction(List<string>(inputArray));
   }
 }
 
@@ -31,6 +44,21 @@ export function componentReducer(state: ComponentState = initialComponentState, 
         return state;
       }
       return newState;
+    }
+    case ADD_COMPONENTS: {
+      const payload: List<string> = (<AddComponentsAction>action).payload;
+      if (payload.size > 0) {
+
+
+        const newComponents: List<string> = state.components.concat(payload)
+          .sort((a, b) => a.toLocaleLowerCase().localeCompare(b.toLocaleLowerCase()))
+          .toList();
+
+        return ComponentUtil.toStateRecord(state).withMutations(mutable => {
+          mutable.components = newComponents;
+        });
+      }
+      return state;
     }
     default:
       return state;

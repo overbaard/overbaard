@@ -119,10 +119,10 @@ describe('Board reducer tests', () => {
       expect(assignees.get('kabir').initials).toEqual('KK');
 
       const components: List<string> = boardState.components.components;
-      expect(components.toArray()).toEqual(['C-1', 'C-2', 'C-3']);
+      expect(components.toArray()).toEqual(['C-10', 'C-20', 'C-30']);
 
       const labels: List<string> = boardState.labels.labels;
-      expect(labels.toArray()).toEqual(['L-1', 'L-2', 'L-3']);
+      expect(labels.toArray()).toEqual(['L-10', 'L-20', 'L-30']);
 
       const priorities: OrderedMap<string, Priority> = boardState.priorities.priorities;
       expect(priorities.size).toBe(2);
@@ -157,9 +157,9 @@ describe('Board reducer tests', () => {
       expect(issue1.type.name).toEqual('bug');
       expect(issue1.priority.name).toEqual('Major');
       expect(issue1.components.size).toBe(1);
-      expect(issue1.components.get(0)).toEqual('C-2');
+      expect(issue1.components.get(0)).toEqual('C-20');
       expect(issue1.labels.size).toBe(2);
-      expect(issue1.labels.get(0)).toEqual('L-1');
+      expect(issue1.labels.get(0)).toEqual('L-10');
       expect(issue1.customFields.size).toEqual(2);
       expect(issue1.customFields.get('Custom-2').value).toEqual('Second C2');
       expect(issue1.parallelTasks.size).toEqual(1);
