@@ -105,13 +105,6 @@ describe('Projects reducer tests', () => {
         Board2: 'Test2'
       });
 
-      // Ranked keys
-      expect(projectState.rankedIssueKeys.size).toBe(2);
-      const p1Ranked = projectState.rankedIssueKeys.get('P1');
-      expect(p1Ranked.toArray()).toEqual(['P1-1', 'P1-3', 'P1-2']);
-      const p2Ranked = projectState.rankedIssueKeys.get('P2');
-      expect(p2Ranked.toArray()).toEqual(['P2-3', 'P2-2', 'P2-1']);
-
       // Linked projects
       expect(projectState.linkedProjects.size).toBe(3);
       const l1: LinkedProject = projectState.linkedProjects.get('L1');

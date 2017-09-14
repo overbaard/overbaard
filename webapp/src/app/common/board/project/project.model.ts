@@ -5,7 +5,6 @@ import {HeaderState} from '../header/header.model';
 export interface ProjectState {
   owner: string;
   boardProjects: Map<string, BoardProject>;
-  rankedIssueKeys: Map<string, List<string>>;
   linkedProjects: Map<string, LinkedProject>;
   parallelTasks: Map<string, List<ParallelTask>>;
 }
@@ -33,7 +32,6 @@ export interface ParallelTask {
 const DEFAULT_STATE: ProjectState = {
   owner: null,
   boardProjects: Map<string, BoardProject>(),
-  rankedIssueKeys: Map<string, List<string>>(),
   linkedProjects: Map<string, LinkedProject>(),
   parallelTasks: Map<string, List<ParallelTask>>()
 };

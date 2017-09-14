@@ -25,6 +25,8 @@ import {BlacklistActions, blacklistReducer} from './blacklist/blacklist.reducer'
 import {Map} from 'immutable';
 import {issueTableReducer} from './calculated/issue-table/issue-table.reducer';
 import {initialIssueTableState, IssueTableState} from './calculated/issue-table/issue-table.model';
+import {initialRankState, RankState} from './rank/rank.model';
+import {RankActions, rankReducer} from './rank/rank.reducer';
 
 export interface BoardState {
   viewId: number;
@@ -38,6 +40,7 @@ export interface BoardState {
   fixVersions: FixVersionState;
   customFields: CustomFieldState;
   projects: ProjectState;
+  ranks: RankState;
   issues: IssueState;
   blacklist: BlacklistState;
 }
@@ -55,6 +58,7 @@ export const initialBoardState: BoardState = {
   fixVersions: initialFixVersionState,
   customFields: initialCustomFieldState,
   projects: initialProjectState,
+  ranks: initialRankState,
   issues: initialIssueState,
   blacklist: initialBlacklistState
 };
@@ -70,6 +74,7 @@ const reducers = {
   fixVersions: fixVersionReducer,
   customFields: customFieldReducer,
   projects: projectReducer,
+  ranks: rankReducer,
   issues: issueReducer,
   blacklist: blacklistReducer
 };
@@ -162,6 +167,8 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
       // This will always be present
       const projectState: ProjectState =
         reducers.projects(state.projects, ProjectActions.createDeserializeProjects(input['projects']));
+      const rankState: RankState =
+        reducers.ranks(state.ranks, RankActions.createDeserializeRanks(input['projects']['main']));
 
       const lookupParams: DeserializeIssueLookupParams = new DeserializeIssueLookupParams()
         .setAssignees(assigneeState.assignees.toList())
@@ -192,6 +199,7 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
         customFields: customFieldState,
         projects: projectState,
         issues: issueState,
+        ranks: rankState,
         blacklist: blacklistState
       };
 

@@ -16,6 +16,7 @@ import {BoardProject, ProjectState} from './project/project.model';
 import {BoardIssue} from './issue/issue.model';
 import {BlacklistState} from './blacklist/blacklist.model';
 import {Header} from './header/header.model';
+import {RankState} from './rank/rank.model';
 
 export function getTestBoardsInput(): any {
   return cloneObject(
@@ -147,6 +148,10 @@ describe('Board reducer tests', () => {
       expect(project1.canRank).toBe(true);
       expect(projectState.linkedProjects.size).toBe(1);
       expect(projectState.linkedProjects.get('L1').states.size).toBe(2);
+
+      const rankState: RankState = boardState.ranks;
+      expect(rankState.rankedIssueKeys.size).toBe(1);
+      expect(rankState.rankedIssueKeys.get('P1').toArray()).toEqual(['P1-1', 'P1-2']);
 
       const issues: Map<string, BoardIssue> = boardState.issues.issues;
       expect(issues.size).toBe(2);

@@ -5,6 +5,7 @@ import {List, Map} from 'immutable';
 import {BoardProject, LinkedProject, ParallelTask, ProjectState} from '../../project/project.model';
 import {initialIssueTableState, IssueTableState} from './issue-table.model';
 import {IssueTableActions, issueTableReducer} from './issue-table.reducer';
+import {RankState} from '../../rank/rank.model';
 
 describe('Issue Table reducer tests', () => {
 
@@ -178,7 +179,8 @@ class CreateIssueTableBuilder {
       IssueTableActions.createCreateIssueTable(
         this.createHeaderState(),
         this.createIssueState(),
-        this.createProjectState()));
+        this.createProjectState(),
+        this.createRankedIssueState()));
   }
 
   private createHeaderState(): HeaderState {
@@ -235,11 +237,17 @@ class CreateIssueTableBuilder {
     const projectState: ProjectState = {
       owner: this._owner,
       boardProjects: projects,
-      rankedIssueKeys: this._rankedIssueKeys,
       linkedProjects: Map<string, LinkedProject>(),
       parallelTasks: Map<string, List<ParallelTask>>()
     };
     return projectState;
+  }
+
+  private createRankedIssueState(): RankState {
+    const rankState: RankState = {
+      rankedIssueKeys: this._rankedIssueKeys
+    };
+    return rankState;
   }
 }
 

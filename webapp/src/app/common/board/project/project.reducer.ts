@@ -17,7 +17,6 @@ class DeserializeProjectsAction implements Action {
 export class ProjectActions {
   static createDeserializeProjects(input: any): DeserializeProjectsAction {
     const boardProjects: Map<string, BoardProject> = Map<string, BoardProject>().asMutable();
-    const rankedIssueKeys: Map<string, List<string>> = Map<string, List<string>>().asMutable();
     const linkedProjects: Map<string, LinkedProject> = Map<string, LinkedProject>().asMutable();
     const parallelTasks: Map<string, List<ParallelTask>> = Map<string, List<ParallelTask>>().asMutable();
 
@@ -27,7 +26,6 @@ export class ProjectActions {
     for (const key of Object.keys(mainInput)) {
       const projectInput: any = mainInput[key];
       boardProjects.set(key, ProjectUtil.boardProjectFromJs(key, projectInput));
-      rankedIssueKeys.set(key, List<string>(projectInput['ranked']));
       const parallelTasksInput: any[] = projectInput['parallel-tasks'];
       if (parallelTasksInput) {
         for (let i = 0 ; i < parallelTasksInput.length ; i++) {
@@ -48,7 +46,6 @@ export class ProjectActions {
     const payload: ProjectState = {
       owner: owner,
       boardProjects: boardProjects.asImmutable(),
-      rankedIssueKeys: rankedIssueKeys.asImmutable(),
       linkedProjects: linkedProjects.asImmutable(),
       parallelTasks: parallelTasks.asImmutable()
     };
@@ -64,7 +61,6 @@ export function projectReducer(state: ProjectState = initialProjectState, action
       const newState: ProjectState = ProjectUtil.toStateRecord(state).withMutations(mutable => {
         mutable.owner = payload.owner;
         mutable.boardProjects = payload.boardProjects;
-        mutable.rankedIssueKeys = payload.rankedIssueKeys;
         mutable.linkedProjects = payload.linkedProjects;
         mutable.parallelTasks = payload.parallelTasks;
       });

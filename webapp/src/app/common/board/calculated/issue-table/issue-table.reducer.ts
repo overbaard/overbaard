@@ -4,6 +4,7 @@ import {BoardIssue, IssueState} from '../../issue/issue.model';
 import {initialIssueTableState, IssueTableState, IssueTableUtil} from './issue-table.model';
 import {HeaderState} from '../../header/header.model';
 import {List} from 'immutable';
+import {RankState} from '../../rank/rank.model';
 
 
 const CREATE_ISSUE_TABLE = 'CREATE_ISSUE_TABLE';
@@ -16,8 +17,9 @@ class CreateIssueTableAction implements Action {
 }
 
 export class IssueTableActions {
-  static createCreateIssueTable(headerState: HeaderState, issueState: IssueState, projectState: ProjectState): Action {
-    return new CreateIssueTableAction(new IssueTableCreator(headerState, issueState, projectState));
+  static createCreateIssueTable(
+    headerState: HeaderState, issueState: IssueState, projectState: ProjectState, rankState: RankState): Action {
+    return new CreateIssueTableAction(new IssueTableCreator(headerState, issueState, projectState, rankState));
   }
 }
 
@@ -40,26 +42,20 @@ export function issueTableReducer(state: IssueTableState = initialIssueTableStat
 };
 
 class IssueTableCreator {
-  constructor(private _headerState: HeaderState, private _issueState: IssueState, private  _projectState: ProjectState) {
+  constructor(private _headerState: HeaderState, private _issueState: IssueState,
+              private  _projectState: ProjectState, private _rankState: RankState) {
   }
 
-  get headerState(): HeaderState {
-    return this._headerState;
-  }
-
-  get projectState(): ProjectState {
-    return this._projectState;
-  }
 
   createIssueTableState(): IssueTableState {
-    const table: List<BoardIssue>[] = new Array<List<BoardIssue>>(this.headerState.states.size);
+    const table: List<BoardIssue>[] = new Array<List<BoardIssue>>(this._headerState.states.size);
     for (let i = 0 ; i < table.length ; i++) {
       table[i] = List<BoardIssue>().asMutable();
     }
 
-    this.addProjectIssues(table, this.projectState.boardProjects.get(this.projectState.owner));
-    this.projectState.boardProjects.forEach((project, key) => {
-      if (key !== this.projectState.owner) {
+    this.addProjectIssues(table, this._projectState.boardProjects.get(this._projectState.owner));
+    this._projectState.boardProjects.forEach((project, key) => {
+      if (key !== this._projectState.owner) {
         this.addProjectIssues(table, project);
       }
     });
@@ -74,8 +70,8 @@ class IssueTableCreator {
   }
 
   private addProjectIssues(list: List<BoardIssue>[], project: BoardProject) {
-    const ownToBoardIndex: number[] = ProjectUtil.getOwnIndexToBoardIndex(this.headerState, project);
-    this.projectState.rankedIssueKeys.get(project.key).forEach((key) => {
+    const ownToBoardIndex: number[] = ProjectUtil.getOwnIndexToBoardIndex(this._headerState, project);
+    this._rankState.rankedIssueKeys.get(project.key).forEach((key) => {
       const issue: BoardIssue = this._issueState.issues.get(key);
       // find the index and add the issue
       const boardIndex: number = ownToBoardIndex[issue.ownState];
