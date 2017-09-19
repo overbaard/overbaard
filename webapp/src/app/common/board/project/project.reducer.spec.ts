@@ -15,7 +15,7 @@ export function getTestProjectsInput(): any {
             Board1: 'Test1',
             Board3: 'Test3'
           },
-          'ranked': [
+          ranked: [
             'P1-1',
             'P1-3',
             'P1-2'
@@ -28,7 +28,7 @@ export function getTestProjectsInput(): any {
             'Board1': 'Test1',
             'Board2': 'Test2'
           },
-          'ranked': [
+          ranked: [
             'P2-3',
             'P2-2',
             'P2-1'
