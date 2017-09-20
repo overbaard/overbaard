@@ -1,5 +1,5 @@
 import {Action} from '@ngrx/store';
-import {List, Map, OrderedMap} from 'immutable';
+import {Map, OrderedMap} from 'immutable';
 import {CustomField, CustomFieldState, CustomFieldUtil, initialCustomFieldState} from './custom-field.model';
 
 
@@ -9,23 +9,24 @@ const ADD_CUSTOM_FIELDS = 'ADD_CUSTOM_FIELDS';
 class DeserializeCustomFieldsAction implements Action {
   readonly type = DESERIALIZE_ALL_CUSTOM_FIELDS;
 
-  constructor(readonly payload: OrderedMap<string, List<CustomField>>) {
+  constructor(readonly payload: OrderedMap<string, OrderedMap<string, CustomField>>) {
   }
 }
 
 class AddCustomFieldsAction implements Action {
   readonly type = ADD_CUSTOM_FIELDS;
 
-  constructor(readonly payload: Map<string, List<CustomField>>) {
+  constructor(readonly payload: Map<string, OrderedMap<string, CustomField>>) {
   }
 }
 
 export class CustomFieldActions {
   static createDeserializeCustomFields(input: any): Action {
     const keys: string[] = Object.keys(input).sort((a, b) => a.toLocaleLowerCase().localeCompare(b.toLocaleLowerCase()));
-    const map: OrderedMap<string, List<CustomField>> = OrderedMap<string, List<CustomField>>().withMutations(mutable => {
+    const map: OrderedMap<string, OrderedMap<string, CustomField>>
+      = OrderedMap<string, OrderedMap<string, CustomField>>().withMutations(mutable => {
       for (const key of keys) {
-        mutable.set(key, this.createListFromInput(input, key));
+        mutable.set(key, this.createMapFromInput(input, key));
       }
     });
 
@@ -33,11 +34,11 @@ export class CustomFieldActions {
   }
 
   static createAddCustomFields(input: any): Action {
-    let map: OrderedMap<string, List<CustomField>> = OrderedMap<string, List<CustomField>>();
+    let map: OrderedMap<string, OrderedMap<string, CustomField>> = OrderedMap<string, OrderedMap<string, CustomField>>();
     if (input) {
       map = map.withMutations(mutable => {
         for (const key of Object.keys(input)) {
-          mutable.set(key, this.createListFromInput(input, key));
+          mutable.set(key, this.createMapFromInput(input, key));
         }
       });
     }
@@ -45,13 +46,14 @@ export class CustomFieldActions {
     return new AddCustomFieldsAction(map);
   }
 
-  private static createListFromInput(input: any, key: string): List<CustomField> {
+  private static createMapFromInput(input: any, key: string): OrderedMap<string, CustomField> {
     const inputArray: any[] = input[key];
-    const cfs: CustomField[] = new Array<CustomField>(inputArray.length);
-    for (let i = 0 ; i < inputArray.length ; i++) {
-      cfs[i] = CustomFieldUtil.fromJs(inputArray[i]);
-    }
-    return List<CustomField>(cfs);
+    return OrderedMap<string, CustomField>().withMutations(mutable => {
+      for (let i = 0 ; i < inputArray.length ; i++) {
+        const cf = CustomFieldUtil.fromJs(inputArray[i]);
+        mutable.set(cf.key, cf);
+      }
+    });
   }
 }
 
@@ -59,7 +61,7 @@ export function customFieldReducer(state: CustomFieldState = initialCustomFieldS
 
   switch (action.type) {
     case DESERIALIZE_ALL_CUSTOM_FIELDS: {
-      const payload: OrderedMap<string, List<CustomField>> = (<DeserializeCustomFieldsAction>action).payload;
+      const payload: OrderedMap<string, OrderedMap<string, CustomField>> = (<DeserializeCustomFieldsAction>action).payload;
       const newState = CustomFieldUtil.toStateRecord(state).withMutations(mutable => {
         mutable.fields = payload;
       });
@@ -69,12 +71,12 @@ export function customFieldReducer(state: CustomFieldState = initialCustomFieldS
       return newState;
     }
     case ADD_CUSTOM_FIELDS: {
-      const payload: Map<string, List<CustomField>> = (<AddCustomFieldsAction>action).payload;
+      const payload: Map<string, OrderedMap<string, CustomField>> = (<AddCustomFieldsAction>action).payload;
       if (payload.size > 0) {
         const fields = state.fields.withMutations(mutableFields => {
-          payload.forEach((list, key) => {
-            const customFields: List<CustomField> = mutableFields.get(key).concat(list)
-              .sort((a, b) => a.value.toLocaleLowerCase().localeCompare(b.value.toLocaleLowerCase())).toList();
+          payload.forEach((map, key) => {
+            const customFields: OrderedMap<string, CustomField> = mutableFields.get(key).concat(map)
+              .sort((a, b) => a.value.toLocaleLowerCase().localeCompare(b.value.toLocaleLowerCase())).toOrderedMap();
             mutableFields.set(
                 key,
                 customFields);

@@ -4,7 +4,7 @@ import {Priority} from '../priority/priority.model';
 import {IssueType} from '../issue-type/issue-type.model';
 import {fromJS, List, Map, OrderedMap} from 'immutable';
 import {CustomField} from '../custom-field/custom-field.model';
-import {ParallelTask} from '../project/project.model';
+import {BoardProject, ParallelTask} from '../project/project.model';
 
 export interface IssueState {
   issues: Map<string, BoardIssue>;
@@ -67,31 +67,40 @@ const LINKED_ISSUE_FACTORY = makeTypedFactory<Issue, LinkedIssueRecord>(DEFAULT_
 const STATE_FACTORY = makeTypedFactory<IssueState, IssueStateRecord>(DEFAULT_STATE);
 export const initialIssueState: IssueState = STATE_FACTORY(DEFAULT_STATE);
 
+const CLEAR_STRING_LIST = List<string>('Clear this!');
 /**
  * Convenience class to make it easier to pass in other data needed to deserialize an issue. Especially from unit tests,
  * where we do this repeatedly.
  */
 export class DeserializeIssueLookupParams {
-  private _assignees: List<Assignee> = List<Assignee>();
-  private _issueTypes: List<IssueType> = List<IssueType>();
-  private _priorities: List<Priority> = List<Priority>();
+  private _assignees: OrderedMap<string, Assignee> = OrderedMap<string, Assignee>();
+  private _assigneesList: List<Assignee>;
+  private _issueTypes: OrderedMap<string, IssueType> = OrderedMap<string, IssueType>();
+  private _issueTypesList: List<IssueType>;
+  private _priorities: OrderedMap<string, Priority> = OrderedMap<string, Priority>();
+  private _prioritiesList: List<Priority>;
   private _components: List<string> = List<string>();
   private _labels: List<string> = List<string>();
   private _fixVersions: List<string> = List<string>();
-  private _customFields: OrderedMap<string, List<CustomField>> = OrderedMap<string, List<CustomField>>();
+  private _customFields: OrderedMap<string, OrderedMap<string, CustomField>> = OrderedMap<string, OrderedMap<string, CustomField>>();
+  private _customFieldsListMap: OrderedMap<string, List<CustomField>>;
   private _parallelTasks: Map<string, List<ParallelTask>> = Map<string, List<ParallelTask>>();
+  private _boardProjects: Map<string, BoardProject> = Map<string, BoardProject>();
+  private _boardStates: List<string>;
 
-  setAssignees(value: List<Assignee>): DeserializeIssueLookupParams {
+  private _ownStatesToBoardIndex: Map<string, Map<string, number>>;
+
+  setAssignees(value: OrderedMap<string, Assignee>): DeserializeIssueLookupParams {
     this._assignees = value;
     return this;
   }
 
-  setIssueTypes(value: List<IssueType>): DeserializeIssueLookupParams {
+  setIssueTypes(value: OrderedMap<string, IssueType>): DeserializeIssueLookupParams {
     this._issueTypes = value;
     return this;
   }
 
-  setPriorities(value: List<Priority>): DeserializeIssueLookupParams {
+  setPriorities(value: OrderedMap<string, Priority>): DeserializeIssueLookupParams {
     this._priorities = value;
     return this;
   }
@@ -111,7 +120,7 @@ export class DeserializeIssueLookupParams {
     return this;
   }
 
-  setCustomFields(value: OrderedMap<string, List<CustomField>>): DeserializeIssueLookupParams {
+  setCustomFields(value: OrderedMap<string, OrderedMap<string, CustomField>>): DeserializeIssueLookupParams {
     this._customFields = value;
     return this;
   }
@@ -121,16 +130,48 @@ export class DeserializeIssueLookupParams {
     return this;
   }
 
-  get assignees(): List<Assignee> {
+  setBoardProjects(value: Map<string, BoardProject>): DeserializeIssueLookupParams {
+    this._boardProjects = value;
+    return this;
+  }
+
+  setBoardStates(value: List<string>): DeserializeIssueLookupParams {
+    this._boardStates = value;
+    return this;
+  }
+
+  get assignees(): OrderedMap<string, Assignee> {
     return this._assignees;
   }
 
-  get issueTypes(): List<IssueType> {
+  get assigneesList(): List<Assignee> {
+    if (!this._assigneesList) {
+      this._assigneesList = this.assignees.toList();
+    }
+    return this._assigneesList;
+  }
+
+  get issueTypes(): OrderedMap<string, IssueType> {
     return this._issueTypes;
   }
 
-  get priorities(): List<Priority> {
+  get issueTypesList(): List<IssueType> {
+    if (!this._issueTypesList) {
+      this._issueTypesList = this._issueTypes.toList();
+    }
+    return this._issueTypesList;
+  }
+
+  get priorities(): OrderedMap<string, Priority> {
     return this._priorities;
+
+  }
+
+  get prioritiesList(): List<Priority> {
+    if (!this._prioritiesList) {
+      this._prioritiesList = this._priorities.toList();
+    }
+    return this._prioritiesList;
   }
 
   get components(): List<string> {
@@ -145,12 +186,43 @@ export class DeserializeIssueLookupParams {
     return this._fixVersions;
   }
 
-  get customFields(): OrderedMap<string, List<CustomField>> {
+  get customFields(): OrderedMap<string, OrderedMap<string, CustomField>> {
     return this._customFields;
+  }
+
+  get customFieldsListMap(): OrderedMap<string, List<CustomField>> {
+    if (!this._customFieldsListMap) {
+      this._customFieldsListMap = this._customFields.map(value => {
+        return value.toList();
+      }).toOrderedMap();
+    }
+    return this._customFieldsListMap;
   }
 
   get parallelTasks(): Map<string, List<ParallelTask>> {
     return this._parallelTasks;
+  }
+
+  getOwnStatesToBoardIndex(issueKey: string): Map<string, number> {
+    if (!this._ownStatesToBoardIndex) {
+      this._ownStatesToBoardIndex = Map<string, Map<string, number>>();
+    }
+    const projectCode = IssueUtil.productCodeFromKey(issueKey);
+    const boardProject: BoardProject = this._boardProjects.get(projectCode);
+    const boardStateIndices: Map<string, number> = Map<string, number>().withMutations(mutable => {
+      this._boardStates.forEach((v, i) => {
+        mutable.set(v, i);
+      });
+    });
+    const ownStatesToBoardIndexForProject: Map<string, number> = Map<string, number>().withMutations(mutable => {
+      boardProject.boardStateNameToOwnStateName.forEach((o, b) => {
+        mutable.set(o, boardStateIndices.get(b));
+      });
+    });
+
+    this._ownStatesToBoardIndex.set(projectCode, ownStatesToBoardIndexForProject);
+
+    return ownStatesToBoardIndexForProject;
   }
 }
 
@@ -166,7 +238,7 @@ export class IssueUtil {
     delete input['linked-issues'];
 
     if (input['assignee'] || input['assignee'] === 0) {
-      input['assignee'] = params.assignees.get(input['assignee']);
+      input['assignee'] = params.assigneesList.get(input['assignee']);
     } else {
       input['assignee'] = NO_ASSIGNEE;
     }
@@ -175,8 +247,8 @@ export class IssueUtil {
     delete input['state'];
 
     // priority and issue-type will never be null
-    input['priority'] = params.priorities.get(input['priority']);
-    input['type'] = params.issueTypes.get(input['type']);
+    input['priority'] = params.prioritiesList.get(input['priority']);
+    input['type'] = params.issueTypesList.get(input['type']);
 
     if (input['components']) {
       input['components'] = IssueUtil.lookupStringsFromIndexArray(input['components'], params.components);
@@ -191,7 +263,10 @@ export class IssueUtil {
     if (input['custom']) {
       const custom = input['custom'];
       for (const key of Object.keys(custom)) {
-        custom[key] = params.customFields.get(key).get(custom[key]);
+        const value = params.customFieldsListMap.get(key).get(custom[key]);
+        if (value) {
+          custom[key] = value;
+        }
       }
       input['customFields'] = custom;
       delete input['custom'];
@@ -224,6 +299,95 @@ export class IssueUtil {
     return ISSUE_FACTORY(temp);
   }
 
+  static issueChangeFromJs(input: any, params: DeserializeIssueLookupParams): BoardIssue {
+    let customFields: Map<string, CustomField>;
+    if (input['custom']) {
+      const customInput: any = input['custom'];
+      customFields = Map<string, CustomField>().withMutations(mutable => {
+        for (const fieldKey of Object.keys(customInput)) {
+          const valueKey: string = customInput[fieldKey];
+
+          if (!valueKey) {
+            mutable.set(fieldKey, null);
+          } else {
+            mutable.set(fieldKey, params.customFields.get(fieldKey).get(valueKey));
+          }
+        }
+      });
+    }
+    let parallelTasks: List<string>;
+    if (input['parallel-tasks']) {
+      const parallelInput: any = input['parallel-tasks'];
+      parallelTasks = List<string>().withMutations(mutable => {
+        for (const key of Object.keys(parallelInput).sort((a, b) => parseInt(a, 10) - parseInt(b, 10))) {
+          const taskIndex = parseInt(key, 10);
+          const optionIndex = parallelInput[key];
+          const taskList: List<ParallelTask> = params.parallelTasks.get(IssueUtil.productCodeFromKey(input['key']));
+          const optionString = taskList.get(taskIndex).options.get(optionIndex);
+          mutable.set(taskIndex, optionString);
+        }
+      });
+    }
+    return {
+      key: input['key'],
+      ownState: input['state'] ? params.getOwnStatesToBoardIndex(input['key']).get(input['state']) : null,
+      summary: input['summary'],
+      assignee: input['unassigned'] ? NO_ASSIGNEE : params.assignees.get(input['assignee']),
+      priority: params.priorities.get(input['priority']),
+      type: params.issueTypes.get(input['type']),
+      components: IssueUtil.getClearableStringList(input, 'clear-components', 'components'),
+      labels: IssueUtil.getClearableStringList(input, 'clear-labels', 'labels'),
+      fixVersions: IssueUtil.getClearableStringList(input, 'clear-fix-versions', 'fix-versions'),
+      customFields: customFields,
+      parallelTasks: parallelTasks,
+      linkedIssues: null // This isn't settable from the events at the moment, and only happens on full board refresh
+    };
+  }
+
+  static updateIssue(issue: BoardIssue, change: BoardIssue): BoardIssue {
+    if (issue == null) {
+      issue = ISSUE_FACTORY(DEFAULT_ISSUE);
+    }
+    issue = (<BoardIssueRecord>issue).withMutations(mutable => {
+      for (const key of Object.keys(change)) {
+        const value = change[key];
+        if (value != null) {
+          if (value === CLEAR_STRING_LIST && (key === 'components' || key === 'labels' || key === 'fixVersions')) {
+            mutable.set(key, null);
+          } else if (key === 'customFields') {
+            change.customFields.forEach((cf, cfKey) => {
+              if (cf) {
+                mutable.customFields = mutable.customFields.set(cfKey, cf);
+              } else {
+                mutable.customFields = mutable.customFields.delete(cfKey);
+              }
+            });
+          } else if (key === 'parallelTasks') {
+              mutable.parallelTasks = mutable.parallelTasks ? mutable.parallelTasks : List<string>();
+              change.parallelTasks.forEach((v, i) => {
+                if (!!v) {
+                  mutable.parallelTasks = mutable.parallelTasks.set(i, v);
+                }
+              });
+          } else {
+            mutable.set(key, value);
+          }
+        }
+      }
+    });
+    return issue;
+  }
+
+  private static getClearableStringList(input: any, clearKey, key): List<string> {
+    if (input[clearKey]) {
+      return CLEAR_STRING_LIST;
+    }
+    if (input[key]) {
+      return List<string>(input[key]);
+    }
+    return null;
+  }
+
   static toStateRecord(s: IssueState): IssueStateRecord {
     // TODO do some checks. TS does not allow use of instanceof when the type is an interface (since they are compiled away)
     return <IssueStateRecord>s;
@@ -240,5 +404,6 @@ export class IssueUtil {
     return key.substring(0, index);
   }
 };
+
 
 

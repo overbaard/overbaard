@@ -1,9 +1,9 @@
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
-import {List, OrderedMap} from 'immutable';
+import {OrderedMap} from 'immutable';
 
 
 export interface CustomFieldState {
-  fields: OrderedMap<string, List<CustomField>>;
+  fields: OrderedMap<string, OrderedMap<string, CustomField>>;
 }
 
 export interface CustomField {
@@ -12,7 +12,7 @@ export interface CustomField {
 }
 
 const DEFAULT_STATE: CustomFieldState = {
-  fields: OrderedMap<string, List<CustomField>>()
+  fields: OrderedMap<string, OrderedMap<string, CustomField>>()
 };
 
 const DEFAULT_COMPONENT: CustomField = {

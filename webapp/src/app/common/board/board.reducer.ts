@@ -171,13 +171,15 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
         reducers.ranks(state.ranks, RankActions.createDeserializeRanks(input['projects']['main']));
 
       const lookupParams: DeserializeIssueLookupParams = new DeserializeIssueLookupParams()
-        .setAssignees(assigneeState.assignees.toList())
-        .setPriorities(priorityState.priorities.toList())
-        .setIssueTypes(issueTypeState.types.toList())
+        .setAssignees(assigneeState.assignees)
+        .setPriorities(priorityState.priorities)
+        .setIssueTypes(issueTypeState.types)
         .setComponents(componentState.components)
         .setLabels(labelState.labels)
         .setFixVersions(fixVersionState.versions)
         .setCustomFields(customFieldState.fields)
+        .setBoardProjects(projectState.boardProjects)
+        .setBoardStates(headers.states)
         .setParallelTasks(projectState.parallelTasks);
 
       const issueState: IssueState =

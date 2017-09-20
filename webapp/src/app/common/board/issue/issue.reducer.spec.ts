@@ -73,13 +73,13 @@ describe('Issue reducer tests', () => {
     lookupParams = new DeserializeIssueLookupParams()
       .setAssignees(
         assigneeReducer(
-          initialAssigneeState, AssigneeActions.createAddInitialAssignees(getTestAssigneesInput())).assignees.toList())
+          initialAssigneeState, AssigneeActions.createAddInitialAssignees(getTestAssigneesInput())).assignees)
       .setPriorities(
         priorityReducer(
-          initialPriorityState, PriorityActions.createDeserializePriorities(getTestPrioritiesInput())).priorities.toList())
+          initialPriorityState, PriorityActions.createDeserializePriorities(getTestPrioritiesInput())).priorities)
       .setIssueTypes(
         issueTypeReducer(
-          initialIssueTypeState, IssueTypeActions.createDeserializeIssueTypes(getTestIssueTypesInput())).types.toList())
+          initialIssueTypeState, IssueTypeActions.createDeserializeIssueTypes(getTestIssueTypesInput())).types)
       .setComponents(
         componentReducer(
           initialComponentState, ComponentActions.createDeserializeComponents(getTestComponentsInput())).components)
@@ -101,20 +101,20 @@ describe('Issue reducer tests', () => {
     expect(issues.size).toEqual(4);
     const issueArray: BoardIssue[] = issues.toArray();
     new IssueChecker(issueArray[0],
-      lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'One', 0)
+      lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Blocker'), lookupParams.assignees.get('bob'), 'One', 0)
       .key('ISSUE-1')
       .addLinkedIssue('LNK-1', 'Linked 1')
       .check();
     new IssueChecker(issueArray[1],
-      lookupParams.issueTypes.get(1), lookupParams.priorities.get(1), lookupParams.assignees.get(1), 'Two', 5)
+      lookupParams.issueTypes.get('bug'), lookupParams.priorities.get('Major'), lookupParams.assignees.get('kabir'), 'Two', 5)
       .key('ISSUE-2')
       .check();
     new IssueChecker(issueArray[2],
-      lookupParams.issueTypes.get(0), lookupParams.priorities.get(0), lookupParams.assignees.get(0), 'Three', 3)
+      lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Blocker'), lookupParams.assignees.get('bob'), 'Three', 3)
       .key('ISSUE-3')
       .check();
     new IssueChecker(issueArray[3],
-      lookupParams.issueTypes.get(0), lookupParams.priorities.get(1), NO_ASSIGNEE, 'Four', 2)
+      lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Major'), NO_ASSIGNEE, 'Four', 2)
       .key('ISSUE-4')
       .check();
   });

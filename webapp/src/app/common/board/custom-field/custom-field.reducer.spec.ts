@@ -37,7 +37,7 @@ describe('CustomField reducer tests', () => {
     it('Deserialize initial state', () => {
       const state: CustomFieldState =
         customFieldReducer(initialCustomFieldState, CustomFieldActions.createDeserializeCustomFields(getTestCustomFieldsInput()));
-      const map: OrderedMap<string, List<CustomField>> = state.fields;
+      const map: OrderedMap<string, List<CustomField>> = state.fields.map(value => value.toList()).toOrderedMap();
       expect(map.size).toBe(2);
       const l1 = map.get('Custom-1');
       expect(l1.size).toBe(3);
@@ -73,7 +73,7 @@ describe('CustomField reducer tests', () => {
         customFieldReducer(state, CustomFieldActions.createAddCustomFields({
           'Custom-1': [{key: 'c1-a', value: 'A'}, {key: 'c1-z', value: 'Z'}],
           'Custom-2': [{key: 'c2-k', value: 'k'}]}));
-      const map: OrderedMap<string, List<CustomField>> = newState.fields;
+      const map: OrderedMap<string, List<CustomField>> = newState.fields.map(value => value.toList()).toOrderedMap();
       expect(map.size).toBe(2);
       const l1 = map.get('Custom-1');
       expect(l1.size).toBe(5);
@@ -103,7 +103,7 @@ describe('CustomField reducer tests', () => {
       const newState: CustomFieldState =
         customFieldReducer(state, CustomFieldActions.createAddCustomFields({
           'Custom-2': [{key: 'c2-k', value: 'k'}]}));
-      const map: OrderedMap<string, List<CustomField>> = newState.fields;
+      const map: OrderedMap<string, List<CustomField>> = newState.fields.map(value => value.toList()).toOrderedMap();
       expect(map.size).toBe(2);
       const l1 = map.get('Custom-1');
       expect(l1.size).toBe(3);

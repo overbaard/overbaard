@@ -135,7 +135,7 @@ describe('Board reducer tests', () => {
       expect(issueTypes.get('task').name).toEqual('task');
       expect(issueTypes.get('bug').name).toEqual('bug');
 
-      const customFields: OrderedMap<string, List<CustomField>> = boardState.customFields.fields;
+      const customFields: OrderedMap<string, OrderedMap<string, CustomField>> = boardState.customFields.fields;
       expect(customFields.size).toBe(2);
       expect(customFields.get('Custom-1').size).toBe(3);
       expect(customFields.get('Custom-2').size).toBe(2);
@@ -224,7 +224,7 @@ describe('Board reducer tests', () => {
       expect(issueTypes.get('task').name).toEqual('task');
       expect(issueTypes.get('bug').name).toEqual('bug');
 
-      const customFields: OrderedMap<string, List<CustomField>> = boardState.customFields.fields;
+      const customFields: OrderedMap<string, OrderedMap<string, CustomField>> = boardState.customFields.fields;
       expect(customFields.size).toBe(0);
 
       const projectState: ProjectState = boardState.projects;

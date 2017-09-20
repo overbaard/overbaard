@@ -1,16 +1,27 @@
 import {AppState} from '../../../app-store';
 import {Action} from '@ngrx/store';
-import {BoardIssue, DeserializeIssueLookupParams, initialIssueState, IssueState, IssueUtil} from './issue.model';
+import {
+  BoardIssue, DeserializeIssueLookupParams, initialIssueState, IssueState,
+  IssueUtil
+} from './issue.model';
 import {createSelector} from 'reselect';
-import {Map} from 'immutable';
+import {List, Map} from 'immutable';
 
 
 const DESERIALIZE_INITIAL_ISSUES = 'DESERIALIZE_INITIAL_ISSUES';
+const CHANGE_ISSUES = 'CHANGE_ISSUES';
 
 class DeserializeIssuesAction implements Action {
   readonly type = DESERIALIZE_INITIAL_ISSUES;
 
   constructor(readonly payload: Map<string, BoardIssue>) {
+  }
+}
+
+class ChangeIssuesAction implements Action {
+  readonly type = CHANGE_ISSUES;
+
+  constructor(readonly payload: ChangeIssuesPayload) {
   }
 }
 
@@ -27,6 +38,29 @@ export class IssueActions {
       }
     });
     return new DeserializeIssuesAction(issues);
+  }
+
+  static createChangeIssuesAction(input: any, params: DeserializeIssueLookupParams): Action {
+    const deletedKeys: string[] = <string[]>input['delete'];
+
+    let newIssues: List<BoardIssue>;
+    if (input['new']) {
+      newIssues = List<BoardIssue>().withMutations(mutable => {
+        for (const issueInput of <any[]>input['new']) {
+
+        }
+      });
+    }
+
+    let updatedIssues: List<BoardIssue>;
+    if (input['new']) {
+      updatedIssues = List<BoardIssue>().withMutations(mutable => {
+        for (const issueInput of <any[]>input['update']) {
+
+        }
+      });
+    }
+    return new ChangeIssuesAction({newIssues: newIssues, changedIssues: updatedIssues, deletedIssues: deletedKeys});
   }
 }
 
@@ -48,6 +82,12 @@ export function issueReducer(state: IssueState = initialIssueState, action: Acti
       return state;
   }
 };
+
+interface ChangeIssuesPayload {
+  changedIssues: List<BoardIssue>;
+  newIssues: List<BoardIssue>;
+  deletedIssues: string[];
+}
 
 const getIssuesState = (state: AppState) => state.board.issues;
 const getIssues = (state: IssueState) => state.issues;
