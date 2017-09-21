@@ -20,11 +20,15 @@ export function getTestAssigneesInput(): any {
   ]);
 }
 
+export function getTestAssigneeState(): AssigneeState {
+  const input = getTestAssigneesInput();
+  return assigneeReducer(initialAssigneeState, AssigneeActions.createAddInitialAssignees(input));
+}
+
 describe('Assignee reducer tests', () => {
   let assigneeState: AssigneeState;
   beforeEach(async(() => {
-    const input = getTestAssigneesInput();
-    assigneeState = assigneeReducer(initialAssigneeState, AssigneeActions.createAddInitialAssignees(input));
+    assigneeState = getTestAssigneeState();
   }));
 
   it('Deserialize', () => {

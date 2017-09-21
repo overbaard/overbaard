@@ -1,6 +1,5 @@
 import {cloneObject} from '../utils/test-util.spec';
 import {BoardActions, boardReducer, BoardState, initialBoardState} from './board.reducer';
-import {getTestAssigneesInput} from './assignee/assignee.reducer.spec';
 import {getTestComponentsInput} from './component/component.reducer.spec';
 import {getTestPrioritiesInput} from './priority/priority.reducer.spec';
 import {getTestIssueTypesInput} from './issue-type/issue-type.reducer.spec';
@@ -17,6 +16,7 @@ import {BoardIssue} from './issue/issue.model';
 import {BlacklistState} from './blacklist/blacklist.model';
 import {Header} from './header/header.model';
 import {RankState} from './rank/rank.model';
+import {getTestAssigneesInput} from './assignee/assignee.reducer.spec';
 
 export function getTestBoardsInput(): any {
   return cloneObject(

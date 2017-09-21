@@ -16,11 +16,15 @@ export function getTestIssueTypesInput(): any {
   ]);
 }
 
+export function getTestIssueTypeState(): IssueTypeState {
+  const input = getTestIssueTypesInput();
+  return issueTypeReducer(initialIssueTypeState, IssueTypeActions.createDeserializeIssueTypes(input));
+}
+
 describe('IssueType reducer tests', () => {
   let state: IssueTypeState;
   beforeEach(async(() => {
-    const input = getTestIssueTypesInput();
-    state = issueTypeReducer(initialIssueTypeState, IssueTypeActions.createDeserializeIssueTypes(input));
+    state = getTestIssueTypeState();
   }));
 
   it('Deserialize initial state', () => {

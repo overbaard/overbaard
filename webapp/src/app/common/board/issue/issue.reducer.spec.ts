@@ -1,26 +1,15 @@
 import {IssueActions, issueReducer} from './issue.reducer';
 import {BoardIssue, DeserializeIssueLookupParams, initialIssueState, IssueState} from './issue.model';
 import {async} from '@angular/core/testing';
-import {IssueTypeActions, issueTypeReducer} from '../issue-type/issue-type.reducer';
-import {PriorityActions, priorityReducer} from '../priority/priority.reducer';
-import {getTestAssigneesInput} from '../assignee/assignee.reducer.spec';
-import {getTestIssueTypesInput} from '../issue-type/issue-type.reducer.spec';
-import {getTestPrioritiesInput} from '../priority/priority.reducer.spec';
+import {getTestAssigneeState} from '../assignee/assignee.reducer.spec';
+import {getTestIssueTypeState} from '../issue-type/issue-type.reducer.spec';
+import {getTestPriorityState} from '../priority/priority.reducer.spec';
 import {IssueChecker} from './issue.model.spec';
-import {initialAssigneeState, NO_ASSIGNEE} from '../assignee/assignee.model';
-import {initialIssueTypeState} from '../issue-type/issue-type.model';
-import {initialPriorityState} from '../priority/priority.model';
-import {AssigneeActions, assigneeReducer} from '../assignee/assignee.reducer';
+import {NO_ASSIGNEE} from '../assignee/assignee.model';
 import {Map} from 'immutable';
-import {ComponentActions, componentReducer} from '../component/component.reducer';
-import {initialComponentState} from '../component/component.model';
-import {getTestComponentsInput} from '../component/component.reducer.spec';
-import {LabelActions, labelReducer} from '../label/label.reducer';
-import {initialLabelState} from '../label/label.model';
-import {getTestLabelsInput} from '../label/label.reducer.spec';
-import {FixVersionActions, fixVersionReducer} from '../fix-version/fix-version.reducer';
-import {initialFixVersionState} from '../fix-version/fix-version.model';
-import {getTestFixVersionsInput} from '../fix-version/fix-version.reducer.spec';
+import {getTestComponentState} from '../component/component.reducer.spec';
+import {getTestLabelState} from '../label/label.reducer.spec';
+import {getTestFixVersionState} from '../fix-version/fix-version.reducer.spec';
 import {cloneObject} from '../../utils/test-util.spec';
 
 function getTestIssuesInput() {
@@ -71,24 +60,12 @@ describe('Issue reducer tests', () => {
   beforeEach(async(() => {
 
     lookupParams = new DeserializeIssueLookupParams()
-      .setAssignees(
-        assigneeReducer(
-          initialAssigneeState, AssigneeActions.createAddInitialAssignees(getTestAssigneesInput())).assignees)
-      .setPriorities(
-        priorityReducer(
-          initialPriorityState, PriorityActions.createDeserializePriorities(getTestPrioritiesInput())).priorities)
-      .setIssueTypes(
-        issueTypeReducer(
-          initialIssueTypeState, IssueTypeActions.createDeserializeIssueTypes(getTestIssueTypesInput())).types)
-      .setComponents(
-        componentReducer(
-          initialComponentState, ComponentActions.createDeserializeComponents(getTestComponentsInput())).components)
-      .setLabels(
-        labelReducer(
-          initialLabelState, LabelActions.createDeserializeLabels(getTestLabelsInput())).labels)
-      .setFixVersions(
-        fixVersionReducer(
-          initialFixVersionState, FixVersionActions.createDeserializeFixVersions(getTestFixVersionsInput())).versions);
+      .setAssignees(getTestAssigneeState().assignees)
+      .setPriorities(getTestPriorityState().priorities)
+      .setIssueTypes(getTestIssueTypeState().types)
+      .setComponents(getTestComponentState().components)
+      .setLabels(getTestLabelState().labels)
+      .setFixVersions(getTestFixVersionState().versions);
 
     issueState = issueReducer(
       initialIssueState,
@@ -96,34 +73,40 @@ describe('Issue reducer tests', () => {
     issues = issueState.issues;
   }));
 
+  describe('Deserialize', () => {
+    it('Deserialize issues', () => {
+      expect(issues.size).toEqual(4);
+      const issueArray: BoardIssue[] = issues.toArray();
+      new IssueChecker(issueArray[0],
+        lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Blocker'), lookupParams.assignees.get('bob'), 'One', 0)
+        .key('ISSUE-1')
+        .addLinkedIssue('LNK-1', 'Linked 1')
+        .check();
+      new IssueChecker(issueArray[1],
+        lookupParams.issueTypes.get('bug'), lookupParams.priorities.get('Major'), lookupParams.assignees.get('kabir'), 'Two', 5)
+        .key('ISSUE-2')
+        .check();
+      new IssueChecker(issueArray[2],
+        lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Blocker'), lookupParams.assignees.get('bob'), 'Three', 3)
+        .key('ISSUE-3')
+        .check();
+      new IssueChecker(issueArray[3],
+        lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Major'), NO_ASSIGNEE, 'Four', 2)
+        .key('ISSUE-4')
+        .check();
+    });
 
-  it('Deserialize', () => {
-    expect(issues.size).toEqual(4);
-    const issueArray: BoardIssue[] = issues.toArray();
-    new IssueChecker(issueArray[0],
-      lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Blocker'), lookupParams.assignees.get('bob'), 'One', 0)
-      .key('ISSUE-1')
-      .addLinkedIssue('LNK-1', 'Linked 1')
-      .check();
-    new IssueChecker(issueArray[1],
-      lookupParams.issueTypes.get('bug'), lookupParams.priorities.get('Major'), lookupParams.assignees.get('kabir'), 'Two', 5)
-      .key('ISSUE-2')
-      .check();
-    new IssueChecker(issueArray[2],
-      lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Blocker'), lookupParams.assignees.get('bob'), 'Three', 3)
-      .key('ISSUE-3')
-      .check();
-    new IssueChecker(issueArray[3],
-      lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Major'), NO_ASSIGNEE, 'Four', 2)
-      .key('ISSUE-4')
-      .check();
+    it('Deserialize same state', () => {
+      const state = issueReducer(
+        issueState,
+        IssueActions.createDeserializeIssuesAction(getTestIssuesInput(), lookupParams));
+      expect(state).toBe(issueState);
+    });
   });
 
-  it('Deserialize same state', () => {
-    const state = issueReducer(
-      issueState,
-      IssueActions.createDeserializeIssuesAction(getTestIssuesInput(), lookupParams));
-    expect(state).toBe(issueState);
+  describe('Update', () => {
+    it('Process updates', () => {
+      fail('NYI');
+    });
   });
-
 });

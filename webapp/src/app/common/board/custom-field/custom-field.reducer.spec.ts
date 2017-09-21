@@ -32,11 +32,15 @@ export function getTestCustomFieldsInput() {
   });
 }
 
+export function getTestCustomFieldState(): CustomFieldState {
+  const input: any = getTestCustomFieldsInput();
+  return customFieldReducer(initialCustomFieldState, CustomFieldActions.createDeserializeCustomFields(input));
+}
+
 describe('CustomField reducer tests', () => {
   describe('Deserialize', () => {
     it('Deserialize initial state', () => {
-      const state: CustomFieldState =
-        customFieldReducer(initialCustomFieldState, CustomFieldActions.createDeserializeCustomFields(getTestCustomFieldsInput()));
+      const state: CustomFieldState = getTestCustomFieldState();
       const map: OrderedMap<string, List<CustomField>> = state.fields.map(value => value.toList()).toOrderedMap();
       expect(map.size).toBe(2);
       const l1 = map.get('Custom-1');
@@ -57,8 +61,7 @@ describe('CustomField reducer tests', () => {
     });
 
     it ('Deserialize same state', () => {
-      const stateA: CustomFieldState =
-        customFieldReducer(initialCustomFieldState, CustomFieldActions.createDeserializeCustomFields(getTestCustomFieldsInput()));
+      const stateA: CustomFieldState = getTestCustomFieldState();
       const stateB: CustomFieldState =
         customFieldReducer(stateA, CustomFieldActions.createDeserializeCustomFields(getTestCustomFieldsInput()));
       expect(stateA).toBe(stateB);
@@ -67,7 +70,7 @@ describe('CustomField reducer tests', () => {
 
   describe('Changes', () => {
     it ('Add several custom fields', () => {
-      const state: CustomFieldState =
+      const state: CustomFieldState = getTestCustomFieldState();
         customFieldReducer(initialCustomFieldState, CustomFieldActions.createDeserializeCustomFields(getTestCustomFieldsInput()));
       const newState: CustomFieldState =
         customFieldReducer(state, CustomFieldActions.createAddCustomFields({
@@ -98,8 +101,7 @@ describe('CustomField reducer tests', () => {
     });
 
     it ('Add one custom field', () => {
-      const state: CustomFieldState =
-        customFieldReducer(initialCustomFieldState, CustomFieldActions.createDeserializeCustomFields(getTestCustomFieldsInput()));
+      const state: CustomFieldState = getTestCustomFieldState();
       const newState: CustomFieldState =
         customFieldReducer(state, CustomFieldActions.createAddCustomFields({
           'Custom-2': [{key: 'c2-k', value: 'k'}]}));
@@ -124,8 +126,7 @@ describe('CustomField reducer tests', () => {
     });
 
     it ('No change', () => {
-      const state: CustomFieldState =
-        customFieldReducer(initialCustomFieldState, CustomFieldActions.createDeserializeCustomFields(getTestCustomFieldsInput()));
+      const state: CustomFieldState = getTestCustomFieldState();
       const newState: CustomFieldState =
         customFieldReducer(state, CustomFieldActions.createAddCustomFields(null));
       expect(newState).toBe(state);

@@ -18,11 +18,15 @@ export function getTestPrioritiesInput(): any {
   ]);
 }
 
+export function getTestPriorityState(): PriorityState {
+  const input = getTestPrioritiesInput();
+  return priorityReducer(initialPriorityState, PriorityActions.createDeserializePriorities(input));
+}
+
 describe('Priority reducer tests', () => {
   let state: PriorityState;
   beforeEach(async(() => {
-    const input = getTestPrioritiesInput();
-    state = priorityReducer(initialPriorityState, PriorityActions.createDeserializePriorities(input));
+    state = getTestPriorityState();
   }));
 
   it('Deserialize initial state', () => {

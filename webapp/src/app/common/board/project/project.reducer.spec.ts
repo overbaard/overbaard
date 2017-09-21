@@ -77,6 +77,7 @@ export function getTestProjectsInput(): any {
     }
   );
 }
+
 describe('Projects reducer tests', () => {
 
   describe('Deserialization tests', () => {

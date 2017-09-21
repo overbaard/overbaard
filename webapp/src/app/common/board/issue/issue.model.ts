@@ -70,7 +70,7 @@ export const initialIssueState: IssueState = STATE_FACTORY(DEFAULT_STATE);
 const CLEAR_STRING_LIST = List<string>('Clear this!');
 /**
  * Convenience class to make it easier to pass in other data needed to deserialize an issue. Especially from unit tests,
- * where we do this repeatedly.
+ * where we do this repeatedly and not all data is always needed.
  */
 export class DeserializeIssueLookupParams {
   private _assignees: OrderedMap<string, Assignee> = OrderedMap<string, Assignee>();
