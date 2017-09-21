@@ -8,9 +8,17 @@ import {RankState} from '../../rank/rank.model';
 
 
 const CREATE_ISSUE_TABLE = 'CREATE_ISSUE_TABLE';
+const UPDATE_ISSUE_TABLE = 'UPDATE_ISSUE_TABLE';
 
 class CreateIssueTableAction implements Action {
   readonly type = CREATE_ISSUE_TABLE;
+
+  constructor(readonly payload: IssueTableCreator) {
+  }
+}
+
+class UpdateIssueTableAction implements Action {
+  readonly type = UPDATE_ISSUE_TABLE;
 
   constructor(readonly payload: IssueTableCreator) {
   }
@@ -20,6 +28,11 @@ export class IssueTableActions {
   static createCreateIssueTable(
     headerState: HeaderState, issueState: IssueState, projectState: ProjectState, rankState: RankState): Action {
     return new CreateIssueTableAction(new IssueTableCreator(headerState, issueState, projectState, rankState));
+  }
+
+  static createUpdateIssueTable(
+    headerState: HeaderState, issueState: IssueState, projectState: ProjectState, rankState: RankState): Action {
+    return new UpdateIssueTableAction(new IssueTableCreator(headerState, issueState, projectState, rankState));
   }
 }
 
@@ -36,6 +49,12 @@ export function issueTableReducer(state: IssueTableState = initialIssueTableStat
       }
       return newState;
     }
+    case UPDATE_ISSUE_TABLE: {
+      const payload: IssueTableCreator = (<UpdateIssueTableAction>action).payload;
+      const newState: IssueTableState = payload.updateIssueTableState(state);
+      // Makes no sense to check for equality of the issue table here since any changes will change it
+      return newState;
+    }
     default:
       return state;
   }
@@ -48,6 +67,32 @@ class IssueTableCreator {
 
 
   createIssueTableState(): IssueTableState {
+    const table: List<BoardIssue>[] = this.createIssueTable();
+    return IssueTableUtil.createIssueTableState(this.makeTableImmutable(table));
+  }
+
+  updateIssueTableState(oldState: IssueTableState): IssueTableState {
+
+    const newTable: List<BoardIssue>[] = this.createIssueTable();
+
+    let noChanges = true;
+    for (let i = 0 ; i < newTable.length ; i++) {
+      const oldIssues: List<BoardIssue> = oldState.table.get(i);
+      const newIssues: List<BoardIssue> = newTable[i];
+      if (oldIssues.equals(newIssues)) {
+        // If the tables are the same, use the old table here to avoid updating the column components unnecessarily
+        newTable[i] = oldIssues;
+      } else {
+        noChanges = false;
+      }
+    }
+    if (noChanges) {
+      return oldState;
+    }
+    return IssueTableUtil.createIssueTableState(this.makeTableImmutable(newTable));
+  }
+
+  private createIssueTable(): List<BoardIssue>[] {
     const table: List<BoardIssue>[] = new Array<List<BoardIssue>>(this._headerState.states.size);
     for (let i = 0 ; i < table.length ; i++) {
       table[i] = List<BoardIssue>().asMutable();
@@ -59,14 +104,14 @@ class IssueTableCreator {
         this.addProjectIssues(table, project);
       }
     });
+    return table;
+  }
 
+  private makeTableImmutable(table: List<BoardIssue>[]): List<List<BoardIssue>> {
     // Make the table immutable
-    const tableList: List<List<BoardIssue>> = List<List<BoardIssue>>().withMutations(mutable => {
+    return List<List<BoardIssue>>().withMutations(mutable => {
       table.forEach((v, i) => mutable.push(table[i].asImmutable()));
     });
-
-    return IssueTableUtil.createIssueTableState(tableList);
-
   }
 
   private addProjectIssues(list: List<BoardIssue>[], project: BoardProject) {

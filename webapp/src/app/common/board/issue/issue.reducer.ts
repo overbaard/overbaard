@@ -78,15 +78,19 @@ export function issueReducer(state: IssueState = initialIssueState, action: Acti
         return state;
       }
       return IssueUtil.toStateRecord(state).withMutations(mState => {
-        mState.issues = mState.issues.withMutations(mIssues => {
-          payload.issueChanges.forEach(change => {
-            // For new issues on the board, original will be null
-            const original: BoardIssue = mIssues.get(change.key);
-            mIssues.set(change.key, IssueUtil.updateIssue(original, change));
+        if (payload.issueChanges) {
+          mState.issues = mState.issues.withMutations(mIssues => {
+            payload.issueChanges.forEach(change => {
+              // For new issues on the board, original will be null
+              const original: BoardIssue = mIssues.get(change.key);
+              mIssues.set(change.key, IssueUtil.updateIssue(original, change));
+            });
           });
-        });
+        }
         // delete does not work on a mutable map
-        payload.deletedIssues.forEach(key => mState.issues = mState.issues.delete(key));
+        if (payload.deletedIssues) {
+          payload.deletedIssues.forEach(key => mState.issues = mState.issues.delete(key));
+        }
       });
     }
     default:

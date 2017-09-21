@@ -1,11 +1,17 @@
 import {HeaderState, initialHeaderState} from '../../header/header.model';
 import {HeaderActions, headerReducer} from '../../header/header.reducer';
-import {BoardIssue, Issue, IssueState} from '../../issue/issue.model';
-import {List, Map} from 'immutable';
+import {BoardIssue, DeserializeIssueLookupParams, initialIssueState, Issue, IssueState} from '../../issue/issue.model';
+import {List, Map, OrderedSet, Set} from 'immutable';
 import {BoardProject, LinkedProject, ParallelTask, ProjectState} from '../../project/project.model';
 import {initialIssueTableState, IssueTableState} from './issue-table.model';
 import {IssueTableActions, issueTableReducer} from './issue-table.reducer';
-import {RankState} from '../../rank/rank.model';
+import {initialRankState, RankState} from '../../rank/rank.model';
+import {IssueActions, issueReducer} from '../../issue/issue.reducer';
+import {Action} from '@ngrx/store';
+import {getTestPriorityState} from '../../priority/priority.reducer.spec';
+import {getTestIssueTypeState} from '../../issue-type/issue-type.reducer.spec';
+import {getTestAssigneeState} from '../../assignee/assignee.reducer.spec';
+import {RankActions, rankReducer} from '../../rank/rank.reducer';
 
 describe('Issue Table reducer tests', () => {
 
@@ -125,6 +131,117 @@ describe('Issue Table reducer tests', () => {
       });
     });
   });
+
+  describe('Update tests', () => {
+    let builder: CreateIssueTableBuilder;
+    let state: IssueTableState;
+    beforeEach(() => {
+      builder = new CreateIssueTableBuilder('ONE', 4)
+        .addIssue('ONE-1', 0)
+        .addIssue('ONE-2', 1)
+        .addIssue('ONE-3', 2)
+        .addIssue('ONE-4', 3)
+        .addIssue('ONE-5', 2)
+        .addIssue('ONE-6', 2)
+        .addIssue('ONE-7', 3)
+        .setRank('ONE', 1, 2, 3, 4, 5, 6, 7)
+        .mapState('ONE', 'S-1', '1-1')
+        .mapState('ONE', 'S-2', '1-2')
+        .mapState('ONE', 'S-3', '1-3')
+        .mapState('ONE', 'S-4', '1-4');
+      state = builder.build();
+
+      checkTable(state.table,
+        [['ONE-1'], ['ONE-2'], ['ONE-3', 'ONE-5', 'ONE-6'], ['ONE-4', 'ONE-7']]);
+    });
+
+    it( 'Update issue detail', () => {
+      const issueState: IssueState = issueReducer(
+        builder.issueState,
+        IssueActions.createChangeIssuesAction({update: [{key: 'ONE-2', summary: 'Test summary'}]},
+          builder.getDeserializeIssueLookupParams()));
+      const newState = issueTableReducer(state, new UpdateActionCreator(builder).issue(issueState).build());
+
+      checkTable(newState.table,
+        [['ONE-1'], ['ONE-2'], ['ONE-3', 'ONE-5', 'ONE-6'], ['ONE-4', 'ONE-7']]);
+      checkSameColumns(state, newState, 0, 2, 3);
+    });
+
+    it ('Update issue state', () => {
+      const issueState: IssueState = issueReducer(
+        builder.issueState,
+        IssueActions.createChangeIssuesAction({update: [{key: 'ONE-5', state: '1-2'}]},
+          builder.getDeserializeIssueLookupParams()));
+      const newState = issueTableReducer(state, new UpdateActionCreator(builder).issue(issueState).build());
+
+      checkTable(newState.table,
+        [['ONE-1'], ['ONE-2', 'ONE-5'], ['ONE-3', 'ONE-6'], ['ONE-4', 'ONE-7']]);
+      checkSameColumns(state, newState, 0, 3);
+    });
+
+    it ('Delete issue', () => {
+      const issueState: IssueState = issueReducer(
+        builder.issueState,
+        IssueActions.createChangeIssuesAction({delete: ['ONE-5']},
+          builder.getDeserializeIssueLookupParams()));
+      const rankState: RankState = rankReducer(
+        builder.rankState,
+        RankActions.createRerank(null, ['ONE-5']));
+      const newState = issueTableReducer(
+        state,
+        new UpdateActionCreator(builder).issue(issueState).rank(rankState).build());
+
+      checkTable(newState.table,
+        [['ONE-1'], ['ONE-2'], ['ONE-3', 'ONE-6'], ['ONE-4', 'ONE-7']]);
+      checkSameColumns(state, newState, 0, 1, 3);
+    });
+
+    it ('New issue', () => {
+      const issueState: IssueState = issueReducer(
+        builder.issueState,
+        IssueActions.createChangeIssuesAction({new: [{key: 'ONE-8', state: '1-1', summary: 'Test', priority: 0, type: 0}]},
+          builder.getDeserializeIssueLookupParams()));
+      const rankState: RankState = rankReducer(
+        builder.rankState,
+        RankActions.createRerank({ONE: [{index: 7, key: 'ONE-8'}]}, null)
+      );
+      const newState = issueTableReducer(state, new UpdateActionCreator(builder).issue(issueState).rank(rankState).build());
+
+      checkTable(newState.table,
+        [['ONE-1', 'ONE-8'], ['ONE-2'], ['ONE-3', 'ONE-5', 'ONE-6'], ['ONE-4', 'ONE-7']]);
+
+      checkSameColumns(state, newState, 1, 2, 3);
+    });
+
+    it ('Rerank issue - no effect on existing states', () => {
+      const rankState: RankState = rankReducer(
+        builder.rankState,
+        RankActions.createRerank({ONE: [{index: 0, key: 'ONE-3'}]}, null)
+      );
+      const newState = issueTableReducer(state, new UpdateActionCreator(builder).rank(rankState).build());
+
+      checkTable(newState.table,
+        [['ONE-1'], ['ONE-2'], ['ONE-3', 'ONE-5', 'ONE-6'], ['ONE-4', 'ONE-7']]);
+
+      checkSameColumns(state, newState, 0, 1, 2, 3);
+      // The table should be the same
+      expect(state).toBe(newState);
+    });
+
+
+    it ('Rerank issue - effect on existing states', () => {
+      const rankState: RankState = rankReducer(
+        builder.rankState,
+        RankActions.createRerank({ONE: [{index: 6, key: 'ONE-3'}]}, null)
+      );
+      const newState = issueTableReducer(state, new UpdateActionCreator(builder).rank(rankState).build());
+
+      checkTable(newState.table,
+        [['ONE-1'], ['ONE-2'], ['ONE-5', 'ONE-6', 'ONE-3'], ['ONE-4', 'ONE-7']]);
+
+      checkSameColumns(state, newState, 0, 1, 3);
+    });
+  });
 });
 
 function checkTable(table: List<List<BoardIssue>>, expected: string[][]) {
@@ -135,15 +252,49 @@ function checkTable(table: List<List<BoardIssue>>, expected: string[][]) {
   expect(actualTable).toEqual(expected);
 }
 
+function checkSameColumns(oldState: IssueTableState, newState: IssueTableState, ...cols: number[]) {
+  const expectedEqual: OrderedSet<number> = OrderedSet<number>(cols);
+  expect(oldState.table.size).toBe(newState.table.size);
+  for (let i = 0 ; i < oldState.table.size ; i++) {
+    const oldCol: List<BoardIssue> = oldState.table.get(i);
+    const newCol: List<BoardIssue> = newState.table.get(i);
+    if (expectedEqual.contains(i)) {
+      expect(oldCol).toBe(newCol, 'Column ' + i);
+    } else {
+      expect(oldCol).not.toBe(newCol, 'Column ' + i);
+    }
+  }
+}
 
 
 class CreateIssueTableBuilder {
   _issueKeys: string[] = [];
   _issueStates: number[] = [];
-  _rankedIssueKeys: Map<string, List<string>> = Map<string, List<string>>();
+  _rankedIssueKeys: any = {};
   _stateMap: Map<string, StateMapping[]> = Map<string, StateMapping[]>();
 
+  private _headerState: HeaderState;
+  private _issueState: IssueState;
+  private _projectState: ProjectState;
+  private _rankState: RankState;
+
   constructor(private _owner: string, private _numberStates: number) {
+  }
+
+  get headerState(): HeaderState {
+    return this._headerState;
+  }
+
+  get issueState(): IssueState {
+    return this._issueState;
+  }
+
+  get projectState(): ProjectState {
+    return this._projectState;
+  }
+
+  get rankState(): RankState {
+    return this._rankState;
   }
 
   addIssue(key: string, state: number): CreateIssueTableBuilder {
@@ -152,10 +303,9 @@ class CreateIssueTableBuilder {
     return this;
   }
 
-  setRank(projectKey: string, ...keys): CreateIssueTableBuilder {
-    const ranked: string[] = [];
-    keys.forEach(v => ranked.push(projectKey + '-' + v));
-    this._rankedIssueKeys = this._rankedIssueKeys.set(projectKey, List<string>(ranked));
+  setRank(projectKey: string, ...keys: number[]): CreateIssueTableBuilder {
+    this._rankedIssueKeys[projectKey] = {};
+    this._rankedIssueKeys[projectKey]['ranked'] = keys.map(v => projectKey + '-' + v);
     return this;
   }
 
@@ -170,53 +320,57 @@ class CreateIssueTableBuilder {
   }
 
   build(): IssueTableState {
-    expect(this._rankedIssueKeys.size).toEqual(this._stateMap.size);
-    expect(this._rankedIssueKeys.keySeq().toArray()).toContain(this._owner);
-    expect(this._stateMap.keySeq().toArray()).toContain(this._owner);
-
+    this.createHeaderState();
+    this.createProjectState();
+    this.createRankState();
+    this.createIssueState();
 
     return issueTableReducer(initialIssueTableState,
       IssueTableActions.createCreateIssueTable(
-        this.createHeaderState(),
-        this.createIssueState(),
-        this.createProjectState(),
-        this.createRankedIssueState()));
+        this._headerState,
+        this._issueState,
+        this._projectState,
+        this._rankState));
   }
 
-  private createHeaderState(): HeaderState {
+  getDeserializeIssueLookupParams(): DeserializeIssueLookupParams {
+    return new DeserializeIssueLookupParams()
+      .setBoardStates(this._headerState.states)
+      .setIssueTypes(getTestIssueTypeState().types)
+      .setPriorities(getTestPriorityState().priorities)
+      .setBoardProjects(this._projectState.boardProjects)
+      .setAssignees(getTestAssigneeState().assignees);
+  }
+
+  private createHeaderState() {
     const input: any[] = new Array<any>();
     for (let i = 1 ; i <= this._numberStates ; i++) {
       input.push({name: 'S-' + i});
     }
-    return headerReducer(initialHeaderState, HeaderActions.createDeserializeHeaders(input, [], 0, 0));
+    this._headerState =
+      headerReducer(initialHeaderState, HeaderActions.createDeserializeHeaders(input, [], 0, 0));
   }
 
-  private createIssueState(): IssueState {
-    // Just mock this, as we don't need most of the data for what we are testing here
-    const issues: Map<string, BoardIssue> = Map<string, BoardIssue>().withMutations(mutable => {
-      for (let i = 0 ; i < this._issueKeys.length ; i++) {
-        const issue: BoardIssue = {
-          key: this._issueKeys[i],
-          summary: null,
-          assignee: null,
-          priority: null,
-          type: null,
-          components: null,
-          labels: null,
-          fixVersions: null,
-          customFields: null,
-          parallelTasks: null,
-          linkedIssues: List<Issue>(),
-          ownState: this._issueStates[i]
-        };
-        mutable.set(issue.key, issue);
-      }
-    });
-    const issueState: IssueState = {issues: issues};
-    return issueState;
+  private createIssueState() {
+    const input: any = {};
+    for (let i = 0 ; i < this._issueKeys.length ; i++) {
+      input[this._issueKeys[i]] = {
+        key: this._issueKeys[i],
+        type: 1,
+        priority: 1,
+        summary: '-',
+        state: this._issueStates[i]
+      };
+    }
+    this._issueState = issueReducer(
+      initialIssueState,
+      IssueActions.createDeserializeIssuesAction(
+        input,
+        this.getDeserializeIssueLookupParams()
+      ));
   }
 
-  private createProjectState(): ProjectState {
+  private createProjectState() {
     const projects: Map<string, BoardProject> = Map<string, BoardProject>().withMutations(projectMap => {
       this._stateMap.forEach((mappings, projectKey) => {
         const stateMap: Map<string, string> = Map<string, string>().withMutations(states => {
@@ -234,20 +388,50 @@ class CreateIssueTableBuilder {
       });
     });
 
-    const projectState: ProjectState = {
+    this._projectState = {
       owner: this._owner,
       boardProjects: projects,
       linkedProjects: Map<string, LinkedProject>(),
       parallelTasks: Map<string, List<ParallelTask>>()
     };
-    return projectState;
   }
 
-  private createRankedIssueState(): RankState {
-    const rankState: RankState = {
-      rankedIssueKeys: this._rankedIssueKeys
-    };
-    return rankState;
+  private createRankState() {
+    this._rankState = rankReducer(initialRankState, RankActions.createDeserializeRanks(this._rankedIssueKeys));
+  }
+}
+
+class UpdateActionCreator {
+  private _headerState: HeaderState;
+  private _issueState: IssueState;
+  private _projectState: ProjectState;
+  private _rankState: RankState;
+
+  constructor(private readonly _builder: CreateIssueTableBuilder) {
+  }
+
+  header(headerState: HeaderState): UpdateActionCreator {
+    this._headerState = headerState;
+    return this;
+  }
+
+  issue(issueState: IssueState): UpdateActionCreator {
+    this._issueState = issueState;
+    return this;
+  }
+
+  rank(rankState: RankState): UpdateActionCreator {
+    this._rankState = rankState;
+    return this;
+  }
+
+  build(): Action {
+    return IssueTableActions.createUpdateIssueTable(
+      this._headerState ? this._headerState : this._builder.headerState,
+      this._issueState ? this._issueState : this._builder.issueState,
+      this._projectState ? this._projectState : this._builder.projectState,
+      this._rankState ? this._rankState : this._builder.rankState
+    );
   }
 }
 
