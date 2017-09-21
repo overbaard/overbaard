@@ -33,7 +33,7 @@ function getTestIssuesInput() {
       priority: 1,
       summary: 'Two',
       assignee: 1,
-      state: 5
+      state: 1
     },
     'ISSUE-3': {
       key: 'ISSUE-3',
@@ -41,14 +41,14 @@ function getTestIssuesInput() {
       priority: 0,
       summary: 'Three',
       assignee: 0,
-      state: 3
+      state: 0
     },
     'ISSUE-4': {
       key: 'ISSUE-4',
       type: 0,
       priority: 1,
       summary: 'Four',
-      state: 2
+      state: 1
     }
   });
 }
@@ -76,22 +76,22 @@ describe('Issue reducer tests', () => {
   describe('Deserialize', () => {
     it('Deserialize issues', () => {
       expect(issues.size).toEqual(4);
-      const issueArray: BoardIssue[] = issues.toArray();
+      const issueArray: BoardIssue[] = issues.toArray().sort((a, b) => a.key.localeCompare(b.key));
       new IssueChecker(issueArray[0],
         lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Blocker'), lookupParams.assignees.get('bob'), 'One', 0)
         .key('ISSUE-1')
         .addLinkedIssue('LNK-1', 'Linked 1')
         .check();
       new IssueChecker(issueArray[1],
-        lookupParams.issueTypes.get('bug'), lookupParams.priorities.get('Major'), lookupParams.assignees.get('kabir'), 'Two', 5)
+        lookupParams.issueTypes.get('bug'), lookupParams.priorities.get('Major'), lookupParams.assignees.get('kabir'), 'Two', 1)
         .key('ISSUE-2')
         .check();
       new IssueChecker(issueArray[2],
-        lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Blocker'), lookupParams.assignees.get('bob'), 'Three', 3)
+        lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Blocker'), lookupParams.assignees.get('bob'), 'Three', 0)
         .key('ISSUE-3')
         .check();
       new IssueChecker(issueArray[3],
-        lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Major'), NO_ASSIGNEE, 'Four', 2)
+        lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Major'), NO_ASSIGNEE, 'Four', 1)
         .key('ISSUE-4')
         .check();
     });
@@ -105,8 +105,64 @@ describe('Issue reducer tests', () => {
   });
 
   describe('Update', () => {
-    it('Process updates', () => {
-      fail('NYI');
+    it('Update and add issues', () => {
+      // We don't need to check changes to everything here, as the issue model tests take care of that
+      const changes: any = {
+        update: [
+          {
+            key: 'ISSUE-2',
+            type: 'task',
+            priority: 'Blocker'
+          },
+          {
+            key: 'ISSUE-3',
+            summary: 'Trois'
+          }
+        ],
+        new: [
+          {
+            key: 'ISSUE-5',
+            summary: 'Five',
+            type: 'bug',
+            priority: 'Major'
+            // Not that I am not setting the new state here to avoid wiring up more stuff for the test
+            // Real data from the server will have this, and we're testing this more extensively in the issue model tests
+          }
+        ],
+        delete: ['ISSUE-4']
+      };
+      const newState: IssueState = issueReducer(
+        issueState,
+        IssueActions.createChangeIssuesAction(changes, lookupParams));
+
+      expect(newState.issues.size).toEqual(4);
+      const issueArray: BoardIssue[] = newState.issues.toArray().sort((a, b) => a.key.localeCompare(b.key));
+      new IssueChecker(issueArray[0],
+        lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Blocker'), lookupParams.assignees.get('bob'), 'One', 0)
+        .key('ISSUE-1')
+        .addLinkedIssue('LNK-1', 'Linked 1')
+        .check();
+      new IssueChecker(issueArray[1],
+        lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Blocker'), lookupParams.assignees.get('kabir'), 'Two', 1)
+        .key('ISSUE-2')
+        .check();
+      new IssueChecker(issueArray[2],
+        lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Blocker'), lookupParams.assignees.get('bob'), 'Trois', 0)
+        .key('ISSUE-3')
+        .check();
+      new IssueChecker(issueArray[3],
+        lookupParams.issueTypes.get('bug'), lookupParams.priorities.get('Major'), NO_ASSIGNEE, 'Five', -1)
+        .key('ISSUE-5')
+        .check();
+    });
+
+    it('Update no changes', () => {
+      const changes: any = {};
+      const newState: IssueState = issueReducer(
+        issueState,
+        IssueActions.createChangeIssuesAction(changes, lookupParams));
+      expect(newState).toBe(issueState);
     });
   });
+
 });

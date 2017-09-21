@@ -36,16 +36,16 @@ const DEFAULT_STATE: IssueState = {
 const DEFAULT_ISSUE: BoardIssue = {
   key: null,
   summary: null,
-  assignee: null,
+  assignee: NO_ASSIGNEE,
   priority: null,
   type: null,
   components: null,
   labels: null,
   fixVersions: null,
-  customFields: null,
+  customFields: Map<string, CustomField>(),
   parallelTasks: null,
   linkedIssues: List<Issue>(),
-  ownState: 0
+  ownState: -1
 };
 
 const DEFAULT_LINKED_ISSUE: Issue = {

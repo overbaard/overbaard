@@ -250,283 +250,331 @@ describe('Issue unit tests', () => {
       });
     });
 
+    describe('Update', () => {
 
-    it ('Update state', () => {
-      const updated = createAndUpdateIssue({
-        key: 'P2-1', state: 'Test2'
+      it ('State', () => {
+        const updated = createAndUpdateIssue({
+          key: 'P2-1', state: 'Test2'
+        });
+        new IssueChecker(updated,
+          lookupParams.issueTypes.get('task'),
+          lookupParams.priorities.get('Blocker'),
+          lookupParams.assignees.get('bob'),
+          'Issue summary', 1)
+          .key('P2-1')
+          .check();
       });
-      new IssueChecker(updated,
-        lookupParams.issueTypes.get('task'),
-        lookupParams.priorities.get('Blocker'),
-        lookupParams.assignees.get('bob'),
-        'Issue summary', 1)
-        .key('P2-1')
-        .check();
+      it ('Summary', () => {
+        const updated = createAndUpdateIssue({
+          key: 'P2-1', summary: 'Updated summary'
+        });
+        new IssueChecker(updated,
+          lookupParams.issueTypes.get('task'),
+          lookupParams.priorities.get('Blocker'),
+          lookupParams.assignees.get('bob'),
+          'Updated summary', 4)
+          .key('P2-1')
+          .check();
+      });
+
+      it ('Assignee', () => {
+        const updated = createAndUpdateIssue({
+          key: 'P2-1', assignee: 'kabir'
+        });
+        new IssueChecker(updated,
+          lookupParams.issueTypes.get('task'),
+          lookupParams.priorities.get('Blocker'),
+          lookupParams.assignees.get('kabir'),
+          'Issue summary', 4)
+          .key('P2-1')
+          .check();
+      });
+
+      it ('Clear assignee', () => {
+        const updated = createAndUpdateIssue({
+          key: 'P2-1', unassigned: true
+        });
+        new IssueChecker(updated,
+          lookupParams.issueTypes.get('task'),
+          lookupParams.priorities.get('Blocker'),
+          NO_ASSIGNEE,
+          'Issue summary', 4)
+          .key('P2-1')
+          .check();
+      });
+
+      it ('Type', () => {
+        const updated = createAndUpdateIssue({
+          key: 'P2-1', type: 'bug'
+        });
+        new IssueChecker(updated,
+          lookupParams.issueTypes.get('bug'),
+          lookupParams.priorities.get('Blocker'),
+          lookupParams.assignees.get('bob'),
+          'Issue summary', 4)
+          .key('P2-1')
+          .check();
+      });
+
+      it ('Priority', () => {
+        const updated = createAndUpdateIssue({
+          key: 'P2-1', priority: 'Major'
+        });
+        new IssueChecker(updated,
+          lookupParams.issueTypes.get('task'),
+          lookupParams.priorities.get('Major'),
+          lookupParams.assignees.get('bob'),
+          'Issue summary', 4)
+          .key('P2-1')
+          .check();
+      });
+
+      it ('Components', () => {
+        const updated = createAndUpdateIssue({
+          key: 'P2-1', components: ['C-10', 'C-20']
+        });
+        new IssueChecker(updated,
+          lookupParams.issueTypes.get('task'),
+          lookupParams.priorities.get('Blocker'),
+          lookupParams.assignees.get('bob'),
+          'Issue summary', 4)
+          .components('C-10', 'C-20')
+          .key('P2-1')
+          .check();
+      });
+
+      it ('Clear components', () => {
+        // Set some components first so we can clear them
+        let updated = createAndUpdateIssue({
+          key: 'P2-1', components: ['C-10', 'C-20']
+        });
+        const second = {
+          key: 'P2-1', 'clear-components': true
+        };
+        updated = updateIssue(updated, second);
+
+        new IssueChecker(updated,
+          lookupParams.issueTypes.get('task'),
+          lookupParams.priorities.get('Blocker'),
+          lookupParams.assignees.get('bob'),
+          'Issue summary', 4)
+          .key('P2-1')
+          .check();
+      });
+
+      it ('Labels', () => {
+        const updated = createAndUpdateIssue({
+          key: 'P2-1', labels: ['L-10', 'L-20']
+        });
+        new IssueChecker(updated,
+          lookupParams.issueTypes.get('task'),
+          lookupParams.priorities.get('Blocker'),
+          lookupParams.assignees.get('bob'),
+          'Issue summary', 4)
+          .labels('L-10', 'L-20')
+          .key('P2-1')
+          .check();
+      });
+
+      it ('Clear labels', () => {
+        // Set some components first so we can clear them
+        let updated = createAndUpdateIssue({
+          key: 'P2-1', labels: ['L-10', 'L-20']
+        });
+        updated = updateIssue(updated, {
+          key: 'P2-1', 'clear-labels': true
+        });
+
+        new IssueChecker(updated,
+          lookupParams.issueTypes.get('task'),
+          lookupParams.priorities.get('Blocker'),
+          lookupParams.assignees.get('bob'),
+          'Issue summary', 4)
+          .key('P2-1')
+          .check();
+      });
+
+      it ('Fix versions', () => {
+        const updated = createAndUpdateIssue({
+          key: 'P2-1', 'fix-versions': ['F-10', 'F-20']
+        });
+        new IssueChecker(updated,
+          lookupParams.issueTypes.get('task'),
+          lookupParams.priorities.get('Blocker'),
+          lookupParams.assignees.get('bob'),
+          'Issue summary', 4)
+          .fixVersions('F-10', 'F-20')
+          .key('P2-1')
+          .check();
+      });
+
+      it ('Clear fix versions', () => {
+        // Set some components first so we can clear them
+        let updated = createAndUpdateIssue({
+          key: 'P2-1', 'fix-versions': ['F-10', 'F-20']
+        });
+        updated = updateIssue(updated, {
+          key: 'P2-1', 'clear-fix-versions': true
+        });
+
+        new IssueChecker(updated,
+          lookupParams.issueTypes.get('task'),
+          lookupParams.priorities.get('Blocker'),
+          lookupParams.assignees.get('bob'),
+          'Issue summary', 4)
+          .key('P2-1')
+          .check();
+      });
+
+      it ('Custom fields', () => {
+        // Update several
+        let updated = createAndUpdateIssue({
+          key: 'P2-1', custom: {'Custom-1': 'c1-C', 'Custom-2': 'c2-B'}
+        });
+        new IssueChecker(updated,
+          lookupParams.issueTypes.get('task'),
+          lookupParams.priorities.get('Blocker'),
+          lookupParams.assignees.get('bob'),
+          'Issue summary', 4)
+          .customField('Custom-1', 'c1-C', 'Third C1')
+          .customField('Custom-2', 'c2-B', 'Second C2')
+          .key('P2-1')
+          .check();
+        // Update one
+        updated = updateIssue(updated, {
+          key: 'P2-1', custom: {'Custom-1': 'c1-A'}
+        });
+        new IssueChecker(updated,
+          lookupParams.issueTypes.get('task'),
+          lookupParams.priorities.get('Blocker'),
+          lookupParams.assignees.get('bob'),
+          'Issue summary', 4)
+          .customField('Custom-1', 'c1-A', 'First C1')
+          .customField('Custom-2', 'c2-B', 'Second C2')
+          .key('P2-1')
+          .check();
+      });
+
+      it ('Clear custom field (one)', () => {
+        // Create the custom fields first so we can clear them later
+        let updated = createAndUpdateIssue({
+          key: 'P2-1', custom: {'Custom-1': 'c1-C', 'Custom-2': 'c2-B'}
+        });
+        // Clear a custom field
+        updated = updateIssue(updated, {
+          key: 'P2-1', custom: {'Custom-1': null}
+        });
+        new IssueChecker(updated,
+          lookupParams.issueTypes.get('task'),
+          lookupParams.priorities.get('Blocker'),
+          lookupParams.assignees.get('bob'),
+          'Issue summary', 4)
+          .customField('Custom-2', 'c2-B', 'Second C2')
+          .key('P2-1')
+          .check();
+      });
+
+      it ('Clear all custom fields', () => {
+        // Create the custom fields first so we can clear them later
+        let updated = createAndUpdateIssue({
+          key: 'P2-1', custom: {'Custom-1': 'c1-C', 'Custom-2': 'c2-B'}
+        });
+        // Clear a custom field
+        updated = updateIssue(updated, {
+          key: 'P2-1', custom: {'Custom-1': null, 'Custom-2': null}
+        });
+        new IssueChecker(updated,
+          lookupParams.issueTypes.get('task'),
+          lookupParams.priorities.get('Blocker'),
+          lookupParams.assignees.get('bob'),
+          'Issue summary', 4)
+          .key('P2-1')
+          .check();
+      });
+
+      it ('Parallel tasks (no existing ones)', () => {
+        const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
+        // Clear a custom field
+        const updated = updateIssue(issue, {
+          key: 'P2-1', 'parallel-tasks': {'1': 2, '0': 1}
+        });
+
+        new IssueChecker(updated,
+          lookupParams.issueTypes.get('task'),
+          lookupParams.priorities.get('Blocker'),
+          lookupParams.assignees.get('bob'),
+          'Issue summary', 4)
+          .key('P2-1')
+          .selectedParallelTaskOptions('Two', 'Tres')
+          .check();
+      });
+
+      it ('Parallel tasks', () => {
+        input['parallel-tasks'] = [0, 0];
+        const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
+        // Clear a custom field
+        const updated = updateIssue(issue, {
+          key: 'P2-1', 'parallel-tasks': {'1': 2}
+        });
+
+        new IssueChecker(updated,
+          lookupParams.issueTypes.get('task'),
+          lookupParams.priorities.get('Blocker'),
+          lookupParams.assignees.get('bob'),
+          'Issue summary', 4)
+          .key('P2-1')
+          .selectedParallelTaskOptions('One', 'Tres')
+          .check();
+      });
     });
-    it ('Update summary', () => {
-      const updated = createAndUpdateIssue({
-        key: 'P2-1', summary: 'Updated summary'
-      });
-      new IssueChecker(updated,
-        lookupParams.issueTypes.get('task'),
-        lookupParams.priorities.get('Blocker'),
-        lookupParams.assignees.get('bob'),
-        'Updated summary', 4)
-        .key('P2-1')
-        .check();
-    });
 
-    it ('Update assignee', () => {
-      const updated = createAndUpdateIssue({
-        key: 'P2-1', assignee: 'kabir'
-      });
-      new IssueChecker(updated,
-        lookupParams.issueTypes.get('task'),
-        lookupParams.priorities.get('Blocker'),
-        lookupParams.assignees.get('kabir'),
-        'Issue summary', 4)
-        .key('P2-1')
-        .check();
-    });
+    describe('New issue', () => {
+      it ('New issue - minimum info', () => {
+        const newIssue = updateIssue(null, {
+          key: 'P2-1',
+          summary: 'Test summary',
+          state: 'Test2',
+          type: 'bug',
+          priority: 'Major'
+        });
+        new IssueChecker(newIssue,
+          lookupParams.issueTypes.get('bug'),
+          lookupParams.priorities.get('Major'),
+          NO_ASSIGNEE,
+          'Test summary', 1)
+          .key('P2-1')
+          .check();
 
-    it ('Clear assignee', () => {
-      const updated = createAndUpdateIssue({
-        key: 'P2-1', unassigned: true
-      });
-      new IssueChecker(updated,
-        lookupParams.issueTypes.get('task'),
-        lookupParams.priorities.get('Blocker'),
-        NO_ASSIGNEE,
-        'Issue summary', 4)
-        .key('P2-1')
-        .check();
-    });
-
-    it ('Update type', () => {
-      const updated = createAndUpdateIssue({
-        key: 'P2-1', type: 'bug'
-      });
-      new IssueChecker(updated,
-        lookupParams.issueTypes.get('bug'),
-        lookupParams.priorities.get('Blocker'),
-        lookupParams.assignees.get('bob'),
-        'Issue summary', 4)
-        .key('P2-1')
-        .check();
-    });
-
-    it ('Update priority', () => {
-      const updated = createAndUpdateIssue({
-        key: 'P2-1', priority: 'Major'
-      });
-      new IssueChecker(updated,
-        lookupParams.issueTypes.get('task'),
-        lookupParams.priorities.get('Major'),
-        lookupParams.assignees.get('bob'),
-        'Issue summary', 4)
-        .key('P2-1')
-        .check();
-    });
-
-    it ('Update components', () => {
-      const updated = createAndUpdateIssue({
-        key: 'P2-1', components: ['C-10', 'C-20']
-      });
-      new IssueChecker(updated,
-        lookupParams.issueTypes.get('task'),
-        lookupParams.priorities.get('Blocker'),
-        lookupParams.assignees.get('bob'),
-        'Issue summary', 4)
-        .components('C-10', 'C-20')
-        .key('P2-1')
-        .check();
-    });
-
-    it ('Clear components', () => {
-      // Set some components first so we can clear them
-      let updated = createAndUpdateIssue({
-        key: 'P2-1', components: ['C-10', 'C-20']
-      });
-      const second = {
-        key: 'P2-1', 'clear-components': true
-      };
-      updated = updateIssue(updated, second);
-
-      new IssueChecker(updated,
-        lookupParams.issueTypes.get('task'),
-        lookupParams.priorities.get('Blocker'),
-        lookupParams.assignees.get('bob'),
-        'Issue summary', 4)
-        .key('P2-1')
-        .check();
-    });
-
-    it ('Update labels', () => {
-      const updated = createAndUpdateIssue({
-        key: 'P2-1', labels: ['L-10', 'L-20']
-      });
-      new IssueChecker(updated,
-        lookupParams.issueTypes.get('task'),
-        lookupParams.priorities.get('Blocker'),
-        lookupParams.assignees.get('bob'),
-        'Issue summary', 4)
-        .labels('L-10', 'L-20')
-        .key('P2-1')
-        .check();
-    });
-
-    it ('Clear labels', () => {
-      // Set some components first so we can clear them
-      let updated = createAndUpdateIssue({
-        key: 'P2-1', labels: ['L-10', 'L-20']
-      });
-      updated = updateIssue(updated, {
-        key: 'P2-1', 'clear-labels': true
       });
 
-      new IssueChecker(updated,
-        lookupParams.issueTypes.get('task'),
-        lookupParams.priorities.get('Blocker'),
-        lookupParams.assignees.get('bob'),
-        'Issue summary', 4)
-        .key('P2-1')
-        .check();
-    });
-
-    it ('Update fix versions', () => {
-      const updated = createAndUpdateIssue({
-        key: 'P2-1', 'fix-versions': ['F-10', 'F-20']
+      it ('New issue - full info', () => {
+        const newIssue = updateIssue(null, {
+          key: 'P2-1',
+          summary: 'Test summary',
+          state: 'Test1',
+          type: 'bug',
+          priority: 'Major',
+          assignee: 'kabir',
+          components: ['C-10', 'C-20'],
+          labels: ['L-10', 'L-20'],
+          'fix-versions': ['F-10', 'F-20'],
+          custom: {'Custom-1': 'c1-C', 'Custom-2': 'c2-B'},
+          'parallel-tasks': {'1': 2, '0': 1}
+        });
+        new IssueChecker(newIssue,
+          lookupParams.issueTypes.get('bug'),
+          lookupParams.priorities.get('Major'),
+          lookupParams.assignees.get('kabir'),
+          'Test summary', 0)
+          .key('P2-1')
+          .components('C-10', 'C-20')
+          .labels('L-10', 'L-20')
+          .fixVersions('F-10', 'F-20')
+          .customField('Custom-1', 'c1-C', 'Third C1')
+          .customField('Custom-2', 'c2-B', 'Second C2')
+          .selectedParallelTaskOptions('Two', 'Tres')
+          .check();
       });
-      new IssueChecker(updated,
-        lookupParams.issueTypes.get('task'),
-        lookupParams.priorities.get('Blocker'),
-        lookupParams.assignees.get('bob'),
-        'Issue summary', 4)
-        .fixVersions('F-10', 'F-20')
-        .key('P2-1')
-        .check();
-    });
-
-    it ('Clear fix versions', () => {
-      // Set some components first so we can clear them
-      let updated = createAndUpdateIssue({
-        key: 'P2-1', 'fix-versions': ['F-10', 'F-20']
-      });
-      updated = updateIssue(updated, {
-        key: 'P2-1', 'clear-fix-versions': true
-      });
-
-      new IssueChecker(updated,
-        lookupParams.issueTypes.get('task'),
-        lookupParams.priorities.get('Blocker'),
-        lookupParams.assignees.get('bob'),
-        'Issue summary', 4)
-        .key('P2-1')
-        .check();
-    });
-
-    it ('Update custom fields', () => {
-      // Update several
-      let updated = createAndUpdateIssue({
-        key: 'P2-1', custom: {'Custom-1': 'c1-C', 'Custom-2': 'c2-B'}
-      });
-      new IssueChecker(updated,
-        lookupParams.issueTypes.get('task'),
-        lookupParams.priorities.get('Blocker'),
-        lookupParams.assignees.get('bob'),
-        'Issue summary', 4)
-        .customField('Custom-1', 'c1-C', 'Third C1')
-        .customField('Custom-2', 'c2-B', 'Second C2')
-        .key('P2-1')
-        .check();
-      // Update one
-      updated = updateIssue(updated, {
-        key: 'P2-1', custom: {'Custom-1': 'c1-A'}
-      });
-      new IssueChecker(updated,
-        lookupParams.issueTypes.get('task'),
-        lookupParams.priorities.get('Blocker'),
-        lookupParams.assignees.get('bob'),
-        'Issue summary', 4)
-        .customField('Custom-1', 'c1-A', 'First C1')
-        .customField('Custom-2', 'c2-B', 'Second C2')
-        .key('P2-1')
-        .check();
-    });
-
-    it ('Clear custom field (one)', () => {
-      // Create the custom fields first so we can clear them later
-      let updated = createAndUpdateIssue({
-        key: 'P2-1', custom: {'Custom-1': 'c1-C', 'Custom-2': 'c2-B'}
-      });
-      // Clear a custom field
-      updated = updateIssue(updated, {
-        key: 'P2-1', custom: {'Custom-1': null}
-      });
-      new IssueChecker(updated,
-        lookupParams.issueTypes.get('task'),
-        lookupParams.priorities.get('Blocker'),
-        lookupParams.assignees.get('bob'),
-        'Issue summary', 4)
-        .customField('Custom-2', 'c2-B', 'Second C2')
-        .key('P2-1')
-        .check();
-    });
-
-    it ('Clear all custom fields', () => {
-      // Create the custom fields first so we can clear them later
-      let updated = createAndUpdateIssue({
-        key: 'P2-1', custom: {'Custom-1': 'c1-C', 'Custom-2': 'c2-B'}
-      });
-      // Clear a custom field
-      updated = updateIssue(updated, {
-        key: 'P2-1', custom: {'Custom-1': null, 'Custom-2': null}
-      });
-      new IssueChecker(updated,
-        lookupParams.issueTypes.get('task'),
-        lookupParams.priorities.get('Blocker'),
-        lookupParams.assignees.get('bob'),
-        'Issue summary', 4)
-        .key('P2-1')
-        .check();
-    });
-
-    it ('Update parallel tasks (no existing ones)', () => {
-      input['key'] = 'P2-100'; // The parallel tasks are set up in the 'P2' project
-      // input['parallel-tasks'] = [2, 1];
-      const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
-      // Clear a custom field
-      const updated = updateIssue(issue, {
-        key: 'P2-100', 'parallel-tasks': {'1': 2, '0': 1}
-      });
-
-      new IssueChecker(updated,
-        lookupParams.issueTypes.get('task'),
-        lookupParams.priorities.get('Blocker'),
-        lookupParams.assignees.get('bob'),
-        'Issue summary', 4)
-        .key('P2-100')
-        .selectedParallelTaskOptions('Two', 'Tres')
-        .check();
-    });
-
-    it ('Update parallel tasks', () => {
-      input['key'] = 'P2-100'; // The parallel tasks are set up in the 'P2' project
-      input['parallel-tasks'] = [0, 0];
-      const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
-      // Clear a custom field
-      const updated = updateIssue(issue, {
-        key: 'P2-100', 'parallel-tasks': {'1': 2}
-      });
-
-      new IssueChecker(updated,
-        lookupParams.issueTypes.get('task'),
-        lookupParams.priorities.get('Blocker'),
-        lookupParams.assignees.get('bob'),
-        'Issue summary', 4)
-        .key('P2-100')
-        .selectedParallelTaskOptions('One', 'Tres')
-        .check();
     });
 
     function createAndUpdateIssue(changeInput: any): BoardIssue {
@@ -538,7 +586,6 @@ describe('Issue unit tests', () => {
       const change: BoardIssue = IssueUtil.issueChangeFromJs(changeInput, lookupParams);
       return IssueUtil.updateIssue(issue, change);
     }
-
   });
 });
 

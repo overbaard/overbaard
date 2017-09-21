@@ -43,24 +43,18 @@ export class IssueActions {
   static createChangeIssuesAction(input: any, params: DeserializeIssueLookupParams): Action {
     const deletedKeys: string[] = <string[]>input['delete'];
 
-    let newIssues: List<BoardIssue>;
-    if (input['new']) {
-      newIssues = List<BoardIssue>().withMutations(mutable => {
-        for (const issueInput of <any[]>input['new']) {
-
+    let issueChanges: List<BoardIssue>;
+    if (input['new'] || input['update']) {
+      issueChanges = List<BoardIssue>().withMutations(mutable => {
+        if (input['new']) {
+          (<any[]>input['new']).forEach(v => mutable.push(IssueUtil.issueChangeFromJs(v, params)));
+        }
+        if (input['update']) {
+          (<any[]>input['update']).forEach(v => mutable.push(IssueUtil.issueChangeFromJs(v, params)));
         }
       });
     }
-
-    let updatedIssues: List<BoardIssue>;
-    if (input['new']) {
-      updatedIssues = List<BoardIssue>().withMutations(mutable => {
-        for (const issueInput of <any[]>input['update']) {
-
-        }
-      });
-    }
-    return new ChangeIssuesAction({newIssues: newIssues, changedIssues: updatedIssues, deletedIssues: deletedKeys});
+    return new ChangeIssuesAction({issueChanges: issueChanges, deletedIssues: deletedKeys});
   }
 }
 
@@ -78,14 +72,31 @@ export function issueReducer(state: IssueState = initialIssueState, action: Acti
       }
       return newState;
     }
+    case CHANGE_ISSUES: {
+      const payload: ChangeIssuesPayload = (<ChangeIssuesAction>action).payload;
+      if (!payload.issueChanges && !payload.deletedIssues) {
+        return state;
+      }
+      return IssueUtil.toStateRecord(state).withMutations(mState => {
+        mState.issues = mState.issues.withMutations(mIssues => {
+          payload.issueChanges.forEach(change => {
+            // For new issues on the board, original will be null
+            const original: BoardIssue = mIssues.get(change.key);
+            mIssues.set(change.key, IssueUtil.updateIssue(original, change));
+          });
+        });
+        // delete does not work on a mutable map
+        payload.deletedIssues.forEach(key => mState.issues = mState.issues.delete(key));
+      });
+    }
     default:
       return state;
   }
 };
 
 interface ChangeIssuesPayload {
-  changedIssues: List<BoardIssue>;
-  newIssues: List<BoardIssue>;
+  // This contains both new and changed issues
+  issueChanges: List<BoardIssue>;
   deletedIssues: string[];
 }
 
