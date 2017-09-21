@@ -124,8 +124,5 @@ describe('Rank reducer tests', () => {
         state, RankActions.createRerank({P: [{index: 0, key: 'P-3'}]}, ['P-1']));
       expect(newState.rankedIssueKeys.get('P').toArray()).toEqual(['P-3', 'P-2', 'P-4']);
     });
-
-
-
   });
 });

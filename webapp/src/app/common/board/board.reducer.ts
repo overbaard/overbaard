@@ -47,7 +47,7 @@ export interface BoardState {
 
 
 export const initialBoardState: BoardState = {
-  viewId: 0,
+  viewId: -1,
   rankCustomFieldId: 0,
   headers: initialHeaderState,
   assignees: initialAssigneeState,
@@ -87,7 +87,6 @@ export function reducer(state: any, action: any) {
 
 const DESERIALIZE_BOARD = 'DESERIALIZE_BOARD';
 const PROCESS_BOARD_CHANGES = 'PROCESS_BOARD_CHANGES';
-const PROCESS_BOARD_FULL_REFRESH = 'PROCESS_BOARD_FULL_REFRESH';
 
 abstract class BoardDataAction {
   constructor(readonly type: string, readonly payload: any) {
@@ -106,25 +105,17 @@ class ProcessBoardChangesAction extends BoardDataAction {
   }
 }
 
-class ProcessBoardFullRefreshAction extends BoardDataAction {
-  constructor(payload: any) {
-    super(PROCESS_BOARD_FULL_REFRESH, payload);
-  }
-}
-
-
 export class BoardActions {
 
   static createDeserializeBoard(input: any) {
     return new DeserializeBoardAction(input);
   }
 
-  static processChanges(input: any) {
-    return new ProcessBoardChangesAction(input);
-  }
-
-  static processFullRefresh(input: any) {
-    return new ProcessBoardFullRefreshAction(input);
+  static createChanges(input: any) {
+    if (input['changes']) {
+      return new ProcessBoardChangesAction(input['changes']);
+    };
+    return new DeserializeBoardAction(input);
   }
 }
 
@@ -134,6 +125,9 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
     case DESERIALIZE_BOARD: {
       const input = action.payload;
       const viewId: number = input['view'];
+      if (viewId === state.viewId) {
+        return state;
+      }
       const rankCustomFieldId = input['rank-custom-field-id'];
       const headers =
         reducers.headers(state.headers, HeaderActions.createDeserializeHeaders(
@@ -157,8 +151,8 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
       const labelState: LabelState = input['labels'] ?
         reducers.labels(state.labels, LabelActions.createDeserializeLabels(input['labels']))
         : initialLabelState;
-      const fixVersionState: FixVersionState = input['labels'] ?
-        reducers.fixVersions(state.fixVersions, FixVersionActions.createDeserializeFixVersions(input['labels']))
+      const fixVersionState: FixVersionState = input['fix-versions'] ?
+        reducers.fixVersions(state.fixVersions, FixVersionActions.createDeserializeFixVersions(input['fix-versions']))
         : initialFixVersionState;
       const customFieldState: CustomFieldState = input['custom'] ?
         reducers.customFields(state.customFields, CustomFieldActions.createDeserializeCustomFields(input['custom']))
@@ -205,20 +199,101 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
         blacklist: blacklistState
       };
 
-      // Since BoardState is not an immutable Record it does not have the equals method so do some custom checking here.
-      // It is not a record since I think the redux store cannot deal with 'parents' being immutable
+      return newState;
+    }
+    case PROCESS_BOARD_CHANGES: {
+      const input: any = action.payload;
+      const viewId: number = input['view'];
 
-      if (Map<any>(state).equals(Map<any>(newState))) {
-        return state;
-      }
+      const assigneeState: AssigneeState = input['assignees'] ?
+        reducers.assignees(state.assignees, AssigneeActions.createAddAssignees(input['assignees']))
+        : state.assignees;
+      const componentState: ComponentState = input['components'] ?
+        reducers.components(state.components, ComponentActions.createAddComponents(input['components']))
+        : state.components;
+      const labelState: LabelState = input['labels'] ?
+        reducers.labels(state.labels, LabelActions.createAddLabels(input['labels']))
+        : state.labels;
+      const fixVersionState: FixVersionState = input['fix-versions'] ?
+        reducers.fixVersions(state.fixVersions, FixVersionActions.createAddFixVersions(input['fix-versions']))
+        : state.fixVersions;
+      const customFieldState: CustomFieldState = input['custom'] ?
+        reducers.customFields(state.customFields, CustomFieldActions.createAddCustomFields(input['custom']))
+        : state.customFields;
+
+      const deletedIssues = getDeletedIssuesForChange(input);
+      let rankState: RankState;
+        rankState = (input['rank'] || deletedIssues) ?
+          reducers.ranks(state.ranks, RankActions.createRerank(input['rank'], deletedIssues))
+          : rankState = state.ranks;
+
+      const lookupParams: DeserializeIssueLookupParams = new DeserializeIssueLookupParams()
+        .setAssignees(assigneeState.assignees)
+        .setPriorities(state.priorities.priorities)
+        .setIssueTypes(state.issueTypes.types)
+        .setComponents(componentState.components)
+        .setLabels(labelState.labels)
+        .setFixVersions(fixVersionState.versions)
+        .setCustomFields(customFieldState.fields)
+        .setBoardProjects(state.projects.boardProjects)
+        .setBoardStates(state.headers.states)
+        .setParallelTasks(state.projects.parallelTasks);
+
+      const issueState: IssueState = input['issues'] ?
+        reducers.issues(state.issues, IssueActions.createChangeIssuesAction(input['issues'], lookupParams))
+        : state.issues;
+
+      const blacklistState: BlacklistState = input['blacklist'] ?
+        reducers.blacklist(state.blacklist, BlacklistActions.createChangeBlacklist(input['blacklist']))
+        : state.blacklist;
+
+      const newState: BoardState = {
+        viewId: viewId,
+        rankCustomFieldId: state.rankCustomFieldId,
+        headers: state.headers,
+        assignees: assigneeState,
+        issueTypes: state.issueTypes,
+        priorities: state.priorities,
+        components: componentState,
+        fixVersions: fixVersionState,
+        labels: labelState,
+        customFields: customFieldState,
+        projects: state.projects,
+        issues: issueState,
+        ranks: rankState,
+        blacklist: blacklistState
+      };
 
       return newState;
     }
-    // TODO the others
     default:
       return state;
   }
 }
+
+function getDeletedIssuesForChange(input: any): string[] {
+  const deletedIssues = [];
+  addAll(deletedIssues, input, 'issues', 'delete');
+  addAll(deletedIssues, input, 'blacklist', 'issues');
+  addAll(deletedIssues, input, 'blacklist', 'removed-issues');
+
+  return deletedIssues.length > 0 ? deletedIssues : null;
+}
+
+function addAll(result: string[], input: any, ...keys: string[]) {
+  let current: any = input;
+  for (const key of keys) {
+    current = current[key];
+    if (!current) {
+      return;
+    }
+  }
+
+  (<string[]>current).forEach(v => result.push(v));
+}
+
+
+
 
 const getBoardState = (state: AppState) => state.board;
 

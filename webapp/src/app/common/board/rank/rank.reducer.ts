@@ -93,13 +93,17 @@ export function rankReducer(state: RankState = initialRankState, action: Action)
 
 function deleteIssues(rankedByProject: Map<string, List<string>>, deletions: Set<string>): Map<string, List<string>> {
   rankedByProject = rankedByProject.asImmutable();
-  deletions.forEach(key => {
-    const projectCode: string = IssueUtil.productCodeFromKey(key);
-    let issues: List<string> = rankedByProject.get(projectCode);
-    const index = issues.indexOf(key);
-    issues = issues.delete(index);
-    rankedByProject = rankedByProject.set(projectCode, issues);
-  });
+  if (deletions) {
+    deletions.forEach(key => {
+      const projectCode: string = IssueUtil.productCodeFromKey(key);
+      let issues: List<string> = rankedByProject.get(projectCode);
+      if (issues) {
+        const index = issues.indexOf(key);
+        issues = issues.delete(index);
+        rankedByProject = rankedByProject.set(projectCode, issues);
+      }
+    });
+  }
   return rankedByProject.asImmutable();
 }
 
