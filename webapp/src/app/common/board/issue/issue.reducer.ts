@@ -63,8 +63,20 @@ export function issueReducer(state: IssueState = initialIssueState, action: Acti
   switch (action.type) {
     case DESERIALIZE_INITIAL_ISSUES: {
       const payload: Map<string, BoardIssue> = (<DeserializeIssuesAction>action).payload;
+
+      const newMap: Map<string, BoardIssue> = Map<string, BoardIssue>().withMutations(mutable => {
+        payload.forEach((issue, key) => {
+          const existing: BoardIssue = state.issues.get(key);
+          if (existing == null || !IssueUtil.toIssueRecord(existing).equals(IssueUtil.toIssueRecord(issue))) {
+            mutable.set(key, issue);
+          } else {
+            mutable.set(key, existing);
+          }
+        });
+      });
+
       const newState: IssueState = IssueUtil.toStateRecord(state).withMutations(mutable => {
-        mutable.issues = payload;
+        mutable.issues = newMap;
       });
 
       if (IssueUtil.toStateRecord(newState).equals(IssueUtil.toStateRecord(state))) {

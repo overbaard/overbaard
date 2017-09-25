@@ -102,6 +102,37 @@ describe('Issue reducer tests', () => {
         IssueActions.createDeserializeIssuesAction(getTestIssuesInput(), lookupParams));
       expect(state).toBe(issueState);
     });
+
+
+    it('Deserialize some issues same, some changed', () => {
+      const input: any = getTestIssuesInput();
+      delete input['ISSUE-1'];
+      input['ISSUE-2']['summary'] = 'Dos';
+
+      input['ISSUE-5'] = input['ISSUE-4'];
+      input['ISSUE-5']['key'] = 'ISSUE-5';
+      input['ISSUE-5']['summary'] = 'Five';
+      delete input['ISSUE-4'];
+
+      const state = issueReducer(
+        issueState,
+        IssueActions.createDeserializeIssuesAction(input, lookupParams));
+
+
+      expect(state).not.toBe(issueState);
+      expect(state.issues.size).toEqual(3);
+      const issueArray: BoardIssue[] = state.issues.toArray().sort((a, b) => a.key.localeCompare(b.key));
+      new IssueChecker(issueArray[0],
+        lookupParams.issueTypes.get('bug'), lookupParams.priorities.get('Major'), lookupParams.assignees.get('kabir'), 'Dos', 1)
+        .key('ISSUE-2')
+        .check();
+      new IssueChecker(issueArray[2],
+        lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Major'), NO_ASSIGNEE, 'Five', 1)
+        .key('ISSUE-5')
+        .check();
+
+      expect(state.issues.get('ISSUE-3')).toBe(issues.get('ISSUE-3'));
+    });
   });
 
   describe('Update', () => {

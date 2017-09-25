@@ -1,5 +1,5 @@
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
-import {Assignee, AssigneeState, NO_ASSIGNEE} from '../assignee/assignee.model';
+import {Assignee, NO_ASSIGNEE} from '../assignee/assignee.model';
 import {Priority} from '../priority/priority.model';
 import {IssueType} from '../issue-type/issue-type.model';
 import {fromJS, List, Map, OrderedMap} from 'immutable';
@@ -391,6 +391,11 @@ export class IssueUtil {
   static toStateRecord(s: IssueState): IssueStateRecord {
     // TODO do some checks. TS does not allow use of instanceof when the type is an interface (since they are compiled away)
     return <IssueStateRecord>s;
+  }
+
+  static toIssueRecord(i: BoardIssue): BoardIssueRecord {
+    // TODO do some checks. TS does not allow use of instanceof when the type is an interface (since they are compiled away)
+    return <BoardIssueRecord>i;
   }
 
   private static lookupStringsFromIndexArray(input: number[], lookup: List<string>): string[] {
