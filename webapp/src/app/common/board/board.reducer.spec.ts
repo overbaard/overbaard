@@ -6,7 +6,7 @@ import {getTestIssueTypesInput} from './issue-type/issue-type.reducer.spec';
 import {getTestLabelsInput} from './label/label.reducer.spec';
 import {getTestCustomFieldsInput} from './custom-field/custom-field.reducer.spec';
 import {getTestBlacklistInput} from './blacklist/blacklist.reducer.spec';
-import {is, List, Map, OrderedMap, Set} from 'immutable';
+import {List, Map, OrderedMap} from 'immutable';
 import {Assignee, NO_ASSIGNEE} from './assignee/assignee.model';
 import {Priority} from './priority/priority.model';
 import {IssueType} from './issue-type/issue-type.model';

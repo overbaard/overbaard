@@ -1,9 +1,6 @@
 import {AppState} from '../../../app-store';
 import {Action} from '@ngrx/store';
-import {
-  BoardIssue, DeserializeIssueLookupParams, initialIssueState, IssueState,
-  IssueUtil
-} from './issue.model';
+import {BoardIssue, DeserializeIssueLookupParams, initialIssueState, IssueState, IssueUtil} from './issue.model';
 import {createSelector} from 'reselect';
 import {List, Map} from 'immutable';
 

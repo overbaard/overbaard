@@ -1,7 +1,7 @@
 import {HeaderState, initialHeaderState} from '../../header/header.model';
 import {HeaderActions, headerReducer} from '../../header/header.reducer';
-import {BoardIssue, DeserializeIssueLookupParams, initialIssueState, Issue, IssueState} from '../../issue/issue.model';
-import {List, Map, OrderedSet, Set} from 'immutable';
+import {BoardIssue, DeserializeIssueLookupParams, initialIssueState, IssueState} from '../../issue/issue.model';
+import {List, Map, OrderedSet} from 'immutable';
 import {BoardProject, LinkedProject, ParallelTask, ProjectState} from '../../project/project.model';
 import {initialIssueTableState, IssueTableState} from './issue-table.model';
 import {IssueTableActions, issueTableReducer} from './issue-table.reducer';

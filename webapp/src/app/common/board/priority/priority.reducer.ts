@@ -1,6 +1,6 @@
 import {AppState} from '../../../app-store';
 import {Action} from '@ngrx/store';
-import {initialPriorityState, Priority, PriorityUtil, PriorityState} from './priority.model';
+import {initialPriorityState, Priority, PriorityState, PriorityUtil} from './priority.model';
 import {createSelector} from 'reselect';
 
 

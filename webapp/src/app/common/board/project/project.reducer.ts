@@ -1,8 +1,13 @@
 import {Action} from '@ngrx/store';
 import {
-  BoardProject, initialProjectState, LinkedProject, ProjectUtil, ProjectState, ParallelTask
+  BoardProject,
+  initialProjectState,
+  LinkedProject,
+  ParallelTask,
+  ProjectState,
+  ProjectUtil
 } from './project.model';
-import {List, Map, OrderedMap} from 'immutable';
+import {List, Map} from 'immutable';
 
 const DESERIALIZE_PROJECTS = 'DESERIALIZE_PROJECTS';
 

@@ -1,5 +1,5 @@
 import {LabelActions, labelReducer} from './label.reducer';
-import {LabelState, initialLabelState} from './label.model';
+import {initialLabelState, LabelState} from './label.model';
 import {cloneObject} from '../../utils/test-util.spec';
 
 export function getTestLabelsInput(): any {

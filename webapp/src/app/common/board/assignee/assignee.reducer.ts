@@ -1,5 +1,5 @@
 import {Action} from '@ngrx/store';
-import {Assignee, AssigneeUtil, AssigneeState, initialAssigneeState} from './assignee.model';
+import {Assignee, AssigneeState, AssigneeUtil, initialAssigneeState} from './assignee.model';
 import {AppState} from '../../../app-store';
 import {createSelector} from 'reselect';
 import {OrderedMap} from 'immutable';

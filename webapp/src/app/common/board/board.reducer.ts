@@ -22,9 +22,6 @@ import {CustomFieldState, initialCustomFieldState} from './custom-field/custom-f
 import {CustomFieldActions, customFieldReducer} from './custom-field/custom-field.reducer';
 import {BlacklistState, initialBlacklistState} from './blacklist/blacklist.model';
 import {BlacklistActions, blacklistReducer} from './blacklist/blacklist.reducer';
-import {Map} from 'immutable';
-import {issueTableReducer} from './calculated/issue-table/issue-table.reducer';
-import {initialIssueTableState, IssueTableState} from './calculated/issue-table/issue-table.model';
 import {initialRankState, RankState} from './rank/rank.model';
 import {RankActions, rankReducer} from './rank/rank.reducer';
 

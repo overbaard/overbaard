@@ -4,10 +4,8 @@
  * - Dynamic stuff such as the issue ranks
  * - More static stuff such as the project key, available parallel-tasks, state mappings etc. which are set up in the config
  */
-import {List, Map, OrderedMap} from 'immutable';
+import {List, Map} from 'immutable';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
-import {HeaderState} from '../header/header.model';
-import {ProjectState} from '../project/project.model';
 
 export interface RankState {
   rankedIssueKeys: Map<string, List<string>>;

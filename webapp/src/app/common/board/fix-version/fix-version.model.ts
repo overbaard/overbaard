@@ -1,5 +1,5 @@
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
-import {List, OrderedMap} from 'immutable';
+import {List} from 'immutable';
 
 
 export interface FixVersionState {

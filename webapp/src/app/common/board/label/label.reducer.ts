@@ -1,6 +1,6 @@
 import {Action} from '@ngrx/store';
 import {List} from 'immutable';
-import {LabelState, LabelUtil, initialLabelState} from './label.model';
+import {initialLabelState, LabelState, LabelUtil} from './label.model';
 
 
 const DESERIALIZE_ALL_LABELS = 'DESERIALIZE_ALL_LABELS';

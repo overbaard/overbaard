@@ -1,4 +1,4 @@
-import {List, Map, OrderedMap} from 'immutable';
+import {List, Map} from 'immutable';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {HeaderState} from '../header/header.model';
 

@@ -1,7 +1,6 @@
 import {Action} from '@ngrx/store';
 import {List, Map, Set} from 'immutable';
 import {initialRankState, RankState, RankUtil} from './rank.model';
-import {ProjectUtil} from '../project/project.model';
 import {IssueUtil} from '../issue/issue.model';
 
 const DESERIALIZE_RANKS = 'DESERIALIZE_RANKS';

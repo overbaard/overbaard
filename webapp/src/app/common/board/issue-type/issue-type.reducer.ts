@@ -1,11 +1,6 @@
 import {AppState} from '../../../app-store';
 import {Action} from '@ngrx/store';
-import {
-  initialIssueTypeState,
-  IssueType,
-  IssueTypeUtil,
-  IssueTypeState
-} from './issue-type.model';
+import {initialIssueTypeState, IssueType, IssueTypeState, IssueTypeUtil} from './issue-type.model';
 import {createSelector} from 'reselect';
 
 
