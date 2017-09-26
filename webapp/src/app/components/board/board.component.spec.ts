@@ -1,6 +1,8 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {BoardComponent} from './board.component';
+import {AppHeaderService} from '../../services/app-header.service';
+import {RouterTestingModule} from '@angular/router/testing';
 
 describe('BoardComponent', () => {
   let component: BoardComponent;
@@ -8,7 +10,9 @@ describe('BoardComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ BoardComponent ]
+      imports: [RouterTestingModule],
+      declarations: [ BoardComponent ],
+      providers: [AppHeaderService]
     })
     .compileComponents();
   }));

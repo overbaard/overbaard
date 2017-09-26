@@ -1,11 +1,12 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {BoardsComponent} from './boards.component';
 import {RouterTestingModule} from '@angular/router/testing';
-import {RestUrlService} from '../../../services/rest-url.service';
+import {RestUrlService} from '../../services/rest-url.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {BoardsService} from '../../../services/boards.service';
+import {BoardsService} from '../../services/boards.service';
 import 'rxjs/add/observable/of';
 import {Observable} from 'rxjs/Observable';
+import {AppHeaderService} from '../../services/app-header.service';
 
 
 class MockBoardsService extends BoardsService {
@@ -39,6 +40,7 @@ describe('BoardsComponent', () => {
       ],
       declarations: [ BoardsComponent ],
       providers: [
+        AppHeaderService,
         RestUrlService,
         mockBoardsService.getProviders()
         ]

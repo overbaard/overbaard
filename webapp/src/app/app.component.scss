@@ -1,6 +1,8 @@
+@import'../styles';
+
 .app-header {
-  min-height: 30px;
-  max-height: 30px;
+  min-height: $toolbar-height;
+  max-height: $toolbar-height;
   border: 0px;
   padding: 0px;
   margin: 0px;

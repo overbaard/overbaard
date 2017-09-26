@@ -253,18 +253,52 @@ describe('Header reducer tests', () => {
       HeaderActions.createDeserializeHeaders(states, ['H1', 'H2'], 0, 0));
     expect(stateB).toBe(stateA);
   });
+
+  it('Check abbreviations', () => {
+    const states = [
+      {name: 'Backlog', header: 0, wip: 3},
+      {name: 'Analysis', header: 0, wip: 4},
+      {name: 'Dev in Progress', header: 1},
+      {name: 'More work is needed', header: 1}
+    ];
+
+    const headerState: HeaderState = headerReducer(
+      initialHeaderState,
+      HeaderActions.createDeserializeHeaders(states, ['Short Header', 'A much longer header'], 0, 0));
+    expect(headerState.states.toArray()).toEqual(['Backlog', 'Analysis', 'Dev in Progress', 'More work is needed']);
+    const headers: List<List<Header>> = headerState.headers;
+
+    expect(headers.size).toBe(2);
+
+    const topRow: List<Header> = headers.get(0);
+    expect(topRow.size).toBe(2);
+
+    const bottomRow: List<Header> = headers.get(1);
+    expect(bottomRow.size).toBe(4);
+
+    new HeaderChecker('Short Header', 'SH').wip(7).cols(2).states(0, 1).check(topRow.get(0));
+    new HeaderChecker('A much longer header', 'AML').cols(2).states(2, 3).check(topRow.get(1));
+
+    new HeaderChecker('Backlog', 'B').wip(3).states(0).check(bottomRow.get(0));
+    new HeaderChecker('Analysis', 'A').wip(4).states(1).check(bottomRow.get(1));
+    new HeaderChecker('Dev in Progress', 'DIP').states(2).check(bottomRow.get(2));
+    new HeaderChecker('More work is needed', 'MWI').states(3).check(bottomRow.get(3));
+
+  });
 });
 
 class HeaderChecker {
   _name: string;
+  _abbreviated: string;
   _rows = 1;
   _cols = 1;
   _wip = 0;
   _backlog = false;
   _states: List<number> = List<number>();
 
-  constructor(name: string) {
+  constructor(name: string, abbreviated?: string) {
     this._name = name;
+    this._abbreviated = abbreviated;
   }
 
   rows(rows: number): HeaderChecker {
@@ -301,6 +335,9 @@ class HeaderChecker {
     expect(header.wip).toEqual(this._wip);
     expect(header.backlog).toEqual(this._backlog);
     expect(header.states).toEqual(this._states);
+    if (this._abbreviated) {
+      expect(header.abbreviated).toEqual(this._abbreviated);
+    }
   }
 
 }

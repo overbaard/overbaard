@@ -1,7 +1,7 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
-import {BoardsComponent} from './components/smart/boards/boards.component';
-import {BoardComponent} from './components/smart/board/board.component';
+import {BoardsComponent} from './components/boards/boards.component';
+import {BoardComponent} from './components/board/board.component';
 
 const routes: Routes = [
   {

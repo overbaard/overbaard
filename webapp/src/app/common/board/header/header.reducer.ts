@@ -178,6 +178,7 @@ export function headerReducer(state: HeaderState = initialHeaderState, action: A
 
 class TempHeader implements Header {
   name: string;
+  abbreviated: string;
   rows: number;
   cols = 0;
   wip: number;
@@ -188,12 +189,32 @@ class TempHeader implements Header {
     this.backlog = backlog;
     this.rows = rows;
     this.name = name;
+    this.abbreviated = this.abbreviate(name);
     this.wip = isNaN(wip) ? 0 : wip;
   }
 
   addState(index: number) {
     this.states = this.states.push(index);
     this.cols++;
+  }
+
+  private abbreviate(str: string): string {
+    let words: string[] = str.split(' ');
+    if (!words) {
+      words = [str];
+    }
+    let abbreviated = '';
+    let length: number = words.length;
+    if (length > 3) {
+      length = 3;
+    }
+    for (let i = 0; i < length; i++) {
+      const s = words[i].trim();
+      if (s.length > 0) {
+        abbreviated += s.charAt(0).toUpperCase();
+      }
+    }
+    return abbreviated;
   }
 
 }

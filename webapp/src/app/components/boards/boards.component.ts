@@ -1,8 +1,10 @@
 import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
-import {BoardsService} from '../../../services/boards.service';
+import {BoardsService} from '../../services/boards.service';
 import {Observable} from 'rxjs/Observable';
 import {Subscription} from 'rxjs/Subscription';
 import 'rxjs/add/operator/catch';
+import {AppHeaderService} from '../../services/app-header.service';
+import {VIEW_RANK} from '../board/board.component';
 
 @Component({
   selector: 'app-boards',
@@ -15,8 +17,9 @@ export class BoardsComponent implements OnInit, OnDestroy {
 
   boards: Observable<any[]>;
   subscription: Subscription;
+  rankViewParameter = VIEW_RANK;
 
-  constructor(private _boardsService: BoardsService) { }
+  constructor(private _boardsService: BoardsService, private _appHeaderService: AppHeaderService) { }
 
   ngOnInit() {
     // TODO turn on progress indicator
@@ -31,7 +34,9 @@ export class BoardsComponent implements OnInit, OnDestroy {
         () => {
           // TODO turn off progress indicator
         }
-      )
+      );
+
+    this._appHeaderService.setTitle('Boards List');
   }
 
   ngOnDestroy(): void {

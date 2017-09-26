@@ -8,6 +8,7 @@ export interface HeaderState {
 
 export interface Header {
   name: string;
+  abbreviated: string;
   rows: number;
   cols: number;
   wip: number;
@@ -22,6 +23,7 @@ const DEFAULT_STATE: HeaderState = {
 
 const DEFAULT_HEADER: Header = {
   name: '',
+  abbreviated: '',
   rows: 1,
   cols: 1,
   wip: 0,
