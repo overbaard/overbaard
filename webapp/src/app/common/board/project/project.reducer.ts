@@ -42,9 +42,11 @@ export class ProjectActions {
     }
 
     const linkedInput = input['linked'];
-    for (const key of Object.keys(linkedInput)) {
-      const projectInput: any = linkedInput[key];
-      linkedProjects.set(key, ProjectUtil.linkedProjectFromJs(key, projectInput));
+    if (linkedInput) {
+      for (const key of Object.keys(linkedInput)) {
+        const projectInput: any = linkedInput[key];
+        linkedProjects.set(key, ProjectUtil.linkedProjectFromJs(key, projectInput));
+      }
     }
 
 

@@ -1,0 +1,157 @@
+{
+  "view" : 0,
+  "rank-custom-field-id" : 12311940,
+  "states" : [
+    {"name": "Backlog Pool"},
+    {"name": "Backlog P2"},
+    {"name": "Backlog P1"},
+    {"name": "Analysis Dev", "header":0},
+    {"name": "Analysis Handoff", "header":0},
+    {"name": "Analysis QA", "header":0},
+    {"name": "Dev TODO"},
+    {"name": "Design/POC", "header":1},
+    {"name": "Dev In Progres", "header":1},
+    {"name": "Awaiting Merge", "header":1},
+    {"name": "Stalled"},
+    {"name": "Awaiting Build"},
+    {"name": "Verification TODO"},
+    {"name": "QA In Progress", "header":2},
+    {"name": "Awaiting Docs", "header":2},
+    {"name": "Docs Verification", "header":2},
+    {"name": "Verified"},
+    {"name": "Done"}
+  ],
+  "backlog": 3,
+  "done": 1,
+  "headers" : ["Analysis", "Development", "QA"],
+  "assignees" : [
+    {
+      "key" : "kabir.khan",
+      "email" : "kabir.khan@example.com",
+      "avatar" : "https://static.jboss.org/developer/gravatar/00aa85cb5ea8fd5882bab9765f40655e?d=mm&s=32",
+      "name" : "Kabir Khan"
+    },
+    {
+      "key" : "other",
+      "email" : "another@example.com",
+      "avatar" : "https://static.jboss.org/developer/gravatar/ddb8426eafc8e3628d263af28aa13086?d=mm&s=32",
+      "name" : "Peter Programmer"
+    }
+  ],
+  "components": ["Component One", "Component Two", "Componnt Three"],
+  "labels": ["Label One", "Label Two", "Label Three"],
+  "fix-versions" : ["1.0.0.Alpha", "1.0.0.Beta", "1.0.0.GA"],
+  "priorities" : [
+    {
+      "name" : "Blocker",
+      "icon" : "/images/icons/priorities/blocker.png"
+    },
+    {
+      "name" : "Major",
+      "icon" : "/images/icons/priorities/major.png"
+    },
+    {
+      "name" : "Minor",
+      "icon" : "/images/icons/priorities/minor.png"
+    },
+    {
+      "name" : "Optional",
+      "icon" : "/images/icons/priorities/minor.png"
+    },
+    {
+      "name" : "Trivial",
+      "icon" : "/images/icons/priorities/trivial.png"
+    }
+  ],
+  "issue-types" : [
+    {
+      "name" : "Task",
+      "icon" : "/images/icons/issuetypes/task.png"
+    },
+    {
+      "name" : "Story",
+      "icon" : "/images/icons/issuetypes/story.png"
+    },
+    {
+      "name" : "Bug",
+      "icon" : "/images/icons/issuetypes/bug.png"
+    },
+    {
+      "name" : "Epic",
+      "icon" : "/images/icons/issuetypes/epic.png"
+    },
+    {
+      "name" : "Empty",
+      "icon" : "/images/icons/issuetypes/epic.png"
+    },
+    {
+      "name" : "Empty2",
+      "icon" : "/images/icons/issuetypes/epic.png"
+    }
+
+  ],
+  "projects" : {
+    "owner" : "EAPDS",
+    "main" : {
+      "FEAT" : {
+        "colour" : "#4667CA",
+        "rank" : true,
+        "state-links" : {
+          "Backlog Pool" : "Backlog Pool",
+          "Backlog P2" : "Backlog P2",
+          "Backlog P1" : "Backlog P1",
+          "Analysis Dev" : "Analysis Dev",
+          "Analysis Handoff" : "Analysis Handoff",
+          "Analysis QA" : "Analysis QA",
+          "Dev TODO" : "Dev TODO",
+          "Design/POC" : "Design/POC",
+          "Dev In Progres" : "Dev In Progres",
+          "Awaiting Merge" : "Awaiting Merge",
+          "Stalled" : "Stalled",
+          "Awaiting Build" : "Awaiting Build",
+          "Verification TODO" : "Verification TODO",
+          "QA In Progress" : "QA In Progress",
+          "Awaiting Build" : "Awaiting Build",
+          "Docs Verification" : "Docs Verification",
+          "verified" : "Verified",
+          "Done" : "Done"
+        },
+        "ranked": []
+      },
+      "BUG" : {
+        "colour" : "#CA6746",
+        "rank" : true,
+        "state-links" : {
+          "Backlog P1" : "Backlog",
+          "Dev In Progres" : "Under Development",
+          "Awaiting Merge" : "To Be Merged",
+          "Awaiting Build" : "Next Build",
+          "Verification TODO" : "Ready For QA",
+          "QA In Progress" : "QA In Progress",
+          "verified" : "Verified",
+          "Done" : "Done"
+        },
+        "ranked" : []
+      }
+    }
+  },
+  "issues" : {
+
+  },
+  "blacklist" : {
+    "states": [
+      "No Such State"
+    ],
+    "priorities": [
+      "Critical"
+    ],
+    "issue-types": [
+      "Super Duper Urgent"
+    ],
+    "issues": [
+      "BAD-20",
+      "BAD-999"
+    ]
+  }
+
+}

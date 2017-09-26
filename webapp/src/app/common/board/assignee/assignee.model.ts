@@ -47,8 +47,13 @@ export const NO_ASSIGNEE: Assignee = ASSIGNEE_FACTORY({
 export class AssigneeUtil {
 
   static fromJS(input: any): AssigneeRecord {
-    input['initials'] = AssigneeUtil.calculateInitials(input['name']);
-    return ASSIGNEE_FACTORY(input);
+    // Clone the object here since in 'strict' mode it does not like us adding the initials attribute
+    const clone: Object = {};
+    for (const key of Object.keys(input)) {
+      clone[key] = input[key];
+    }
+    clone['initials'] = AssigneeUtil.calculateInitials(input['name']);
+    return ASSIGNEE_FACTORY(<Assignee>clone);
   }
 
   static toStateRecord(s: AssigneeState): AssigneeStateRecord {

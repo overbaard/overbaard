@@ -5,6 +5,8 @@ import {Subscription} from 'rxjs/Subscription';
 import 'rxjs/add/operator/catch';
 import {AppHeaderService} from '../../services/app-header.service';
 import {VIEW_RANK} from '../board/board.component';
+import {AppState} from '../../app-store';
+import {Store} from '@ngrx/store';
 
 @Component({
   selector: 'app-boards',
@@ -16,31 +18,18 @@ import {VIEW_RANK} from '../board/board.component';
 export class BoardsComponent implements OnInit, OnDestroy {
 
   boards: Observable<any[]>;
-  subscription: Subscription;
+
   rankViewParameter = VIEW_RANK;
 
   constructor(private _boardsService: BoardsService, private _appHeaderService: AppHeaderService) { }
 
   ngOnInit() {
-    // TODO turn on progress indicator
+    // TODO turn on/off progress indicator and log errors
     this.boards = this._boardsService.loadBoardsList(true);
-
-    this.subscription = this.boards
-      .subscribe(
-        value => {},
-        error => {
-          // TODO turn off progress indicator
-        },
-        () => {
-          // TODO turn off progress indicator
-        }
-      );
-
     this._appHeaderService.setTitle('Boards List');
   }
 
   ngOnDestroy(): void {
-    this.subscription.unsubscribe();
   }
 }
 

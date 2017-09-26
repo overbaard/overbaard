@@ -13,13 +13,17 @@ import {RestUrlService} from './services/rest-url.service';
 import {BoardComponent} from './components/board/board.component';
 import {HttpClientModule} from '@angular/common/http';
 import {AppHeaderService} from './services/app-header.service';
+import { KanbanViewComponent } from './components/board/view/kanban-view/kanban-view.component';
+import { RankViewComponent } from './components/board/view/rank-view/rank-view.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     BoardsComponent,
-    BoardComponent
+    BoardComponent,
+    KanbanViewComponent,
+    RankViewComponent
   ],
   imports: [
     BrowserModule,

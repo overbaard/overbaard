@@ -1,3 +1,14 @@
-<p>
-  board works!
-</p>
+<div (window:focus)="onFocus($event)" (window:blur)="onBlur($event)" (window:resize)="onResize($event)">
+  <app-kanban-view
+    *ngIf="view === 'kbv'"
+    [boardState$]="boardState$"
+    [windowWidth]="windowWidth"
+    [windowHeight]="windowHeight">
+  </app-kanban-view>
+  <app-rank-view
+    *ngIf="view === 'rv'"
+    [boardState$]="boardState$"
+    [windowWidth]="windowWidth"
+    [windowHeight]="windowHeight">
+  </app-rank-view>
+</div>

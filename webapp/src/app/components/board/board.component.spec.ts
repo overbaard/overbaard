@@ -3,6 +3,12 @@ import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {BoardComponent} from './board.component';
 import {AppHeaderService} from '../../services/app-header.service';
 import {RouterTestingModule} from '@angular/router/testing';
+import {RestUrlService} from '../../services/rest-url.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {reducer} from '../../app-store';
+import {StoreModule} from '@ngrx/store';
+import {RankViewComponent} from './view/rank-view/rank-view.component';
+import {KanbanViewComponent} from './view/kanban-view/kanban-view.component';
 
 describe('BoardComponent', () => {
   let component: BoardComponent;
@@ -10,9 +16,12 @@ describe('BoardComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule],
-      declarations: [ BoardComponent ],
-      providers: [AppHeaderService]
+      imports: [RouterTestingModule, HttpClientTestingModule, StoreModule.provideStore(reducer)],
+      declarations: [
+        BoardComponent,
+        KanbanViewComponent,
+        RankViewComponent ],
+      providers: [AppHeaderService, RestUrlService]
     })
     .compileComponents();
   }));
