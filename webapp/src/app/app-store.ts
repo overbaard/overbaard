@@ -9,7 +9,7 @@ export interface AppState {
 }
 
 const reducers = {
-  board: board.reducer
+  board: board.boardReducer
 };
 
 const developmentReducer: ActionReducer<AppState> = compose(storeFreeze, combineReducers)(reducers);

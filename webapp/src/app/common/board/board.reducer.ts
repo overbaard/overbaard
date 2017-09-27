@@ -60,8 +60,7 @@ export const initialBoardState: BoardState = {
   blacklist: initialBlacklistState
 };
 
-const reducers = {
-  board: boardReducer,
+const metaReducers = {
   headers: headerReducer,
   assignees: assigneeReducer,
   issueTypes: issueTypeReducer,
@@ -75,12 +74,6 @@ const reducers = {
   issues: issueReducer,
   blacklist: blacklistReducer
 };
-
-const reducerInstance: ActionReducer<BoardState> = combineReducers(reducers);
-
-export function reducer(state: any, action: any) {
-  return reducerInstance(state, action);
-}
 
 const DESERIALIZE_BOARD = 'DESERIALIZE_BOARD';
 const PROCESS_BOARD_CHANGES = 'PROCESS_BOARD_CHANGES';
@@ -127,7 +120,7 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
       }
       const rankCustomFieldId = input['rank-custom-field-id'];
       const headers =
-        reducers.headers(state.headers, HeaderActions.createDeserializeHeaders(
+        metaReducers.headers(state.headers, HeaderActions.createDeserializeHeaders(
           input['states'],
           input['headers'],
           input['backlog'] ? input['backlog'] : 0,
@@ -135,31 +128,31 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
 
       // These will always be present
       const assigneeState: AssigneeState =
-          reducers.assignees(state.assignees, AssigneeActions.createAddInitialAssignees(input['assignees']));
+        metaReducers.assignees(state.assignees, AssigneeActions.createAddInitialAssignees(input['assignees']));
       const priorityState: PriorityState =
-        reducers.priorities(state.priorities, PriorityActions.createDeserializePriorities(input['priorities']));
+        metaReducers.priorities(state.priorities, PriorityActions.createDeserializePriorities(input['priorities']));
       const issueTypeState: IssueTypeState =
-        reducers.issueTypes(state.issueTypes, IssueTypeActions.createDeserializeIssueTypes(input['issue-types']));
+        metaReducers.issueTypes(state.issueTypes, IssueTypeActions.createDeserializeIssueTypes(input['issue-types']));
 
       // These might not be there
       const componentState: ComponentState = input['components'] ?
-        reducers.components(state.components, ComponentActions.createDeserializeComponents(input['components']))
+        metaReducers.components(state.components, ComponentActions.createDeserializeComponents(input['components']))
         : initialComponentState;
       const labelState: LabelState = input['labels'] ?
-        reducers.labels(state.labels, LabelActions.createDeserializeLabels(input['labels']))
+        metaReducers.labels(state.labels, LabelActions.createDeserializeLabels(input['labels']))
         : initialLabelState;
       const fixVersionState: FixVersionState = input['fix-versions'] ?
-        reducers.fixVersions(state.fixVersions, FixVersionActions.createDeserializeFixVersions(input['fix-versions']))
+        metaReducers.fixVersions(state.fixVersions, FixVersionActions.createDeserializeFixVersions(input['fix-versions']))
         : initialFixVersionState;
       const customFieldState: CustomFieldState = input['custom'] ?
-        reducers.customFields(state.customFields, CustomFieldActions.createDeserializeCustomFields(input['custom']))
+        metaReducers.customFields(state.customFields, CustomFieldActions.createDeserializeCustomFields(input['custom']))
         : initialCustomFieldState;
 
       // This will always be present
       const projectState: ProjectState =
-        reducers.projects(state.projects, ProjectActions.createDeserializeProjects(input['projects']));
+        metaReducers.projects(state.projects, ProjectActions.createDeserializeProjects(input['projects']));
       const rankState: RankState =
-        reducers.ranks(state.ranks, RankActions.createDeserializeRanks(input['projects']['main']));
+        metaReducers.ranks(state.ranks, RankActions.createDeserializeRanks(input['projects']['main']));
 
       const lookupParams: DeserializeIssueLookupParams = new DeserializeIssueLookupParams()
         .setAssignees(assigneeState.assignees)
@@ -174,10 +167,10 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
         .setParallelTasks(projectState.parallelTasks);
 
       const issueState: IssueState =
-        reducers.issues(state.issues, IssueActions.createDeserializeIssuesAction(input['issues'], lookupParams));
+        metaReducers.issues(state.issues, IssueActions.createDeserializeIssuesAction(input['issues'], lookupParams));
 
       const blacklistState: BlacklistState =
-        reducers.blacklist(state.blacklist, BlacklistActions.createDeserializeBlacklist(input['blacklist']));
+        metaReducers.blacklist(state.blacklist, BlacklistActions.createDeserializeBlacklist(input['blacklist']));
 
       const newState: BoardState = {
         viewId: viewId,
@@ -203,25 +196,25 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
       const viewId: number = input['view'];
 
       const assigneeState: AssigneeState = input['assignees'] ?
-        reducers.assignees(state.assignees, AssigneeActions.createAddAssignees(input['assignees']))
+        metaReducers.assignees(state.assignees, AssigneeActions.createAddAssignees(input['assignees']))
         : state.assignees;
       const componentState: ComponentState = input['components'] ?
-        reducers.components(state.components, ComponentActions.createAddComponents(input['components']))
+        metaReducers.components(state.components, ComponentActions.createAddComponents(input['components']))
         : state.components;
       const labelState: LabelState = input['labels'] ?
-        reducers.labels(state.labels, LabelActions.createAddLabels(input['labels']))
+        metaReducers.labels(state.labels, LabelActions.createAddLabels(input['labels']))
         : state.labels;
       const fixVersionState: FixVersionState = input['fix-versions'] ?
-        reducers.fixVersions(state.fixVersions, FixVersionActions.createAddFixVersions(input['fix-versions']))
+        metaReducers.fixVersions(state.fixVersions, FixVersionActions.createAddFixVersions(input['fix-versions']))
         : state.fixVersions;
       const customFieldState: CustomFieldState = input['custom'] ?
-        reducers.customFields(state.customFields, CustomFieldActions.createAddCustomFields(input['custom']))
+        metaReducers.customFields(state.customFields, CustomFieldActions.createAddCustomFields(input['custom']))
         : state.customFields;
 
       const deletedIssues = getDeletedIssuesForChange(input);
       let rankState: RankState;
         rankState = (input['rank'] || deletedIssues) ?
-          reducers.ranks(state.ranks, RankActions.createRerank(input['rank'], deletedIssues))
+          metaReducers.ranks(state.ranks, RankActions.createRerank(input['rank'], deletedIssues))
           : rankState = state.ranks;
 
       const lookupParams: DeserializeIssueLookupParams = new DeserializeIssueLookupParams()
@@ -237,11 +230,11 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
         .setParallelTasks(state.projects.parallelTasks);
 
       const issueState: IssueState = input['issues'] ?
-        reducers.issues(state.issues, IssueActions.createChangeIssuesAction(input['issues'], lookupParams))
+        metaReducers.issues(state.issues, IssueActions.createChangeIssuesAction(input['issues'], lookupParams))
         : state.issues;
 
       const blacklistState: BlacklistState = input['blacklist'] ?
-        reducers.blacklist(state.blacklist, BlacklistActions.createChangeBlacklist(input['blacklist']))
+        metaReducers.blacklist(state.blacklist, BlacklistActions.createChangeBlacklist(input['blacklist']))
         : state.blacklist;
 
       const newState: BoardState = {
