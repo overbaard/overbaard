@@ -64,15 +64,18 @@ export class BoardComponent implements OnInit {
   ngOnInit() {
     // TODO use backlog from querystring (store in the state)
     // TODO turn on/off progress indicator and log errors
-    this._boardService.loadBoardData(this.boardCode, false)
+    this._boardService.loadBoardData(this.boardCode, true)
       .subscribe(
         value => {
-          console.log(value);
           this._store.dispatch(BoardActions.createDeserializeBoard(value));
         }
       );
 
-    this.boardState$ = this._store.select('board');
+    this._store.subscribe(
+      value => {
+        this.boardState$ = this._store.select('board');
+      }
+    );
   }
 
   onFocus($event: Event) {

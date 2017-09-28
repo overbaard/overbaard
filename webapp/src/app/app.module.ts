@@ -15,6 +15,7 @@ import {HttpClientModule} from '@angular/common/http';
 import {AppHeaderService} from './services/app-header.service';
 import { KanbanViewComponent } from './components/board/view/kanban-view/kanban-view.component';
 import { RankViewComponent } from './components/board/view/rank-view/rank-view.component';
+import { KanbanViewHeadersComponent } from './components/board/view/kanban-view/kanban-view-headers/kanban-view-headers.component';
 
 
 @NgModule({
@@ -23,7 +24,8 @@ import { RankViewComponent } from './components/board/view/rank-view/rank-view.c
     BoardsComponent,
     BoardComponent,
     KanbanViewComponent,
-    RankViewComponent
+    RankViewComponent,
+    KanbanViewHeadersComponent
   ],
   imports: [
     BrowserModule,

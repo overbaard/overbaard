@@ -24,6 +24,8 @@ import {BlacklistState, initialBlacklistState} from './blacklist/blacklist.model
 import {BlacklistActions, blacklistReducer} from './blacklist/blacklist.reducer';
 import {initialRankState, RankState} from './rank/rank.model';
 import {RankActions, rankReducer} from './rank/rank.reducer';
+import {initialIssueTableState, IssueTableState} from './calculated/issue-table/issue-table.model';
+import {IssueTableActions, issueTableReducer} from './calculated/issue-table/issue-table.reducer';
 
 export interface BoardState {
   viewId: number;
@@ -40,6 +42,7 @@ export interface BoardState {
   ranks: RankState;
   issues: IssueState;
   blacklist: BlacklistState;
+  issueTable: IssueTableState;
 }
 
 
@@ -57,7 +60,8 @@ export const initialBoardState: BoardState = {
   projects: initialProjectState,
   ranks: initialRankState,
   issues: initialIssueState,
-  blacklist: initialBlacklistState
+  blacklist: initialBlacklistState,
+  issueTable: initialIssueTableState
 };
 
 const metaReducers = {
@@ -72,7 +76,8 @@ const metaReducers = {
   projects: projectReducer,
   ranks: rankReducer,
   issues: issueReducer,
-  blacklist: blacklistReducer
+  blacklist: blacklistReducer,
+  issueTable: issueTableReducer
 };
 
 const DESERIALIZE_BOARD = 'DESERIALIZE_BOARD';
@@ -119,7 +124,7 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
         return state;
       }
       const rankCustomFieldId = input['rank-custom-field-id'];
-      const headers =
+      const headerState: HeaderState =
         metaReducers.headers(state.headers, HeaderActions.createDeserializeHeaders(
           input['states'],
           input['headers'],
@@ -163,7 +168,7 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
         .setFixVersions(fixVersionState.versions)
         .setCustomFields(customFieldState.fields)
         .setBoardProjects(projectState.boardProjects)
-        .setBoardStates(headers.states)
+        .setBoardStates(headerState.states)
         .setParallelTasks(projectState.parallelTasks);
 
       const issueState: IssueState =
@@ -172,10 +177,16 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
       const blacklistState: BlacklistState =
         metaReducers.blacklist(state.blacklist, BlacklistActions.createDeserializeBlacklist(input['blacklist']));
 
+      const issueTableState: IssueTableState =
+        metaReducers.issueTable(
+          state.issueTable,
+          IssueTableActions.createCreateIssueTable(headerState, issueState, projectState, rankState));
+
+
       const newState: BoardState = {
         viewId: viewId,
         rankCustomFieldId: rankCustomFieldId,
-        headers: headers,
+        headers: headerState,
         assignees: assigneeState,
         issueTypes: issueTypeState,
         priorities: priorityState,
@@ -186,7 +197,9 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
         projects: projectState,
         issues: issueState,
         ranks: rankState,
-        blacklist: blacklistState
+        blacklist: blacklistState,
+        issueTable: issueTableState
+
       };
 
       return newState;
@@ -237,6 +250,11 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
         metaReducers.blacklist(state.blacklist, BlacklistActions.createChangeBlacklist(input['blacklist']))
         : state.blacklist;
 
+      const issueTableState: IssueTableState =
+        metaReducers.issueTable(
+          state.issueTable,
+          IssueTableActions.createUpdateIssueTable(state.headers, issueState, state.projects, rankState));
+
       const newState: BoardState = {
         viewId: viewId,
         rankCustomFieldId: state.rankCustomFieldId,
@@ -251,7 +269,8 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
         projects: state.projects,
         issues: issueState,
         ranks: rankState,
-        blacklist: blacklistState
+        blacklist: blacklistState,
+        issueTable: issueTableState
       };
 
       return newState;

@@ -1,5 +1,24 @@
 /* You can add global styles to this file, and also import other style files */
 $toolbar-height: 30px;
+body {
+  margin:0;
+  padding:0;
+  font-family: 'Open Sans', Verdana, Arial, sans-serif;
+}
+
+/* Global link settings */
+a:link {
+  text-decoration: none;
+}
+a:visited {
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+a:active {
+  text-decoration: underline;
+}
 
 
 

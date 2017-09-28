@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { KanbanViewComponent } from './kanban-view.component';
+import {KanbanViewComponent} from './kanban-view.component';
+import {KanbanViewHeadersComponent} from './kanban-view-headers/kanban-view-headers.component';
 
 describe('KanbanViewComponent', () => {
   let component: KanbanViewComponent;
@@ -8,7 +8,7 @@ describe('KanbanViewComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ KanbanViewComponent ]
+      declarations: [ KanbanViewComponent, KanbanViewHeadersComponent ]
     })
     .compileComponents();
   }));

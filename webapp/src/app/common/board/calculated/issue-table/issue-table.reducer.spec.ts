@@ -244,7 +244,7 @@ describe('Issue Table reducer tests', () => {
   });
 });
 
-function checkTable(table: List<List<BoardIssue>>, expected: string[][]) {
+export function checkTable(table: List<List<BoardIssue>>, expected: string[][]) {
   const actualTable: string[][] = [];
   table.forEach((v, i) => {
     actualTable.push(table.get(i).map(issue => issue.key).toArray());

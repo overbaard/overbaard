@@ -9,6 +9,7 @@ import {reducer} from '../../app-store';
 import {StoreModule} from '@ngrx/store';
 import {RankViewComponent} from './view/rank-view/rank-view.component';
 import {KanbanViewComponent} from './view/kanban-view/kanban-view.component';
+import {KanbanViewHeadersComponent} from './view/kanban-view/kanban-view-headers/kanban-view-headers.component';
 
 describe('BoardComponent', () => {
   let component: BoardComponent;
@@ -20,6 +21,7 @@ describe('BoardComponent', () => {
       declarations: [
         BoardComponent,
         KanbanViewComponent,
+        KanbanViewHeadersComponent,
         RankViewComponent ],
       providers: [AppHeaderService, RestUrlService]
     })

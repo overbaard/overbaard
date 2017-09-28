@@ -1,6 +1,4 @@
-import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
-import {BoardState} from '../../../../common/board/board.reducer';
+import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {FixedHeaderView} from '../fixed-header-view';
 
 @Component({
@@ -11,14 +9,15 @@ import {FixedHeaderView} from '../fixed-header-view';
 })
 export class KanbanViewComponent extends FixedHeaderView implements OnInit {
 
-
   constructor() {
     super();
   }
 
   ngOnInit() {
-    console.log('---> have boardState ' + this.boardState$);
-    console.log(`---> width ${this.windowWidth} ${this.windowHeight}`);
   }
 
+  get boardBodyHeight() {
+    // TODO calculate properly taking into account the sizes of the toolbar and the headers, which may be one or two rows
+    return this.windowHeight - 150;
+  }
 }

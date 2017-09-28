@@ -1,3 +1,31 @@
-<p>
-  kanban-view works!
-</p>
+<div id="board-outer">
+  <div id="board-inner">
+
+    <app-kanban-view-headers
+      [headerState]="headers"
+      [boardLeftOffset]="boardLeftOffset">
+    </app-kanban-view-headers>
+    <div id="table-body"
+         [style.height]="boardBodyHeight+'px'"
+         (scroll)="scrollTableBodyX($event)">
+      <table id="body-table" class="board">
+        <tr>
+          <td *ngFor="let issuesForState of issueTable" class="cell visible">
+            <ul>
+              <li>One</li>
+              <li>Two</li>
+              <li>Three</li>
+              <li>Four</li>
+              <li>Five</li>
+              <li>One</li>
+              <li>Two</li>
+              <li>Three</li>
+              <li>Four</li>
+              <li>Five</li>
+            </ul>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>

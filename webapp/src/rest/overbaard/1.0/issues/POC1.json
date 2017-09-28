@@ -1,5 +1,5 @@
 {
-  "view" : 0,
+  "view" : 11,
   "rank-custom-field-id" : 12311940,
   "states" : [
     {"name": "Backlog Pool"},
@@ -91,7 +91,7 @@
 
   ],
   "projects" : {
-    "owner" : "EAPDS",
+    "owner" : "FEAT",
     "main" : {
       "FEAT" : {
         "colour" : "#4667CA",

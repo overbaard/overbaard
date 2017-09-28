@@ -1,0 +1,27 @@
+@import "../../../../../styles";
+@import "../../board.component";
+
+#board-outer {
+  background-color: #fff;
+  position: absolute;
+  top: $toolbar-height;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+}
+#board-inner {
+  height: 100%;
+  overflow: hidden;
+}
+/* Board body */
+#table-body {
+  overflow: auto;
+  height: 100px; /** This will get calculated and set by the component code */
+}
+#body-table table, td{
+  font-weight: normal;
+  table-layout: fixed;
+  vertical-align: top;
+  text-align: left;
+}
+

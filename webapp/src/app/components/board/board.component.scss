@@ -1,0 +1,11 @@
+table.board {
+  border-collapse: collapse;
+  border: 1px black solid;
+}
+td.cell {
+  border: 1px black solid;
+}
+td.visible {
+  min-width: 200px;
+  max-width: 200px;
+}

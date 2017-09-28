@@ -1,0 +1,9 @@
+<div id="table-header" [ngStyle]="{left:boardLeftOffset+'px'}">
+  <table class="board">
+    <tr *ngFor="let row of headerState.headers">
+      <td *ngFor="let header of row" class="cell visible header" [attr.colspan]="header.cols" [attr.rowspan]="header.rows">
+        {{header.name}}
+      </td>
+    </tr>
+  </table>
+</div>

@@ -19,6 +19,7 @@ import {RankState} from './rank/rank.model';
 import {getTestAssigneesInput} from './assignee/assignee.reducer.spec';
 import {getTestFixVersionsInput} from './fix-version/fix-version.reducer.spec';
 import {IssueChecker} from './issue/issue.model.spec';
+import {checkTable} from './calculated/issue-table/issue-table.reducer.spec';
 
 export function getTestBoardsInput(): any {
   return cloneObject(
@@ -180,6 +181,8 @@ describe('Board reducer tests', () => {
       expect(blacklist.priorities.size).toBe(2);
       expect(blacklist.issueTypes.size).toBe(2);
       expect(blacklist.issues.size).toBe(2);
+
+      checkTable(boardState.issueTable.table, [[], ['P1-1', 'P1-2'], [], []])
     });
 
     it('Minimum', () => {
@@ -386,6 +389,9 @@ describe('Board reducer tests', () => {
       expect(blacklist.priorities.size).toBe(2);
       expect(blacklist.issueTypes.size).toBe(2);
       expect(blacklist.issues.size).toBe(2);
+
+
+      checkTable(newState.issueTable.table, [['P1-3'], ['P1-1', 'P1-4'], [], []])
     });
 
     it ('Issues added to the blacklist are removed from rank', () => {
@@ -411,6 +417,8 @@ describe('Board reducer tests', () => {
       expect(blacklist.issueTypes.size).toBe(2);
       expect(blacklist.issues.size).toBe(3);
       expect(blacklist.issues).toContain('P1-2');
+
+      checkTable(newState.issueTable.table, [[], ['P1-1'], [], []])
     });
 
     it ('Issues removed from the blacklist are removed from rank', () => {
@@ -439,6 +447,8 @@ describe('Board reducer tests', () => {
       expect(blacklist.issueTypes.size).toBe(2);
       expect(blacklist.issues.size).toBe(1);
       expect(blacklist.issues).toContain('BAD-1');
+
+      checkTable(newState.issueTable.table, [[], ['P1-2'], [], []])
     });
 
     function checkSameStateEntries(originalState: BoardState, currentState: BoardState, ...included: string[]) {
