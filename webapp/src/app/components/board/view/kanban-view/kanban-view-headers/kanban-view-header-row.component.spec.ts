@@ -1,6 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { KanbanViewHeaderRowComponent } from './kanban-view-header-row.component';
+import {KanbanViewComponent} from '../kanban-view.component';
+import {KanbanViewHeaderComponent} from './kanban-view-header.component';
 
 describe('KanbanViewHeaderRowComponent', () => {
   let component: KanbanViewHeaderRowComponent;
@@ -8,7 +10,9 @@ describe('KanbanViewHeaderRowComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ KanbanViewHeaderRowComponent ]
+      declarations: [
+        KanbanViewHeaderRowComponent,
+        KanbanViewHeaderComponent]
     })
     .compileComponents();
   }));

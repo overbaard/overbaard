@@ -10,6 +10,8 @@ import {StoreModule} from '@ngrx/store';
 import {RankViewComponent} from './view/rank-view/rank-view.component';
 import {KanbanViewComponent} from './view/kanban-view/kanban-view.component';
 import {KanbanViewHeadersComponent} from './view/kanban-view/kanban-view-headers/kanban-view-headers.component';
+import {KanbanViewHeaderRowComponent} from './view/kanban-view/kanban-view-headers/kanban-view-header-row.component';
+import {KanbanViewHeaderComponent} from './view/kanban-view/kanban-view-headers/kanban-view-header.component';
 
 describe('BoardComponent', () => {
   let component: BoardComponent;
@@ -22,6 +24,8 @@ describe('BoardComponent', () => {
         BoardComponent,
         KanbanViewComponent,
         KanbanViewHeadersComponent,
+        KanbanViewHeaderRowComponent,
+        KanbanViewHeaderComponent,
         RankViewComponent ],
       providers: [AppHeaderService, RestUrlService]
     })
