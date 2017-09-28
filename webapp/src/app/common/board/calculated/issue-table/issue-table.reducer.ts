@@ -2,7 +2,7 @@ import {Action} from '@ngrx/store';
 import {BoardProject, ProjectState, ProjectUtil} from '../../project/project.model';
 import {BoardIssue, IssueState} from '../../issue/issue.model';
 import {initialIssueTableState, IssueTableState, IssueTableUtil} from './issue-table.model';
-import {HeaderState} from '../../header/header.model';
+import {HeaderState} from '../../header/header.state';
 import {List} from 'immutable';
 import {RankState} from '../../rank/rank.model';
 

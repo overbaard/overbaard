@@ -5,8 +5,9 @@ import {AppHeaderService} from '../../services/app-header.service';
 import {BoardService} from '../../services/board.service';
 import {Store} from '@ngrx/store';
 import {AppState} from '../../app-store';
-import {BoardActions, BoardState} from '../../common/board/board.reducer';
+import {BoardActions} from '../../common/board/board.reducer';
 import {Observable} from 'rxjs/Observable';
+import {BoardState} from '../../common/board/board.state';
 
 const VIEW_KANBAN = 'kbv';
 export const VIEW_RANK = 'rv';

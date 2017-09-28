@@ -16,6 +16,8 @@ import {AppHeaderService} from './services/app-header.service';
 import { KanbanViewComponent } from './components/board/view/kanban-view/kanban-view.component';
 import { RankViewComponent } from './components/board/view/rank-view/rank-view.component';
 import { KanbanViewHeadersComponent } from './components/board/view/kanban-view/kanban-view-headers/kanban-view-headers.component';
+import { KanbanViewHeaderRowComponent } from './components/board/view/kanban-view/kanban-view-headers/kanban-view-header-row.component';
+import { KanbanViewHeaderComponent } from './components/board/view/kanban-view/kanban-view-headers/kanban-view-header.component';
 
 
 @NgModule({
@@ -25,7 +27,9 @@ import { KanbanViewHeadersComponent } from './components/board/view/kanban-view/
     BoardComponent,
     KanbanViewComponent,
     RankViewComponent,
-    KanbanViewHeadersComponent
+    KanbanViewHeadersComponent,
+    KanbanViewHeaderRowComponent,
+    KanbanViewHeaderComponent
   ],
   imports: [
     BrowserModule,

@@ -1,5 +1,5 @@
 import {cloneObject} from '../utils/test-util.spec';
-import {BoardActions, boardReducer, BoardState, initialBoardState} from './board.reducer';
+import {BoardActions, boardReducer, initialBoardState} from './board.reducer';
 import {getTestComponentsInput} from './component/component.reducer.spec';
 import {getTestPrioritiesInput} from './priority/priority.reducer.spec';
 import {getTestIssueTypesInput} from './issue-type/issue-type.reducer.spec';
@@ -20,6 +20,7 @@ import {getTestAssigneesInput} from './assignee/assignee.reducer.spec';
 import {getTestFixVersionsInput} from './fix-version/fix-version.reducer.spec';
 import {IssueChecker} from './issue/issue.model.spec';
 import {checkTable} from './calculated/issue-table/issue-table.reducer.spec';
+import {BoardState} from './board.state';
 
 export function getTestBoardsInput(): any {
   return cloneObject(

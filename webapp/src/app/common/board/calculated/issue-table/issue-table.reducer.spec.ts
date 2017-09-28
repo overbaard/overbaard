@@ -1,4 +1,4 @@
-import {HeaderState, initialHeaderState} from '../../header/header.model';
+import {initialHeaderState} from '../../header/header.model';
 import {HeaderActions, headerReducer} from '../../header/header.reducer';
 import {BoardIssue, DeserializeIssueLookupParams, initialIssueState, IssueState} from '../../issue/issue.model';
 import {List, Map, OrderedSet} from 'immutable';
@@ -12,6 +12,7 @@ import {getTestPriorityState} from '../../priority/priority.reducer.spec';
 import {getTestIssueTypeState} from '../../issue-type/issue-type.reducer.spec';
 import {getTestAssigneeState} from '../../assignee/assignee.reducer.spec';
 import {RankActions, rankReducer} from '../../rank/rank.reducer';
+import {HeaderState} from '../../header/header.state';
 
 describe('Issue Table reducer tests', () => {
 

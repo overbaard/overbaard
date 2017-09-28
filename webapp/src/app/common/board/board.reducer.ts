@@ -1,4 +1,4 @@
-import {Action, ActionReducer, combineReducers} from '@ngrx/store';
+import {Action} from '@ngrx/store';
 import {AppState} from '../../app-store';
 import {IssueTypeActions, issueTypeReducer} from './issue-type/issue-type.reducer';
 import {IssueActions, issueReducer} from './issue/issue.reducer';
@@ -7,7 +7,7 @@ import {PriorityActions, priorityReducer} from './priority/priority.reducer';
 import {HeaderActions, headerReducer} from './header/header.reducer';
 import {ProjectActions, projectReducer} from './project/project.reducer';
 import {AssigneeState, initialAssigneeState} from './assignee/assignee.model';
-import {HeaderState, initialHeaderState} from './header/header.model';
+import {initialHeaderState} from './header/header.model';
 import {DeserializeIssueLookupParams, initialIssueState, IssueState} from './issue/issue.model';
 import {initialIssueTypeState, IssueTypeState} from './issue-type/issue-type.model';
 import {initialPriorityState, PriorityState} from './priority/priority.model';
@@ -26,24 +26,8 @@ import {initialRankState, RankState} from './rank/rank.model';
 import {RankActions, rankReducer} from './rank/rank.reducer';
 import {initialIssueTableState, IssueTableState} from './calculated/issue-table/issue-table.model';
 import {IssueTableActions, issueTableReducer} from './calculated/issue-table/issue-table.reducer';
-
-export interface BoardState {
-  viewId: number;
-  rankCustomFieldId: number;
-  headers: HeaderState;
-  assignees: AssigneeState;
-  issueTypes: IssueTypeState;
-  priorities: PriorityState;
-  components: ComponentState;
-  labels: LabelState;
-  fixVersions: FixVersionState;
-  customFields: CustomFieldState;
-  projects: ProjectState;
-  ranks: RankState;
-  issues: IssueState;
-  blacklist: BlacklistState;
-  issueTable: IssueTableState;
-}
+import {HeaderState} from './header/header.state';
+import {BoardState} from './board.state';
 
 
 export const initialBoardState: BoardState = {

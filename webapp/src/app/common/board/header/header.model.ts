@@ -1,10 +1,6 @@
 import {List} from 'immutable';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
-
-export interface HeaderState {
-  headers: List<List<Header>>;
-  states: List<string>;
-}
+import {HeaderState} from './header.state';
 
 export interface Header {
   name: string;
