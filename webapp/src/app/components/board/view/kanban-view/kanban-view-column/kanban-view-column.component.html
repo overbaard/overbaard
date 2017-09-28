@@ -1,6 +1,6 @@
 <ul class="issues-list">
-  <li>
-    <app-board-issue *ngFor="let issue of issues">
-    </app-board-issue>
-  </li>
+  <app-board-issue
+    *ngFor="let issue of issues"
+    [issue]="issue">
+  </app-board-issue>
 </ul>

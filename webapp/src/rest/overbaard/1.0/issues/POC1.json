@@ -55,10 +55,6 @@
       "icon" : "/images/icons/priorities/minor.png"
     },
     {
-      "name" : "Optional",
-      "icon" : "/images/icons/priorities/minor.png"
-    },
-    {
       "name" : "Trivial",
       "icon" : "/images/icons/priorities/trivial.png"
     }
@@ -79,16 +75,7 @@
     {
       "name" : "Epic",
       "icon" : "/images/icons/issuetypes/epic.png"
-    },
-    {
-      "name" : "Empty",
-      "icon" : "/images/icons/issuetypes/epic.png"
-    },
-    {
-      "name" : "Empty2",
-      "icon" : "/images/icons/issuetypes/epic.png"
     }
-
   ],
   "projects" : {
     "owner" : "FEAT",
@@ -116,7 +103,7 @@
           "verified" : "Verified",
           "Done" : "Done"
         },
-        "ranked": []
+        "ranked": ["FEAT-1"]
       },
       "BUG" : {
         "colour" : "#CA6746",
@@ -136,7 +123,26 @@
     }
   },
   "issues" : {
-
+    "FEAT-1" : {
+      "key": "FEAT-1",
+      "state": 4,
+      "summary": "Issue number 1",
+      "priority": 0,
+      "type": 3,
+      "components": [
+        0,
+        1
+      ],
+      "fix-versions": [
+        0,
+        1
+      ],
+      "labels": [
+        0,
+        1
+      ],
+      "assignee": 1
+    }
   },
   "blacklist" : {
     "states": [

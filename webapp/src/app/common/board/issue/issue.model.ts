@@ -5,6 +5,7 @@ import {IssueType} from '../issue-type/issue-type.model';
 import {fromJS, List, Map, OrderedMap} from 'immutable';
 import {CustomField} from '../custom-field/custom-field.model';
 import {BoardProject, ParallelTask} from '../project/project.model';
+import {cloneObject} from '../../utils/test-util.spec';
 
 export interface IssueState {
   issues: Map<string, BoardIssue>;
@@ -229,6 +230,8 @@ export class DeserializeIssueLookupParams {
 export class IssueUtil {
 
   static fromJS(input: any, params: DeserializeIssueLookupParams): BoardIssue {
+    // Clone this since we are modifying it heavily, and the data received from the server has been frozen
+    input = cloneObject(input);
     const projectKey: string = IssueUtil.productCodeFromKey(input['key']);
 
     // Rework the data as needed before deserializing
