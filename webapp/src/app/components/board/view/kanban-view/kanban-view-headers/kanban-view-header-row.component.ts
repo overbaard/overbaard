@@ -7,6 +7,7 @@ import {List} from 'immutable';
  * https://stackoverflow.com/questions/34556277/angular2-table-rows-as-component for why this is needed to use this
  * in a table.
  */
+/* tslint:disable:component-selector */
 @Component({
   selector: '[app-kanban-view-header-row]',
   templateUrl: './kanban-view-header-row.component.html',

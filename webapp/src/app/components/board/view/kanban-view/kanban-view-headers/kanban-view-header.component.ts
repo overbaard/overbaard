@@ -6,6 +6,7 @@ import {Header} from '../../../../../common/board/header/header';
  * https://stackoverflow.com/questions/34556277/angular2-table-rows-as-component for why this is needed to use this
  * in a table.
  */
+/* tslint:disable:component-selector */
 @Component({
   selector: '[app-kanban-view-header]',
   templateUrl: './kanban-view-header.component.html',

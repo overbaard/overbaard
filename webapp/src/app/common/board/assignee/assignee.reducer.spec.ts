@@ -45,7 +45,7 @@ describe('Assignee reducer tests', () => {
     });
 
     it ('Same', () => {
-      const newState : AssigneeState =
+      const newState: AssigneeState =
         assigneeReducer(assigneeState, AssigneeActions.createAddInitialAssignees(getTestAssigneesInput()));
       expect(newState).toBe(assigneeState);
     });
