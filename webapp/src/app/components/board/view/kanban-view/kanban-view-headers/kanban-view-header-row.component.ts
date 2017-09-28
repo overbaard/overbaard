@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {Header} from '../../../../../common/board/header/header.model';
+import {Header} from '../../../../../common/board/header/header';
 import {List} from 'immutable';
 
 /**

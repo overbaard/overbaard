@@ -1,16 +1,7 @@
 import {List} from 'immutable';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {HeaderState} from './header.state';
-
-export interface Header {
-  name: string;
-  abbreviated: string;
-  rows: number;
-  cols: number;
-  wip: number;
-  backlog: boolean;
-  states: List<number>;
-}
+import {Header} from './header';
 
 const DEFAULT_STATE: HeaderState = {
   headers: List<List<Header>>(),

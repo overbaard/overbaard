@@ -14,7 +14,7 @@ import {CustomField} from './custom-field/custom-field.model';
 import {BoardProject, ProjectState} from './project/project.model';
 import {BoardIssue} from './issue/issue.model';
 import {BlacklistState} from './blacklist/blacklist.model';
-import {Header} from './header/header.model';
+import {Header} from './header/header';
 import {RankState} from './rank/rank.model';
 import {getTestAssigneesInput} from './assignee/assignee.reducer.spec';
 import {getTestFixVersionsInput} from './fix-version/fix-version.reducer.spec';

@@ -1,8 +1,9 @@
 import {List} from 'immutable';
-import {Header, HeaderUtil, initialHeaderState} from './header.model';
+import {HeaderUtil, initialHeaderState} from './header.model';
 import {Action} from '@ngrx/store';
 import {Dictionary} from '../../utils/dictionary';
 import {HeaderState} from './header.state';
+import {Header} from './header';
 
 const DESERIALIZE_PRIORITIES = 'DESERIALIZE_HEADERS';
 
