@@ -12,6 +12,8 @@ import {KanbanViewComponent} from './view/kanban-view/kanban-view.component';
 import {KanbanViewHeadersComponent} from './view/kanban-view/kanban-view-headers/kanban-view-headers.component';
 import {KanbanViewHeaderRowComponent} from './view/kanban-view/kanban-view-headers/kanban-view-header-row.component';
 import {KanbanViewHeaderComponent} from './view/kanban-view/kanban-view-headers/kanban-view-header.component';
+import {BoardIssueComponent} from './issue/board-issue.component';
+import {KanbanViewColumnComponent} from './view/kanban-view/kanban-view-column/kanban-view-column.component';
 
 describe('BoardComponent', () => {
   let component: BoardComponent;
@@ -22,7 +24,9 @@ describe('BoardComponent', () => {
       imports: [RouterTestingModule, HttpClientTestingModule, StoreModule.provideStore(reducer)],
       declarations: [
         BoardComponent,
+        BoardIssueComponent,
         KanbanViewComponent,
+        KanbanViewColumnComponent,
         KanbanViewHeadersComponent,
         KanbanViewHeaderRowComponent,
         KanbanViewHeaderComponent,

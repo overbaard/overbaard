@@ -10,19 +10,10 @@
          (scroll)="scrollTableBodyX($event)">
       <table id="body-table" class="board">
         <tr>
-          <td *ngFor="let issuesForState of issueTable" class="cell visible">
-            <ul>
-              <li>One</li>
-              <li>Two</li>
-              <li>Three</li>
-              <li>Four</li>
-              <li>Five</li>
-              <li>One</li>
-              <li>Two</li>
-              <li>Three</li>
-              <li>Four</li>
-              <li>Five</li>
-            </ul>
+          <td app-kanban-view-column
+              class="cell visible"
+              *ngFor="let issuesForState of issueTable"
+              [issues]="issuesForState">
           </td>
         </tr>
       </table>

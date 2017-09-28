@@ -18,6 +18,8 @@ import { RankViewComponent } from './components/board/view/rank-view/rank-view.c
 import { KanbanViewHeadersComponent } from './components/board/view/kanban-view/kanban-view-headers/kanban-view-headers.component';
 import { KanbanViewHeaderRowComponent } from './components/board/view/kanban-view/kanban-view-headers/kanban-view-header-row.component';
 import { KanbanViewHeaderComponent } from './components/board/view/kanban-view/kanban-view-headers/kanban-view-header.component';
+import { KanbanViewColumnComponent } from './components/board/view/kanban-view/kanban-view-column/kanban-view-column.component';
+import { BoardIssueComponent } from './components/board/issue/board-issue.component';
 
 
 @NgModule({
@@ -29,7 +31,9 @@ import { KanbanViewHeaderComponent } from './components/board/view/kanban-view/k
     RankViewComponent,
     KanbanViewHeadersComponent,
     KanbanViewHeaderRowComponent,
-    KanbanViewHeaderComponent
+    KanbanViewHeaderComponent,
+    KanbanViewColumnComponent,
+    BoardIssueComponent
   ],
   imports: [
     BrowserModule,

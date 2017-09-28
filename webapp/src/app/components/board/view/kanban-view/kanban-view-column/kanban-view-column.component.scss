@@ -1,0 +1,9 @@
+@import "../kanban-view.component";
+
+ul.issues-list {
+  margin: 0px;
+  padding: 0px;
+  list-style: none;
+  display: block;
+  width: 192px;
+}
