@@ -20,7 +20,8 @@ import {getTestAssigneesInput} from './assignee/assignee.reducer.spec';
 import {getTestFixVersionsInput} from './fix-version/fix-version.reducer.spec';
 import {IssueChecker} from './issue/issue.model.spec';
 import {checkTable} from './calculated/issue-table/issue-table.reducer.spec';
-import {BoardState} from './board.state';
+import {BoardState} from './board';
+import {BoardUtil} from './board.model';
 
 export function getTestBoardsInput(): any {
   return cloneObject(
@@ -453,7 +454,7 @@ describe('Board reducer tests', () => {
     });
 
     function checkSameStateEntries(originalState: BoardState, currentState: BoardState, ...included: string[]) {
-      for (const key of Object.keys(originalState)) {
+      for (const key of BoardUtil.toStateRecord(originalState).keySeq().toArray()) {
         if (key === 'viewId') {
           continue;
         }
@@ -461,7 +462,6 @@ describe('Board reducer tests', () => {
           expect(currentState[key]).toEqual(originalState[key]);
           continue;
         }
-
         if (included.length === 0 || included.indexOf(key) >= 0) {
           expect(currentState[key]).toBe(originalState[key]);
         } else {

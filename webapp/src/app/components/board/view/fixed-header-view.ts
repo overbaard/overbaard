@@ -1,7 +1,7 @@
 /**
  * Abstract base class for a board containing a fixed header.
  */
-import {BoardState} from '../../../common/board/board.state';
+import {BoardState} from '../../../common/board/board';
 import {Input} from '@angular/core';
 import {List} from 'immutable';
 import {HeaderState} from '../../../common/board/header/header.state';

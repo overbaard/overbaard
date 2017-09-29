@@ -7,7 +7,7 @@ import {Store} from '@ngrx/store';
 import {AppState} from '../../app-store';
 import {BoardActions} from '../../common/board/board.reducer';
 import {Observable} from 'rxjs/Observable';
-import {BoardState} from '../../common/board/board.state';
+import {BoardState} from '../../common/board/board';
 
 const VIEW_KANBAN = 'kbv';
 export const VIEW_RANK = 'rv';

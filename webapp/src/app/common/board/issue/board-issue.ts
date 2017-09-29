@@ -3,7 +3,7 @@ import {Priority} from '../priority/priority.model';
 import {IssueType} from '../issue-type/issue-type.model';
 import {List, Map} from 'immutable';
 import {CustomField} from '../custom-field/custom-field.model';
-import {Issue} from './issue.model';
+import {Issue} from './issue';
 
 export interface BoardIssue extends Issue {
   assignee: Assignee;

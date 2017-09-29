@@ -1,4 +1,4 @@
-import {DeserializeIssueLookupParams, Issue, IssueUtil} from './issue.model';
+import {DeserializeIssueLookupParams, IssueUtil} from './issue.model';
 import {Assignee, NO_ASSIGNEE} from '../assignee/assignee.model';
 import {Priority} from '../priority/priority.model';
 import {IssueType} from '../issue-type/issue-type.model';
@@ -17,6 +17,7 @@ import {getTestAssigneeState} from '../assignee/assignee.reducer.spec';
 import {getTestPriorityState} from '../priority/priority.reducer.spec';
 import {getTestIssueTypeState} from '../issue-type/issue-type.reducer.spec';
 import {BoardIssue} from './board-issue';
+import {Issue} from './issue';
 
 describe('Issue unit tests', () => {
 

@@ -27,7 +27,8 @@ import {RankActions, rankReducer} from './rank/rank.reducer';
 import {initialIssueTableState, IssueTableState} from './calculated/issue-table/issue-table.model';
 import {IssueTableActions, issueTableReducer} from './calculated/issue-table/issue-table.reducer';
 import {HeaderState} from './header/header.state';
-import {BoardState} from './board.state';
+import {BoardState} from './board';
+import {BoardUtil} from './board.model';
 
 
 export const initialBoardState: BoardState = {
@@ -186,7 +187,7 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
 
       };
 
-      return newState;
+      return BoardUtil.recordFromObject(newState);
     }
     case PROCESS_BOARD_CHANGES: {
       const input: any = action.payload;
@@ -257,7 +258,7 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
         issueTable: issueTableState
       };
 
-      return newState;
+      return BoardUtil.recordFromObject(newState);
     }
     default:
       return state;

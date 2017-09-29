@@ -7,16 +7,12 @@ import {CustomField} from '../custom-field/custom-field.model';
 import {BoardProject, ParallelTask} from '../project/project.model';
 import {cloneObject} from '../../utils/test-util.spec';
 import {BoardIssue} from './board-issue';
+import {Issue} from './issue';
 
 export interface IssueState {
   issues: Map<string, BoardIssue>;
 }
 
-
-export interface Issue {
-  key: string;
-  summary: string;
-}
 
 const DEFAULT_STATE: IssueState = {
   issues: Map<string, BoardIssue>()
