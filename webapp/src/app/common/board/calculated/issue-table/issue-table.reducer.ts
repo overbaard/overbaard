@@ -1,10 +1,11 @@
 import {Action} from '@ngrx/store';
 import {BoardProject, ProjectState, ProjectUtil} from '../../project/project.model';
-import {BoardIssue, IssueState} from '../../issue/issue.model';
+import {IssueState} from '../../issue/issue.model';
 import {initialIssueTableState, IssueTableState, IssueTableUtil} from './issue-table.model';
 import {HeaderState} from '../../header/header.state';
 import {List} from 'immutable';
 import {RankState} from '../../rank/rank.model';
+import {BoardIssue} from '../../issue/board-issue';
 
 
 const CREATE_ISSUE_TABLE = 'CREATE_ISSUE_TABLE';

@@ -12,7 +12,7 @@ import {Priority} from './priority/priority.model';
 import {IssueType} from './issue-type/issue-type.model';
 import {CustomField} from './custom-field/custom-field.model';
 import {BoardProject, ProjectState} from './project/project.model';
-import {BoardIssue} from './issue/issue.model';
+import {BoardIssue} from './issue/board-issue';
 import {BlacklistState} from './blacklist/blacklist.model';
 import {Header} from './header/header';
 import {RankState} from './rank/rank.model';

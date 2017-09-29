@@ -1,5 +1,5 @@
 import {IssueActions, issueReducer} from './issue.reducer';
-import {BoardIssue, DeserializeIssueLookupParams, initialIssueState, IssueState} from './issue.model';
+import {DeserializeIssueLookupParams, initialIssueState, IssueState} from './issue.model';
 import {async} from '@angular/core/testing';
 import {getTestAssigneeState} from '../assignee/assignee.reducer.spec';
 import {getTestIssueTypeState} from '../issue-type/issue-type.reducer.spec';
@@ -11,6 +11,7 @@ import {getTestComponentState} from '../component/component.reducer.spec';
 import {getTestLabelState} from '../label/label.reducer.spec';
 import {getTestFixVersionState} from '../fix-version/fix-version.reducer.spec';
 import {cloneObject} from '../../utils/test-util.spec';
+import {BoardIssue} from './board-issue';
 
 function getTestIssuesInput() {
   return cloneObject({

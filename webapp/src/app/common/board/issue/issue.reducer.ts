@@ -1,8 +1,9 @@
 import {AppState} from '../../../app-store';
 import {Action} from '@ngrx/store';
-import {BoardIssue, DeserializeIssueLookupParams, initialIssueState, IssueState, IssueUtil} from './issue.model';
+import {DeserializeIssueLookupParams, initialIssueState, IssueState, IssueUtil} from './issue.model';
 import {createSelector} from 'reselect';
 import {List, Map} from 'immutable';
+import {BoardIssue} from './board-issue';
 
 
 const DESERIALIZE_INITIAL_ISSUES = 'DESERIALIZE_INITIAL_ISSUES';

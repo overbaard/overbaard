@@ -5,7 +5,7 @@ import {BoardState} from '../../../common/board/board.state';
 import {Input} from '@angular/core';
 import {List} from 'immutable';
 import {HeaderState} from '../../../common/board/header/header.state';
-import {BoardIssue} from '../../../common/board/issue/issue.model';
+import {BoardIssue} from '../../../common/board/issue/board-issue';
 
 export class FixedHeaderView {
 

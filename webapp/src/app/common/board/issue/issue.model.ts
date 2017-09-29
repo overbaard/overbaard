@@ -6,6 +6,7 @@ import {fromJS, List, Map, OrderedMap} from 'immutable';
 import {CustomField} from '../custom-field/custom-field.model';
 import {BoardProject, ParallelTask} from '../project/project.model';
 import {cloneObject} from '../../utils/test-util.spec';
+import {BoardIssue} from './board-issue';
 
 export interface IssueState {
   issues: Map<string, BoardIssue>;
@@ -15,19 +16,6 @@ export interface IssueState {
 export interface Issue {
   key: string;
   summary: string;
-}
-
-export interface BoardIssue extends Issue {
-  assignee: Assignee;
-  priority: Priority;
-  type: IssueType;
-  components: List<string>;
-  labels: List<string>;
-  fixVersions: List<string>;
-  customFields: Map<string, CustomField>;
-  parallelTasks: List<string>;
-  linkedIssues: List<Issue>;
-  ownState: number;
 }
 
 const DEFAULT_STATE: IssueState = {

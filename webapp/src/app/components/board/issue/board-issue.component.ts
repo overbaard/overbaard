@@ -1,10 +1,11 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {BoardIssue} from '../../../common/board/issue/issue.model';
+import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
+import {BoardIssue} from '../../../common/board/issue/board-issue';
 
 @Component({
   selector: 'app-board-issue',
   templateUrl: './board-issue.component.html',
-  styleUrls: ['./board-issue.component.scss']
+  styleUrls: ['./board-issue.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BoardIssueComponent implements OnInit {
 

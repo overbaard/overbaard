@@ -1,5 +1,5 @@
 import {List} from 'immutable';
-import {BoardIssue} from '../../issue/issue.model';
+import {BoardIssue} from '../../issue/board-issue';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 
 export interface IssueTableState {

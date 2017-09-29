@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
 import {Header} from '../../../../../common/board/header/header';
 import {List} from 'immutable';
 
@@ -11,7 +11,8 @@ import {List} from 'immutable';
 @Component({
   selector: '[app-kanban-view-header-row]',
   templateUrl: './kanban-view-header-row.component.html',
-  styleUrls: ['./kanban-view-header-row.component.scss']
+  styleUrls: ['./kanban-view-header-row.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class KanbanViewHeaderRowComponent implements OnInit {
 
