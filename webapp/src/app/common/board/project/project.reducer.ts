@@ -7,7 +7,9 @@ import {
   ProjectState,
   ProjectUtil
 } from './project.model';
-import {List, Map} from 'immutable';
+import {List, Map, OrderedMap} from 'immutable';
+import {AppState} from '../../../app-store';
+import {createSelector} from 'reselect';
 
 const DESERIALIZE_PROJECTS = 'DESERIALIZE_PROJECTS';
 
@@ -21,7 +23,7 @@ class DeserializeProjectsAction implements Action {
 
 export class ProjectActions {
   static createDeserializeProjects(input: any): DeserializeProjectsAction {
-    const boardProjects: Map<string, BoardProject> = Map<string, BoardProject>().asMutable();
+    const boardProjects: OrderedMap<string, BoardProject> = OrderedMap<string, BoardProject>().asMutable();
     const linkedProjects: Map<string, LinkedProject> = Map<string, LinkedProject>().asMutable();
     const parallelTasks: Map<string, List<ParallelTask>> = Map<string, List<ParallelTask>>().asMutable();
 
@@ -77,3 +79,7 @@ export function projectReducer(state: ProjectState = initialProjectState, action
   }
   return state;
 }
+
+const getProjectState = (state: AppState): ProjectState => state.board.projects;
+const getBoardProjects = (state: ProjectState): OrderedMap<string, BoardProject> => state.boardProjects;
+export const boardProjectsSelector = createSelector(getProjectState, getBoardProjects);

@@ -286,8 +286,4 @@ function addAll(result: string[], input: any, ...keys: string[]) {
   (<string[]>current).forEach(v => result.push(v));
 }
 
-
-
-
 const getBoardState = (state: AppState) => state.board;
-

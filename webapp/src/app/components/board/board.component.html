@@ -13,3 +13,5 @@
     [windowHeight]="windowHeight">
   </app-rank-view>
 </div>
+<button id="temp-control-button" (click)="onToggleControlPanel($event)">*</button>
+<app-control-panel *ngIf="showControlPanel"></app-control-panel>

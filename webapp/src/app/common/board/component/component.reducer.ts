@@ -1,6 +1,8 @@
 import {Action} from '@ngrx/store';
 import {List} from 'immutable';
 import {ComponentState, ComponentUtil, initialComponentState} from './component.model';
+import {AppState} from '../../../app-store';
+import {createSelector} from 'reselect';
 
 
 const DESERIALIZE_ALL_COMPONENTS = 'DESERIALIZE_ALL_COMPONENTS';
@@ -64,3 +66,7 @@ export function componentReducer(state: ComponentState = initialComponentState, 
       return state;
   }
 };
+
+const getComponentsState = (state: AppState) => state.board.components;
+const getComponents = (state: ComponentState) => state.components;
+export const componentsSelector = createSelector(getComponentsState, getComponents);

@@ -1,10 +1,10 @@
-import {List, Map} from 'immutable';
+import {List, Map, OrderedMap} from 'immutable';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {HeaderState} from '../header/header.state';
 
 export interface ProjectState {
   owner: string;
-  boardProjects: Map<string, BoardProject>;
+  boardProjects: OrderedMap<string, BoardProject>;
   linkedProjects: Map<string, LinkedProject>;
   parallelTasks: Map<string, List<ParallelTask>>;
 }
@@ -31,7 +31,7 @@ export interface ParallelTask {
 
 const DEFAULT_STATE: ProjectState = {
   owner: null,
-  boardProjects: Map<string, BoardProject>(),
+  boardProjects: OrderedMap<string, BoardProject>(),
   linkedProjects: Map<string, LinkedProject>(),
   parallelTasks: Map<string, List<ParallelTask>>()
 };

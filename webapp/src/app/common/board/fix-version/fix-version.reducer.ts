@@ -1,6 +1,8 @@
 import {Action} from '@ngrx/store';
 import {List} from 'immutable';
 import {FixVersionState, FixVersionUtil, initialFixVersionState} from './fix-version.model';
+import {AppState} from '../../../app-store';
+import {createSelector} from 'reselect';
 
 
 const DESERIALIZE_ALL_FIX_VERSIONS = 'DESERIALIZE_ALL_FIX_VERSIONS';
@@ -62,3 +64,7 @@ export function fixVersionReducer(state: FixVersionState = initialFixVersionStat
       return state;
   }
 };
+
+const getFixVersionsState = (state: AppState) => state.board.fixVersions
+const getFixVersions = (state: FixVersionState) => state.versions;
+export const fixVersionsSelector = createSelector(getFixVersionsState, getFixVersions);

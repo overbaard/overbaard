@@ -9,3 +9,14 @@ td.visible {
   min-width: 200px;
   max-width: 200px;
 }
+
+#temp-control-button {
+  width: 30px;
+  height: 30px;
+  z-index: 10;
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  font-size: 25px;
+  padding: 3px;
+}

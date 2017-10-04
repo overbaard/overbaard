@@ -8,6 +8,13 @@ import {AppState} from '../../app-store';
 import {BoardActions} from '../../common/board/board.reducer';
 import {Observable} from 'rxjs/Observable';
 import {BoardState} from '../../common/board/board';
+import {Subscription} from 'rxjs/Subscription';
+import {BoardFilterActions} from '../../common/board/user/board-filter/board-filter.reducer';
+import 'rxjs/add/operator/skipWhile';
+import 'rxjs/add/operator/takeUntil';
+import {BoardFilterState} from '../../common/board/user/board-filter/board-filter.model';
+import {Subject} from 'rxjs/Subject';
+
 
 const VIEW_KANBAN = 'kbv';
 export const VIEW_RANK = 'rv';
@@ -30,15 +37,17 @@ export class BoardComponent implements OnInit {
   windowHeight: number;
   windowWidth: number;
 
+  showControlPanel = false;
+
   constructor(
-    route: ActivatedRoute,
+    private _route: ActivatedRoute,
     private _boardService: BoardService,
     private _appHeaderService: AppHeaderService,
     private _store: Store<AppState>) {
 
     this.setWindowSize();
 
-    const queryParams: Dictionary<string> = route.snapshot.queryParams;
+    const queryParams: Dictionary<string> = _route.snapshot.queryParams;
     const code: string = queryParams['board'];
     if (!code) {
       return;
@@ -65,18 +74,41 @@ export class BoardComponent implements OnInit {
   ngOnInit() {
     // TODO use backlog from querystring (store in the state)
     // TODO turn on/off progress indicator and log errors
+
+    const gotAllData$: Subject<boolean> = new Subject<boolean>();
+
     this._boardService.loadBoardData(this.boardCode, true)
+      .takeUntil(gotAllData$)
       .subscribe(
         value => {
+          // Deserialize the board
           this._store.dispatch(BoardActions.createDeserializeBoard(value));
         }
       );
 
-    this._store.subscribe(
-      value => {
-        this.boardState$ = this._store.select('board');
-      }
-    );
+    this._store.select<BoardState>('board')
+      .skipWhile(board => board.viewId < 0)
+      .takeUntil(gotAllData$)
+      .subscribe(
+        board => {
+          // Parse the filters once we have the board
+          this._store.dispatch(
+              BoardFilterActions.createInitialiseFromQueryString(this._route.snapshot.queryParams));
+        }
+      );
+
+    this._store.select<BoardFilterState>('filters')
+      .skipWhile(filters => !filters)
+      .takeUntil(gotAllData$)
+      .subscribe(filters => {
+        // Got the filters, emit the event to unsubscribe all takeUntil(gotAllData$)
+        gotAllData$.next(true);
+        // Unsubscribe from the subject itself
+        gotAllData$.unsubscribe();
+      });
+
+    this.boardState$ = this._store.select('board');
+
   }
 
   onFocus($event: Event) {
@@ -94,5 +126,9 @@ export class BoardComponent implements OnInit {
   private setWindowSize() {
     this.windowHeight = window.innerHeight;
     this.windowWidth = window.innerWidth;
+  }
+
+  onToggleControlPanel($event: Event) {
+    this.showControlPanel = !this.showControlPanel;
   }
 }

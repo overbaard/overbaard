@@ -1,0 +1,35 @@
+<div id="control-panel">
+  <!-- Don't use a table once we have a real UI -->
+  <table>
+    <tr>
+      <td>
+        <div>Select Filter</div>
+        <div *ngFor="let name of filterList" [class.selected]="filtersToDisplay === name">
+          <a href="Filter {{name}}"
+             (click)="onSelectFiltersToDisplay($event, name)">{{name}}</a>
+        </div>
+      </td>
+      <td>
+        <div *ngIf="!filtersToDisplay">
+          <div>Select A Filter</div>
+          <div>
+            <div>No Filter has been selected.</div>
+            <div>Select a filter from the Filters column to view/edit filters for that category.</div>
+          </div>
+        </div>
+        <div *ngIf="filtersToDisplay === 'Project'">
+          <div>Project Filter</div>
+<!--
+          <div formGroupName="project">
+            <div *ngFor="let project of boardProjectCodes | async" class="setting-entry">
+              <input type="checkbox" formControlName="{{project}}" id="project-{{project}}"/>
+              <label [attr.for]="'project-'+project">{{project}}</label>
+            </div>
+          </div>
+-->
+        </div>
+
+      </td>
+    </tr>
+  </table>
+</div>

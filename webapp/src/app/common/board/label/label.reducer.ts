@@ -1,6 +1,8 @@
 import {Action} from '@ngrx/store';
 import {List} from 'immutable';
 import {initialLabelState, LabelState, LabelUtil} from './label.model';
+import {AppState} from '../../../app-store';
+import {createSelector} from 'reselect';
 
 
 const DESERIALIZE_ALL_LABELS = 'DESERIALIZE_ALL_LABELS';
@@ -71,3 +73,8 @@ export function labelReducer(state: LabelState = initialLabelState, action: Acti
       return state;
   }
 };
+
+
+const getLabelsState = (state: AppState) => state.board.labels;
+const getLabels = (state: LabelState) => state.labels;
+export const labelsSelector = createSelector(getLabelsState, getLabels);

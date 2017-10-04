@@ -20,6 +20,7 @@ import { KanbanViewHeaderRowComponent } from './components/board/view/kanban-vie
 import { KanbanViewHeaderComponent } from './components/board/view/kanban-view/kanban-view-headers/kanban-view-header.component';
 import { KanbanViewColumnComponent } from './components/board/view/kanban-view/kanban-view-column/kanban-view-column.component';
 import { BoardIssueComponent } from './components/board/issue/board-issue.component';
+import { ControlPanelComponent } from './components/board/control-panel/control-panel.component';
 
 
 @NgModule({
@@ -33,7 +34,8 @@ import { BoardIssueComponent } from './components/board/issue/board-issue.compon
     KanbanViewHeaderRowComponent,
     KanbanViewHeaderComponent,
     KanbanViewColumnComponent,
-    BoardIssueComponent
+    BoardIssueComponent,
+    ControlPanelComponent
   ],
   imports: [
     BrowserModule,

@@ -14,6 +14,7 @@ import {KanbanViewHeaderRowComponent} from './view/kanban-view/kanban-view-heade
 import {KanbanViewHeaderComponent} from './view/kanban-view/kanban-view-headers/kanban-view-header.component';
 import {BoardIssueComponent} from './issue/board-issue.component';
 import {KanbanViewColumnComponent} from './view/kanban-view/kanban-view-column/kanban-view-column.component';
+import {ControlPanelComponent} from './control-panel/control-panel.component';
 
 describe('BoardComponent', () => {
   let component: BoardComponent;
@@ -25,6 +26,7 @@ describe('BoardComponent', () => {
       declarations: [
         BoardComponent,
         BoardIssueComponent,
+        ControlPanelComponent,
         KanbanViewComponent,
         KanbanViewColumnComponent,
         KanbanViewHeadersComponent,
