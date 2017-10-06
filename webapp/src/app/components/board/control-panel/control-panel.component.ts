@@ -18,9 +18,9 @@ import {labelsSelector} from '../../../common/board/label/label.reducer';
 import {fixVersionsSelector} from '../../../common/board/fix-version/fix-version.reducer';
 import {OutputSelector} from 'reselect';
 import {
-  ASSIGNEE, COMPONENT,
-  FilterAttributes, FIX_VERSION, ISSUE_TYPE, LABEL, PRIORITY,
-  PROJECT
+  ASSIGNEE_ATTRIBUTES, COMPONENT_ATTRIBUTES,
+  FilterAttributes, FIX_VERSION_ATTRIBUTES, ISSUE_TYPE_ATTRIBUTES, LABEL_ATTRIBUTES, PRIORITY_ATTRIBUTES,
+  PROJECT_ATTRIBUTES
 } from '../../../common/board/user/board-filter/board-filter.constants';
 
 @Component({
@@ -43,7 +43,7 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    const filterList: FilterAttributes[] = [PROJECT, ISSUE_TYPE, PRIORITY, ASSIGNEE, COMPONENT, LABEL, FIX_VERSION];
+    const filterList: FilterAttributes[] = [PROJECT_ATTRIBUTES, ISSUE_TYPE_ATTRIBUTES, PRIORITY_ATTRIBUTES, ASSIGNEE_ATTRIBUTES, COMPONENT_ATTRIBUTES, LABEL_ATTRIBUTES, FIX_VERSION_ATTRIBUTES];
 
     // TODO custom fields and parallel tasks
     this.filterList = filterList;
@@ -54,25 +54,25 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
       .takeWhile((filterState, i) => (i === 0))
       .subscribe(
         filterState => {
-          this.createGroup(this._store.select(boardProjectsSelector), PROJECT,
+          this.createGroup(this._store.select(boardProjectsSelector), PROJECT_ATTRIBUTES,
             project => project.map(p => FilterFormEntry(p.key, p.key)).toArray(),
             () => filterState.project);
-          this.createGroup(this._store.select(issuesTypesSelector), ISSUE_TYPE,
+          this.createGroup(this._store.select(issuesTypesSelector), ISSUE_TYPE_ATTRIBUTES,
             types => types.map(t => FilterFormEntry(t.name, t.name)).toArray(),
             () => filterState.issueType);
-          this.createGroup(this._store.select(prioritiesSelector), PRIORITY,
+          this.createGroup(this._store.select(prioritiesSelector), PRIORITY_ATTRIBUTES,
             priorities => priorities.map(p => FilterFormEntry(p.name, p.name)).toArray(),
             () => filterState.priority);
-          this.createGroup(this._store.select(assigneesSelector), ASSIGNEE,
+          this.createGroup(this._store.select(assigneesSelector), ASSIGNEE_ATTRIBUTES,
             assignees => assignees.map(a => FilterFormEntry(a.key, a.name)).toArray(),
             () => filterState.assignee);
-          this.createGroup(this._store.select(componentsSelector), COMPONENT,
+          this.createGroup(this._store.select(componentsSelector), COMPONENT_ATTRIBUTES,
             components => components.map(c => FilterFormEntry(c, c)).toArray(),
             () => filterState.component);
-          this.createGroup(this._store.select(labelsSelector), LABEL,
+          this.createGroup(this._store.select(labelsSelector), LABEL_ATTRIBUTES,
             labels => labels.map(l => FilterFormEntry(l, l)).toArray(),
             () => filterState.label);
-          this.createGroup(this._store.select(fixVersionsSelector), FIX_VERSION,
+          this.createGroup(this._store.select(fixVersionsSelector), FIX_VERSION_ATTRIBUTES,
             fixVersions => fixVersions.map(l => FilterFormEntry(l, l)).toArray(),
             () => filterState.fixVersion);
           // TODO custom fields and parallel tasks

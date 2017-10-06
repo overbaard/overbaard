@@ -1,16 +1,32 @@
-import {BoardFilterState, BoardFilterUtil, initialBoardFilterState} from './board-filter.model';
+import {BoardFilterState, BoardFilterUtil} from './board-filter.model';
 import {Action} from '@ngrx/store';
-import {Set, Map} from 'immutable';
+import {Map, Set} from 'immutable';
 import {Dictionary} from '../../../utils/dictionary';
-import {AppState} from '../../../../app-store';
-import {createSelector} from 'reselect';
+import {
+  ASSIGNEE_ATTRIBUTES,
+  COMPONENT_ATTRIBUTES,
+  FilterAttributes,
+  FIX_VERSION_ATTRIBUTES,
+  ISSUE_TYPE_ATTRIBUTES,
+  LABEL_ATTRIBUTES,
+  PRIORITY_ATTRIBUTES,
+  PROJECT_ATTRIBUTES,
+} from './board-filter.constants';
 
 const INITIALISE_FILTERS_FROM_QUERYSTRING = 'INITIALISE_FILTERS_FROM_QUERYSTRING';
+const UPDATE_FILTER = 'UPDATE_FILTER';
 
 class InitialiseFromQueryStringAction implements Action {
   readonly type = INITIALISE_FILTERS_FROM_QUERYSTRING;
 
   constructor(readonly payload: BoardFilterState) {
+  }
+}
+
+class UpdateFilterAction implements Action {
+  readonly type = UPDATE_FILTER;
+
+  constructor(readonly payload: UpdateFilterPayload) {
   }
 }
 
@@ -30,6 +46,10 @@ export class BoardFilterActions {
       parallelTask: Map<string, Set<string>>()
     };
     return new InitialiseFromQueryStringAction(payload);
+  }
+
+  static createUpdateFilter(filter: FilterAttributes, data: Object) {
+    return new UpdateFilterAction({filter: filter, data: data});
   }
 
   private static parseBooleanFilter(queryParams: Dictionary<string>, name: string): Set<string> {
@@ -55,7 +75,56 @@ export function boardFilterReducer(state: BoardFilterState, action: Action): Boa
       const payload: BoardFilterState = (<InitialiseFromQueryStringAction>action).payload;
       return BoardFilterUtil.fromObject(payload);
     }
+    case UPDATE_FILTER: {
+      const payload: UpdateFilterPayload = (<UpdateFilterAction>action).payload;
+      return BoardFilterUtil.toStateRecord(state).withMutations(mutable => {
+        switch (payload.filter) {
+          case PROJECT_ATTRIBUTES: {
+            mutable.project = createSelectedFieldsSet(payload.data)
+            break;
+          }
+          case ISSUE_TYPE_ATTRIBUTES: {
+            mutable.issueType = createSelectedFieldsSet(payload.data)
+            break;
+          }
+          case PRIORITY_ATTRIBUTES: {
+            mutable.priority = createSelectedFieldsSet(payload.data)
+            break;
+          }
+          case ASSIGNEE_ATTRIBUTES: {
+            mutable.assignee = createSelectedFieldsSet(payload.data)
+            break;
+          }
+          case COMPONENT_ATTRIBUTES: {
+            mutable.component = createSelectedFieldsSet(payload.data)
+            break;
+          }
+          case LABEL_ATTRIBUTES: {
+            mutable.label = createSelectedFieldsSet(payload.data)
+            break;
+          }
+          case FIX_VERSION_ATTRIBUTES: {
+            mutable.fixVersion = createSelectedFieldsSet(payload.data)
+            break;
+          }
+        }
+      });
+    }
   }
   return state;
 }
 
+function createSelectedFieldsSet(object: Object): Set<string> {
+  return Set<string>().withMutations(mutable => {
+    for (const key of Object.keys(object)) {
+      if (object[key]) {
+        mutable.add(key);
+      }
+    }
+  });
+}
+
+interface UpdateFilterPayload {
+  filter: FilterAttributes;
+  data: Object;
+}
