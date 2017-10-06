@@ -29,15 +29,12 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
   filterForm: FormGroup;
 
   filtersToDisplay: string = null;
-  filterFormGroup: string;
+  currentFilterFormGroupName: string;
+  currentFilterEntries: FilterFormEntry[];
 
   filterList: string[] = [];
   filterFormGroupKeys: Dictionary<string> = {};
   filterEntries: Dictionary<FilterFormEntry[]> = {};
-  filterTooltips: Dictionary<string> = {};
-  // filterObservables: Dictionary<Observable<string>> = {}
-
-  private _subscriptions: Subscription[];
 
   constructor(private _store: Store<AppState>) {
   }
@@ -63,6 +60,9 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
           this.createGroup(this._store.select(boardProjectsSelector), 'Project',
             project => project.map(p => FilterFormEntry(p.key, p.key)).toArray(),
             () => filterState.project);
+          this.createGroup(this._store.select(issuesTypesSelector), 'Issue Type',
+            types => types.map(t => FilterFormEntry(t.name, t.name)).toArray(),
+            () => filterState.issueType);
           this.createGroup(this._store.select(prioritiesSelector), 'Priority',
             priorities => priorities.map(p => FilterFormEntry(p.name, p.name)).toArray(),
             () => filterState.priority);
@@ -114,7 +114,8 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
   onSelectFiltersToDisplay(event: MouseEvent, filter: string) {
     event.preventDefault();
     this.filtersToDisplay = filter;
-    this.filterFormGroup = this.filterFormGroupKeys[filter];
+    this.currentFilterFormGroupName = this.filterFormGroupKeys[filter];
+    this.currentFilterEntries = this.filterEntries[filter];
   }
 }
 

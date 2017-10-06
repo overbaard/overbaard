@@ -9,7 +9,7 @@
              (click)="onSelectFiltersToDisplay($event, name)">{{name}}</a>
         </div>
       </td>
-      <td>
+      <td style="vertical-align: top">
         <div *ngIf="!filtersToDisplay">
           <div>Select A Filter</div>
           <div>
@@ -17,16 +17,16 @@
             <div>Select a filter from the Filters column to view/edit filters for that category.</div>
           </div>
         </div>
-        <div *ngIf="filtersToDisplay === 'Project'">
-          <div>Project Filter</div>
-<!--
-          <div formGroupName="project">
-            <div *ngFor="let project of boardProjectCodes | async" class="setting-entry">
-              <input type="checkbox" formControlName="{{project}}" id="project-{{project}}"/>
-              <label [attr.for]="'project-'+project">{{project}}</label>
+        <div *ngIf="filtersToDisplay">
+          <div>{{filtersToDisplay}} Filter</div>
+          <div [formGroup]="filterForm" #f="ngForm">
+            <div formGroupName="{{currentFilterFormGroupName}}">
+              <div *ngFor="let entry of currentFilterEntries">
+                <input type="checkbox" formControlName="{{entry.key}}" id="{{currentFilterFormGroupName}}-{{entry.key}}"/>
+                <label [attr.for]="'currentFilterFormGroupName-' + entry.key">{{entry.display}}</label>
+              </div>
             </div>
           </div>
--->
         </div>
 
       </td>
