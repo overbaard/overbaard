@@ -27,7 +27,7 @@ class MockBoardsService extends BoardsService {
   }
 }
 
-describe('BoardsComponent', () => {
+xdescribe('BoardsComponent', () => {
   let component: BoardsComponent;
   let fixture: ComponentFixture<BoardsComponent>;
   const mockBoardsService: MockBoardsService = new MockBoardsService();
