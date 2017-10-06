@@ -98,6 +98,10 @@ export function boardFilterReducer(state: BoardFilterState, action: Action): Boa
     case UPDATE_FILTER: {
       const payload: UpdateFilterPayload = (<UpdateFilterAction>action).payload;
       return BoardFilterUtil.toStateRecord(state).withMutations(mutable => {
+        if (payload.filter.customField) {
+          mutable.customField = mutable.customField.set(payload.filter.key, createSelectedFieldsSet(payload.data));
+          return;
+        }
         switch (payload.filter) {
           case PROJECT_ATTRIBUTES: {
             mutable.project = createSelectedFieldsSet(payload.data)

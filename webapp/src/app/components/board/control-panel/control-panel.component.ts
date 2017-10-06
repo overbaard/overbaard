@@ -9,7 +9,7 @@ import 'rxjs/add/operator/debounceTime';
 import {Observable} from 'rxjs/Observable';
 import {boardProjectsSelector} from '../../../common/board/project/project.reducer';
 import {BoardFilterState} from '../../../common/board/user/board-filter/board-filter.model';
-import {Set} from 'immutable';
+import {OrderedMap, Set} from 'immutable';
 import {issuesTypesSelector} from '../../../common/board/issue-type/issue-type.reducer';
 import {prioritiesSelector} from '../../../common/board/priority/priority.reducer';
 import {assigneesSelector} from '../../../common/board/assignee/assignee.reducer';
@@ -18,10 +18,13 @@ import {labelsSelector} from '../../../common/board/label/label.reducer';
 import {fixVersionsSelector} from '../../../common/board/fix-version/fix-version.reducer';
 import {
   ASSIGNEE_ATTRIBUTES, COMPONENT_ATTRIBUTES,
-  FilterAttributes, FIX_VERSION_ATTRIBUTES, ISSUE_TYPE_ATTRIBUTES, LABEL_ATTRIBUTES, PRIORITY_ATTRIBUTES,
+  FilterAttributes, FilterAttributesUtil, FIX_VERSION_ATTRIBUTES, ISSUE_TYPE_ATTRIBUTES, LABEL_ATTRIBUTES,
+  PRIORITY_ATTRIBUTES,
   PROJECT_ATTRIBUTES
 } from '../../../common/board/user/board-filter/board-filter.constants';
 import {BoardFilterActions} from '../../../common/board/user/board-filter/board-filter.reducer';
+import {customFieldsSelector} from '../../../common/board/custom-field/custom-field.reducer';
+import {CustomField} from '../../../common/board/custom-field/custom-field.model';
 
 @Component({
   selector: 'app-control-panel',
@@ -56,28 +59,30 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
       .takeWhile((filterState, i) => (i === 0))
       .subscribe(
         filterState => {
-          this.createGroup(this._store.select(boardProjectsSelector), PROJECT_ATTRIBUTES,
+          this.createGroupFromObservable(this._store.select(boardProjectsSelector), PROJECT_ATTRIBUTES,
             project => project.map(p => FilterFormEntry(p.key, p.key)).toArray(),
             () => filterState.project);
-          this.createGroup(this._store.select(issuesTypesSelector), ISSUE_TYPE_ATTRIBUTES,
+          this.createGroupFromObservable(this._store.select(issuesTypesSelector), ISSUE_TYPE_ATTRIBUTES,
             types => types.map(t => FilterFormEntry(t.name, t.name)).toArray(),
             () => filterState.issueType);
-          this.createGroup(this._store.select(prioritiesSelector), PRIORITY_ATTRIBUTES,
+          this.createGroupFromObservable(this._store.select(prioritiesSelector), PRIORITY_ATTRIBUTES,
             priorities => priorities.map(p => FilterFormEntry(p.name, p.name)).toArray(),
             () => filterState.priority);
-          this.createGroup(this._store.select(assigneesSelector), ASSIGNEE_ATTRIBUTES,
+          this.createGroupFromObservable(this._store.select(assigneesSelector), ASSIGNEE_ATTRIBUTES,
             assignees => assignees.map(a => FilterFormEntry(a.key, a.name)).toArray(),
             () => filterState.assignee);
-          this.createGroup(this._store.select(componentsSelector), COMPONENT_ATTRIBUTES,
+          this.createGroupFromObservable(this._store.select(componentsSelector), COMPONENT_ATTRIBUTES,
             components => components.map(c => FilterFormEntry(c, c)).toArray(),
             () => filterState.component);
-          this.createGroup(this._store.select(labelsSelector), LABEL_ATTRIBUTES,
+          this.createGroupFromObservable(this._store.select(labelsSelector), LABEL_ATTRIBUTES,
             labels => labels.map(l => FilterFormEntry(l, l)).toArray(),
             () => filterState.label);
-          this.createGroup(this._store.select(fixVersionsSelector), FIX_VERSION_ATTRIBUTES,
+          this.createGroupFromObservable(this._store.select(fixVersionsSelector), FIX_VERSION_ATTRIBUTES,
             fixVersions => fixVersions.map(l => FilterFormEntry(l, l)).toArray(),
             () => filterState.fixVersion);
-          // TODO custom fields and parallel tasks
+          this.createCustomFieldGroups(filterState, this._store.select(customFieldsSelector));
+
+          // TODO parallel tasks
 
         }
       );
@@ -89,27 +94,52 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
       });
   }
 
-  private createGroup<T>(observable: Observable<T>,
-                         filter: FilterAttributes,
-                         mapper: (t: T) => FilterFormEntry[],
-                         setFilterGetter: () => Set<string>) {
+  private createGroupFromObservable<T>(observable: Observable<T>,
+                                       filter: FilterAttributes,
+                                       mapper: (t: T) => FilterFormEntry[],
+                                       setFilterGetter: () => Set<string>) {
     observable
       .takeWhile((v, i) => (i === 0))
       .map(v => mapper(v))
       .subscribe(
         filterFormEntries => {
-
-          this.filterEntries[filter.key] = filterFormEntries;
-          const set: Set<string> = setFilterGetter();
-          const group: FormGroup = new FormGroup({});
-
-          filterFormEntries.forEach(entry => {
-            group.addControl(entry.key, new FormControl(set.contains(entry.key)));
-          });
-
-          this.filterForm.addControl(filter.key, group);
+          this.createGroup(filterFormEntries, filter, setFilterGetter);
         }
       );
+  }
+
+  private createCustomFieldGroups(filterState: BoardFilterState,
+                                  observable: Observable<OrderedMap<string,
+                                    OrderedMap<string, CustomField>>>) {
+    observable
+      .takeWhile((v, i) => (i === 0))
+      .subscribe(
+        customFields => {
+          customFields.forEach((fields, key) => {
+            console.log(fields.toString());
+            const filterFormEntries: FilterFormEntry[] = fields.map(c => FilterFormEntry(c.key, c.value)).toArray();
+            const cfFilterAttributes: FilterAttributes = FilterAttributesUtil.createCustomFieldFilterAttributes(key);
+            this.filterList.push(cfFilterAttributes);
+            this.createGroup(filterFormEntries, cfFilterAttributes, () => filterState.customField.get(key));
+          });
+        }
+      );
+  }
+
+  private createGroup(filterFormEntries: FilterFormEntry[], filter: FilterAttributes, setFilterGetter: () => Set<string>) {
+    this.filterEntries[filter.key] = filterFormEntries;
+    let set: Set<string> = setFilterGetter();
+    if (!set) {
+      set = Set<string>();
+    }
+    const group: FormGroup = new FormGroup({});
+
+    filterFormEntries.forEach(entry => {
+      group.addControl(entry.key, new FormControl(set.contains(entry.key)));
+    });
+
+    this.filterForm.addControl(filter.key, group);
+
   }
 
   ngOnDestroy() {

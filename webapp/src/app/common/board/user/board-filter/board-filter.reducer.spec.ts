@@ -1,9 +1,11 @@
 import {Dictionary} from '../../../utils/dictionary';
 import {BoardFilterState, BoardFilterUtil, initialBoardFilterState} from './board-filter.model';
 import {BoardFilterActions, boardFilterReducer} from './board-filter.reducer';
-import {Set} from 'immutable';
+import {Map, Set} from 'immutable';
 import {
-  ASSIGNEE_ATTRIBUTES, COMPONENT_ATTRIBUTES, FIX_VERSION_ATTRIBUTES, ISSUE_TYPE_ATTRIBUTES, LABEL_ATTRIBUTES,
+  ASSIGNEE_ATTRIBUTES, COMPONENT_ATTRIBUTES, FilterAttributes, FilterAttributesUtil, FIX_VERSION_ATTRIBUTES,
+  ISSUE_TYPE_ATTRIBUTES,
+  LABEL_ATTRIBUTES,
   PRIORITY_ATTRIBUTES,
   PROJECT_ATTRIBUTES
 } from './board-filter.constants';
@@ -27,20 +29,29 @@ describe('BoardFilter reducer tests', () => {
         assignee: 'A%201,A2',
         component: 'C%201,C2',
         label: 'L%201,L2',
-        'fix-version': 'F%201,F2'
+        'fix-version': 'F%201,F2',
+        'cf.Custom%201': 'CF%2011,CF12',
+        'cf.Custom2': 'CF%2021,CF22',
+        'pt.Par%201': 'PT%2011,PT12',
+        'pt.Par2': 'PT%2021,PT22'
       };
       const state: BoardFilterState = boardFilterReducer(initialBoardFilterState, BoardFilterActions.createInitialiseFromQueryString(qs));
-      checkSetContents(state, 'project', ['P 1', 'P2']);
-      checkSetContents(state, 'priority', ['Pr 1', 'Pr2']);
-      checkSetContents(state, 'issueType', ['T 1', 'T2']);
-      checkSetContents(state, 'assignee', ['A 1', 'A2']);
-      checkSetContents(state, 'component', ['C 1', 'C2']);
-      checkSetContents(state, 'label', ['L 1', 'L2']);
-      checkSetContents(state, 'fixVersion', ['F 1', 'F2']);
+      checkSetContents(state.project, ['P 1', 'P2']);
+      checkSetContents(state.priority, ['Pr 1', 'Pr2']);
+      checkSetContents(state.issueType, ['T 1', 'T2']);
+      checkSetContents(state.assignee, ['A 1', 'A2']);
+      checkSetContents(state.component, ['C 1', 'C2']);
+      checkSetContents(state.label, ['L 1', 'L2']);
+      checkSetContents(state.fixVersion, ['F 1', 'F2']);
+      expect(state.customField.size).toBe(2);
+      checkSetContents(state.customField.get('Custom 1'), ['CF 11', 'CF12']);
+      checkSetContents(state.customField.get('Custom2'), ['CF 21', 'CF22']);
+      expect(state.parallelTask.size).toBe(2);
+      checkSetContents(state.parallelTask.get('Par 1'), ['PT 11', 'PT12']);
+      checkSetContents(state.parallelTask.get('Par2'), ['PT 21', 'PT22']);
     });
 
-    function checkSetContents(state: BoardFilterState, name: string, expected: string[]) {
-      const set: Set<string> = state[name];
+    function checkSetContents(set: Set<string>, expected: string[]) {
       expect(set.size).toEqual(expected.length, 'state.field=' + name);
       for (const curr of expected) {
         expect(set.contains(curr)).toBe(true);
@@ -58,7 +69,11 @@ describe('BoardFilter reducer tests', () => {
         assignee: 'A1',
         component: 'C1',
         label: 'L1',
-        'fix-version': 'F1'
+        'fix-version': 'F1',
+        'cf.Custom1': 'CF11',
+        'cf.Custom2': 'CF21',
+        'pt.Par1': 'PT11',
+        'pt.Par2': 'PT21'
       };
       state = boardFilterReducer(initialBoardFilterState, BoardFilterActions.createInitialiseFromQueryString(qs));
     });
@@ -111,6 +126,19 @@ describe('BoardFilter reducer tests', () => {
       checker.fixVersion = ['F2', 'F3'];
       checker.check(state);
     });
+
+    it ('Update custom field', () => {
+      const customFieldAttributes: FilterAttributes = FilterAttributesUtil.createCustomFieldFilterAttributes('Custom2');
+      state = boardFilterReducer(
+        state, BoardFilterActions.createUpdateFilter(customFieldAttributes, {CF21: false, CF22: true, CF23: true}));
+      const checker: UpdateChecker = new UpdateChecker();
+      checker.customField['Custom2'] = ['CF22', 'CF23'];
+      checker.check(state);
+    })
+
+    it ('Update parallel tasks', () => {
+      fail('NYI')
+    })
   });
 });
 
@@ -122,6 +150,8 @@ class UpdateChecker {
   component: string[] = ['C1'];
   label: string[] = ['L1'];
   fixVersion: string[] = ['F1'];
+  customField: Dictionary<string[]> = {Custom1: ['CF11'], Custom2: ['CF21']};
+  parallelTask: Dictionary<string[]> = {Par1: ['PT11'], Par2: ['PT21']};
 
   check(filterState: BoardFilterState) {
     this.checkFilter(this.project, filterState.project);
@@ -131,6 +161,15 @@ class UpdateChecker {
     this.checkFilter(this.component, filterState.component);
     this.checkFilter(this.label, filterState.label);
     this.checkFilter(this.fixVersion, filterState.fixVersion);
+    this.checkMapFilter(this.customField, filterState.customField);
+    this.checkMapFilter(this.parallelTask, filterState.parallelTask);
+  }
+
+  checkMapFilter(expected: Dictionary<string[]>, actual: Map<string, Set<string>>) {
+    expect(actual.size).toBe(Object.keys(expected).length);
+    for (const key of Object.keys(expected)) {
+      this.checkFilter(expected[key], actual.get(key));
+    }
   }
 
   checkFilter(expected: string[], actual: Set<string>) {
