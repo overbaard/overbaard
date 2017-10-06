@@ -77,6 +77,28 @@
       "icon" : "/images/icons/issuetypes/epic.png"
     }
   ],
+  "custom": {
+    "User Custom Field": [
+      {
+        "key": "userA",
+        "value": "Another User"
+      },
+      {
+        "key": "userB",
+        "value": "Better User"
+      }
+    ],
+    "Version Custom Field": [
+      {
+        "key": "1.0.0.GA",
+        "value": "1.0.0.GA"
+      },
+      {
+        "key": "1.0.1.GA",
+        "value": "1.0.1.GA"
+      }
+    ]
+  },
   "projects" : {
     "owner" : "FEAT",
     "main" : {

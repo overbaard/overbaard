@@ -42,14 +42,34 @@ export class BoardFilterActions {
       label: this.parseBooleanFilter(queryParams, 'label'),
       fixVersion: this.parseBooleanFilter(queryParams, 'fix-version'),
       // TODO parallel tasks and custom fields
-      customField: Map<string, Set<string>>(),
-      parallelTask: Map<string, Set<string>>()
+      customField: this.parseCustomFieldFilters(queryParams),
+      parallelTask: this.parseParallelTaskFilters(queryParams)
     };
     return new InitialiseFromQueryStringAction(payload);
   }
 
   static createUpdateFilter(filter: FilterAttributes, data: Object) {
     return new UpdateFilterAction({filter: filter, data: data});
+  }
+
+  private static parseCustomFieldFilters(queryParams: Dictionary<string>): Map<string, Set<string>> {
+    return this.parsePrefixedMapFilters('cf.', queryParams);
+  }
+
+  private static parseParallelTaskFilters(queryParams: Dictionary<string>): Map<string, Set<string>> {
+    return this.parsePrefixedMapFilters('pt.', queryParams);
+  }
+
+  private static parsePrefixedMapFilters(prefix: string, queryParams: Dictionary<string>): Map<string, Set<string>> {
+    return Map<string, Set<string>>().withMutations(mutable => {
+      for (const key of Object.keys(queryParams)) {
+        if (key.startsWith(prefix)) {
+          console.log('---->' + key);
+          const name: string = decodeURIComponent(key.substr(prefix.length));
+          mutable.set(name, this.parseBooleanFilter(queryParams, key));
+        }
+      }
+    });
   }
 
   private static parseBooleanFilter(queryParams: Dictionary<string>, name: string): Set<string> {
