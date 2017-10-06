@@ -17,6 +17,11 @@ import {componentsSelector} from '../../../common/board/component/component.redu
 import {labelsSelector} from '../../../common/board/label/label.reducer';
 import {fixVersionsSelector} from '../../../common/board/fix-version/fix-version.reducer';
 import {OutputSelector} from 'reselect';
+import {
+  ASSIGNEE, COMPONENT,
+  FilterAttributes, FIX_VERSION, ISSUE_TYPE, LABEL, PRIORITY,
+  PROJECT
+} from '../../../common/board/user/board-filter/board-filter.constants';
 
 @Component({
   selector: 'app-control-panel',
@@ -28,28 +33,20 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
 
   filterForm: FormGroup;
 
-  filtersToDisplay: string = null;
-  currentFilterFormGroupName: string;
-  currentFilterEntries: FilterFormEntry[];
-
-  filterList: string[] = [];
-  filterFormGroupKeys: Dictionary<string> = {};
+  filterList: FilterAttributes[] = [];
   filterEntries: Dictionary<FilterFormEntry[]> = {};
+
+  filtersToDisplay: FilterAttributes = null;
+  currentFilterEntries: FilterFormEntry[];
 
   constructor(private _store: Store<AppState>) {
   }
 
   ngOnInit() {
-    const filterList: string[] = ['Project', 'Issue Type', 'Priority', 'Assignee', 'Component', 'Label', 'Fix Version'];
-    const filterFormGroupNames: Dictionary<string> = {}
-    filterList.forEach(v => {
-      const groupName: string = v.replace(' ', '-').toLowerCase();
-      filterFormGroupNames[v] = groupName;
-    });
+    const filterList: FilterAttributes[] = [PROJECT, ISSUE_TYPE, PRIORITY, ASSIGNEE, COMPONENT, LABEL, FIX_VERSION];
 
     // TODO custom fields and parallel tasks
     this.filterList = filterList;
-    this.filterFormGroupKeys = filterFormGroupNames;
 
     this.filterForm = new FormGroup({});
 
@@ -57,25 +54,25 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
       .takeWhile((filterState, i) => (i === 0))
       .subscribe(
         filterState => {
-          this.createGroup(this._store.select(boardProjectsSelector), 'Project',
+          this.createGroup(this._store.select(boardProjectsSelector), PROJECT,
             project => project.map(p => FilterFormEntry(p.key, p.key)).toArray(),
             () => filterState.project);
-          this.createGroup(this._store.select(issuesTypesSelector), 'Issue Type',
+          this.createGroup(this._store.select(issuesTypesSelector), ISSUE_TYPE,
             types => types.map(t => FilterFormEntry(t.name, t.name)).toArray(),
             () => filterState.issueType);
-          this.createGroup(this._store.select(prioritiesSelector), 'Priority',
+          this.createGroup(this._store.select(prioritiesSelector), PRIORITY,
             priorities => priorities.map(p => FilterFormEntry(p.name, p.name)).toArray(),
             () => filterState.priority);
-          this.createGroup(this._store.select(assigneesSelector), 'Assignee',
+          this.createGroup(this._store.select(assigneesSelector), ASSIGNEE,
             assignees => assignees.map(a => FilterFormEntry(a.key, a.name)).toArray(),
             () => filterState.assignee);
-          this.createGroup(this._store.select(componentsSelector), 'Component',
+          this.createGroup(this._store.select(componentsSelector), COMPONENT,
             components => components.map(c => FilterFormEntry(c, c)).toArray(),
             () => filterState.component);
-          this.createGroup(this._store.select(labelsSelector), 'Label',
+          this.createGroup(this._store.select(labelsSelector), LABEL,
             labels => labels.map(l => FilterFormEntry(l, l)).toArray(),
             () => filterState.label);
-          this.createGroup(this._store.select(fixVersionsSelector), 'Fix Version',
+          this.createGroup(this._store.select(fixVersionsSelector), FIX_VERSION,
             fixVersions => fixVersions.map(l => FilterFormEntry(l, l)).toArray(),
             () => filterState.fixVersion);
           // TODO custom fields and parallel tasks
@@ -86,7 +83,7 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
   }
 
   private createGroup<T>(observable: Observable<T>,
-                         filterName: string,
+                         filter: FilterAttributes,
                          mapper: (t: T) => FilterFormEntry[],
                          setFilterGetter: () => Set<string>) {
     observable
@@ -95,7 +92,7 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
       .subscribe(
         filterFormEntries => {
 
-          this.filterEntries[filterName] = filterFormEntries;
+          this.filterEntries[filter.key] = filterFormEntries;
           const set: Set<string> = setFilterGetter();
           const group: FormGroup = new FormGroup({});
 
@@ -103,7 +100,7 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
             group.addControl(entry.key, new FormControl(set.contains(entry.key)));
           });
 
-          this.filterForm.addControl(this.filterFormGroupKeys[filterName], group);
+          this.filterForm.addControl(filter.key, group);
         }
       );
   }
@@ -111,11 +108,10 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
   }
 
-  onSelectFiltersToDisplay(event: MouseEvent, filter: string) {
+  onSelectFiltersToDisplay(event: MouseEvent, filter: FilterAttributes) {
     event.preventDefault();
     this.filtersToDisplay = filter;
-    this.currentFilterFormGroupName = this.filterFormGroupKeys[filter];
-    this.currentFilterEntries = this.filterEntries[filter];
+    this.currentFilterEntries = this.filterEntries[filter.key];
   }
 }
 

@@ -4,9 +4,9 @@
     <tr>
       <td>
         <div>Select Filter</div>
-        <div *ngFor="let name of filterList" [class.selected]="filtersToDisplay === name">
-          <a href="Filter {{name}}"
-             (click)="onSelectFiltersToDisplay($event, name)">{{name}}</a>
+        <div *ngFor="let entry of filterList" [class.selected]="filtersToDisplay === entry">
+          <a href="Filter {{entry.display}}"
+             (click)="onSelectFiltersToDisplay($event, entry)">{{entry.display}}</a>
         </div>
       </td>
       <td style="vertical-align: top">
@@ -18,12 +18,12 @@
           </div>
         </div>
         <div *ngIf="filtersToDisplay">
-          <div>{{filtersToDisplay}} Filter</div>
+          <div>{{filtersToDisplay.display}} Filter</div>
           <div [formGroup]="filterForm" #f="ngForm">
-            <div formGroupName="{{currentFilterFormGroupName}}">
+            <div formGroupName="{{filtersToDisplay.key}}">
               <div *ngFor="let entry of currentFilterEntries">
-                <input type="checkbox" formControlName="{{entry.key}}" id="{{currentFilterFormGroupName}}-{{entry.key}}"/>
-                <label [attr.for]="'currentFilterFormGroupName-' + entry.key">{{entry.display}}</label>
+                <input type="checkbox" formControlName="{{entry.key}}" id="{{filtersToDisplay.key}}-{{entry.key}}"/>
+                <label [attr.for]="'filtersToDisplay.key-' + entry.key">{{entry.display}}</label>
               </div>
             </div>
           </div>
