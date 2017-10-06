@@ -2,10 +2,10 @@ import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/co
 import {AppState} from '../../../app-store';
 import {Store} from '@ngrx/store';
 import {Dictionary} from '../../../common/utils/dictionary';
-import {Subscription} from 'rxjs/Subscription';
 import {FormControl, FormGroup} from '@angular/forms';
 import 'rxjs/add/operator/takeWhile';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/debounceTime';
 import {Observable} from 'rxjs/Observable';
 import {boardProjectsSelector} from '../../../common/board/project/project.reducer';
 import {BoardFilterState} from '../../../common/board/user/board-filter/board-filter.model';
@@ -16,12 +16,12 @@ import {assigneesSelector} from '../../../common/board/assignee/assignee.reducer
 import {componentsSelector} from '../../../common/board/component/component.reducer';
 import {labelsSelector} from '../../../common/board/label/label.reducer';
 import {fixVersionsSelector} from '../../../common/board/fix-version/fix-version.reducer';
-import {OutputSelector} from 'reselect';
 import {
   ASSIGNEE_ATTRIBUTES, COMPONENT_ATTRIBUTES,
   FilterAttributes, FIX_VERSION_ATTRIBUTES, ISSUE_TYPE_ATTRIBUTES, LABEL_ATTRIBUTES, PRIORITY_ATTRIBUTES,
   PROJECT_ATTRIBUTES
 } from '../../../common/board/user/board-filter/board-filter.constants';
+import {BoardFilterActions} from '../../../common/board/user/board-filter/board-filter.reducer';
 
 @Component({
   selector: 'app-control-panel',
@@ -43,7 +43,9 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    const filterList: FilterAttributes[] = [PROJECT_ATTRIBUTES, ISSUE_TYPE_ATTRIBUTES, PRIORITY_ATTRIBUTES, ASSIGNEE_ATTRIBUTES, COMPONENT_ATTRIBUTES, LABEL_ATTRIBUTES, FIX_VERSION_ATTRIBUTES];
+    const filterList: FilterAttributes[] =
+      [PROJECT_ATTRIBUTES, ISSUE_TYPE_ATTRIBUTES, PRIORITY_ATTRIBUTES, ASSIGNEE_ATTRIBUTES, COMPONENT_ATTRIBUTES,
+        LABEL_ATTRIBUTES, FIX_VERSION_ATTRIBUTES];
 
     // TODO custom fields and parallel tasks
     this.filterList = filterList;
@@ -80,6 +82,11 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
         }
       );
 
+    this.filterForm.valueChanges
+      .debounceTime(150)
+      .subscribe((value) => {
+        this.processFormValueChanges(value);
+      });
   }
 
   private createGroup<T>(observable: Observable<T>,
@@ -112,6 +119,12 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
     event.preventDefault();
     this.filtersToDisplay = filter;
     this.currentFilterEntries = this.filterEntries[filter.key];
+  }
+
+  processFormValueChanges(value: any) {
+    const obj: Object = value[this.filtersToDisplay.key];
+    this._store.dispatch(BoardFilterActions.createUpdateFilter(this.filtersToDisplay, obj));
+    this.filterForm.reset(value);
   }
 }
 
