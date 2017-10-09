@@ -1,5 +1,4 @@
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
-import {CustomField} from '../../custom-field/custom-field.model';
 
 export interface FilterAttributes {
   display: string;
@@ -14,6 +13,8 @@ const DEFAULT_ATTRIBUTES: FilterAttributes = {
   hasNone: false,
   customField: false
 };
+
+export const NONE_FILTER = '$n$o$n$e$';
 
 interface FilterAttributesRecord extends TypedRecord<FilterAttributesRecord>, FilterAttributes {
 }

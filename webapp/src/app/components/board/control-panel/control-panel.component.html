@@ -23,7 +23,7 @@
             <div formGroupName="{{filtersToDisplay.key}}">
               <div *ngFor="let entry of currentFilterEntries">
                 <input type="checkbox" formControlName="{{entry.key}}" id="{{filtersToDisplay.key}}-{{entry.key}}"/>
-                <label [attr.for]="'filtersToDisplay.key-' + entry.key">{{entry.display}}</label>
+                <label [attr.for]="filtersToDisplay.key + '-' + entry.key">{{entry.display}}</label>
               </div>
             </div>
           </div>

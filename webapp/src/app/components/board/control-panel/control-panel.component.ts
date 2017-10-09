@@ -18,7 +18,7 @@ import {labelsSelector} from '../../../common/board/label/label.reducer';
 import {fixVersionsSelector} from '../../../common/board/fix-version/fix-version.reducer';
 import {
   ASSIGNEE_ATTRIBUTES, COMPONENT_ATTRIBUTES,
-  FilterAttributes, FilterAttributesUtil, FIX_VERSION_ATTRIBUTES, ISSUE_TYPE_ATTRIBUTES, LABEL_ATTRIBUTES,
+  FilterAttributes, FilterAttributesUtil, FIX_VERSION_ATTRIBUTES, ISSUE_TYPE_ATTRIBUTES, LABEL_ATTRIBUTES, NONE_FILTER,
   PRIORITY_ATTRIBUTES,
   PROJECT_ATTRIBUTES
 } from '../../../common/board/user/board-filter/board-filter.constants';
@@ -33,6 +33,8 @@ import {CustomField} from '../../../common/board/custom-field/custom-field.model
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ControlPanelComponent implements OnInit, OnDestroy {
+
+  readonly none = NONE_FILTER;
 
   filterForm: FormGroup;
 
@@ -127,6 +129,9 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
   }
 
   private createGroup(filterFormEntries: FilterFormEntry[], filter: FilterAttributes, setFilterGetter: () => Set<string>) {
+    if (filter.hasNone) {
+      filterFormEntries.unshift(FilterFormEntry(this.none, 'None'));
+    }
     this.filterEntries[filter.key] = filterFormEntries;
     let set: Set<string> = setFilterGetter();
     if (!set) {
