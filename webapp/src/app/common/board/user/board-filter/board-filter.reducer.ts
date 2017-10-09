@@ -8,7 +8,7 @@ import {
   FilterAttributes,
   FIX_VERSION_ATTRIBUTES,
   ISSUE_TYPE_ATTRIBUTES,
-  LABEL_ATTRIBUTES,
+  LABEL_ATTRIBUTES, PARALLEL_TASK_ATTRIBUTES,
   PRIORITY_ATTRIBUTES,
   PROJECT_ATTRIBUTES,
 } from './board-filter.constants';
@@ -129,6 +129,14 @@ export function boardFilterReducer(state: BoardFilterState, action: Action): Boa
           }
           case FIX_VERSION_ATTRIBUTES: {
             mutable.fixVersion = createSelectedFieldsSet(payload.data)
+            break;
+          }
+          case PARALLEL_TASK_ATTRIBUTES: {
+            mutable.parallelTask = Map<string, Set<string>>().withMutations(ptMutable => {
+              for (const key of Object.keys(payload.data)) {
+                ptMutable.set(key, createSelectedFieldsSet(payload.data[key]));
+              }
+            });
             break;
           }
         }

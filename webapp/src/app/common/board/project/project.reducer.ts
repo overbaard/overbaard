@@ -10,6 +10,7 @@ import {
 import {List, Map, OrderedMap} from 'immutable';
 import {AppState} from '../../../app-store';
 import {createSelector} from 'reselect';
+import {cloneObject} from '../../utils/test-util.spec';
 
 const DESERIALIZE_PROJECTS = 'DESERIALIZE_PROJECTS';
 
@@ -33,8 +34,10 @@ export class ProjectActions {
     for (const key of Object.keys(mainInput)) {
       const projectInput: any = mainInput[key];
       boardProjects.set(key, ProjectUtil.boardProjectFromJs(key, projectInput));
-      const parallelTasksInput: any[] = projectInput['parallel-tasks'];
+      let parallelTasksInput: any[] = projectInput['parallel-tasks'];
       if (parallelTasksInput) {
+        // Something makes this read-only so clone it
+        parallelTasksInput = cloneObject(parallelTasksInput);
         for (let i = 0 ; i < parallelTasksInput.length ; i++) {
           const task: ParallelTask = ProjectUtil.parallelTaskFromJs(parallelTasksInput[i]);
           parallelTasksInput[i] = task;
@@ -82,4 +85,6 @@ export function projectReducer(state: ProjectState = initialProjectState, action
 
 const getProjectState = (state: AppState): ProjectState => state.board.projects;
 const getBoardProjects = (state: ProjectState): OrderedMap<string, BoardProject> => state.boardProjects;
+const getParallelTasks = (state: ProjectState): OrderedMap<string, List<ParallelTask>> => state.parallelTasks;
 export const boardProjectsSelector = createSelector(getProjectState, getBoardProjects);
+export const parallelTasksSelector = createSelector(getProjectState, getParallelTasks);

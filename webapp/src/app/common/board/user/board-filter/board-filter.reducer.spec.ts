@@ -5,7 +5,7 @@ import {Map, Set} from 'immutable';
 import {
   ASSIGNEE_ATTRIBUTES, COMPONENT_ATTRIBUTES, FilterAttributes, FilterAttributesUtil, FIX_VERSION_ATTRIBUTES,
   ISSUE_TYPE_ATTRIBUTES,
-  LABEL_ATTRIBUTES,
+  LABEL_ATTRIBUTES, PARALLEL_TASK_ATTRIBUTES,
   PRIORITY_ATTRIBUTES,
   PROJECT_ATTRIBUTES
 } from './board-filter.constants';
@@ -134,11 +134,17 @@ describe('BoardFilter reducer tests', () => {
       const checker: UpdateChecker = new UpdateChecker();
       checker.customField['Custom2'] = ['CF22', 'CF23'];
       checker.check(state);
-    })
+    });
 
     it ('Update parallel tasks', () => {
-      fail('NYI')
-    })
+      state = boardFilterReducer(state, BoardFilterActions.createUpdateFilter(PARALLEL_TASK_ATTRIBUTES, {
+          Par1: {PT12: true, PT13: true},
+          Par2: {PT22: true, PT23: true}}));
+      const checker: UpdateChecker = new UpdateChecker();
+      checker.parallelTask['Par1'] = ['PT12', 'PT13'];
+      checker.parallelTask['Par2'] = ['PT22', 'PT23'];
+      checker.check(state);
+    });
   });
 });
 

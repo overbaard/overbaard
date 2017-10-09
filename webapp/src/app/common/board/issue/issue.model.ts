@@ -214,9 +214,10 @@ export class DeserializeIssueLookupParams {
 export class IssueUtil {
 
   static fromJS(input: any, params: DeserializeIssueLookupParams): BoardIssue {
-    // Clone this since we are modifying it heavily, and the data received from the server has been frozen
-    input = cloneObject(input);
     const projectKey: string = IssueUtil.productCodeFromKey(input['key']);
+
+    // Clone this since we will be modifying it, and the data received from the server has been frozen
+    input = cloneObject(input);
 
     // Rework the data as needed before deserializing
     if (input['linked-issues']) {

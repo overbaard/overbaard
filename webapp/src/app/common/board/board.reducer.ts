@@ -29,6 +29,7 @@ import {IssueTableActions, issueTableReducer} from './calculated/issue-table/iss
 import {HeaderState} from './header/header.state';
 import {BoardState} from './board';
 import {BoardUtil} from './board.model';
+import {cloneObject} from '../utils/test-util.spec';
 
 
 export const initialBoardState: BoardState = {

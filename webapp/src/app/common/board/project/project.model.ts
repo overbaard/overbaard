@@ -1,6 +1,7 @@
 import {List, Map, OrderedMap} from 'immutable';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {HeaderState} from '../header/header.state';
+import {cloneObject} from '../../utils/test-util.spec';
 
 export interface ProjectState {
   owner: string;

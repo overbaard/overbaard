@@ -7,9 +7,9 @@ import 'rxjs/add/operator/takeWhile';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/debounceTime';
 import {Observable} from 'rxjs/Observable';
-import {boardProjectsSelector} from '../../../common/board/project/project.reducer';
+import {boardProjectsSelector, parallelTasksSelector} from '../../../common/board/project/project.reducer';
 import {BoardFilterState} from '../../../common/board/user/board-filter/board-filter.model';
-import {OrderedMap, Set} from 'immutable';
+import {List, OrderedMap, Set} from 'immutable';
 import {issuesTypesSelector} from '../../../common/board/issue-type/issue-type.reducer';
 import {prioritiesSelector} from '../../../common/board/priority/priority.reducer';
 import {assigneesSelector} from '../../../common/board/assignee/assignee.reducer';
@@ -19,12 +19,14 @@ import {fixVersionsSelector} from '../../../common/board/fix-version/fix-version
 import {
   ASSIGNEE_ATTRIBUTES, COMPONENT_ATTRIBUTES,
   FilterAttributes, FilterAttributesUtil, FIX_VERSION_ATTRIBUTES, ISSUE_TYPE_ATTRIBUTES, LABEL_ATTRIBUTES, NONE_FILTER,
+  PARALLEL_TASK_ATTRIBUTES,
   PRIORITY_ATTRIBUTES,
   PROJECT_ATTRIBUTES
 } from '../../../common/board/user/board-filter/board-filter.constants';
 import {BoardFilterActions} from '../../../common/board/user/board-filter/board-filter.reducer';
 import {customFieldsSelector} from '../../../common/board/custom-field/custom-field.reducer';
 import {CustomField} from '../../../common/board/custom-field/custom-field.model';
+import {ParallelTask} from '../../../common/board/project/project.model';
 
 @Component({
   selector: 'app-control-panel',
@@ -83,9 +85,7 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
             fixVersions => fixVersions.map(l => FilterFormEntry(l, l)).toArray(),
             () => filterState.fixVersion);
           this.createCustomFieldGroups(filterState, this._store.select(customFieldsSelector));
-
-          // TODO parallel tasks
-
+          this.createParallelTaskGroup(filterState, this._store.select(parallelTasksSelector));
         }
       );
 
@@ -118,7 +118,6 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
       .subscribe(
         customFields => {
           customFields.forEach((fields, key) => {
-            console.log(fields.toString());
             const filterFormEntries: FilterFormEntry[] = fields.map(c => FilterFormEntry(c.key, c.value)).toArray();
             const cfFilterAttributes: FilterAttributes = FilterAttributesUtil.createCustomFieldFilterAttributes(key);
             this.filterList.push(cfFilterAttributes);
@@ -127,6 +126,50 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
         }
       );
   }
+
+  private createParallelTaskGroup(filterState: BoardFilterState, observable: Observable<OrderedMap<string, List<ParallelTask>>>) {
+    observable
+      .takeWhile((v, i) => (i === 0))
+      .subscribe(
+        parallelTasks => {
+          if (parallelTasks.size === 0) {
+            // No parallel tasks configured
+            return;
+          }
+          this.filterList.push(PARALLEL_TASK_ATTRIBUTES);
+          const filterFormEntries: FilterFormEntry[] = [];
+          const done: Dictionary<boolean> = {};
+          const parallelTasksGroup: FormGroup = new FormGroup({});
+
+          parallelTasks.forEach((tasksForProject => {
+            // TODO if we have different options for different projects, we should merge those here if that becomes needed
+            tasksForProject.forEach((parallelTask: ParallelTask) => {
+              if (done[parallelTask.name]) {
+                return;
+              };
+              done[parallelTask.name] = true;
+
+              const options: FilterFormEntry[] = new Array<FilterFormEntry>(parallelTask.options.size);
+              const taskGroup: FormGroup = new FormGroup({});
+
+              parallelTask.options.forEach((option, i) => {
+                options[i] = FilterFormEntry(option, option);
+                const filteredOptions: Set<string> = filterState.parallelTask.get(parallelTask.display);
+                taskGroup.addControl(option, new FormControl(!!filteredOptions && filteredOptions.contains(option)));
+              });
+
+              filterFormEntries.push(FilterFormEntry(parallelTask.display, parallelTask.name, options));
+              parallelTasksGroup.addControl(parallelTask.display, taskGroup);
+            });
+          }));
+
+          this.filterEntries[PARALLEL_TASK_ATTRIBUTES.key] = filterFormEntries;
+          this.filterForm.addControl(PARALLEL_TASK_ATTRIBUTES.key, parallelTasksGroup);
+        }
+      );
+  }
+
+
 
   private createGroup(filterFormEntries: FilterFormEntry[], filter: FilterAttributes, setFilterGetter: () => Set<string>) {
     if (filter.hasNone) {
@@ -140,7 +183,8 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
     const group: FormGroup = new FormGroup({});
 
     filterFormEntries.forEach(entry => {
-      group.addControl(entry.key, new FormControl(set.contains(entry.key)));
+      const control: FormControl = new FormControl(set.contains(entry.key));
+      group.addControl(entry.key, control);
     });
 
     this.filterForm.addControl(filter.key, group);
@@ -166,7 +210,8 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
 interface FilterFormEntry {
   key: string;
   display: string;
+  children: FilterFormEntry[];
 }
-function FilterFormEntry(key: string, display: string): FilterFormEntry {
-  return {key: key, display: display};
+function FilterFormEntry(key: string, display: string, children?: FilterFormEntry[]): FilterFormEntry {
+  return {key: key, display: display, children: children};
 }

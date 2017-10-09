@@ -125,6 +125,24 @@
           "verified" : "Verified",
           "Done" : "Done"
         },
+        "parallel-tasks" : [
+          {
+            "name" : "Community Docs",
+            "display" : "CD",
+            "options" : [
+              "TODO",
+              "Done"]
+          },
+          {
+            "name" : "Test Development",
+            "display" : "TD",
+            "options" : [
+              "TODO",
+              "In Progress",
+              "Review",
+              "Merged"]
+          }
+        ],
         "ranked": ["FEAT-1"]
       },
       "BUG" : {

@@ -22,8 +22,19 @@
           <div [formGroup]="filterForm" #f="ngForm">
             <div formGroupName="{{filtersToDisplay.key}}">
               <div *ngFor="let entry of currentFilterEntries">
-                <input type="checkbox" formControlName="{{entry.key}}" id="{{filtersToDisplay.key}}-{{entry.key}}"/>
-                <label [attr.for]="filtersToDisplay.key + '-' + entry.key">{{entry.display}}</label>
+                <div *ngIf="!entry.children; else parallelTasksForm">
+                  <input type="checkbox" formControlName="{{entry.key}}" id="{{filtersToDisplay.key}}-{{entry.key}}"/>
+                  <label [attr.for]="filtersToDisplay.key + '-' + entry.key">{{entry.display}}</label>
+                </div>
+                <ng-template #parallelTasksForm>
+                  <div formGroupName="{{entry.key}}">
+                    <div>{{entry.display}}</div>
+                    <div *ngFor="let childEntry of entry.children">
+                      <input type="checkbox" formControlName="{{childEntry.key}}" id="pt-{{filtersToDisplay.key}}-{{childEntry.key}}"/>
+                      <label [attr.for]="'pt' + filtersToDisplay.key + '-' + childEntry.key">{{childEntry.display}}</label>
+                    </div>
+                  </div>
+                </ng-template>
               </div>
             </div>
           </div>
