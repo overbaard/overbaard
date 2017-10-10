@@ -1,6 +1,6 @@
 import {ComponentActions, componentReducer} from './component.reducer';
 import {ComponentState, initialComponentState} from './component.model';
-import {cloneObject} from '../../utils/test-util.spec';
+import {cloneObject} from '../../../common/object-util';
 
 export function getTestComponentsInput(): any {
   return cloneObject(['C-10', 'C-20', 'C-30']);

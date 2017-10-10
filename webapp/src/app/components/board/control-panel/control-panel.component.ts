@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
 import {AppState} from '../../../app-store';
 import {Store} from '@ngrx/store';
-import {Dictionary} from '../../../model/utils/dictionary';
+import {Dictionary} from '../../../common/dictionary';
 import {FormControl, FormGroup} from '@angular/forms';
 import 'rxjs/add/operator/takeWhile';
 import 'rxjs/add/operator/map';

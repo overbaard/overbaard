@@ -1,7 +1,7 @@
 import {async} from '@angular/core/testing';
 import {initialIssueTypeState, IssueType, IssueTypeState} from './issue-type.model';
 import {IssueTypeActions, issueTypeReducer} from './issue-type.reducer';
-import {cloneObject} from '../../utils/test-util.spec';
+import {cloneObject} from '../../../common/object-util';
 
 export function getTestIssueTypesInput(): any {
   return cloneObject([

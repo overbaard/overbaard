@@ -1,7 +1,7 @@
 import {ProjectActions, projectReducer} from './project.reducer';
 import {List} from 'immutable';
 import {BoardProject, initialProjectState, LinkedProject, ParallelTask, ProjectState} from './project.model';
-import {cloneObject} from '../../utils/test-util.spec';
+import {cloneObject} from '../../../common/object-util';
 
 export function getTestProjectsInput(): any {
   return cloneObject(

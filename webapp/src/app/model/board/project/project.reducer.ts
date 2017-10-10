@@ -10,7 +10,7 @@ import {
 import {List, Map, OrderedMap} from 'immutable';
 import {AppState} from '../../../app-store';
 import {createSelector} from 'reselect';
-import {cloneObject} from '../../utils/test-util.spec';
+import {cloneObject} from '../../../common/object-util';
 
 const DESERIALIZE_PROJECTS = 'DESERIALIZE_PROJECTS';
 

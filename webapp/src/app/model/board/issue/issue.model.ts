@@ -5,7 +5,7 @@ import {IssueType} from '../issue-type/issue-type.model';
 import {fromJS, List, Map, OrderedMap} from 'immutable';
 import {CustomField} from '../custom-field/custom-field.model';
 import {BoardProject, ParallelTask} from '../project/project.model';
-import {cloneObject} from '../../utils/test-util.spec';
+import {cloneObject} from '../../../common/object-util';
 import {BoardIssue} from './board-issue';
 import {Issue} from './issue';
 

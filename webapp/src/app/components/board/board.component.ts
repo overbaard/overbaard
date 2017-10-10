@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
-import {Dictionary} from '../../model/utils/dictionary';
+import {Dictionary} from '../../common/dictionary';
 import {ActivatedRoute} from '@angular/router';
 import {AppHeaderService} from '../../services/app-header.service';
 import {BoardService} from '../../services/board.service';

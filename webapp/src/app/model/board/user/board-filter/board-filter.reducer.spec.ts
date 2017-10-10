@@ -1,4 +1,4 @@
-import {Dictionary} from '../../../utils/dictionary';
+import {Dictionary} from '../../../../common/dictionary';
 import {BoardFilterState, BoardFilterUtil, initialBoardFilterState} from './board-filter.model';
 import {BoardFilterActions, boardFilterReducer} from './board-filter.reducer';
 import {Map, Set} from 'immutable';

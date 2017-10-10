@@ -1,7 +1,7 @@
 import {async} from '@angular/core/testing';
 import {Assignee, AssigneeState, initialAssigneeState} from './assignee.model';
 import {AssigneeActions, assigneeReducer} from './assignee.reducer';
-import {cloneObject} from '../../utils/test-util.spec';
+import {cloneObject} from '../../../common/object-util';
 
 export function getTestAssigneesInput(): any {
   return cloneObject([

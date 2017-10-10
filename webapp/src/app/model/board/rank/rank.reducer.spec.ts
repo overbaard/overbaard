@@ -1,7 +1,7 @@
 import {initialRankState, RankState} from './rank.model';
 import {RankActions, rankReducer} from './rank.reducer';
 import {getTestProjectsInput} from '../project/project.reducer.spec';
-import {cloneObject} from '../../utils/test-util.spec';
+import {cloneObject} from '../../../common/object-util';
 
 export function getTestRanksInput(): any {
   return getTestProjectsInput()['main'];

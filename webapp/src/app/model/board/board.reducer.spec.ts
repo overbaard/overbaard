@@ -1,4 +1,4 @@
-import {cloneObject} from '../utils/test-util.spec';
+import {cloneObject} from '../../common/object-util';
 import {BoardActions, boardReducer, initialBoardState} from './board.reducer';
 import {getTestComponentsInput} from './component/component.reducer.spec';
 import {getTestPrioritiesInput} from './priority/priority.reducer.spec';

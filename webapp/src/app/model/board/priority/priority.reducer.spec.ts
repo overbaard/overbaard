@@ -1,7 +1,7 @@
 import {async} from '@angular/core/testing';
 import {initialPriorityState, Priority, PriorityState} from './priority.model';
 import {PriorityActions, priorityReducer} from './priority.reducer';
-import {cloneObject} from '../../utils/test-util.spec';
+import {cloneObject} from '../../../common/object-util';
 import {initialLabelState, LabelState} from '../label/label.model';
 import {LabelActions, labelReducer} from '../label/label.reducer';
 import {getTestLabelsInput} from '../label/label.reducer.spec';

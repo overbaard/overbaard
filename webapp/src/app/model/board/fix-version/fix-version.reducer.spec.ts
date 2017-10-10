@@ -1,6 +1,6 @@
 import {FixVersionActions, fixVersionReducer} from './fix-version.reducer';
 import {FixVersionState, initialFixVersionState} from './fix-version.model';
-import {cloneObject} from '../../utils/test-util.spec';
+import {cloneObject} from '../../../common/object-util';
 
 export function getTestFixVersionsInput(): any {
   return cloneObject(['F-10', 'F-20', 'F-30']);

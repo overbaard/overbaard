@@ -1,4 +1,4 @@
-import {cloneObject} from '../../utils/test-util.spec';
+import {cloneObject} from '../../../common/object-util';
 import {BlacklistState, initialBlacklistState} from './blacklist.model';
 import {BlacklistActions, blacklistReducer} from './blacklist.reducer';
 

@@ -10,7 +10,7 @@ import {Map} from 'immutable';
 import {getTestComponentState} from '../component/component.reducer.spec';
 import {getTestLabelState} from '../label/label.reducer.spec';
 import {getTestFixVersionState} from '../fix-version/fix-version.reducer.spec';
-import {cloneObject} from '../../utils/test-util.spec';
+import {cloneObject} from '../../../common/object-util';
 import {BoardIssue} from './board-issue';
 
 function getTestIssuesInput() {

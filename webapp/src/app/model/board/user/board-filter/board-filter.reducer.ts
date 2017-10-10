@@ -1,7 +1,7 @@
 import {BoardFilterState, BoardFilterUtil} from './board-filter.model';
 import {Action} from '@ngrx/store';
 import {Map, Set} from 'immutable';
-import {Dictionary} from '../../../utils/dictionary';
+import {Dictionary} from '../../../../common/dictionary';
 import {
   ASSIGNEE_ATTRIBUTES,
   COMPONENT_ATTRIBUTES,

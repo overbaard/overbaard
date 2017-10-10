@@ -1,7 +1,7 @@
 import {CustomField, CustomFieldState, initialCustomFieldState} from './custom-field.model';
 import {CustomFieldActions, customFieldReducer} from './custom-field.reducer';
 import {List, OrderedMap} from 'immutable';
-import {cloneObject} from '../../utils/test-util.spec';
+import {cloneObject} from '../../../common/object-util';
 
 export function getTestCustomFieldsInput() {
   return cloneObject({

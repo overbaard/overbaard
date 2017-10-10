@@ -1,7 +1,7 @@
 import {List} from 'immutable';
 import {HeaderUtil, initialHeaderState} from './header.model';
 import {Action} from '@ngrx/store';
-import {Dictionary} from '../../utils/dictionary';
+import {Dictionary} from '../../../common/dictionary';
 import {HeaderState} from './header.state';
 import {Header} from './header';
 

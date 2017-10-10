@@ -1,5 +1,5 @@
 import {IssueType, IssueTypeUtil} from './issue-type.model';
-import {cloneObject} from '../../utils/test-util.spec';
+import {cloneObject} from '../../../common/object-util';
 
 describe('Issue Type unit tests', () => {
 

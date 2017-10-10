@@ -1,5 +1,5 @@
 import {Priority, PriorityUtil} from './priority.model';
-import {cloneObject} from '../../utils/test-util.spec';
+import {cloneObject} from '../../../common/object-util';
 
 describe('Priority unit tests', () => {
 

@@ -1,5 +1,5 @@
 import {Assignee, AssigneeUtil} from './assignee.model';
-import {cloneObject} from '../../utils/test-util.spec';
+import {cloneObject} from '../../../common/object-util';
 
 describe('Assignee unit tests', () => {
 
