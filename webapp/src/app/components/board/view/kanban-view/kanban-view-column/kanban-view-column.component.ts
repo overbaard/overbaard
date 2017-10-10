@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
-import {BoardIssue} from '../../../../../common/board/issue/board-issue';
+import {BoardIssue} from '../../../../../model/board/issue/board-issue';
 import {List} from 'immutable';
 
 /* tslint:disable:component-selector */

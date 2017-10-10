@@ -2,10 +2,10 @@ import {ActionReducer, combineReducers} from '@ngrx/store';
 import {environment} from '../environments/environment';
 import {compose} from '@ngrx/core/compose';
 import {storeFreeze} from 'ngrx-store-freeze';
-import {BoardState} from './common/board/board';
-import {boardReducer} from './common/board/board.reducer';
-import {boardFilterReducer} from './common/board/user/board-filter/board-filter.reducer';
-import {BoardFilterState} from './common/board/user/board-filter/board-filter.model';
+import {BoardState} from './model/board/board';
+import {boardReducer} from './model/board/board.reducer';
+import {boardFilterReducer} from './model/board/user/board-filter/board-filter.reducer';
+import {BoardFilterState} from './model/board/user/board-filter/board-filter.model';
 
 export interface AppState {
   board: BoardState;

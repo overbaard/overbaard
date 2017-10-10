@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
-import {HeaderState} from '../../../../../common/board/header/header.state';
+import {HeaderState} from '../../../../../model/board/header/header.state';
 
 @Component({
   selector: 'app-kanban-view-headers',

@@ -1,11 +1,11 @@
 /**
  * Abstract base class for a board containing a fixed header.
  */
-import {BoardState} from '../../../common/board/board';
+import {BoardState} from '../../../model/board/board';
 import {Input} from '@angular/core';
 import {List} from 'immutable';
-import {HeaderState} from '../../../common/board/header/header.state';
-import {BoardIssue} from '../../../common/board/issue/board-issue';
+import {HeaderState} from '../../../model/board/header/header.state';
+import {BoardIssue} from '../../../model/board/issue/board-issue';
 
 export class FixedHeaderView {
 

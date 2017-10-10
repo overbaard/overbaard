@@ -1,32 +1,32 @@
 import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
 import {AppState} from '../../../app-store';
 import {Store} from '@ngrx/store';
-import {Dictionary} from '../../../common/utils/dictionary';
+import {Dictionary} from '../../../model/utils/dictionary';
 import {FormControl, FormGroup} from '@angular/forms';
 import 'rxjs/add/operator/takeWhile';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/debounceTime';
 import {Observable} from 'rxjs/Observable';
-import {boardProjectsSelector, parallelTasksSelector} from '../../../common/board/project/project.reducer';
-import {BoardFilterState} from '../../../common/board/user/board-filter/board-filter.model';
+import {boardProjectsSelector, parallelTasksSelector} from '../../../model/board/project/project.reducer';
+import {BoardFilterState} from '../../../model/board/user/board-filter/board-filter.model';
 import {List, OrderedMap, Set} from 'immutable';
-import {issuesTypesSelector} from '../../../common/board/issue-type/issue-type.reducer';
-import {prioritiesSelector} from '../../../common/board/priority/priority.reducer';
-import {assigneesSelector} from '../../../common/board/assignee/assignee.reducer';
-import {componentsSelector} from '../../../common/board/component/component.reducer';
-import {labelsSelector} from '../../../common/board/label/label.reducer';
-import {fixVersionsSelector} from '../../../common/board/fix-version/fix-version.reducer';
+import {issuesTypesSelector} from '../../../model/board/issue-type/issue-type.reducer';
+import {prioritiesSelector} from '../../../model/board/priority/priority.reducer';
+import {assigneesSelector} from '../../../model/board/assignee/assignee.reducer';
+import {componentsSelector} from '../../../model/board/component/component.reducer';
+import {labelsSelector} from '../../../model/board/label/label.reducer';
+import {fixVersionsSelector} from '../../../model/board/fix-version/fix-version.reducer';
 import {
   ASSIGNEE_ATTRIBUTES, COMPONENT_ATTRIBUTES,
   FilterAttributes, FilterAttributesUtil, FIX_VERSION_ATTRIBUTES, ISSUE_TYPE_ATTRIBUTES, LABEL_ATTRIBUTES, NONE_FILTER,
   PARALLEL_TASK_ATTRIBUTES,
   PRIORITY_ATTRIBUTES,
   PROJECT_ATTRIBUTES
-} from '../../../common/board/user/board-filter/board-filter.constants';
-import {BoardFilterActions} from '../../../common/board/user/board-filter/board-filter.reducer';
-import {customFieldsSelector} from '../../../common/board/custom-field/custom-field.reducer';
-import {CustomField} from '../../../common/board/custom-field/custom-field.model';
-import {ParallelTask} from '../../../common/board/project/project.model';
+} from '../../../model/board/user/board-filter/board-filter.constants';
+import {BoardFilterActions} from '../../../model/board/user/board-filter/board-filter.reducer';
+import {customFieldsSelector} from '../../../model/board/custom-field/custom-field.reducer';
+import {CustomField} from '../../../model/board/custom-field/custom-field.model';
+import {ParallelTask} from '../../../model/board/project/project.model';
 
 @Component({
   selector: 'app-control-panel',

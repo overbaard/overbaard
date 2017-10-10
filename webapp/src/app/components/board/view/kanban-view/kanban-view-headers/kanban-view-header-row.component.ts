@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
-import {Header} from '../../../../../common/board/header/header';
+import {Header} from '../../../../../model/board/header/header';
 import {List} from 'immutable';
 
 /**

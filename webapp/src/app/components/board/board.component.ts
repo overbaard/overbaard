@@ -1,19 +1,26 @@
 import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
-import {Dictionary} from '../../common/utils/dictionary';
+import {Dictionary} from '../../model/utils/dictionary';
 import {ActivatedRoute} from '@angular/router';
 import {AppHeaderService} from '../../services/app-header.service';
 import {BoardService} from '../../services/board.service';
 import {Store} from '@ngrx/store';
 import {AppState} from '../../app-store';
-import {BoardActions} from '../../common/board/board.reducer';
+import {BoardActions} from '../../model/board/board.reducer';
 import {Observable} from 'rxjs/Observable';
-import {BoardState} from '../../common/board/board';
+import {BoardState} from '../../model/board/board';
 import {Subscription} from 'rxjs/Subscription';
-import {BoardFilterActions} from '../../common/board/user/board-filter/board-filter.reducer';
+import {BoardFilterActions} from '../../model/board/user/board-filter/board-filter.reducer';
 import 'rxjs/add/operator/skipWhile';
 import 'rxjs/add/operator/takeUntil';
-import {BoardFilterState} from '../../common/board/user/board-filter/board-filter.model';
+import 'rxjs/add/observable/combineLatest';
+import 'rxjs/add/observable/of';
+import {BoardFilterState} from '../../model/board/user/board-filter/board-filter.model';
 import {Subject} from 'rxjs/Subject';
+import {assigneesSelector} from '../../model/board/assignee/assignee.reducer';
+import {Assignee} from '../../model/board/assignee/assignee.model';
+import {OrderedMap} from 'immutable';
+import {IssueType} from '../../model/board/issue-type/issue-type.model';
+import {issuesTypesSelector} from '../../model/board/issue-type/issue-type.reducer';
 
 
 const VIEW_KANBAN = 'kbv';
@@ -108,7 +115,6 @@ export class BoardComponent implements OnInit {
       });
 
     this.boardState$ = this._store.select('board');
-
   }
 
   onFocus($event: Event) {
