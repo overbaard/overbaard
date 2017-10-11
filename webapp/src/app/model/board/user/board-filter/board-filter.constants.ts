@@ -5,13 +5,15 @@ export interface FilterAttributes {
   key: string;
   hasNone: boolean;
   customField: boolean;
+  swimlaneOption: boolean;
 }
 
 const DEFAULT_ATTRIBUTES: FilterAttributes = {
   display: '',
   key: '',
   hasNone: false,
-  customField: false
+  customField: false,
+  swimlaneOption: false
 };
 
 export const NONE_FILTER = '$n$o$n$e$';
@@ -21,17 +23,27 @@ interface FilterAttributesRecord extends TypedRecord<FilterAttributesRecord>, Fi
 
 const FACTORY = makeTypedFactory<FilterAttributes, FilterAttributesRecord>(DEFAULT_ATTRIBUTES);
 
-export const PROJECT_ATTRIBUTES = FACTORY({display: 'Project', key: 'project', hasNone: false, customField: false});
-export const ISSUE_TYPE_ATTRIBUTES = FACTORY({display: 'Issue Type', key: 'issue-type', hasNone: false, customField: false});
-export const PRIORITY_ATTRIBUTES = FACTORY({display: 'Priority', key: 'priority', hasNone: false, customField: false});
-export const ASSIGNEE_ATTRIBUTES = FACTORY({display: 'Assignee', key: 'assignee', hasNone: true, customField: false});
-export const COMPONENT_ATTRIBUTES = FACTORY({display: 'Component', key: 'component', hasNone: true, customField: false});
-export const LABEL_ATTRIBUTES = FACTORY({display: 'Label', key: 'label', hasNone: true, customField: false});
-export const FIX_VERSION_ATTRIBUTES = FACTORY({display: 'Fix Version', key: 'fix-version', hasNone: true, customField: false});
-export const PARALLEL_TASK_ATTRIBUTES = FACTORY({display: 'Parallel Tasks', key: 'parallel-tasks', hasNone: true, customField: false});
+export const PROJECT_ATTRIBUTES = FACTORY(FilterAttributes('Project', 'project', false, false, true));
+export const ISSUE_TYPE_ATTRIBUTES = FACTORY(FilterAttributes('Issue Type', 'issue-type', false, false, true));
+export const PRIORITY_ATTRIBUTES = FACTORY(FilterAttributes('Priority', 'priority', false, false, true));
+export const ASSIGNEE_ATTRIBUTES = FACTORY(FilterAttributes('Assignee', 'assignee', true, false, true));
+export const COMPONENT_ATTRIBUTES = FACTORY(FilterAttributes('Component', 'component', true, false, true));
+export const LABEL_ATTRIBUTES = FACTORY(FilterAttributes('Label', 'label', true, false, true));
+export const FIX_VERSION_ATTRIBUTES = FACTORY(FilterAttributes('Fix Version', 'fix-version', true, false, true));
+export const PARALLEL_TASK_ATTRIBUTES = FACTORY(FilterAttributes('Parallel Tasks', 'parallel-tasks', true, false, false));
+
+function FilterAttributes(display: string, key: string, hasNone: boolean, customField: boolean, swimlaneOption: boolean): FilterAttributes {
+  return {
+    display: display,
+    key: key,
+    hasNone: hasNone,
+    customField: customField,
+    swimlaneOption: swimlaneOption
+  };
+}
 
 export class FilterAttributesUtil {
   static createCustomFieldFilterAttributes(customFieldName: string): FilterAttributes {
-    return FACTORY({display: customFieldName, key: customFieldName, hasNone: true, customField: true});
+    return FACTORY(FilterAttributes(customFieldName, customFieldName, true, true, true));
   }
 }

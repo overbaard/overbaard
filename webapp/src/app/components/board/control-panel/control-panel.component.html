@@ -3,6 +3,19 @@
   <table style="font-size: 12px;">
     <tr>
       <td>
+        <div [formGroup]="swimlaneForm" #f="ngForm">
+          <select formControlName="swimlane">
+            <!-- Don't set a value for the undefined one -->
+            <option></option>
+            <option *ngFor="let sl of swimlaneList" value="{{sl.key}}">{{sl.display}}</option>
+          </select>
+
+        </div>
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>
         <div>Select Filter</div>
         <div *ngFor="let entry of filterList" [class.selected]="filtersToDisplay === entry">
           <a href="Filter {{entry.display}}"

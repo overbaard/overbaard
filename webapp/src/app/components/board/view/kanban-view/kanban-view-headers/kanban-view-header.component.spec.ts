@@ -1,8 +1,6 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { KanbanViewHeaderComponent } from './kanban-view-header.component';
-import {KanbanViewHeaderRowComponent} from './kanban-view-header-row.component';
-import {KanbanViewComponent} from '../kanban-view.component';
+import {KanbanViewHeaderComponent} from './kanban-view-header.component';
 import {List} from 'immutable';
 
 describe('KanbanViewHeaderComponent', () => {

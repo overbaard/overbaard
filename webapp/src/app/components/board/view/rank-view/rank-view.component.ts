@@ -1,6 +1,4 @@
-import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
-import {BoardState} from '../../../../model/board/data/board';
+import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {FixedHeaderView} from '../fixed-header-view';
 
 @Component({

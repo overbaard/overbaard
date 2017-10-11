@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {KanbanViewComponent} from './kanban-view.component';
 import {KanbanViewHeadersComponent} from './kanban-view-headers/kanban-view-headers.component';
 import {KanbanViewHeaderRowComponent} from './kanban-view-headers/kanban-view-header-row.component';

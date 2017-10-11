@@ -8,12 +8,10 @@ import {AppState} from '../../app-store';
 import {BoardActions} from '../../model/board/data/board.reducer';
 import {Observable} from 'rxjs/Observable';
 import {BoardState} from '../../model/board/data/board';
-import {BoardFilterActions} from '../../model/board/user/board-filter/board-filter.reducer';
 import 'rxjs/add/operator/skipWhile';
 import 'rxjs/add/operator/takeUntil';
 import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/observable/of';
-import {BoardFilterState} from '../../model/board/user/board-filter/board-filter.model';
 import {Subject} from 'rxjs/Subject';
 import {List} from 'immutable';
 import {headersSelector} from '../../model/board/data/header/header.reducer';
@@ -86,6 +84,8 @@ export class BoardComponent implements OnInit, OnDestroy {
     // TODO use backlog from querystring (store in the state)
     // TODO turn on/off progress indicator and log errors
 
+    UserSettingActions.createInitialiseFromQueryString(this._route.snapshot.queryParams);
+
     const gotAllData$: Subject<boolean> = new Subject<boolean>();
 
     this._boardService.loadBoardData(this.boardCode, true)
@@ -105,18 +105,10 @@ export class BoardComponent implements OnInit, OnDestroy {
           // Parse the filters once we have the board
           this._store.dispatch(
               UserSettingActions.createInitialiseFromQueryString(this._route.snapshot.queryParams));
+          // Unsubscribe from the subject itself
+          gotAllData$.unsubscribe();
         }
       );
-
-    this._store.select<BoardFilterState>('filters')
-      .skipWhile(filters => !filters)
-      .takeUntil(gotAllData$)
-      .subscribe(filters => {
-        // Got the filters, emit the event to unsubscribe all takeUntil(gotAllData$)
-        gotAllData$.next(true);
-        // Unsubscribe from the subject itself
-        gotAllData$.unsubscribe();
-      });
 
     this.headers$ = this._store.select(headersSelector);
     this.issueTable$ = this._issueTableVmService.getIssueTableVm();

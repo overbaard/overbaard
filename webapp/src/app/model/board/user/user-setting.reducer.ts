@@ -3,13 +3,19 @@ import {Dictionary} from '../../../common/dictionary';
 import {Map, Set} from 'immutable';
 import {initialUserSettingState, UserSettingState, UserSettingUtil} from './user-setting.model';
 import {boardFilterMetaReducer} from './board-filter/board-filter.reducer';
-import {BoardFilterState} from './board-filter/board-filter.model';
 
 const CLEAR_SETTINGS = 'CLEAR_SETTINGS';
 export const INITIALISE_SETTINGS_FROM_QUERYSTRING = 'INITIALISE_SETTINGS_FROM_QUERYSTRING';
+const UPDATE_SWIMLANE = 'UPDATE_SWIMLANE';
 
 export class ClearSettingsAction implements Action {
-  type = CLEAR_SETTINGS;
+  readonly type = CLEAR_SETTINGS;
+}
+
+export class UpdateSwimlaneAction implements Action {
+  readonly type = UPDATE_SWIMLANE;
+  constructor(readonly payload: string) {
+  }
 }
 
 export class InitialiseFromQueryStringAction implements Action {
@@ -61,13 +67,23 @@ export class UserSettingActions {
   static createInitialiseFromQueryString(queryParams: Dictionary<string>): Action {
     return new InitialiseFromQueryStringAction(queryParams);
   }
+
+  static createUpdateSwimlane(swimlane: string) {
+    return new UpdateSwimlaneAction(swimlane);
+  }
 }
 
 export function userSettingReducer(state: UserSettingState = initialUserSettingState, action: Action): UserSettingState {
   switch (action.type) {
     case INITIALISE_SETTINGS_FROM_QUERYSTRING: {
       return UserSettingUtil.toStateRecord(state).withMutations( mutable => {
+        mutable.swimlane = (<InitialiseFromQueryStringAction>action).payload['swimlane'];
         mutable.filters = boardFilterMetaReducer(state.filters, action);
+      });
+    }
+    case UPDATE_SWIMLANE: {
+      return UserSettingUtil.toStateRecord(state).withMutations(mutable => {
+        mutable.swimlane = (<UpdateSwimlaneAction>action).payload;
       });
     }
   }

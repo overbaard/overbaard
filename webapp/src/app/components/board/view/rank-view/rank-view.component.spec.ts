@@ -1,6 +1,6 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { RankViewComponent } from './rank-view.component';
+import {RankViewComponent} from './rank-view.component';
 
 describe('RankViewComponent', () => {
   let component: RankViewComponent;

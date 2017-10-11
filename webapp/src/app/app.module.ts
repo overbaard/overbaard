@@ -13,14 +13,14 @@ import {RestUrlService} from './services/rest-url.service';
 import {BoardComponent} from './components/board/board.component';
 import {HttpClientModule} from '@angular/common/http';
 import {AppHeaderService} from './services/app-header.service';
-import { KanbanViewComponent } from './components/board/view/kanban-view/kanban-view.component';
-import { RankViewComponent } from './components/board/view/rank-view/rank-view.component';
-import { KanbanViewHeadersComponent } from './components/board/view/kanban-view/kanban-view-headers/kanban-view-headers.component';
-import { KanbanViewHeaderRowComponent } from './components/board/view/kanban-view/kanban-view-headers/kanban-view-header-row.component';
-import { KanbanViewHeaderComponent } from './components/board/view/kanban-view/kanban-view-headers/kanban-view-header.component';
-import { KanbanViewColumnComponent } from './components/board/view/kanban-view/kanban-view-column/kanban-view-column.component';
-import { BoardIssueComponent } from './components/board/issue/board-issue.component';
-import { ControlPanelComponent } from './components/board/control-panel/control-panel.component';
+import {KanbanViewComponent} from './components/board/view/kanban-view/kanban-view.component';
+import {RankViewComponent} from './components/board/view/rank-view/rank-view.component';
+import {KanbanViewHeadersComponent} from './components/board/view/kanban-view/kanban-view-headers/kanban-view-headers.component';
+import {KanbanViewHeaderRowComponent} from './components/board/view/kanban-view/kanban-view-headers/kanban-view-header-row.component';
+import {KanbanViewHeaderComponent} from './components/board/view/kanban-view/kanban-view-headers/kanban-view-header.component';
+import {KanbanViewColumnComponent} from './components/board/view/kanban-view/kanban-view-column/kanban-view-column.component';
+import {BoardIssueComponent} from './components/board/issue/board-issue.component';
+import {ControlPanelComponent} from './components/board/control-panel/control-panel.component';
 
 
 @NgModule({

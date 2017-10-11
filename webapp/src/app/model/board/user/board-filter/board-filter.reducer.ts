@@ -1,18 +1,21 @@
 import {BoardFilterState, BoardFilterUtil, initialBoardFilterState} from './board-filter.model';
 import {Action} from '@ngrx/store';
 import {Map, Set} from 'immutable';
-import {Dictionary} from '../../../../common/dictionary';
 import {
   ASSIGNEE_ATTRIBUTES,
   COMPONENT_ATTRIBUTES,
   FilterAttributes,
   FIX_VERSION_ATTRIBUTES,
   ISSUE_TYPE_ATTRIBUTES,
-  LABEL_ATTRIBUTES, PARALLEL_TASK_ATTRIBUTES,
+  LABEL_ATTRIBUTES,
+  PARALLEL_TASK_ATTRIBUTES,
   PRIORITY_ATTRIBUTES,
   PROJECT_ATTRIBUTES,
 } from './board-filter.constants';
 import {INITIALISE_SETTINGS_FROM_QUERYSTRING, InitialiseFromQueryStringAction} from '../user-setting.reducer';
+import {AppState} from '../../../../app-store';
+import {UserSettingState} from '../user-setting.model';
+import {createSelector} from 'reselect';
 
 const UPDATE_FILTER = 'UPDATE_FILTER';
 
@@ -121,3 +124,7 @@ interface UpdateFilterPayload {
   filter: FilterAttributes;
   data: Object;
 }
+
+const getUserSettingState = (state: AppState) => state.userSettings;
+const getFilters = (state: UserSettingState) => state.filters;
+export const filtersSelector = createSelector(getUserSettingState, getFilters);

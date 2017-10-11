@@ -18,12 +18,14 @@ describe('User setting reducer tests', () => {
     it ('With Querystring', () => {
       // Just test a few filter fields, the board filter reducer tests test this properly
       const qs: Dictionary<string> = {
-        project: 'P1'
+        project: 'P1',
+        swimlane: 'project'
       };
       const state: UserSettingState = userSettingReducer(
         initialUserSettingState,
         UserSettingActions.createInitialiseFromQueryString(qs));
       const settingChecker: SettingChecker = new SettingChecker();
+      settingChecker.swimlane = 'project';
       settingChecker.filterChecker.project = ['P1'];
       settingChecker.check(state)
     });
@@ -47,10 +49,18 @@ describe('User setting reducer tests', () => {
       checker.filterChecker.project = ['P2', 'P3'];
       checker.check(state);
     });
+
+    it ('Update swimlane', () => {
+      state = userSettingReducer(state, UserSettingActions.createUpdateSwimlane('project'));
+      const checker: SettingChecker = new SettingChecker();
+      checker.swimlane = 'project';
+      checker.check(state);
+    });
   });
 });
 
 class SettingChecker {
+  swimlane: string = null;
   filterChecker: FilterChecker = new FilterChecker();
 
   constructor() {
@@ -65,6 +75,11 @@ class SettingChecker {
   }
 
   check(state: UserSettingState) {
+    if (!this.swimlane) {
+      expect(state.swimlane).toBeFalsy();
+    } else {
+      expect(state.swimlane).toEqual(this.swimlane);
+    }
     this.filterChecker.check(state.filters);
   }
 }

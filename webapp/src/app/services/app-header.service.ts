@@ -7,6 +7,6 @@ export class AppHeaderService {
     }
 
     setTitle(title: string) {
-        this._title.setTitle('Overbård -¡ ' + title);
+        this._title.setTitle('Overbård - ' + title);
     }
 }

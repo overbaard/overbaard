@@ -1,12 +1,9 @@
 import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
 import {BoardsService} from '../../services/boards.service';
 import {Observable} from 'rxjs/Observable';
-import {Subscription} from 'rxjs/Subscription';
 import 'rxjs/add/operator/catch';
 import {AppHeaderService} from '../../services/app-header.service';
 import {VIEW_RANK} from '../board/board.component';
-import {AppState} from '../../app-store';
-import {Store} from '@ngrx/store';
 
 @Component({
   selector: 'app-boards',
