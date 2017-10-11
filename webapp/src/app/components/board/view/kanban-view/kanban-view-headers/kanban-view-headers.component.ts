@@ -1,5 +1,7 @@
 import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
 import {HeaderState} from '../../../../../model/board/header/header.state';
+import {Header} from '../../../../../model/board/header/header';
+import {List} from 'immutable';
 
 @Component({
   selector: 'app-kanban-view-headers',
@@ -10,7 +12,7 @@ import {HeaderState} from '../../../../../model/board/header/header.state';
 export class KanbanViewHeadersComponent implements OnInit {
 
   @Input()
-  headerState: HeaderState;
+  headers: List<List<Header>>;
 
   @Input()
   boardLeftOffset = 0;

@@ -1,14 +1,14 @@
 <div (window:focus)="onFocus($event)" (window:blur)="onBlur($event)" (window:resize)="onResize($event)">
-  {{boardState$['viewId'] | async}}
   <app-kanban-view
     *ngIf="view === 'kbv'"
-    [boardState]="boardState$ | async"
+    [headers]="headers$ | async"
+    [issueTable]="issueTable$ | async"
     [windowWidth]="windowWidth"
     [windowHeight]="windowHeight">
   </app-kanban-view>
   <app-rank-view
     *ngIf="view === 'rv'"
-    [boardState]="boardState$ | async"
+    [headers]="headers$ | async"
     [windowWidth]="windowWidth"
     [windowHeight]="windowHeight">
   </app-rank-view>

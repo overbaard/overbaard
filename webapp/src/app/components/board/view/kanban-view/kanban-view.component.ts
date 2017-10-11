@@ -1,5 +1,6 @@
-import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
 import {FixedHeaderView} from '../fixed-header-view';
+import {IssueTableVm} from '../../../../view-model/board/issue-table/issue-table-vm';
 
 @Component({
   selector: 'app-kanban-view',
@@ -8,6 +9,9 @@ import {FixedHeaderView} from '../fixed-header-view';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class KanbanViewComponent extends FixedHeaderView implements OnInit {
+
+  @Input()
+  issueTable: IssueTableVm;
 
   constructor() {
     super();

@@ -9,7 +9,6 @@ import {initialProjectState} from './project/project.model';
 import {initialRankState} from './rank/rank.model';
 import {initialIssueState} from './issue/issue.model';
 import {initialBlacklistState} from './blacklist/blacklist.model';
-import {initialIssueTableState} from './calculated/issue-table/issue-table.model';
 import {initialHeaderState} from './header/header.model';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {BoardState} from './board';
@@ -28,8 +27,7 @@ const DEFAULT_STATE: BoardState = {
   projects: initialProjectState,
   ranks: initialRankState,
   issues: initialIssueState,
-  blacklist: initialBlacklistState,
-  issueTable: initialIssueTableState
+  blacklist: initialBlacklistState
 };
 
 interface BoardStateRecord extends TypedRecord<BoardStateRecord>, BoardState {

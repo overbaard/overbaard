@@ -13,8 +13,13 @@ import {
   PROJECT_ATTRIBUTES,
 } from './board-filter.constants';
 
+const CLEAR_FILTERS = 'CLEAR_FILTERS';
 const INITIALISE_FILTERS_FROM_QUERYSTRING = 'INITIALISE_FILTERS_FROM_QUERYSTRING';
 const UPDATE_FILTER = 'UPDATE_FILTER';
+
+class ClearFiltersAction implements Action {
+  type = CLEAR_FILTERS;
+}
 
 class InitialiseFromQueryStringAction implements Action {
   readonly type = INITIALISE_FILTERS_FROM_QUERYSTRING;
@@ -32,6 +37,10 @@ class UpdateFilterAction implements Action {
 
 
 export class BoardFilterActions {
+  static createClearFilters() {
+    return new ClearFiltersAction();
+  }
+
   static createInitialiseFromQueryString(queryParams: Dictionary<string>): Action {
     const payload: BoardFilterState = {
       project: this.parseBooleanFilter(queryParams, 'project'),
@@ -64,7 +73,6 @@ export class BoardFilterActions {
     return Map<string, Set<string>>().withMutations(mutable => {
       for (const key of Object.keys(queryParams)) {
         if (key.startsWith(prefix)) {
-          console.log('---->' + key);
           const name: string = decodeURIComponent(key.substr(prefix.length));
           mutable.set(name, this.parseBooleanFilter(queryParams, key));
         }
@@ -91,6 +99,9 @@ export class BoardFilterActions {
 
 export function boardFilterReducer(state: BoardFilterState, action: Action): BoardFilterState {
   switch (action.type) {
+    case CLEAR_FILTERS: {
+      return null;
+    }
     case INITIALISE_FILTERS_FROM_QUERYSTRING: {
       const payload: BoardFilterState = (<InitialiseFromQueryStringAction>action).payload;
       return BoardFilterUtil.fromObject(payload);

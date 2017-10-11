@@ -2,7 +2,7 @@
   <div id="board-inner">
 
     <app-kanban-view-headers
-      [headerState]="headers"
+      [headers]="headers"
       [boardLeftOffset]="boardLeftOffset">
     </app-kanban-view-headers>
     <div id="table-body"
@@ -12,7 +12,7 @@
         <tr>
           <td app-kanban-view-column
               class="cell visible"
-              *ngFor="let issuesForState of issueTable"
+              *ngFor="let issuesForState of issueTable.table"
               [issues]="issuesForState">
           </td>
         </tr>

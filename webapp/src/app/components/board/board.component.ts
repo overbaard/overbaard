@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
 import {Dictionary} from '../../common/dictionary';
 import {ActivatedRoute} from '@angular/router';
 import {AppHeaderService} from '../../services/app-header.service';
@@ -8,7 +8,6 @@ import {AppState} from '../../app-store';
 import {BoardActions} from '../../model/board/board.reducer';
 import {Observable} from 'rxjs/Observable';
 import {BoardState} from '../../model/board/board';
-import {Subscription} from 'rxjs/Subscription';
 import {BoardFilterActions} from '../../model/board/user/board-filter/board-filter.reducer';
 import 'rxjs/add/operator/skipWhile';
 import 'rxjs/add/operator/takeUntil';
@@ -16,11 +15,11 @@ import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/observable/of';
 import {BoardFilterState} from '../../model/board/user/board-filter/board-filter.model';
 import {Subject} from 'rxjs/Subject';
-import {assigneesSelector} from '../../model/board/assignee/assignee.reducer';
-import {Assignee} from '../../model/board/assignee/assignee.model';
-import {OrderedMap} from 'immutable';
-import {IssueType} from '../../model/board/issue-type/issue-type.model';
-import {issuesTypesSelector} from '../../model/board/issue-type/issue-type.reducer';
+import {List} from 'immutable';
+import {headersSelector} from '../../model/board/header/header.reducer';
+import {Header} from '../../model/board/header/header';
+import {IssueTableVmService} from '../../view-model/board/issue-table/issue-table-vm.service';
+import {IssueTableVm} from '../../view-model/board/issue-table/issue-table-vm';
 
 
 const VIEW_KANBAN = 'kbv';
@@ -30,27 +29,30 @@ export const VIEW_RANK = 'rv';
   selector: 'app-board',
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss'],
-  providers: [BoardService],
+  providers: [BoardService, IssueTableVmService],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class BoardComponent implements OnInit {
+export class BoardComponent implements OnInit, OnDestroy {
 
   // TODO move these into the store?
   private boardCode: string;
   view: string = VIEW_KANBAN;
   private _wasBacklogForced = false;
 
-  boardState$: Observable<BoardState>;
+  headers$: Observable<List<List<Header>>>;
+  issueTable$: Observable<IssueTableVm>;
   windowHeight: number;
   windowWidth: number;
 
   showControlPanel = false;
 
+
   constructor(
     private _route: ActivatedRoute,
     private _boardService: BoardService,
     private _appHeaderService: AppHeaderService,
-    private _store: Store<AppState>) {
+    private _store: Store<AppState>,
+    private _issueTableVmService: IssueTableVmService) {
 
     this.setWindowSize();
 
@@ -79,6 +81,7 @@ export class BoardComponent implements OnInit {
   }
 
   ngOnInit() {
+
     // TODO use backlog from querystring (store in the state)
     // TODO turn on/off progress indicator and log errors
 
@@ -114,7 +117,14 @@ export class BoardComponent implements OnInit {
         gotAllData$.unsubscribe();
       });
 
-    this.boardState$ = this._store.select('board');
+    this.headers$ = this._store.select(headersSelector);
+    this.issueTable$ = this._issueTableVmService.getIssueTableVm();
+  }
+
+
+  ngOnDestroy(): void {
+    this._store.dispatch(BoardActions.createClearBoard());
+    this._store.dispatch(BoardFilterActions.createClearFilters());
   }
 
   onFocus($event: Event) {

@@ -1,7 +1,7 @@
 <div id="table-header" [ngStyle]="{left:boardLeftOffset+'px'}">
   <table class="board">
     <tr app-kanban-view-header-row
-      *ngFor="let row of headerState.headers"
+      *ngFor="let row of headers"
       [headerRow]="row">
     </tr>
   </table>

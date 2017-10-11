@@ -6,12 +6,11 @@ import {AssigneeActions, assigneeReducer} from './assignee/assignee.reducer';
 import {PriorityActions, priorityReducer} from './priority/priority.reducer';
 import {HeaderActions, headerReducer} from './header/header.reducer';
 import {ProjectActions, projectReducer} from './project/project.reducer';
-import {AssigneeState, initialAssigneeState} from './assignee/assignee.model';
-import {initialHeaderState} from './header/header.model';
-import {DeserializeIssueLookupParams, initialIssueState, IssueState} from './issue/issue.model';
-import {initialIssueTypeState, IssueTypeState} from './issue-type/issue-type.model';
-import {initialPriorityState, PriorityState} from './priority/priority.model';
-import {initialProjectState, ProjectState} from './project/project.model';
+import {AssigneeState} from './assignee/assignee.model';
+import {DeserializeIssueLookupParams, IssueState} from './issue/issue.model';
+import {IssueTypeState} from './issue-type/issue-type.model';
+import {PriorityState} from './priority/priority.model';
+import {ProjectState} from './project/project.model';
 import {ComponentState, initialComponentState} from './component/component.model';
 import {ComponentActions, componentReducer} from './component/component.reducer';
 import {initialLabelState, LabelState} from './label/label.model';
@@ -20,35 +19,14 @@ import {FixVersionState, initialFixVersionState} from './fix-version/fix-version
 import {FixVersionActions, fixVersionReducer} from './fix-version/fix-version.reducer';
 import {CustomFieldState, initialCustomFieldState} from './custom-field/custom-field.model';
 import {CustomFieldActions, customFieldReducer} from './custom-field/custom-field.reducer';
-import {BlacklistState, initialBlacklistState} from './blacklist/blacklist.model';
+import {BlacklistState} from './blacklist/blacklist.model';
 import {BlacklistActions, blacklistReducer} from './blacklist/blacklist.reducer';
-import {initialRankState, RankState} from './rank/rank.model';
+import {RankState} from './rank/rank.model';
 import {RankActions, rankReducer} from './rank/rank.reducer';
-import {initialIssueTableState, IssueTableState} from './calculated/issue-table/issue-table.model';
-import {IssueTableActions, issueTableReducer} from './calculated/issue-table/issue-table.reducer';
 import {HeaderState} from './header/header.state';
 import {BoardState} from './board';
-import {BoardUtil} from './board.model';
-import {cloneObject} from '../../common/object-util';
+import {BoardUtil, initialBoardState} from './board.model';
 
-
-export const initialBoardState: BoardState = {
-  viewId: -1,
-  rankCustomFieldId: 0,
-  headers: initialHeaderState,
-  assignees: initialAssigneeState,
-  issueTypes: initialIssueTypeState,
-  priorities: initialPriorityState,
-  components: initialComponentState,
-  labels: initialLabelState,
-  fixVersions: initialFixVersionState,
-  customFields: initialCustomFieldState,
-  projects: initialProjectState,
-  ranks: initialRankState,
-  issues: initialIssueState,
-  blacklist: initialBlacklistState,
-  issueTable: initialIssueTableState
-};
 
 const metaReducers = {
   headers: headerReducer,
@@ -62,16 +40,20 @@ const metaReducers = {
   projects: projectReducer,
   ranks: rankReducer,
   issues: issueReducer,
-  blacklist: blacklistReducer,
-  issueTable: issueTableReducer
+  blacklist: blacklistReducer
 };
 
+const CLEAR_BOARD = 'CLEAR_BOARD';
 const DESERIALIZE_BOARD = 'DESERIALIZE_BOARD';
 const PROCESS_BOARD_CHANGES = 'PROCESS_BOARD_CHANGES';
 
 abstract class BoardDataAction {
   constructor(readonly type: string, readonly payload: any) {
   }
+}
+
+class ClearBoardAction implements Action {
+  type = CLEAR_BOARD;
 }
 
 class DeserializeBoardAction extends BoardDataAction {
@@ -88,6 +70,10 @@ class ProcessBoardChangesAction extends BoardDataAction {
 
 export class BoardActions {
 
+  static createClearBoard(): Action {
+    return new ClearBoardAction();
+  }
+
   static createDeserializeBoard(input: any) {
     return new DeserializeBoardAction(input);
   }
@@ -103,6 +89,9 @@ export class BoardActions {
 export function boardReducer(state: BoardState = initialBoardState, action: Action): BoardState {
 
   switch (action.type) {
+    case CLEAR_BOARD: {
+      return initialBoardState;
+    }
     case DESERIALIZE_BOARD: {
       const input = action.payload;
       const viewId: number = input['view'];
@@ -163,12 +152,6 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
       const blacklistState: BlacklistState =
         metaReducers.blacklist(state.blacklist, BlacklistActions.createDeserializeBlacklist(input['blacklist']));
 
-      const issueTableState: IssueTableState =
-        metaReducers.issueTable(
-          state.issueTable,
-          IssueTableActions.createCreateIssueTable(headerState, issueState, projectState, rankState));
-
-
       const newState: BoardState = {
         viewId: viewId,
         rankCustomFieldId: rankCustomFieldId,
@@ -183,8 +166,7 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
         projects: projectState,
         issues: issueState,
         ranks: rankState,
-        blacklist: blacklistState,
-        issueTable: issueTableState
+        blacklist: blacklistState
 
       };
 
@@ -236,11 +218,6 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
         metaReducers.blacklist(state.blacklist, BlacklistActions.createChangeBlacklist(input['blacklist']))
         : state.blacklist;
 
-      const issueTableState: IssueTableState =
-        metaReducers.issueTable(
-          state.issueTable,
-          IssueTableActions.createUpdateIssueTable(state.headers, issueState, state.projects, rankState));
-
       const newState: BoardState = {
         viewId: viewId,
         rankCustomFieldId: state.rankCustomFieldId,
@@ -255,8 +232,7 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
         projects: state.projects,
         issues: issueState,
         ranks: rankState,
-        blacklist: blacklistState,
-        issueTable: issueTableState
+        blacklist: blacklistState
       };
 
       return BoardUtil.recordFromObject(newState);

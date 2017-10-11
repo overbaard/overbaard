@@ -4,6 +4,8 @@ import {Action} from '@ngrx/store';
 import {Dictionary} from '../../../common/dictionary';
 import {HeaderState} from './header.state';
 import {Header} from './header';
+import {AppState} from '../../../app-store';
+import {createSelector} from 'reselect';
 
 const DESERIALIZE_PRIORITIES = 'DESERIALIZE_HEADERS';
 
@@ -218,5 +220,9 @@ class TempHeader implements Header {
     }
     return abbreviated;
   }
-
 }
+
+const getHeadersState = (state: AppState) => state.board.headers;
+const getHeaders = (state: HeaderState) => state.headers;
+export const headersSelector = createSelector(getHeadersState, getHeaders);
+
