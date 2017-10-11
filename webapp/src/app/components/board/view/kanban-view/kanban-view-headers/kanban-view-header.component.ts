@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
-import {Header} from '../../../../../model/board/header/header';
+import {Header} from '../../../../../model/board/data/header/header';
 
 /**
  * This uses an attribute selector, i.e. the 'selector' value is wrapped in square quotes. See

@@ -1,6 +1,6 @@
 import {List} from 'immutable';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
-import {BoardIssue} from '../../../model/board/issue/board-issue';
+import {BoardIssue} from '../../../model/board/data/issue/board-issue';
 import {IssueTableVm} from './issue-table-vm';
 
 const DEFAULT_STATE: IssueTableVm = {

@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
-import {BoardIssue} from '../../../model/board/issue/board-issue';
+import {BoardIssue} from '../../../model/board/data/issue/board-issue';
 
 @Component({
   selector: 'app-board-issue',

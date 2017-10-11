@@ -3,11 +3,11 @@ import {Store} from '@ngrx/store';
 import {AppState} from '../../../app-store';
 import {Observable} from 'rxjs/Observable';
 import {initialIssueTableVm, IssueTableVmUtil} from './issue-table-vm.model';
-import {BoardState} from '../../../model/board/board';
+import {BoardState} from '../../../model/board/data/board';
 import 'rxjs/add/observable/combineLatest';
 import {List} from 'immutable';
-import {BoardIssue} from '../../../model/board/issue/board-issue';
-import {BoardProject, ProjectUtil} from '../../../model/board/project/project.model';
+import {BoardIssue} from '../../../model/board/data/issue/board-issue';
+import {BoardProject, ProjectUtil} from '../../../model/board/data/project/project.model';
 import {IssueTableVm} from './issue-table-vm';
 
 @Injectable()

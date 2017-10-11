@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
-import {HeaderState} from '../../../../../model/board/header/header.state';
-import {Header} from '../../../../../model/board/header/header';
+import {HeaderState} from '../../../../../model/board/data/header/header.state';
+import {Header} from '../../../../../model/board/data/header/header';
 import {List} from 'immutable';
 
 @Component({

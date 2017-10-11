@@ -7,15 +7,15 @@ import 'rxjs/add/operator/takeWhile';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/debounceTime';
 import {Observable} from 'rxjs/Observable';
-import {boardProjectsSelector, parallelTasksSelector} from '../../../model/board/project/project.reducer';
+import {boardProjectsSelector, parallelTasksSelector} from '../../../model/board/data/project/project.reducer';
 import {BoardFilterState} from '../../../model/board/user/board-filter/board-filter.model';
 import {List, OrderedMap, Set} from 'immutable';
-import {issuesTypesSelector} from '../../../model/board/issue-type/issue-type.reducer';
-import {prioritiesSelector} from '../../../model/board/priority/priority.reducer';
-import {assigneesSelector} from '../../../model/board/assignee/assignee.reducer';
-import {componentsSelector} from '../../../model/board/component/component.reducer';
-import {labelsSelector} from '../../../model/board/label/label.reducer';
-import {fixVersionsSelector} from '../../../model/board/fix-version/fix-version.reducer';
+import {issuesTypesSelector} from '../../../model/board/data/issue-type/issue-type.reducer';
+import {prioritiesSelector} from '../../../model/board/data/priority/priority.reducer';
+import {assigneesSelector} from '../../../model/board/data/assignee/assignee.reducer';
+import {componentsSelector} from '../../../model/board/data/component/component.reducer';
+import {labelsSelector} from '../../../model/board/data/label/label.reducer';
+import {fixVersionsSelector} from '../../../model/board/data/fix-version/fix-version.reducer';
 import {
   ASSIGNEE_ATTRIBUTES, COMPONENT_ATTRIBUTES,
   FilterAttributes, FilterAttributesUtil, FIX_VERSION_ATTRIBUTES, ISSUE_TYPE_ATTRIBUTES, LABEL_ATTRIBUTES, NONE_FILTER,
@@ -24,9 +24,9 @@ import {
   PROJECT_ATTRIBUTES
 } from '../../../model/board/user/board-filter/board-filter.constants';
 import {BoardFilterActions} from '../../../model/board/user/board-filter/board-filter.reducer';
-import {customFieldsSelector} from '../../../model/board/custom-field/custom-field.reducer';
-import {CustomField} from '../../../model/board/custom-field/custom-field.model';
-import {ParallelTask} from '../../../model/board/project/project.model';
+import {customFieldsSelector} from '../../../model/board/data/custom-field/custom-field.reducer';
+import {CustomField} from '../../../model/board/data/custom-field/custom-field.model';
+import {ParallelTask} from '../../../model/board/data/project/project.model';
 
 @Component({
   selector: 'app-control-panel',

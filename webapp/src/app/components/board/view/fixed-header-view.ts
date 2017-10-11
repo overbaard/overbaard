@@ -3,7 +3,7 @@
  */
 import {Input} from '@angular/core';
 import {List} from 'immutable';
-import {Header} from '../../../model/board/header/header';
+import {Header} from '../../../model/board/data/header/header';
 
 export class FixedHeaderView {
 
