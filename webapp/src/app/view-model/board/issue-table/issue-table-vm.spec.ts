@@ -8,10 +8,10 @@ import {initialRankState, RankState} from '../../../model/board/data/rank/rank.m
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {BoardUtil, initialBoardState} from '../../../model/board/data/board.model';
 import {BoardState} from '../../../model/board/data/board';
-import {HeaderActions, headerReducer} from '../../../model/board/data/header/header.reducer';
+import {HeaderActions, headerMetaReducer} from '../../../model/board/data/header/header.reducer';
 import {initialHeaderState} from '../../../model/board/data/header/header.model';
-import {IssueActions, issueReducer} from '../../../model/board/data/issue/issue.reducer';
-import {RankActions, rankReducer} from '../../../model/board/data/rank/rank.reducer';
+import {IssueActions, issueMetaReducer} from '../../../model/board/data/issue/issue.reducer';
+import {RankActions, rankMetaReducer} from '../../../model/board/data/rank/rank.reducer';
 import {getTestIssueTypeState} from '../../../model/board/data/issue-type/issue-type.reducer.spec';
 import {getTestPriorityState} from '../../../model/board/data/priority/priority.reducer.spec';
 import {getTestAssigneeState} from '../../../model/board/data/assignee/assignee.reducer.spec';
@@ -349,7 +349,7 @@ class IssueTableObservableUtil {
       this._boardState = BoardUtil.toStateRecord(this._boardState).withMutations(mutable => {
         mutable.viewId = mutable.viewId + 1;
         if (this._issueChanges) {
-          mutable.issues = issueReducer(
+          mutable.issues = issueMetaReducer(
             this._boardState.issues,
             IssueActions.createChangeIssuesAction(
               this._issueChanges,
@@ -357,7 +357,7 @@ class IssueTableObservableUtil {
           this._issueChanges = null;
         }
         if (this._rankChanges || this._rankDeleted) {
-          mutable.ranks = rankReducer(
+          mutable.ranks = rankMetaReducer(
             this._boardState.ranks,
             RankActions.createRerank(this._rankChanges, this._rankDeleted));
           this._rankChanges = null;
@@ -383,7 +383,7 @@ class IssueTableObservableUtil {
     for (let i = 1 ; i <= this._numberStates ; i++) {
       input.push({name: 'S-' + i});
     }
-    return headerReducer(
+    return headerMetaReducer(
       initialHeaderState,
       HeaderActions.createDeserializeHeaders(input, [], 0, 0));
   }
@@ -399,7 +399,7 @@ class IssueTableObservableUtil {
         state: this._issueStates[i]
       };
     }
-    return issueReducer(
+    return issueMetaReducer(
       initialIssueState,
       IssueActions.createDeserializeIssuesAction(input, params));
   }
@@ -431,7 +431,7 @@ class IssueTableObservableUtil {
   }
 
   private createRankState(): RankState {
-    return rankReducer(initialRankState, RankActions.createDeserializeRanks(this._rankedIssueKeys));
+    return rankMetaReducer(initialRankState, RankActions.createDeserializeRanks(this._rankedIssueKeys));
   }
 }
 

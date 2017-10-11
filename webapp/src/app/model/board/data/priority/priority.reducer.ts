@@ -25,7 +25,8 @@ export class PriorityActions {
   }
 }
 
-export function priorityReducer(state: PriorityState = initialPriorityState, action: Action): PriorityState {
+// 'meta-reducer here means it is not called directly by the store, rather from the boardReducer
+export function priorityMetaReducer(state: PriorityState = initialPriorityState, action: Action): PriorityState {
 
   switch (action.type) {
     case DESERIALIZE_ALL_PRIORITIES: {

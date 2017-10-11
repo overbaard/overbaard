@@ -1,4 +1,4 @@
-import {LabelActions, labelReducer} from './label.reducer';
+import {LabelActions, labelMetaReducer} from './label.reducer';
 import {initialLabelState, LabelState} from './label.model';
 import {cloneObject} from '../../../../common/object-util';
 
@@ -8,7 +8,7 @@ export function getTestLabelsInput(): any {
 
 export function getTestLabelState(): LabelState {
   const input: any = getTestLabelsInput();
-  return labelReducer(initialLabelState, LabelActions.createDeserializeLabels(input));
+  return labelMetaReducer(initialLabelState, LabelActions.createDeserializeLabels(input));
 }
 
 describe('Label reducer tests', () => {
@@ -21,7 +21,7 @@ describe('Label reducer tests', () => {
     it ('Same', () => {
       const stateA: LabelState = getTestLabelState();
       const stateB: LabelState =
-        labelReducer(stateA, LabelActions.createDeserializeLabels(getTestLabelsInput()));
+        labelMetaReducer(stateA, LabelActions.createDeserializeLabels(getTestLabelsInput()));
       expect(stateA).toBe(stateB);
     });
   });
@@ -30,14 +30,14 @@ describe('Label reducer tests', () => {
     it ('Add labels', () => {
       const state: LabelState = getTestLabelState();
       const newState: LabelState =
-        labelReducer(state, LabelActions.createAddLabels(['l-05', 'L-14', 'l-13', 'L-25']));
+        labelMetaReducer(state, LabelActions.createAddLabels(['l-05', 'L-14', 'l-13', 'L-25']));
       expect(newState.labels.toArray()).toEqual(['l-05', 'L-10', 'l-13', 'L-14', 'L-20', 'L-25', 'L-30']);
     });
 
     it ('No change', () => {
       const state: LabelState = getTestLabelState();
       const newState: LabelState =
-        labelReducer(state, LabelActions.createAddLabels(null));
+        labelMetaReducer(state, LabelActions.createAddLabels(null));
       expect(newState).toBe(state);
     });
   });

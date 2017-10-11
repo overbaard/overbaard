@@ -34,7 +34,8 @@ export class FixVersionActions {
   }
 }
 
-export function fixVersionReducer(state: FixVersionState = initialFixVersionState, action: Action): FixVersionState {
+// 'meta-reducer here means it is not called directly by the store, rather from the boardReducer
+export function fixVersionMetaReducer(state: FixVersionState = initialFixVersionState, action: Action): FixVersionState {
 
   switch (action.type) {
     case DESERIALIZE_ALL_FIX_VERSIONS: {

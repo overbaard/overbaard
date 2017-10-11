@@ -155,7 +155,8 @@ class HeaderTableCreator {
   }
 }
 
-export function headerReducer(state: HeaderState = initialHeaderState, action: Action): HeaderState {
+// 'meta-reducer here means it is not called directly by the store, rather from the boardReducer
+export function headerMetaReducer(state: HeaderState = initialHeaderState, action: Action): HeaderState {
   switch (action.type) {
     case DESERIALIZE_PRIORITIES: {
       const payload: HeaderTableCreator = (<DeserializeHeadersAction>action).payload;

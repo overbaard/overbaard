@@ -34,7 +34,8 @@ export class ComponentActions {
   }
 }
 
-export function componentReducer(state: ComponentState = initialComponentState, action: Action): ComponentState {
+// 'meta-reducer here means it is not called directly by the store, rather from the boardReducer
+export function componentMetaReducer(state: ComponentState = initialComponentState, action: Action): ComponentState {
 
   switch (action.type) {
     case DESERIALIZE_ALL_COMPONENTS: {

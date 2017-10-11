@@ -20,6 +20,7 @@ import {headersSelector} from '../../model/board/data/header/header.reducer';
 import {Header} from '../../model/board/data/header/header';
 import {IssueTableVmService} from '../../view-model/board/issue-table/issue-table-vm.service';
 import {IssueTableVm} from '../../view-model/board/issue-table/issue-table-vm';
+import {UserSettingActions} from '../../model/board/user/user-setting.reducer';
 
 
 const VIEW_KANBAN = 'kbv';
@@ -103,7 +104,7 @@ export class BoardComponent implements OnInit, OnDestroy {
         board => {
           // Parse the filters once we have the board
           this._store.dispatch(
-              BoardFilterActions.createInitialiseFromQueryString(this._route.snapshot.queryParams));
+              UserSettingActions.createInitialiseFromQueryString(this._route.snapshot.queryParams));
         }
       );
 
@@ -124,7 +125,7 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this._store.dispatch(BoardActions.createClearBoard());
-    this._store.dispatch(BoardFilterActions.createClearFilters());
+    this._store.dispatch(UserSettingActions.createClearSettings());
   }
 
   onFocus($event: Event) {

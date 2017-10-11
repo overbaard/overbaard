@@ -42,8 +42,8 @@ export class AssigneeActions {
 
 
 
-
-export function assigneeReducer(state: AssigneeState = initialAssigneeState, action: Action): AssigneeState {
+// 'meta-reducer here means it is not called directly by the store, rather from the boardReducer
+export function assigneeMetaReducer(state: AssigneeState = initialAssigneeState, action: Action): AssigneeState {
 
   switch (action.type) {
     case ADD_INITAL_ASSIGNEES:

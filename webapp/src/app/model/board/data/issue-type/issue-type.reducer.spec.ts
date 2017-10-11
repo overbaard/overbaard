@@ -1,6 +1,6 @@
 import {async} from '@angular/core/testing';
 import {initialIssueTypeState, IssueType, IssueTypeState} from './issue-type.model';
-import {IssueTypeActions, issueTypeReducer} from './issue-type.reducer';
+import {IssueTypeActions, issueTypeMetaReducer} from './issue-type.reducer';
 import {cloneObject} from '../../../../common/object-util';
 
 export function getTestIssueTypesInput(): any {
@@ -18,7 +18,7 @@ export function getTestIssueTypesInput(): any {
 
 export function getTestIssueTypeState(): IssueTypeState {
   const input = getTestIssueTypesInput();
-  return issueTypeReducer(initialIssueTypeState, IssueTypeActions.createDeserializeIssueTypes(input));
+  return issueTypeMetaReducer(initialIssueTypeState, IssueTypeActions.createDeserializeIssueTypes(input));
 }
 
 describe('IssueType reducer tests', () => {
@@ -40,9 +40,9 @@ describe('IssueType reducer tests', () => {
 
   it ('Deserialize same state', () => {
     const stateA: IssueTypeState =
-      issueTypeReducer(initialIssueTypeState, IssueTypeActions.createDeserializeIssueTypes(getTestIssueTypesInput()));
+      issueTypeMetaReducer(initialIssueTypeState, IssueTypeActions.createDeserializeIssueTypes(getTestIssueTypesInput()));
     const stateB: IssueTypeState =
-      issueTypeReducer(stateA, IssueTypeActions.createDeserializeIssueTypes(getTestIssueTypesInput()));
+      issueTypeMetaReducer(stateA, IssueTypeActions.createDeserializeIssueTypes(getTestIssueTypesInput()));
     expect(stateA).toBe(stateB);
   });
 

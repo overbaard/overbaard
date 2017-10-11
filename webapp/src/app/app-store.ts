@@ -4,17 +4,17 @@ import {compose} from '@ngrx/core/compose';
 import {storeFreeze} from 'ngrx-store-freeze';
 import {BoardState} from './model/board/data/board';
 import {boardReducer} from './model/board/data/board.reducer';
-import {boardFilterReducer} from './model/board/user/board-filter/board-filter.reducer';
-import {BoardFilterState} from './model/board/user/board-filter/board-filter.model';
+import {userSettingReducer} from './model/board/user/user-setting.reducer';
+import {UserSettingState} from './model/board/user/user-setting.model';
 
 export interface AppState {
   board: BoardState;
-  filters: BoardFilterState;
+  userSettings: UserSettingState;
 }
 
 const reducers = {
   board: boardReducer,
-  filters: boardFilterReducer
+  userSettings: userSettingReducer
 
 };
 

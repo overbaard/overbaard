@@ -56,7 +56,8 @@ export class IssueActions {
   }
 }
 
-export function issueReducer(state: IssueState = initialIssueState, action: Action): IssueState {
+// 'meta-reducer here means it is not called directly by the store, rather from the boardReducer
+export function issueMetaReducer(state: IssueState = initialIssueState, action: Action): IssueState {
 
   switch (action.type) {
     case DESERIALIZE_INITIAL_ISSUES: {

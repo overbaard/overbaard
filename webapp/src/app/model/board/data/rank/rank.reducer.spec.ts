@@ -1,5 +1,5 @@
 import {initialRankState, RankState} from './rank.model';
-import {RankActions, rankReducer} from './rank.reducer';
+import {RankActions, rankMetaReducer} from './rank.reducer';
 import {getTestProjectsInput} from '../project/project.reducer.spec';
 import {cloneObject} from '../../../../common/object-util';
 
@@ -10,7 +10,7 @@ describe('Rank reducer tests', () => {
 
   describe('Deserialization tests', () => {
     it('Deserialize', () => {
-      const rankState: RankState = rankReducer(
+      const rankState: RankState = rankMetaReducer(
         initialRankState, RankActions.createDeserializeRanks(getTestRanksInput()));
       // Ranked keys
       expect(rankState.rankedIssueKeys.size).toBe(2);
@@ -21,9 +21,9 @@ describe('Rank reducer tests', () => {
     });
 
     it('Deserialize same', () => {
-      const rankStateA: RankState = rankReducer(
+      const rankStateA: RankState = rankMetaReducer(
         initialRankState, RankActions.createDeserializeRanks(getTestRanksInput()));
-      const rankStateB: RankState = rankReducer(
+      const rankStateB: RankState = rankMetaReducer(
         rankStateA, RankActions.createDeserializeRanks((getTestRanksInput())));
       expect(rankStateB).toBe(rankStateA);
     });
@@ -36,91 +36,91 @@ describe('Rank reducer tests', () => {
       input = cloneObject({
         P: {ranked: ['P-1', 'P-2', 'P-3', 'P-4']}
       });
-      state = rankReducer(
+      state = rankMetaReducer(
         initialRankState, RankActions.createDeserializeRanks(input));
       expect(state.rankedIssueKeys.size).toBe(1);
       expect(state.rankedIssueKeys.get('P').toArray()).toEqual(['P-1', 'P-2', 'P-3', 'P-4']);
     });
 
     it ('End issue to start', () => {
-      const newState: RankState = rankReducer(
+      const newState: RankState = rankMetaReducer(
         state, RankActions.createRerank({P: [{index: 0, key: 'P-4'}]}, null));
       expect(newState.rankedIssueKeys.get('P').toArray()).toEqual(['P-4', 'P-1', 'P-2', 'P-3']);
     });
 
     it ('Third issue to start', () => {
-      const newState: RankState = rankReducer(
+      const newState: RankState = rankMetaReducer(
         state, RankActions.createRerank({P: [{index: 0, key: 'P-3'}]}, null));
       expect(newState.rankedIssueKeys.get('P').toArray()).toEqual(['P-3', 'P-1', 'P-2', 'P-4']);
     });
 
 
     it ('Second issue to start', () => {
-      const newState: RankState = rankReducer(
+      const newState: RankState = rankMetaReducer(
         state, RankActions.createRerank({P: [{index: 0, key: 'P-2'}]}, null));
       expect(newState.rankedIssueKeys.get('P').toArray()).toEqual(['P-2', 'P-1', 'P-3', 'P-4']);
     });
 
 
     it ('Start issue to end', () => {
-      const newState: RankState = rankReducer(
+      const newState: RankState = rankMetaReducer(
         state, RankActions.createRerank({P: [{index: 3, key: 'P-1'}]}, null));
       expect(newState.rankedIssueKeys.get('P').toArray()).toEqual(['P-2', 'P-3', 'P-4', 'P-1']);
     });
 
     it ('Second issue to end', () => {
-      const newState: RankState = rankReducer(
+      const newState: RankState = rankMetaReducer(
         state, RankActions.createRerank({P: [{index: 3, key: 'P-2'}]}, null));
       expect(newState.rankedIssueKeys.get('P').toArray()).toEqual(['P-1', 'P-3', 'P-4', 'P-2']);
     });
 
     it ('Third issue to end', () => {
-      const newState: RankState = rankReducer(
+      const newState: RankState = rankMetaReducer(
         state, RankActions.createRerank({P: [{index: 3, key: 'P-3'}]}, null));
       expect(newState.rankedIssueKeys.get('P').toArray()).toEqual(['P-1', 'P-2', 'P-4', 'P-3']);
     });
 
     it ('Swap middle issues', () => {
-      const newState: RankState = rankReducer(
+      const newState: RankState = rankMetaReducer(
         state, RankActions.createRerank({P: [{index: 2, key: 'P-2'}]}, null));
       expect(newState.rankedIssueKeys.get('P').toArray()).toEqual(['P-1', 'P-3', 'P-2', 'P-4']);
     });
 
     it ('Rank two issues', () => {
-      const newState: RankState = rankReducer(
+      const newState: RankState = rankMetaReducer(
         state, RankActions.createRerank({P: [{index: 1, key: 'P-3'}, {index: 3, key: 'P-2'}]}, null));
       expect(newState.rankedIssueKeys.get('P').toArray()).toEqual(['P-1', 'P-3', 'P-4', 'P-2']);
     });
 
     it ('Rank all issues', () => {
-      const newState: RankState = rankReducer(
+      const newState: RankState = rankMetaReducer(
         state, RankActions.createRerank({P:
           [{index: 0, key: 'P-3'}, {index: 1, key: 'P-4'}, {index: 2, key: 'P-1'}, {index: 3, key: 'P-2'}]}, null));
       expect(newState.rankedIssueKeys.get('P').toArray()).toEqual(['P-3', 'P-4', 'P-1', 'P-2']);
     });
 
     it ('Add issue to start', () => {
-      const newState: RankState = rankReducer(
+      const newState: RankState = rankMetaReducer(
         state, RankActions.createRerank({P: [{index: 0, key: 'P-5'}]}, null));
       expect(newState.rankedIssueKeys.get('P').toArray()).toEqual(['P-5', 'P-1', 'P-2', 'P-3', 'P-4']);
     });
 
     it ('Add issue to middle', () => {
-      const newState: RankState = rankReducer(
+      const newState: RankState = rankMetaReducer(
         state, RankActions.createRerank({P: [{index: 2, key: 'P-5'}]}, null));
       expect(newState.rankedIssueKeys.get('P').toArray()).toEqual(['P-1', 'P-2', 'P-5', 'P-3', 'P-4']);
     });
 
 
     it ('Add issue to end', () => {
-      const newState: RankState = rankReducer(
+      const newState: RankState = rankMetaReducer(
         state, RankActions.createRerank({P: [{index: 4, key: 'P-5'}]}, null));
       expect(newState.rankedIssueKeys.get('P').toArray()).toEqual(['P-1', 'P-2', 'P-3', 'P-4', 'P-5']);
     });
 
 
     it ('Delete issue', () => {
-      const newState: RankState = rankReducer(
+      const newState: RankState = rankMetaReducer(
         state, RankActions.createRerank({P: [{index: 0, key: 'P-3'}]}, ['P-1']));
       expect(newState.rankedIssueKeys.get('P').toArray()).toEqual(['P-3', 'P-2', 'P-4']);
     });

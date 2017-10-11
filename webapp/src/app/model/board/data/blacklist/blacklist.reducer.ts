@@ -39,7 +39,8 @@ export class BlacklistActions {
   }
 }
 
-export function blacklistReducer(state: BlacklistState = initialBlacklistState, action: Action): BlacklistState {
+// 'meta-reducer here means it is not called directly by the store, rather from the boardReducer
+export function blacklistMetaReducer(state: BlacklistState = initialBlacklistState, action: Action): BlacklistState {
 
   switch (action.type) {
     case DESERIALIZE_BLACKLIST: {

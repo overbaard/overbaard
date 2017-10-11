@@ -59,7 +59,8 @@ export class CustomFieldActions {
   }
 }
 
-export function customFieldReducer(state: CustomFieldState = initialCustomFieldState, action: Action): CustomFieldState {
+// 'meta-reducer here means it is not called directly by the store, rather from the boardReducer
+export function customFieldMetaReducer(state: CustomFieldState = initialCustomFieldState, action: Action): CustomFieldState {
 
   switch (action.type) {
     case DESERIALIZE_ALL_CUSTOM_FIELDS: {

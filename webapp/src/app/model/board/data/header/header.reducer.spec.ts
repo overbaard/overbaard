@@ -1,4 +1,4 @@
-import {HeaderActions, headerReducer} from './header.reducer';
+import {HeaderActions, headerMetaReducer} from './header.reducer';
 import {initialHeaderState} from './header.model';
 import {List} from 'immutable';
 import {HeaderState} from './header.state';
@@ -13,7 +13,7 @@ describe('Header reducer tests', () => {
       {name: 'S3'}
     ];
 
-    const headerState: HeaderState = headerReducer(
+    const headerState: HeaderState = headerMetaReducer(
       initialHeaderState,
       HeaderActions.createDeserializeHeaders(states, [], 0, 0));
     expect(headerState.states.toArray()).toEqual(['S1', 'S2', 'S3']);
@@ -36,7 +36,7 @@ describe('Header reducer tests', () => {
       {name: 'S4', header: 1}
     ];
 
-    const headerState: HeaderState = headerReducer(
+    const headerState: HeaderState = headerMetaReducer(
       initialHeaderState,
       HeaderActions.createDeserializeHeaders(states, ['H1', 'H2'], 0, 0));
     expect(headerState.states.toArray()).toEqual(['S1', 'S2', 'S3', 'S4']);
@@ -68,7 +68,7 @@ describe('Header reducer tests', () => {
       {name: 'S4', header: 1}
     ];
 
-    const headerState: HeaderState = headerReducer(
+    const headerState: HeaderState = headerMetaReducer(
       initialHeaderState,
       HeaderActions.createDeserializeHeaders(states, ['H1', 'H2'], 0, 0));
     expect(headerState.states.toArray()).toEqual(['S1', 'S2', 'S3', 'S4']);
@@ -100,7 +100,7 @@ describe('Header reducer tests', () => {
       {name: 'S4', wip: 6}
     ];
 
-    const headerState: HeaderState = headerReducer(
+    const headerState: HeaderState = headerMetaReducer(
       initialHeaderState,
       HeaderActions.createDeserializeHeaders(states, ['H1', 'H2'], 0, 0));
     expect(headerState.states.toArray()).toEqual(['S1', 'S2', 'S3', 'S4']);
@@ -132,7 +132,7 @@ describe('Header reducer tests', () => {
       {name: 'S4', header: 1}
     ];
 
-    const headerState: HeaderState = headerReducer(
+    const headerState: HeaderState = headerMetaReducer(
       initialHeaderState,
       HeaderActions.createDeserializeHeaders(states, ['H1', 'H2'], 0, 0));
     expect(headerState.states.toArray()).toEqual(['S1', 'S2', 'S3', 'S4']);
@@ -163,7 +163,7 @@ describe('Header reducer tests', () => {
       {name: 'S4'}
     ];
 
-    const headerState: HeaderState = headerReducer(
+    const headerState: HeaderState = headerMetaReducer(
       initialHeaderState,
       HeaderActions.createDeserializeHeaders(states, [], 2, 0));
     expect(headerState.states.toArray()).toEqual(['S1', 'S2', 'S3', 'S4']);
@@ -194,7 +194,7 @@ describe('Header reducer tests', () => {
       {name: 'S5', header: 1}
     ];
 
-    const headerState: HeaderState = headerReducer(
+    const headerState: HeaderState = headerMetaReducer(
       initialHeaderState,
       HeaderActions.createDeserializeHeaders(states, ['H1', 'H2'], 1, 0));
     expect(headerState.states.toArray()).toEqual(['S1', 'S2', 'S3', 'S4', 'S5']);
@@ -228,11 +228,11 @@ describe('Header reducer tests', () => {
       {name: 'S5', header: 1, wip: 2}
     ];
 
-    const headerState: HeaderState = headerReducer(
+    const headerState: HeaderState = headerMetaReducer(
       initialHeaderState,
       HeaderActions.createDeserializeHeaders(states, ['H1', 'H2'], 1, 0));
 
-    const headerStateB: HeaderState = headerReducer(
+    const headerStateB: HeaderState = headerMetaReducer(
       headerState,
       HeaderActions.createDeserializeHeaders(states, ['H1', 'H2'], 1, 0));
 
@@ -247,10 +247,10 @@ describe('Header reducer tests', () => {
       {name: 'S4', header: 1}
     ];
 
-    const stateA: HeaderState = headerReducer(
+    const stateA: HeaderState = headerMetaReducer(
       initialHeaderState,
       HeaderActions.createDeserializeHeaders(states, ['H1', 'H2'], 0, 0));
-    const stateB: HeaderState = headerReducer(
+    const stateB: HeaderState = headerMetaReducer(
       stateA,
       HeaderActions.createDeserializeHeaders(states, ['H1', 'H2'], 0, 0));
     expect(stateB).toBe(stateA);
@@ -264,7 +264,7 @@ describe('Header reducer tests', () => {
       {name: 'More work is needed', header: 1}
     ];
 
-    const headerState: HeaderState = headerReducer(
+    const headerState: HeaderState = headerMetaReducer(
       initialHeaderState,
       HeaderActions.createDeserializeHeaders(states, ['Short Header', 'A much longer header'], 0, 0));
     expect(headerState.states.toArray()).toEqual(['Backlog', 'Analysis', 'Dev in Progress', 'More work is needed']);

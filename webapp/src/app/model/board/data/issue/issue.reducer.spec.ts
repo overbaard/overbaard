@@ -1,4 +1,4 @@
-import {IssueActions, issueReducer} from './issue.reducer';
+import {IssueActions, issueMetaReducer} from './issue.reducer';
 import {DeserializeIssueLookupParams, initialIssueState, IssueState} from './issue.model';
 import {async} from '@angular/core/testing';
 import {getTestAssigneeState} from '../assignee/assignee.reducer.spec';
@@ -68,7 +68,7 @@ describe('Issue reducer tests', () => {
       .setLabels(getTestLabelState().labels)
       .setFixVersions(getTestFixVersionState().versions);
 
-    issueState = issueReducer(
+    issueState = issueMetaReducer(
       initialIssueState,
       IssueActions.createDeserializeIssuesAction(getTestIssuesInput(), lookupParams));
     issues = issueState.issues;
@@ -98,7 +98,7 @@ describe('Issue reducer tests', () => {
     });
 
     it('Deserialize same state', () => {
-      const state = issueReducer(
+      const state = issueMetaReducer(
         issueState,
         IssueActions.createDeserializeIssuesAction(getTestIssuesInput(), lookupParams));
       expect(state).toBe(issueState);
@@ -115,7 +115,7 @@ describe('Issue reducer tests', () => {
       input['ISSUE-5']['summary'] = 'Five';
       delete input['ISSUE-4'];
 
-      const state = issueReducer(
+      const state = issueMetaReducer(
         issueState,
         IssueActions.createDeserializeIssuesAction(input, lookupParams));
 
@@ -163,7 +163,7 @@ describe('Issue reducer tests', () => {
         ],
         delete: ['ISSUE-4']
       };
-      const newState: IssueState = issueReducer(
+      const newState: IssueState = issueMetaReducer(
         issueState,
         IssueActions.createChangeIssuesAction(changes, lookupParams));
 
@@ -190,7 +190,7 @@ describe('Issue reducer tests', () => {
 
     it('no changes', () => {
       const changes: any = {};
-      const newState: IssueState = issueReducer(
+      const newState: IssueState = issueMetaReducer(
         issueState,
         IssueActions.createChangeIssuesAction(changes, lookupParams));
       expect(newState).toBe(issueState);
@@ -206,7 +206,7 @@ describe('Issue reducer tests', () => {
           }
         ]
       };
-      const newState: IssueState = issueReducer(
+      const newState: IssueState = issueMetaReducer(
         issueState,
         IssueActions.createChangeIssuesAction(changes, lookupParams));
 
@@ -237,7 +237,7 @@ describe('Issue reducer tests', () => {
       const changes: any = {
         delete: ['ISSUE-1', 'ISSUE-3', 'ISSUE-4']
       };
-      const newState: IssueState = issueReducer(
+      const newState: IssueState = issueMetaReducer(
         issueState,
         IssueActions.createChangeIssuesAction(changes, lookupParams));
 

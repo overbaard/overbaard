@@ -1,9 +1,9 @@
 import {async} from '@angular/core/testing';
 import {initialPriorityState, Priority, PriorityState} from './priority.model';
-import {PriorityActions, priorityReducer} from './priority.reducer';
+import {PriorityActions, priorityMetaReducer} from './priority.reducer';
 import {cloneObject} from '../../../../common/object-util';
 import {initialLabelState, LabelState} from '../label/label.model';
-import {LabelActions, labelReducer} from '../label/label.reducer';
+import {LabelActions, labelMetaReducer} from '../label/label.reducer';
 import {getTestLabelsInput} from '../label/label.reducer.spec';
 
 export function getTestPrioritiesInput(): any {
@@ -20,7 +20,7 @@ export function getTestPrioritiesInput(): any {
 
 export function getTestPriorityState(): PriorityState {
   const input = getTestPrioritiesInput();
-  return priorityReducer(initialPriorityState, PriorityActions.createDeserializePriorities(input));
+  return priorityMetaReducer(initialPriorityState, PriorityActions.createDeserializePriorities(input));
 }
 
 describe('Priority reducer tests', () => {
@@ -42,9 +42,9 @@ describe('Priority reducer tests', () => {
 
   it ('Deserialize same state', () => {
     const stateA: LabelState =
-      labelReducer(initialLabelState, LabelActions.createDeserializeLabels(getTestLabelsInput()));
+      labelMetaReducer(initialLabelState, LabelActions.createDeserializeLabels(getTestLabelsInput()));
     const stateB: LabelState =
-      labelReducer(stateA, LabelActions.createDeserializeLabels(getTestLabelsInput()));
+      labelMetaReducer(stateA, LabelActions.createDeserializeLabels(getTestLabelsInput()));
     expect(stateA).toBe(stateB);
   });
 

@@ -1,46 +1,46 @@
 import {Action} from '@ngrx/store';
 import {AppState} from '../../../app-store';
-import {IssueTypeActions, issueTypeReducer} from './issue-type/issue-type.reducer';
-import {IssueActions, issueReducer} from './issue/issue.reducer';
-import {AssigneeActions, assigneeReducer} from './assignee/assignee.reducer';
-import {PriorityActions, priorityReducer} from './priority/priority.reducer';
-import {HeaderActions, headerReducer} from './header/header.reducer';
-import {ProjectActions, projectReducer} from './project/project.reducer';
+import {IssueTypeActions, issueTypeMetaReducer} from './issue-type/issue-type.reducer';
+import {IssueActions, issueMetaReducer} from './issue/issue.reducer';
+import {AssigneeActions, assigneeMetaReducer} from './assignee/assignee.reducer';
+import {PriorityActions, priorityMetaReducer} from './priority/priority.reducer';
+import {HeaderActions, headerMetaReducer} from './header/header.reducer';
+import {ProjectActions, projectMetaReducer} from './project/project.reducer';
 import {AssigneeState} from './assignee/assignee.model';
 import {DeserializeIssueLookupParams, IssueState} from './issue/issue.model';
 import {IssueTypeState} from './issue-type/issue-type.model';
 import {PriorityState} from './priority/priority.model';
 import {ProjectState} from './project/project.model';
 import {ComponentState, initialComponentState} from './component/component.model';
-import {ComponentActions, componentReducer} from './component/component.reducer';
+import {ComponentActions, componentMetaReducer} from './component/component.reducer';
 import {initialLabelState, LabelState} from './label/label.model';
-import {LabelActions, labelReducer} from './label/label.reducer';
+import {LabelActions, labelMetaReducer} from './label/label.reducer';
 import {FixVersionState, initialFixVersionState} from './fix-version/fix-version.model';
-import {FixVersionActions, fixVersionReducer} from './fix-version/fix-version.reducer';
+import {FixVersionActions, fixVersionMetaReducer} from './fix-version/fix-version.reducer';
 import {CustomFieldState, initialCustomFieldState} from './custom-field/custom-field.model';
-import {CustomFieldActions, customFieldReducer} from './custom-field/custom-field.reducer';
+import {CustomFieldActions, customFieldMetaReducer} from './custom-field/custom-field.reducer';
 import {BlacklistState} from './blacklist/blacklist.model';
-import {BlacklistActions, blacklistReducer} from './blacklist/blacklist.reducer';
+import {BlacklistActions, blacklistMetaReducer} from './blacklist/blacklist.reducer';
 import {RankState} from './rank/rank.model';
-import {RankActions, rankReducer} from './rank/rank.reducer';
+import {RankActions, rankMetaReducer} from './rank/rank.reducer';
 import {HeaderState} from './header/header.state';
 import {BoardState} from './board';
 import {BoardUtil, initialBoardState} from './board.model';
 
 
 const metaReducers = {
-  headers: headerReducer,
-  assignees: assigneeReducer,
-  issueTypes: issueTypeReducer,
-  priorities: priorityReducer,
-  components: componentReducer,
-  labels: labelReducer,
-  fixVersions: fixVersionReducer,
-  customFields: customFieldReducer,
-  projects: projectReducer,
-  ranks: rankReducer,
-  issues: issueReducer,
-  blacklist: blacklistReducer
+  headers: headerMetaReducer,
+  assignees: assigneeMetaReducer,
+  issueTypes: issueTypeMetaReducer,
+  priorities: priorityMetaReducer,
+  components: componentMetaReducer,
+  labels: labelMetaReducer,
+  fixVersions: fixVersionMetaReducer,
+  customFields: customFieldMetaReducer,
+  projects: projectMetaReducer,
+  ranks: rankMetaReducer,
+  issues: issueMetaReducer,
+  blacklist: blacklistMetaReducer
 };
 
 const CLEAR_BOARD = 'CLEAR_BOARD';

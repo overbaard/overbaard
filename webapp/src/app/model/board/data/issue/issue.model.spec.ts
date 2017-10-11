@@ -11,7 +11,7 @@ import {getTestCustomFieldState} from '../custom-field/custom-field.reducer.spec
 import {Dictionary} from '../../../../common/dictionary';
 import {cloneObject} from '../../../../common/object-util';
 import {initialProjectState, ProjectState} from '../project/project.model';
-import {ProjectActions, projectReducer} from '../project/project.reducer';
+import {ProjectActions, projectMetaReducer} from '../project/project.reducer';
 import {getTestProjectsInput} from '../project/project.reducer.spec';
 import {getTestAssigneeState} from '../assignee/assignee.reducer.spec';
 import {getTestPriorityState} from '../priority/priority.reducer.spec';
@@ -34,7 +34,7 @@ describe('Issue unit tests', () => {
     const customFields: OrderedMap<string, OrderedMap<string, CustomField>> = getTestCustomFieldState().fields;
 
     const projectState: ProjectState =
-      projectReducer(
+      projectMetaReducer(
         initialProjectState,
         ProjectActions.createDeserializeProjects(getTestProjectsInput()));
 

@@ -1,6 +1,6 @@
 import {async} from '@angular/core/testing';
 import {Assignee, AssigneeState, initialAssigneeState} from './assignee.model';
-import {AssigneeActions, assigneeReducer} from './assignee.reducer';
+import {AssigneeActions, assigneeMetaReducer} from './assignee.reducer';
 import {cloneObject} from '../../../../common/object-util';
 
 export function getTestAssigneesInput(): any {
@@ -22,7 +22,7 @@ export function getTestAssigneesInput(): any {
 
 export function getTestAssigneeState(): AssigneeState {
   const input = getTestAssigneesInput();
-  return assigneeReducer(initialAssigneeState, AssigneeActions.createAddInitialAssignees(input));
+  return assigneeMetaReducer(initialAssigneeState, AssigneeActions.createAddInitialAssignees(input));
 }
 
 describe('Assignee reducer tests', () => {
@@ -46,14 +46,14 @@ describe('Assignee reducer tests', () => {
 
     it ('Same', () => {
       const newState: AssigneeState =
-        assigneeReducer(assigneeState, AssigneeActions.createAddInitialAssignees(getTestAssigneesInput()));
+        assigneeMetaReducer(assigneeState, AssigneeActions.createAddInitialAssignees(getTestAssigneesInput()));
       expect(newState).toBe(assigneeState);
     });
   });
 
   it( 'Changes', () => {
     it('Add new assignees', () => {
-      assigneeState = assigneeReducer(assigneeState, AssigneeActions.createAddAssignees([{
+      assigneeState = assigneeMetaReducer(assigneeState, AssigneeActions.createAddAssignees([{
         key: 'z-fun',
         name: 'Fun Freddy Fox',
         email: 'fun@example.com',
@@ -83,7 +83,7 @@ describe('Assignee reducer tests', () => {
     });
 
     it ('No change', () => {
-      const newState = assigneeReducer(assigneeState, AssigneeActions.createAddAssignees(null));
+      const newState = assigneeMetaReducer(assigneeState, AssigneeActions.createAddAssignees(null));
       expect(newState).toBe(assigneeState);
     });
   });

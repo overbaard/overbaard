@@ -36,7 +36,8 @@ export class LabelActions {
   }
 }
 
-export function labelReducer(state: LabelState = initialLabelState, action: Action): LabelState {
+// 'meta-reducer here means it is not called directly by the store, rather from the boardReducer
+export function labelMetaReducer(state: LabelState = initialLabelState, action: Action): LabelState {
 
   switch (action.type) {
     case DESERIALIZE_ALL_LABELS: {

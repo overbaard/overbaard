@@ -1,24 +1,31 @@
 import {Dictionary} from '../../../../common/dictionary';
-import {BoardFilterState, BoardFilterUtil, initialBoardFilterState} from './board-filter.model';
-import {BoardFilterActions, boardFilterReducer} from './board-filter.reducer';
+import {BoardFilterState, initialBoardFilterState} from './board-filter.model';
+import {BoardFilterActions, boardFilterMetaReducer} from './board-filter.reducer';
 import {Map, Set} from 'immutable';
 import {
-  ASSIGNEE_ATTRIBUTES, COMPONENT_ATTRIBUTES, FilterAttributes, FilterAttributesUtil, FIX_VERSION_ATTRIBUTES,
+  ASSIGNEE_ATTRIBUTES,
+  COMPONENT_ATTRIBUTES,
+  FilterAttributes,
+  FilterAttributesUtil,
+  FIX_VERSION_ATTRIBUTES,
   ISSUE_TYPE_ATTRIBUTES,
-  LABEL_ATTRIBUTES, PARALLEL_TASK_ATTRIBUTES,
+  LABEL_ATTRIBUTES,
+  PARALLEL_TASK_ATTRIBUTES,
   PRIORITY_ATTRIBUTES,
   PROJECT_ATTRIBUTES
 } from './board-filter.constants';
+import {UserSettingActions} from '../user-setting.reducer';
 
 describe('BoardFilter reducer tests', () => {
+
 
   describe('Querystring tests', () => {
     it('No querystring', () => {
       const qs: Dictionary<string> = {};
-      const state: BoardFilterState = boardFilterReducer(initialBoardFilterState, BoardFilterActions.createInitialiseFromQueryString(qs));
-      for (const key of BoardFilterUtil.toStateRecord(state).keySeq().toArray()) {
-        expect(state[key].size).toEqual(0);
-      }
+      const state: BoardFilterState = boardFilterMetaReducer(
+        initialBoardFilterState,
+        UserSettingActions.createInitialiseFromQueryString(qs));
+      expect(state).toBe(initialBoardFilterState);
     });
 
     it ('With querystring', () => {
@@ -35,20 +42,20 @@ describe('BoardFilter reducer tests', () => {
         'pt.Par%201': 'PT%2011,PT12',
         'pt.Par2': 'PT%2021,PT22'
       };
-      const state: BoardFilterState = boardFilterReducer(initialBoardFilterState, BoardFilterActions.createInitialiseFromQueryString(qs));
-      checkSetContents(state.project, ['P 1', 'P2']);
-      checkSetContents(state.priority, ['Pr 1', 'Pr2']);
-      checkSetContents(state.issueType, ['T 1', 'T2']);
-      checkSetContents(state.assignee, ['A 1', 'A2']);
-      checkSetContents(state.component, ['C 1', 'C2']);
-      checkSetContents(state.label, ['L 1', 'L2']);
-      checkSetContents(state.fixVersion, ['F 1', 'F2']);
-      expect(state.customField.size).toBe(2);
-      checkSetContents(state.customField.get('Custom 1'), ['CF 11', 'CF12']);
-      checkSetContents(state.customField.get('Custom2'), ['CF 21', 'CF22']);
-      expect(state.parallelTask.size).toBe(2);
-      checkSetContents(state.parallelTask.get('Par 1'), ['PT 11', 'PT12']);
-      checkSetContents(state.parallelTask.get('Par2'), ['PT 21', 'PT22']);
+      const state: BoardFilterState = boardFilterMetaReducer(
+        initialBoardFilterState,
+        UserSettingActions.createInitialiseFromQueryString(qs));
+      const filterChecker: FilterChecker = new FilterChecker();
+      filterChecker.project = ['P 1', 'P2'];
+      filterChecker.priority = ['Pr 1', 'Pr2'];
+      filterChecker.issueType = ['T 1', 'T2'];
+      filterChecker.assignee = ['A 1', 'A2'];
+      filterChecker.component = ['C 1', 'C2'];
+      filterChecker.label = ['L 1', 'L2'];
+      filterChecker.fixVersion = ['F 1', 'F2'];
+      filterChecker.customField = {'Custom 1': ['CF 11', 'CF12'], Custom2: ['CF 21', 'CF22']};
+      filterChecker.parallelTask = {'Par 1': ['PT 11', 'PT12'], Par2: ['PT 21', 'PT22']};
+      filterChecker.check(state);
     });
 
     function checkSetContents(set: Set<string>, expected: string[]) {
@@ -75,72 +82,74 @@ describe('BoardFilter reducer tests', () => {
         'pt.Par1': 'PT11',
         'pt.Par2': 'PT21'
       };
-      state = boardFilterReducer(initialBoardFilterState, BoardFilterActions.createInitialiseFromQueryString(qs));
+      state = boardFilterMetaReducer(
+        initialBoardFilterState,
+        UserSettingActions.createInitialiseFromQueryString(qs));
     });
 
     it ('Update project', () => {
-      state = boardFilterReducer(state, BoardFilterActions.createUpdateFilter(PROJECT_ATTRIBUTES, {P1: false, P2: true, P3: true}));
-      const checker: UpdateChecker = new UpdateChecker();
+      state = boardFilterMetaReducer(state, BoardFilterActions.createUpdateFilter(PROJECT_ATTRIBUTES, {P1: false, P2: true, P3: true}));
+      const checker: FilterChecker = new FilterChecker();
       checker.project = ['P2', 'P3'];
       checker.check(state);
     });
 
     it ('Update priority', () => {
-      state = boardFilterReducer(state, BoardFilterActions.createUpdateFilter(PRIORITY_ATTRIBUTES, {Pr1: false, Pr2: true, Pr3: true}));
-      const checker: UpdateChecker = new UpdateChecker();
+      state = boardFilterMetaReducer(state, BoardFilterActions.createUpdateFilter(PRIORITY_ATTRIBUTES, {Pr1: false, Pr2: true, Pr3: true}));
+      const checker: FilterChecker = new FilterChecker();
       checker.priority = ['Pr2', 'Pr3'];
       checker.check(state);
     });
 
     it ('Update issue type', () => {
-      state = boardFilterReducer(state, BoardFilterActions.createUpdateFilter(ISSUE_TYPE_ATTRIBUTES, {T1: false, T2: true, T3: true}));
-      const checker: UpdateChecker = new UpdateChecker();
+      state = boardFilterMetaReducer(state, BoardFilterActions.createUpdateFilter(ISSUE_TYPE_ATTRIBUTES, {T1: false, T2: true, T3: true}));
+      const checker: FilterChecker = new FilterChecker();
       checker.issueType = ['T2', 'T3'];
       checker.check(state);
     });
 
     it ('Update assignee', () => {
-      state = boardFilterReducer(state, BoardFilterActions.createUpdateFilter(ASSIGNEE_ATTRIBUTES, {A1: false, A2: true, A3: true}));
-      const checker: UpdateChecker = new UpdateChecker();
+      state = boardFilterMetaReducer(state, BoardFilterActions.createUpdateFilter(ASSIGNEE_ATTRIBUTES, {A1: false, A2: true, A3: true}));
+      const checker: FilterChecker = new FilterChecker();
       checker.assignee = ['A2', 'A3'];
       checker.check(state);
     });
 
     it ('Update component', () => {
-      state = boardFilterReducer(state, BoardFilterActions.createUpdateFilter(COMPONENT_ATTRIBUTES, {C1: false, C2: true, C3: true}));
-      const checker: UpdateChecker = new UpdateChecker();
+      state = boardFilterMetaReducer(state, BoardFilterActions.createUpdateFilter(COMPONENT_ATTRIBUTES, {C1: false, C2: true, C3: true}));
+      const checker: FilterChecker = new FilterChecker();
       checker.component = ['C2', 'C3'];
       checker.check(state);
     });
 
     it ('Update label', () => {
-      state = boardFilterReducer(state, BoardFilterActions.createUpdateFilter(LABEL_ATTRIBUTES, {L1: false, L2: true, L3: true}));
-      const checker: UpdateChecker = new UpdateChecker();
+      state = boardFilterMetaReducer(state, BoardFilterActions.createUpdateFilter(LABEL_ATTRIBUTES, {L1: false, L2: true, L3: true}));
+      const checker: FilterChecker = new FilterChecker();
       checker.label = ['L2', 'L3'];
       checker.check(state);
     });
 
     it ('Update fix version', () => {
-      state = boardFilterReducer(state, BoardFilterActions.createUpdateFilter(FIX_VERSION_ATTRIBUTES, {F1: false, F2: true, F3: true}));
-      const checker: UpdateChecker = new UpdateChecker();
+      state = boardFilterMetaReducer(state, BoardFilterActions.createUpdateFilter(FIX_VERSION_ATTRIBUTES, {F1: false, F2: true, F3: true}));
+      const checker: FilterChecker = new FilterChecker();
       checker.fixVersion = ['F2', 'F3'];
       checker.check(state);
     });
 
     it ('Update custom field', () => {
       const customFieldAttributes: FilterAttributes = FilterAttributesUtil.createCustomFieldFilterAttributes('Custom2');
-      state = boardFilterReducer(
+      state = boardFilterMetaReducer(
         state, BoardFilterActions.createUpdateFilter(customFieldAttributes, {CF21: false, CF22: true, CF23: true}));
-      const checker: UpdateChecker = new UpdateChecker();
+      const checker: FilterChecker = new FilterChecker();
       checker.customField['Custom2'] = ['CF22', 'CF23'];
       checker.check(state);
     });
 
     it ('Update parallel tasks', () => {
-      state = boardFilterReducer(state, BoardFilterActions.createUpdateFilter(PARALLEL_TASK_ATTRIBUTES, {
+      state = boardFilterMetaReducer(state, BoardFilterActions.createUpdateFilter(PARALLEL_TASK_ATTRIBUTES, {
           Par1: {PT12: true, PT13: true},
           Par2: {PT22: true, PT23: true}}));
-      const checker: UpdateChecker = new UpdateChecker();
+      const checker: FilterChecker = new FilterChecker();
       checker.parallelTask['Par1'] = ['PT12', 'PT13'];
       checker.parallelTask['Par2'] = ['PT22', 'PT23'];
       checker.check(state);
@@ -148,7 +157,7 @@ describe('BoardFilter reducer tests', () => {
   });
 });
 
-class UpdateChecker {
+export class FilterChecker {
   project: string[] = ['P1'];
   priority: string[] = ['Pr1'];
   issueType: string[] = ['T1'];

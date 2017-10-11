@@ -1,5 +1,5 @@
 import {CustomField, CustomFieldState, initialCustomFieldState} from './custom-field.model';
-import {CustomFieldActions, customFieldReducer} from './custom-field.reducer';
+import {CustomFieldActions, customFieldMetaReducer} from './custom-field.reducer';
 import {List, OrderedMap} from 'immutable';
 import {cloneObject} from '../../../../common/object-util';
 
@@ -34,7 +34,7 @@ export function getTestCustomFieldsInput() {
 
 export function getTestCustomFieldState(): CustomFieldState {
   const input: any = getTestCustomFieldsInput();
-  return customFieldReducer(initialCustomFieldState, CustomFieldActions.createDeserializeCustomFields(input));
+  return customFieldMetaReducer(initialCustomFieldState, CustomFieldActions.createDeserializeCustomFields(input));
 }
 
 describe('CustomField reducer tests', () => {
@@ -63,7 +63,7 @@ describe('CustomField reducer tests', () => {
     it ('Deserialize same state', () => {
       const stateA: CustomFieldState = getTestCustomFieldState();
       const stateB: CustomFieldState =
-        customFieldReducer(stateA, CustomFieldActions.createDeserializeCustomFields(getTestCustomFieldsInput()));
+        customFieldMetaReducer(stateA, CustomFieldActions.createDeserializeCustomFields(getTestCustomFieldsInput()));
       expect(stateA).toBe(stateB);
     });
   });
@@ -71,9 +71,9 @@ describe('CustomField reducer tests', () => {
   describe('Changes', () => {
     it ('Add several custom fields', () => {
       const state: CustomFieldState = getTestCustomFieldState();
-        customFieldReducer(initialCustomFieldState, CustomFieldActions.createDeserializeCustomFields(getTestCustomFieldsInput()));
+        customFieldMetaReducer(initialCustomFieldState, CustomFieldActions.createDeserializeCustomFields(getTestCustomFieldsInput()));
       const newState: CustomFieldState =
-        customFieldReducer(state, CustomFieldActions.createAddCustomFields({
+        customFieldMetaReducer(state, CustomFieldActions.createAddCustomFields({
           'Custom-1': [{key: 'c1-a', value: 'A'}, {key: 'c1-z', value: 'Z'}],
           'Custom-2': [{key: 'c2-k', value: 'k'}]}));
       const map: OrderedMap<string, List<CustomField>> = newState.fields.map(value => value.toList()).toOrderedMap();
@@ -103,7 +103,7 @@ describe('CustomField reducer tests', () => {
     it ('Add one custom field', () => {
       const state: CustomFieldState = getTestCustomFieldState();
       const newState: CustomFieldState =
-        customFieldReducer(state, CustomFieldActions.createAddCustomFields({
+        customFieldMetaReducer(state, CustomFieldActions.createAddCustomFields({
           'Custom-2': [{key: 'c2-k', value: 'k'}]}));
       const map: OrderedMap<string, List<CustomField>> = newState.fields.map(value => value.toList()).toOrderedMap();
       expect(map.size).toBe(2);
@@ -128,7 +128,7 @@ describe('CustomField reducer tests', () => {
     it ('No change', () => {
       const state: CustomFieldState = getTestCustomFieldState();
       const newState: CustomFieldState =
-        customFieldReducer(state, CustomFieldActions.createAddCustomFields(null));
+        customFieldMetaReducer(state, CustomFieldActions.createAddCustomFields(null));
       expect(newState).toBe(state);
     });
   });

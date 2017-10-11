@@ -66,7 +66,8 @@ export class ProjectActions {
   }
 }
 
-export function projectReducer(state: ProjectState = initialProjectState, action: Action): ProjectState {
+// 'meta-reducer here means it is not called directly by the store, rather from the boardReducer
+export function projectMetaReducer(state: ProjectState = initialProjectState, action: Action): ProjectState {
   switch (action.type) {
     case DESERIALIZE_PROJECTS: {
       const payload: ProjectState = (<DeserializeProjectsAction>action).payload;

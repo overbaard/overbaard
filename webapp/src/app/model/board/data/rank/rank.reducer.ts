@@ -53,7 +53,8 @@ export class RankActions {
   }
 }
 
-export function rankReducer(state: RankState = initialRankState, action: Action): RankState {
+// 'meta-reducer here means it is not called directly by the store, rather from the boardReducer
+export function rankMetaReducer(state: RankState = initialRankState, action: Action): RankState {
   switch (action.type) {
     case DESERIALIZE_RANKS: {
       const payload: RankState = (<DeserializeRanksAction>action).payload;

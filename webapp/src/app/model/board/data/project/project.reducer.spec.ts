@@ -1,4 +1,4 @@
-import {ProjectActions, projectReducer} from './project.reducer';
+import {ProjectActions, projectMetaReducer} from './project.reducer';
 import {List} from 'immutable';
 import {BoardProject, initialProjectState, LinkedProject, ParallelTask, ProjectState} from './project.model';
 import {cloneObject} from '../../../../common/object-util';
@@ -82,7 +82,7 @@ describe('Projects reducer tests', () => {
 
   describe('Deserialization tests', () => {
     it('Deserialize', () => {
-      const projectState: ProjectState = projectReducer(
+      const projectState: ProjectState = projectMetaReducer(
         initialProjectState, ProjectActions.createDeserializeProjects(getTestProjectsInput()));
       expect(projectState.owner).toBe('P1');
 
@@ -128,9 +128,9 @@ describe('Projects reducer tests', () => {
     });
 
     it('Deserialize same', () => {
-      const projectStateA: ProjectState = projectReducer(
+      const projectStateA: ProjectState = projectMetaReducer(
         initialProjectState, ProjectActions.createDeserializeProjects(getTestProjectsInput()));
-      const projectStateB: ProjectState = projectReducer(
+      const projectStateB: ProjectState = projectMetaReducer(
         projectStateA, ProjectActions.createDeserializeProjects((getTestProjectsInput())));
       expect(projectStateB).toBe(projectStateA);
     });
