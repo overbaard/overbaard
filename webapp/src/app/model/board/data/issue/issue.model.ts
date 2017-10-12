@@ -11,11 +11,29 @@ import {Issue} from './issue';
 
 export interface IssueState {
   issues: Map<string, BoardIssue>;
+  /**
+   * If null, this means a full refresh into an empty board happened on last contact with the server.
+   * Otherwise, this map will be populated with each change that happened.
+   */
+  lastChanged: Map<string, IssueChangeInfo>;
+}
+
+/**
+ * For:
+ * - issues moving state, fromState and toState will both be set
+ * - issues where the change did not affect the state, neither fromState not toState will be set
+ * - new issues, only toState will be set
+ * - deleted issues, only fromState will be set
+ */
+export interface IssueChangeInfo {
+  fromState: number;
+  toState: number;
 }
 
 
 const DEFAULT_STATE: IssueState = {
-  issues: Map<string, BoardIssue>()
+  issues: Map<string, BoardIssue>(),
+  lastChanged: null
 };
 
 const DEFAULT_ISSUE: BoardIssue = {
@@ -38,6 +56,12 @@ const DEFAULT_LINKED_ISSUE: Issue = {
   summary: null
 };
 
+const DEFAULT_ISSUE_CHANGE_INFO: IssueChangeInfo = {
+  fromState: null,
+  toState: null
+}
+
+
 interface BoardIssueRecord extends TypedRecord<BoardIssueRecord>, BoardIssue {
 }
 
@@ -47,9 +71,13 @@ interface LinkedIssueRecord extends TypedRecord<LinkedIssueRecord>, Issue {
 interface IssueStateRecord extends TypedRecord<IssueStateRecord>, IssueState {
 }
 
+interface IssueChangeInfoRecord extends TypedRecord<IssueChangeInfoRecord>, IssueChangeInfo {
+}
+
 const ISSUE_FACTORY = makeTypedFactory<BoardIssue, BoardIssueRecord>(DEFAULT_ISSUE);
 const LINKED_ISSUE_FACTORY = makeTypedFactory<Issue, LinkedIssueRecord>(DEFAULT_LINKED_ISSUE);
 const STATE_FACTORY = makeTypedFactory<IssueState, IssueStateRecord>(DEFAULT_STATE);
+const ISSUE_CHANGE_INFO_FACTORY = makeTypedFactory<IssueChangeInfo, IssueChangeInfoRecord>(DEFAULT_ISSUE_CHANGE_INFO);
 export const initialIssueState: IssueState = STATE_FACTORY(DEFAULT_STATE);
 
 const CLEAR_STRING_LIST = List<string>('Clear this!');
@@ -364,6 +392,21 @@ export class IssueUtil {
       }
     });
     return issue;
+  }
+
+  static createChangeInfo(existing: BoardIssue, current: BoardIssue): IssueChangeInfo {
+    let existingState: number = existing ? existing.ownState : null;
+    let currentState: number = current ? current.ownState : null;
+    if (existingState === currentState) {
+      // There was no state change
+      existingState = null;
+      currentState = null;
+    }
+    const changeInfo: IssueChangeInfo = {
+      fromState: existingState,
+      toState: currentState
+    };
+    return ISSUE_CHANGE_INFO_FACTORY(changeInfo);
   }
 
   private static getClearableStringList(input: any, clearKey, key): List<string> {

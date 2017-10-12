@@ -1,5 +1,5 @@
 import {IssueActions, issueMetaReducer} from './issue.reducer';
-import {DeserializeIssueLookupParams, initialIssueState, IssueState} from './issue.model';
+import {DeserializeIssueLookupParams, initialIssueState, IssueChangeInfo, IssueState} from './issue.model';
 import {async} from '@angular/core/testing';
 import {getTestAssigneeState} from '../assignee/assignee.reducer.spec';
 import {getTestIssueTypeState} from '../issue-type/issue-type.reducer.spec';
@@ -95,6 +95,8 @@ describe('Issue reducer tests', () => {
         lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Major'), NO_ASSIGNEE, 'Four', 1)
         .key('ISSUE-4')
         .check();
+
+      expect(issueState.lastChanged).toBeFalsy();
     });
 
     it('Deserialize same state', () => {
@@ -102,6 +104,7 @@ describe('Issue reducer tests', () => {
         issueState,
         IssueActions.createDeserializeIssuesAction(getTestIssuesInput(), lookupParams));
       expect(state).toBe(issueState);
+      expect(state.lastChanged).toBeFalsy();
     });
 
 
@@ -133,6 +136,11 @@ describe('Issue reducer tests', () => {
         .check();
 
       expect(state.issues.get('ISSUE-3')).toBe(issues.get('ISSUE-3'));
+      expect(state.lastChanged.size).toBe(4);
+      checkChange(state.lastChanged.get('ISSUE-1'), 0, null);
+      checkChange(state.lastChanged.get('ISSUE-2'), null, null);
+      checkChange(state.lastChanged.get('ISSUE-4'), 1, null);
+      checkChange(state.lastChanged.get('ISSUE-5'), null, 1);
     });
   });
 
@@ -186,6 +194,12 @@ describe('Issue reducer tests', () => {
         lookupParams.issueTypes.get('bug'), lookupParams.priorities.get('Major'), NO_ASSIGNEE, 'Five', -1)
         .key('ISSUE-5')
         .check();
+      expect(newState.lastChanged.size).toBe(4);
+      checkChange(newState.lastChanged.get('ISSUE-2'), null, null);
+      checkChange(newState.lastChanged.get('ISSUE-3'), null, null);
+      checkChange(newState.lastChanged.get('ISSUE-4'), 1, null);
+      checkChange(newState.lastChanged.get('ISSUE-5'), null, -1);
+
     });
 
     it('no changes', () => {
@@ -194,6 +208,7 @@ describe('Issue reducer tests', () => {
         issueState,
         IssueActions.createChangeIssuesAction(changes, lookupParams));
       expect(newState).toBe(issueState);
+      expect(newState.lastChanged).toBeFalsy();
     });
 
     it ('Updates only', () => {
@@ -229,7 +244,8 @@ describe('Issue reducer tests', () => {
         lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Major'), NO_ASSIGNEE, 'Four', 1)
         .key('ISSUE-4')
         .check();
-
+      expect(newState.lastChanged.size).toBe(1);
+      checkChange(newState.lastChanged.get('ISSUE-2'), null, null);
     });
 
     it ('Deletions only', () => {
@@ -247,7 +263,16 @@ describe('Issue reducer tests', () => {
         lookupParams.issueTypes.get('bug'), lookupParams.priorities.get('Major'), lookupParams.assignees.get('kabir'), 'Two', 1)
         .key('ISSUE-2')
         .check();
+      expect(newState.lastChanged.size).toBe(3);
+      checkChange(newState.lastChanged.get('ISSUE-1'), 0, null);
+      checkChange(newState.lastChanged.get('ISSUE-3'), 0, null);
+      checkChange(newState.lastChanged.get('ISSUE-4'), 1, null);
     });
   });
 
 });
+
+function checkChange(change: IssueChangeInfo, from: number, to: number) {
+  expect(change.fromState).toBe(from);
+  expect(change.toState).toBe(to);
+}
