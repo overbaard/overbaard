@@ -20,4 +20,10 @@ export class KanbanViewColumnComponent implements OnInit {
 
   ngOnInit() {
   }
+
+  // trackBy is a hint to angular to be able to keep (i.e. don't destroy and recreate) as many components as possible
+  issueTrackByFn(index: number, key: string) {
+    return key;
+  }
+
 }

@@ -24,4 +24,9 @@ export class KanbanViewComponent extends FixedHeaderView implements OnInit {
     // TODO calculate properly taking into account the sizes of the toolbar and the headers, which may be one or two rows
     return this.windowHeight - 150;
   }
+
+  // trackBy is a hint to angular to be able to keep (i.e. don't destroy and recreate) as many components as possible
+  columnTrackByFn(index: number, key: string) {
+    return index;
+  }
 }
