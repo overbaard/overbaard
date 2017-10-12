@@ -1,6 +1,6 @@
 <ul class="issues-list">
   <app-board-issue
-    *ngFor="let issue of issues"
-    [issue]="issue">
+    *ngFor="let issueKey of issueKeys"
+    [issue]="issues.get(issueKey)">
   </app-board-issue>
 </ul>

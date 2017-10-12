@@ -13,7 +13,8 @@
           <td app-kanban-view-column
               class="cell visible"
               *ngFor="let issuesForState of issueTable.table"
-              [issues]="issuesForState">
+              [issues]="issueTable.issues"
+              [issueKeys]="issuesForState">
           </td>
         </tr>
       </table>

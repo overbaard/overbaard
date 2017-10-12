@@ -1,10 +1,11 @@
-import {List} from 'immutable';
+import {List, Map} from 'immutable';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {BoardIssue} from '../../../model/board/data/issue/board-issue';
 import {IssueTableVm} from './issue-table-vm';
 
 const DEFAULT_STATE: IssueTableVm = {
-  table: List<List<BoardIssue>>()
+  issues: Map<string, BoardIssue>(),
+  table: List<List<string>>()
 };
 
 interface IssueTableVmRecord extends TypedRecord<IssueTableVmRecord>, IssueTableVm {
@@ -20,8 +21,9 @@ export class IssueTableVmUtil {
     return <IssueTableVmRecord>s;
   }
 
-  static createIssueTableVm(tableList: List<List<BoardIssue>>) {
+  static createIssueTableVm(issues: Map<string, BoardIssue>, tableList: List<List<string>>) {
     const state: IssueTableVm = {
+      issues: issues,
       table: tableList
     };
     return STATE_FACTORY(state);

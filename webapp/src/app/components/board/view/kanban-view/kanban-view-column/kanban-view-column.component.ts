@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
 import {BoardIssue} from '../../../../../model/board/data/issue/board-issue';
-import {List} from 'immutable';
+import {List, Map} from 'immutable';
 
 /* tslint:disable:component-selector */
 @Component({
@@ -12,7 +12,9 @@ import {List} from 'immutable';
 export class KanbanViewColumnComponent implements OnInit {
 
   @Input()
-  issues: List<BoardIssue>;
+  issues: Map<string, BoardIssue>;
+  @Input()
+  issueKeys: List<string>;
 
   constructor() { }
 

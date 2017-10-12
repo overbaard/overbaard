@@ -57,22 +57,26 @@ export class IssueTableVmHandler {
 }
 
 class IssueTableCreator {
+
+  issues: Map<string, BoardIssue>;
+  table: List<string>[];
+
   constructor(private _boardState: BoardState) {
   }
 
   createIssueTable(): IssueTableVm {
-    const table: List<BoardIssue>[] = this.createTable();
-    return IssueTableVmUtil.createIssueTableVm(this.makeTableImmutable(table));
+    const table: List<string>[] = this.createTable();
+    return IssueTableVmUtil.createIssueTableVm(this._boardState.issues.issues, this.makeTableImmutable(table));
   }
 
   updateIssueTable(oldState: IssueTableVm): IssueTableVm {
 
-    const newTable: List<BoardIssue>[] = this.createTable();
+    const newTable: List<string>[] = this.createTable();
 
     let noChanges = true;
     for (let i = 0 ; i < newTable.length ; i++) {
-      const oldIssues: List<BoardIssue> = oldState.table.get(i);
-      const newIssues: List<BoardIssue> = newTable[i];
+      const oldIssues: List<string> = oldState.table.get(i);
+      const newIssues: List<string> = newTable[i];
       if (oldIssues.equals(newIssues)) {
         // If the tables are the same, use the old table here to avoid updating the column components unnecessarily
         newTable[i] = oldIssues;
@@ -83,13 +87,13 @@ class IssueTableCreator {
     if (noChanges) {
       return oldState;
     }
-    return IssueTableVmUtil.createIssueTableVm(this.makeTableImmutable(newTable));
+    return IssueTableVmUtil.createIssueTableVm(this._boardState.issues.issues, this.makeTableImmutable(newTable));
   }
 
-  private createTable(): List<BoardIssue>[] {
-    const table: List<BoardIssue>[] = new Array<List<BoardIssue>>(this._boardState.headers.states.size);
+  private createTable(): List<string>[] {
+    const table: List<string>[] = new Array<List<string>>(this._boardState.headers.states.size);
     for (let i = 0 ; i < table.length ; i++) {
-      table[i] = List<BoardIssue>().asMutable();
+      table[i] = List<string>().asMutable();
     }
 
     this.addProjectIssues(table, this._boardState.projects.boardProjects.get(this._boardState.projects.owner));
@@ -101,20 +105,20 @@ class IssueTableCreator {
     return table;
   }
 
-  private makeTableImmutable(table: List<BoardIssue>[]): List<List<BoardIssue>> {
+  private makeTableImmutable(table: List<string>[]): List<List<string>> {
     // Make the table immutable
-    return List<List<BoardIssue>>().withMutations(mutable => {
+    return List<List<string>>().withMutations(mutable => {
       table.forEach((v, i) => mutable.push(table[i].asImmutable()));
     });
   }
 
-  private addProjectIssues(list: List<BoardIssue>[], project: BoardProject) {
+  private addProjectIssues(list: List<string>[], project: BoardProject) {
     const ownToBoardIndex: number[] = ProjectUtil.getOwnIndexToBoardIndex(this._boardState.headers, project);
     this._boardState.ranks.rankedIssueKeys.get(project.key).forEach((key) => {
       const issue: BoardIssue = this._boardState.issues.issues.get(key);
       // find the index and add the issue
       const boardIndex: number = ownToBoardIndex[issue.ownState];
-      list[boardIndex].push(issue);
+      list[boardIndex].push(key);
     });
   }
 

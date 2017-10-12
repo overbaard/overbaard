@@ -180,7 +180,7 @@ describe('Issue Table observer tests', () => {
         issueTable => {
           checkTable(issueTable.table,
             [['ONE-1'], ['ONE-2'], ['ONE-3', 'ONE-5', 'ONE-6'], ['ONE-4', 'ONE-7']]);
-          checkSameColumns(original, issueTable, 0, 2, 3);
+          expect(issueTable.table).toBe(original.table)
         });
     });
 
@@ -251,10 +251,10 @@ describe('Issue Table observer tests', () => {
   });
 });
 
-export function checkTable(table: List<List<BoardIssue>>, expected: string[][]) {
+export function checkTable(table: List<List<string>>, expected: string[][]) {
   const actualTable: string[][] = [];
   table.forEach((v, i) => {
-    actualTable.push(table.get(i).map(issue => issue.key).toArray());
+    actualTable.push(table.get(i).toArray());
   });
   expect(actualTable).toEqual(expected);
 }
@@ -263,8 +263,8 @@ function checkSameColumns(oldState: IssueTableVm, newState: IssueTableVm, ...col
   const expectedEqual: OrderedSet<number> = OrderedSet<number>(cols);
   expect(oldState.table.size).toBe(newState.table.size);
   for (let i = 0 ; i < oldState.table.size ; i++) {
-    const oldCol: List<BoardIssue> = oldState.table.get(i);
-    const newCol: List<BoardIssue> = newState.table.get(i);
+    const oldCol: List<string> = oldState.table.get(i);
+    const newCol: List<string> = newState.table.get(i);
     if (expectedEqual.contains(i)) {
       expect(oldCol).toBe(newCol, 'Column ' + i);
     } else {
