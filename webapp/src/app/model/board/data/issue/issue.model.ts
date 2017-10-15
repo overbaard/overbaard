@@ -11,23 +11,16 @@ import {Issue} from './issue';
 
 export interface IssueState {
   issues: Map<string, BoardIssue>;
-  /**
-   * If null, this means a full refresh into an empty board happened on last contact with the server.
-   * Otherwise, this map will be populated with each change that happened.
-   */
   lastChanged: Map<string, IssueChangeInfo>;
 }
 
-/**
- * For:
- * - issues moving state, fromState and toState will both be set
- * - issues where the change did not affect the state, neither fromState not toState will be set
- * - new issues, only toState will be set
- * - deleted issues, only fromState will be set
- */
 export interface IssueChangeInfo {
-  fromState: number;
-  toState: number;
+  key: string;
+  change: IssueChange;
+}
+
+export enum IssueChange {
+  NEW, UPDATE, DELETE
 }
 
 
@@ -57,8 +50,8 @@ const DEFAULT_LINKED_ISSUE: Issue = {
 };
 
 const DEFAULT_ISSUE_CHANGE_INFO: IssueChangeInfo = {
-  fromState: null,
-  toState: null
+  key: null,
+  change: null
 }
 
 
@@ -395,16 +388,18 @@ export class IssueUtil {
   }
 
   static createChangeInfo(existing: BoardIssue, current: BoardIssue): IssueChangeInfo {
-    let existingState: number = existing ? existing.ownState : null;
-    let currentState: number = current ? current.ownState : null;
-    if (existingState === currentState) {
-      // There was no state change
-      existingState = null;
-      currentState = null;
+    const key: string = existing ? existing.key : current.key;
+    let changeType: IssueChange;
+    if (existing && current) {
+      changeType = IssueChange.UPDATE;
+    } else if (!current) {
+      changeType = IssueChange.DELETE;
+    } else {
+      changeType = IssueChange.NEW;
     }
     const changeInfo: IssueChangeInfo = {
-      fromState: existingState,
-      toState: currentState
+      key: key,
+      change: changeType
     };
     return ISSUE_CHANGE_INFO_FACTORY(changeInfo);
   }

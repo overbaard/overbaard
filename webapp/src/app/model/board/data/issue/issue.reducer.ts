@@ -62,48 +62,46 @@ export function issueMetaReducer(state: IssueState = initialIssueState, action: 
   switch (action.type) {
     case DESERIALIZE_INITIAL_ISSUES: {
       const payload: Map<string, BoardIssue> = (<DeserializeIssuesAction>action).payload;
-      let changed: Map<string, IssueChangeInfo> = null;
+      let changed: Map<string, IssueChangeInfo> = Map<string, IssueChangeInfo>().asMutable();
       let newMap: Map<string, BoardIssue>;
-      if (state.issues.size === 0) {
-        // We are doing a full refresh so don't record the changes
-        newMap = payload;
-      } else {
-        // We have been sent the full board when polling for changes, but already have a copy. Only update what is needed.
-        changed = Map<string, IssueChangeInfo>().asMutable();
-        newMap = Map<string, BoardIssue>().withMutations(mutable => {
-          payload.forEach((issue, key) => {
-            const existing: BoardIssue = state.issues.get(key);
-            if (existing == null || !IssueUtil.toIssueRecord(existing).equals(IssueUtil.toIssueRecord(issue))) {
-              // It is a new issue, or an existing one with a change
-              mutable.set(key, issue);
-              changed.set(issue.key, IssueUtil.createChangeInfo(existing, issue));
-            } else {
-              mutable.set(key, existing);
-            }
-          });
+      // We have been sent the full board when polling for changes, but already have a copy. Only update what is needed.
+      newMap = Map<string, BoardIssue>().withMutations(mutable => {
+        payload.forEach((issue, key) => {
+          const existing: BoardIssue = state.issues.get(key);
+          if (existing == null || !IssueUtil.toIssueRecord(existing).equals(IssueUtil.toIssueRecord(issue))) {
+            // It is a new issue, or an existing one with a change
+            mutable.set(key, issue);
+            changed.set(issue.key, IssueUtil.createChangeInfo(existing, issue));
+          } else {
+            mutable.set(key, existing);
+          }
         });
-        // Record the deleted ones
-        state.issues
-          .filter((issue, key) => !newMap.get(key))
-          .forEach(issue => changed.set(issue.key, IssueUtil.createChangeInfo(issue, null)));
+      });
+      // Record the deleted ones
+      state.issues
+        .filter((issue, key) => !newMap.get(key))
+        .forEach(issue => changed.set(issue.key, IssueUtil.createChangeInfo(issue, null)));
+      changed = changed.asImmutable();
 
-        changed = changed.size > 0 ? changed.asImmutable() : null;
+
+      if (newMap.equals(state.issues)) {
+        return IssueUtil.toStateRecord(state).withMutations(mutable => {
+          mutable.lastChanged = changed;
+          mutable.issues = state.issues;
+        });
       }
-
-      const newState: IssueState = IssueUtil.toStateRecord(state).withMutations(mutable => {
+      return IssueUtil.toStateRecord(state).withMutations(mutable => {
         mutable.lastChanged = changed;
         mutable.issues = newMap;
       });
-
-      if (IssueUtil.toStateRecord(newState).equals(IssueUtil.toStateRecord(state))) {
-        return state;
-      }
-      return newState;
     }
     case CHANGE_ISSUES: {
       const payload: ChangeIssuesPayload = (<ChangeIssuesAction>action).payload;
       if (!payload.issueChanges && !payload.deletedIssues) {
-        return state;
+        return IssueUtil.toStateRecord(state).withMutations(mutable => {
+          mutable.lastChanged = Map<string, IssueChangeInfo>();
+          mutable.issues = state.issues;
+        });
       }
       return IssueUtil.toStateRecord(state).withMutations(mState => {
         const changed: Map<string, IssueChangeInfo> = Map<string, IssueChangeInfo>().asMutable();

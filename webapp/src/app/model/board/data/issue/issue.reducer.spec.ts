@@ -1,5 +1,5 @@
 import {IssueActions, issueMetaReducer} from './issue.reducer';
-import {DeserializeIssueLookupParams, initialIssueState, IssueChangeInfo, IssueState} from './issue.model';
+import {DeserializeIssueLookupParams, initialIssueState, IssueChange, IssueChangeInfo, IssueState} from './issue.model';
 import {async} from '@angular/core/testing';
 import {getTestAssigneeState} from '../assignee/assignee.reducer.spec';
 import {getTestIssueTypeState} from '../issue-type/issue-type.reducer.spec';
@@ -12,6 +12,7 @@ import {getTestLabelState} from '../label/label.reducer.spec';
 import {getTestFixVersionState} from '../fix-version/fix-version.reducer.spec';
 import {cloneObject} from '../../../../common/object-util';
 import {BoardIssue} from './board-issue';
+import {Dictionary} from '../../../../common/dictionary';
 
 function getTestIssuesInput() {
   return cloneObject({
@@ -96,15 +97,16 @@ describe('Issue reducer tests', () => {
         .key('ISSUE-4')
         .check();
 
-      expect(issueState.lastChanged).toBeFalsy();
+      checkIssueChanges(issueState,
+        {'ISSUE-1': IssueChange.NEW, 'ISSUE-2': IssueChange.NEW, 'ISSUE-3': IssueChange.NEW, 'ISSUE-4': IssueChange.NEW})
     });
 
     it('Deserialize same state', () => {
       const state = issueMetaReducer(
         issueState,
         IssueActions.createDeserializeIssuesAction(getTestIssuesInput(), lookupParams));
-      expect(state).toBe(issueState);
-      expect(state.lastChanged).toBeFalsy();
+      expect(state.issues).toBe(issueState.issues);
+      checkIssueChanges(state, {})
     });
 
 
@@ -137,10 +139,9 @@ describe('Issue reducer tests', () => {
 
       expect(state.issues.get('ISSUE-3')).toBe(issues.get('ISSUE-3'));
       expect(state.lastChanged.size).toBe(4);
-      checkChange(state.lastChanged.get('ISSUE-1'), 0, null);
-      checkChange(state.lastChanged.get('ISSUE-2'), null, null);
-      checkChange(state.lastChanged.get('ISSUE-4'), 1, null);
-      checkChange(state.lastChanged.get('ISSUE-5'), null, 1);
+      checkIssueChanges(state,
+        {'ISSUE-1': IssueChange.DELETE, 'ISSUE-2': IssueChange.UPDATE, 'ISSUE-4': IssueChange.DELETE, 'ISSUE-5': IssueChange.NEW});
+
     });
   });
 
@@ -194,12 +195,8 @@ describe('Issue reducer tests', () => {
         lookupParams.issueTypes.get('bug'), lookupParams.priorities.get('Major'), NO_ASSIGNEE, 'Five', -1)
         .key('ISSUE-5')
         .check();
-      expect(newState.lastChanged.size).toBe(4);
-      checkChange(newState.lastChanged.get('ISSUE-2'), null, null);
-      checkChange(newState.lastChanged.get('ISSUE-3'), null, null);
-      checkChange(newState.lastChanged.get('ISSUE-4'), 1, null);
-      checkChange(newState.lastChanged.get('ISSUE-5'), null, -1);
-
+      checkIssueChanges(newState,
+        {'ISSUE-2': IssueChange.UPDATE, 'ISSUE-3': IssueChange.UPDATE, 'ISSUE-4': IssueChange.DELETE, 'ISSUE-5': IssueChange.NEW});
     });
 
     it('no changes', () => {
@@ -207,8 +204,8 @@ describe('Issue reducer tests', () => {
       const newState: IssueState = issueMetaReducer(
         issueState,
         IssueActions.createChangeIssuesAction(changes, lookupParams));
-      expect(newState).toBe(issueState);
-      expect(newState.lastChanged).toBeFalsy();
+      expect(newState.issues).toBe(issueState.issues);
+      checkIssueChanges(newState, {});
     });
 
     it ('Updates only', () => {
@@ -245,7 +242,7 @@ describe('Issue reducer tests', () => {
         .key('ISSUE-4')
         .check();
       expect(newState.lastChanged.size).toBe(1);
-      checkChange(newState.lastChanged.get('ISSUE-2'), null, null);
+      checkIssueChanges(newState, {'ISSUE-2': IssueChange.UPDATE});
     });
 
     it ('Deletions only', () => {
@@ -264,15 +261,18 @@ describe('Issue reducer tests', () => {
         .key('ISSUE-2')
         .check();
       expect(newState.lastChanged.size).toBe(3);
-      checkChange(newState.lastChanged.get('ISSUE-1'), 0, null);
-      checkChange(newState.lastChanged.get('ISSUE-3'), 0, null);
-      checkChange(newState.lastChanged.get('ISSUE-4'), 1, null);
+      checkIssueChanges(newState, {'ISSUE-1': IssueChange.DELETE, 'ISSUE-3': IssueChange.DELETE, 'ISSUE-4': IssueChange.DELETE});
     });
   });
 
 });
 
-function checkChange(change: IssueChangeInfo, from: number, to: number) {
-  expect(change.fromState).toBe(from);
-  expect(change.toState).toBe(to);
+function checkIssueChanges(issueState: IssueState, expected: Dictionary<IssueChange>) {
+  expect(issueState.lastChanged.size).toBe(Object.keys(expected).length);
+  for (const key of Object.keys(expected)) {
+    const change: IssueChangeInfo = issueState.lastChanged.get(key);
+    expect(change).toBeTruthy(key);
+    expect(change.key).toEqual(key);
+    expect(change.change).toBe(expected[key]);
+  }
 }

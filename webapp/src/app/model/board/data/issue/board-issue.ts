@@ -16,4 +16,5 @@ export interface BoardIssue extends Issue {
   parallelTasks: List<string>;
   linkedIssues: List<Issue>;
   ownState: number;
+
 }

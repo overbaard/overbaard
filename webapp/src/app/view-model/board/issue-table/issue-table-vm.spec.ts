@@ -18,6 +18,7 @@ import {getTestAssigneeState} from '../../../model/board/data/assignee/assignee.
 import {IssueTableVmHandler} from './issue-table-vm.service';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/take';
+import {initialUserSettingState, UserSettingState} from '../../../model/board/user/user-setting.model';
 
 
 describe('Issue Table observer tests', () => {
@@ -283,6 +284,7 @@ class IssueTableObservableUtil {
   _service: IssueTableVmHandler = new IssueTableVmHandler();
   _boardState: BoardState = initialBoardState;
   _boardStateSubject$: BehaviorSubject<BoardState> = new BehaviorSubject(initialBoardState);
+  _userSettingSubject$: BehaviorSubject<UserSettingState> = new BehaviorSubject(initialUserSettingState);
   _issueTableVm$: Observable<IssueTableVm>;
 
   // Used for the update tests
@@ -291,7 +293,7 @@ class IssueTableObservableUtil {
   private _rankDeleted: string[];
 
   constructor(private _owner: string, private _numberStates: number) {
-    this._issueTableVm$ = this._service.getIssueTableVm(this._boardStateSubject$);
+    this._issueTableVm$ = this._service.getIssueTableVm(this._boardStateSubject$, this._userSettingSubject$);
   }
 
   addIssue(key: string, state: number): IssueTableObservableUtil {
