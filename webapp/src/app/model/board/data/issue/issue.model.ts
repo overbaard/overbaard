@@ -2,7 +2,7 @@ import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {Assignee, NO_ASSIGNEE} from '../assignee/assignee.model';
 import {Priority} from '../priority/priority.model';
 import {IssueType} from '../issue-type/issue-type.model';
-import {fromJS, List, Map, OrderedMap} from 'immutable';
+import {fromJS, List, Map, OrderedMap, OrderedSet} from 'immutable';
 import {CustomField} from '../custom-field/custom-field.model';
 import {BoardProject, ParallelTask} from '../project/project.model';
 import {cloneObject} from '../../../../common/object-util';
@@ -73,7 +73,7 @@ const STATE_FACTORY = makeTypedFactory<IssueState, IssueStateRecord>(DEFAULT_STA
 const ISSUE_CHANGE_INFO_FACTORY = makeTypedFactory<IssueChangeInfo, IssueChangeInfoRecord>(DEFAULT_ISSUE_CHANGE_INFO);
 export const initialIssueState: IssueState = STATE_FACTORY(DEFAULT_STATE);
 
-const CLEAR_STRING_LIST = List<string>('Clear this!');
+const CLEAR_STRING_LIST = OrderedSet<string>('Clear this!');
 /**
  * Convenience class to make it easier to pass in other data needed to deserialize an issue. Especially from unit tests,
  * where we do this repeatedly and not all data is always needed.
@@ -344,9 +344,9 @@ export class IssueUtil {
       assignee: input['unassigned'] ? NO_ASSIGNEE : params.assignees.get(input['assignee']),
       priority: params.priorities.get(input['priority']),
       type: params.issueTypes.get(input['type']),
-      components: IssueUtil.getClearableStringList(input, 'clear-components', 'components'),
-      labels: IssueUtil.getClearableStringList(input, 'clear-labels', 'labels'),
-      fixVersions: IssueUtil.getClearableStringList(input, 'clear-fix-versions', 'fix-versions'),
+      components: IssueUtil.getClearableStringSet(input, 'clear-components', 'components'),
+      labels: IssueUtil.getClearableStringSet(input, 'clear-labels', 'labels'),
+      fixVersions: IssueUtil.getClearableStringSet(input, 'clear-fix-versions', 'fix-versions'),
       customFields: customFields,
       parallelTasks: parallelTasks,
       linkedIssues: null // This isn't settable from the events at the moment, and only happens on full board refresh
@@ -404,12 +404,12 @@ export class IssueUtil {
     return ISSUE_CHANGE_INFO_FACTORY(changeInfo);
   }
 
-  private static getClearableStringList(input: any, clearKey, key): List<string> {
+  private static getClearableStringSet(input: any, clearKey: string, key: string): OrderedSet<string> {
     if (input[clearKey]) {
       return CLEAR_STRING_LIST;
     }
     if (input[key]) {
-      return List<string>(input[key]);
+      return List<string>(input[key]).sort((a, b) => a.localeCompare(b)).toOrderedSet();
     }
     return null;
   }
