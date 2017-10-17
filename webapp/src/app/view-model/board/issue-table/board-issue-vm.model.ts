@@ -10,6 +10,7 @@ import {Issue} from '../../../model/board/data/issue/issue';
 const DEFAULT_STATE: BoardIssueVm = {
   // Fields from core issue
   key: null,
+  projectCode: null,
   summary: null,
   assignee: NO_ASSIGNEE,
   priority: null,
@@ -38,6 +39,7 @@ export class BoardIssueVmUtil {
   static createBoardIssueVm(issue: BoardIssue): BoardIssueVmRecord {
     return ISSUE_FACTORY({
       key: issue.key,
+      projectCode: issue.projectCode,
       summary: issue.summary,
       assignee: issue.assignee,
       priority: issue.priority,

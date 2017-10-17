@@ -1,4 +1,12 @@
-<li class="issue">
+<li *ngIf="visible" class="issue">
+  <div>{{visible}}</div>
   <div>{{issue.key}}</div>
   <div>{{issue.summary}}</div>
+  <div>Priortity: {{issue.priority.name}}</div>
+  <div>Type: {{issue.type.name}}</div>
+  <div>
+    Assignee:
+    <span *ngIf="issue.assignee !== noAssignee; else emptyAssignee">{{issue.assignee.name}}</span>
+    <ng-template #emptyAssignee>-</ng-template>
+  </div>
 </li>

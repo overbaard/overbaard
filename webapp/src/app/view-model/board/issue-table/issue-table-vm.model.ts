@@ -6,7 +6,8 @@ import {BoardIssueVm} from './board-issue-vm';
 
 const DEFAULT_STATE: IssueTableVm = {
   issues: Map<string, BoardIssueVm>(),
-  table: List<List<string>>()
+  table: List<List<string>>(),
+  issueVisibilities: Map<string, boolean>()
 };
 
 interface IssueTableVmRecord extends TypedRecord<IssueTableVmRecord>, IssueTableVm {
@@ -22,10 +23,14 @@ export class IssueTableVmUtil {
     return <IssueTableVmRecord>s;
   }
 
-  static createIssueTableVm(issues: Map<string, BoardIssueVm>, tableList: List<List<string>>) {
+  static createIssueTableVm(
+    issues: Map<string, BoardIssueVm>,
+    tableList: List<List<string>>,
+    issueVisibilities: Map<string, boolean>) {
     const state: IssueTableVm = {
       issues: issues,
-      table: tableList
+      table: tableList,
+      issueVisibilities: issueVisibilities
     };
     return STATE_FACTORY(state);
   }

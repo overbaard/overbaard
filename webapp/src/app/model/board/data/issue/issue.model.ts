@@ -31,6 +31,7 @@ const DEFAULT_STATE: IssueState = {
 
 const DEFAULT_ISSUE: BoardIssue = {
   key: null,
+  projectCode: null,
   summary: null,
   assignee: NO_ASSIGNEE,
   priority: null,
@@ -235,10 +236,11 @@ export class DeserializeIssueLookupParams {
 export class IssueUtil {
 
   static fromJS(input: any, params: DeserializeIssueLookupParams): BoardIssue {
-    const projectKey: string = IssueUtil.productCodeFromKey(input['key']);
+    const projectCode: string = IssueUtil.productCodeFromKey(input['key']);
 
     // Clone this since we will be modifying it, and the data received from the server has been frozen
     input = cloneObject(input);
+    input['projectCode'] = projectCode;
 
     // Rework the data as needed before deserializing
     if (input['linked-issues']) {
@@ -284,7 +286,7 @@ export class IssueUtil {
     }
 
     if (input['parallel-tasks']) {
-      const ptList: List<ParallelTask> = params.parallelTasks.get(projectKey);
+      const ptList: List<ParallelTask> = params.parallelTasks.get(projectCode);
       const parallelTasksInput: any[] = input['parallel-tasks'];
       for (let i = 0 ; i < parallelTasksInput.length ; i++) {
         const parallelTask: ParallelTask = ptList.get(i);
@@ -339,6 +341,7 @@ export class IssueUtil {
     }
     return {
       key: input['key'],
+      projectCode: null,
       ownState: input['state'] ? params.getOwnStatesToBoardIndex(input['key']).get(input['state']) : null,
       summary: input['summary'],
       assignee: input['unassigned'] ? NO_ASSIGNEE : params.assignees.get(input['assignee']),

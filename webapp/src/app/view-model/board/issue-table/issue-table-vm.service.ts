@@ -14,6 +14,7 @@ import {initialBoardState} from '../../../model/board/data/board.model';
 import {BoardIssueVm} from './board-issue-vm';
 import {BoardIssueVmUtil} from './board-issue-vm.model';
 import {IssueChange} from '../../../model/board/data/issue/issue.model';
+import {AllFilters} from './filter.util';
 
 @Injectable()
 export class IssueTableVmService {
@@ -21,7 +22,6 @@ export class IssueTableVmService {
   private _issueTableVmHandler: IssueTableVmHandler = new IssueTableVmHandler();
 
   constructor(private _store: Store<AppState>) {
-    console.log('Creating issue table service')
   }
 
   getIssueTableVm(): Observable<IssueTableVm> {
@@ -37,16 +37,20 @@ export class IssueTableVmService {
  * its lifecycle follows that of the service
  */
 export class IssueTableVmHandler {
+  // Last inputs
   lastBoardState: BoardState = initialBoardState;
   lastUserSettingState: UserSettingState = initialUserSettingState;
+  // Last result
   lastIssueTable: IssueTableVm = initialIssueTableVm;
 
-  getIssueTableVm(boardState$: Observable<BoardState>, userSettingState$: Observable<UserSettingState>):  Observable<IssueTableVm> {
+  getIssueTableVm(
+    boardState$: Observable<BoardState>,
+    userSettingState$: Observable<UserSettingState>):  Observable<IssueTableVm> {
     return Observable
       .combineLatest(boardState$, userSettingState$, (boardState, userSettingState) => {
         let issueTable = this.lastIssueTable;
         if (boardState !== this.lastBoardState) {
-          const tableCreator: IssueTableCreator = new IssueTableCreator(boardState);
+          const tableCreator: IssueTableCreator = new IssueTableCreator(boardState, userSettingState);
           if (this.lastBoardState === initialBoardState) {
             // We are populating the table for the first time
             issueTable = tableCreator.createIssueTable();
@@ -56,12 +60,24 @@ export class IssueTableVmHandler {
           }
         }
         if (boardState.viewId >= 0) {
-          if (boardState !== this.lastBoardState || userSettingState !== this.lastUserSettingState) {
+          if (userSettingState.filters !== this.lastUserSettingState.filters) {
             // Filter all the issues (we can optimise this later)
+            const filters: AllFilters = new AllFilters(userSettingState.filters);
+            let visibilities: Map<string, boolean> = this.lastIssueTable.issueVisibilities.asMutable();
+            this.lastIssueTable.issues.forEach((issue, key) => {
+              const visible: boolean = !filters.filter(issue);
+              if (visible !== visibilities.get(key)) {
+                visibilities.set(key, visible);
+              }
+            });
+            visibilities = visibilities.asImmutable();
+            issueTable =
+              IssueTableVmUtil.createIssueTableVm(this.lastIssueTable.issues, this.lastIssueTable.table, visibilities);
           }
         }
         this.lastIssueTable = issueTable;
         this.lastBoardState = boardState;
+        this.lastUserSettingState = userSettingState
         return issueTable;
       });
   }
@@ -69,32 +85,53 @@ export class IssueTableVmHandler {
 
 class IssueTableCreator {
 
-  constructor(private _boardState: BoardState) {
+  constructor(private _boardState: BoardState, private _userSettingState: UserSettingState) {
   }
 
   createIssueTable(): IssueTableVm {
-    const table: List<string>[] = this.createTable();
-    const issues: Map<string, BoardIssueVm> = Map<string, BoardIssueVm>().withMutations(mutable => {
-      this._boardState.issues.issues.forEach((issue, key) => mutable.set(key, BoardIssueVmUtil.createBoardIssueVm(issue)));
+    const issues: Map<string, BoardIssueVm> = Map<string, BoardIssueVm>().asMutable();
+    const issueVisibilities: Map<string, boolean> = Map<string, boolean>().asMutable();
+    const filters: AllFilters = new AllFilters(this._userSettingState.filters);
+
+    this._boardState.issues.issues.forEach((issue, key) => {
+      const issueVm: BoardIssueVm = BoardIssueVmUtil.createBoardIssueVm(issue);
+      issues.set(key, issueVm);
+      issueVisibilities.set(key, !filters.filter(issueVm));
     });
-    return IssueTableVmUtil.createIssueTableVm(issues, this.makeTableImmutable(table));
+
+    const table: List<string>[] = this.createTable();
+    return IssueTableVmUtil.createIssueTableVm(issues.asImmutable(), this.makeTableImmutable(table), issueVisibilities);
   }
 
   updateIssueTable(oldState: IssueTableVm): IssueTableVm {
 
     const noIssueChanges = this._boardState.issues.lastChanged.size > 0;
+
     let issues: Map<string, BoardIssueVm> = oldState.issues;
+    let visibilities: Map<string, boolean> = oldState.issueVisibilities;
+
     if (!noIssueChanges) {
-      issues = issues.withMutations(mutable => {
-        this._boardState.issues.lastChanged.forEach((change, key) => {
-          if (change.change === IssueChange.DELETE) {
-            mutable.delete(key);
-          } else {
-            const issue: BoardIssue = this._boardState.issues.issues.get(key);
-            mutable.set(key, BoardIssueVmUtil.createBoardIssueVm(issue));
+      issues = issues.asMutable();
+      visibilities = visibilities.asMutable();
+      const filters: AllFilters = new AllFilters(this._userSettingState.filters);
+
+      this._boardState.issues.lastChanged.forEach((change, key) => {
+        if (change.change === IssueChange.DELETE) {
+          issues.delete(key);
+          visibilities.delete(key);
+        } else {
+          const issue: BoardIssue = this._boardState.issues.issues.get(key);
+          issues.set(key, BoardIssueVmUtil.createBoardIssueVm(issue));
+          const visible: boolean = !filters.filter(issue);
+          if (change.change === IssueChange.NEW ||
+            (change.change === IssueChange.UPDATE && !visibilities.get(key) === visible)) {
+            visibilities.set(key, visible);
           }
-        });
+        }
       });
+
+      issues = issues.asImmutable();
+      visibilities = visibilities.asImmutable();
     }
 
 
@@ -115,7 +152,7 @@ class IssueTableCreator {
     }
 
     const table: List<List<string>> = noTableChanges ? oldState.table : this.makeTableImmutable(newTable);
-    return IssueTableVmUtil.createIssueTableVm(issues, table);
+    return IssueTableVmUtil.createIssueTableVm(issues, table, visibilities);
   }
 
   private createTable(): List<string>[] {
@@ -149,5 +186,5 @@ class IssueTableCreator {
       list[boardIndex].push(key);
     });
   }
-
 }
+

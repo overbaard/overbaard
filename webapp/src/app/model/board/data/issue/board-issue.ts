@@ -6,6 +6,7 @@ import {CustomField} from '../custom-field/custom-field.model';
 import {Issue} from './issue';
 
 export interface BoardIssue extends Issue {
+  projectCode: string;
   assignee: Assignee;
   priority: Priority;
   type: IssueType;

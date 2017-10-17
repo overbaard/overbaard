@@ -15,6 +15,7 @@
               class="cell visible"
               *ngFor="let issuesForState of issueTable.table ; trackBy: columnTrackByFn "
               [issues]="issueTable.issues"
+              [issueVisibilities]="issueTable.issueVisibilities"
               [issueKeys]="issuesForState">
           </td>
         </tr>
