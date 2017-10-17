@@ -65,7 +65,7 @@ export class IssueTableVmHandler {
             const filters: AllFilters = new AllFilters(userSettingState.filters);
             let visibilities: Map<string, boolean> = this.lastIssueTable.issueVisibilities.asMutable();
             this.lastIssueTable.issues.forEach((issue, key) => {
-              const visible: boolean = !filters.filter(issue);
+              const visible: boolean = filters.filterVisible(issue);
               if (visible !== visibilities.get(key)) {
                 visibilities.set(key, visible);
               }
@@ -96,7 +96,7 @@ class IssueTableCreator {
     this._boardState.issues.issues.forEach((issue, key) => {
       const issueVm: BoardIssueVm = BoardIssueVmUtil.createBoardIssueVm(issue);
       issues.set(key, issueVm);
-      issueVisibilities.set(key, !filters.filter(issueVm));
+      issueVisibilities.set(key, filters.filterVisible(issueVm));
     });
 
     const table: List<string>[] = this.createTable();
@@ -122,7 +122,7 @@ class IssueTableCreator {
         } else {
           const issue: BoardIssue = this._boardState.issues.issues.get(key);
           issues.set(key, BoardIssueVmUtil.createBoardIssueVm(issue));
-          const visible: boolean = !filters.filter(issue);
+          const visible: boolean = filters.filterVisible(issue);
           if (change.change === IssueChange.NEW ||
             (change.change === IssueChange.UPDATE && !visibilities.get(key) === visible)) {
             visibilities.set(key, visible);

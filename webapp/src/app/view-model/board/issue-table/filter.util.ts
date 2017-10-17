@@ -36,33 +36,33 @@ export class AllFilters {
   /**
    *
    * @param {BoardIssueVm} issue
-   * @return {true} if it is filtered, i.e. invisible, {false} otherwise
+   * @return {true} if it is visible, {false} otherwise
    */
-  filter(issue: BoardIssueVm): boolean {
-    if (this._project.doFilter(issue.projectCode)) {
-      return true;
+  filterVisible(issue: BoardIssueVm): boolean {
+    if (!this._project.doFilter(issue.projectCode)) {
+      return false;
     }
-    if (this._priority.doFilter(issue.priority.name)) {
-      return true;
+    if (!this._priority.doFilter(issue.priority.name)) {
+      return false;
     }
-    if (this._issueType.doFilter(issue.type.name)) {
-      return true;
+    if (!this._issueType.doFilter(issue.type.name)) {
+      return false;
     }
-    if (this._assignee.doFilter(issue.assignee !== NO_ASSIGNEE ? issue.assignee.key : null)) {
-      return true;
+    if (!this._assignee.doFilter(issue.assignee !== NO_ASSIGNEE ? issue.assignee.key : null)) {
+      return false;
     }
-    if (this._component.filterAll(issue.components)) {
-      return true;
+    if (!this._component.filterAll(issue.components)) {
+      return false;
     }
-    if (this._label.filterAll(issue.labels)) {
-      return true;
+    if (!this._label.filterAll(issue.labels)) {
+      return false;
     }
-    if (this._fixVersion.filterAll(issue.fixVersions)) {
-      return true;
+    if (!this._fixVersion.filterAll(issue.fixVersions)) {
+      return false;
     }
     // TODO - the other map ones
 
-    return false;
+    return true;
   }
 }
 
@@ -77,9 +77,9 @@ class SimpleFilter {
         useKey = NONE_FILTER;
       }
 
-      return !this._filter.contains(useKey);
+      return this._filter.contains(useKey);
     }
-    return false;
+    return true;
   }
 }
 
@@ -94,12 +94,12 @@ class MultiSelectFilter extends SimpleFilter {
   filterAll(keys: Set<string>): boolean {
     if (this._filter.size > 0) {
       if (!keys) {
-        return !this._filter.contains(NONE_FILTER);
+        return this._filter.contains(NONE_FILTER);
       } else {
         if (this._filter.size === 1 && this._filter.contains(NONE_FILTER)) {
           // All we want to match is no components, and we have some components so return that we
           // should be filtered out
-          return true;
+          return false;
         }
 
 
@@ -110,12 +110,12 @@ class MultiSelectFilter extends SimpleFilter {
             continue;
           }
           if (keys.contains(key)) {
-            return false;
+            return true;
           }
         }
-        return true;
+        return false;
       }
     }
-    return false;
+    return true;
   }
 }
