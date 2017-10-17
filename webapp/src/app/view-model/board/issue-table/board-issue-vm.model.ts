@@ -21,7 +21,8 @@ const DEFAULT_STATE: BoardIssueVm = {
   customFields: Map<string, CustomField>(),
   parallelTasks: null,
   linkedIssues: List<Issue>(),
-  ownState: -1
+  ownState: -1,
+  visible: true
 };
 
 interface BoardIssueVmRecord extends TypedRecord<BoardIssueVmRecord>, BoardIssueVm {
@@ -36,7 +37,7 @@ export class BoardIssueVmUtil {
     return <BoardIssueVmRecord>s;
   }
 
-  static createBoardIssueVm(issue: BoardIssue): BoardIssueVmRecord {
+  static createBoardIssueVm(issue: BoardIssue, visible: boolean): BoardIssueVmRecord {
     return ISSUE_FACTORY({
       key: issue.key,
       projectCode: issue.projectCode,
@@ -50,11 +51,18 @@ export class BoardIssueVmUtil {
       customFields: issue.customFields,
       parallelTasks: issue.parallelTasks,
       linkedIssues: issue.linkedIssues,
-      ownState: issue.ownState
+      ownState: issue.ownState,
+      visible: visible
     });
   }
 
   static equals(one: BoardIssueVm, two: BoardIssueVm) {
     return BoardIssueVmUtil.toIssueRecord(one).equals(BoardIssueVmUtil.toIssueRecord(two));
+  }
+
+  static updateVisibility(issue: BoardIssueVm, visible: boolean): BoardIssueVm {
+    return BoardIssueVmUtil.toIssueRecord(issue).withMutations(mutable => {
+      mutable.visible = visible;
+    })
   }
 }

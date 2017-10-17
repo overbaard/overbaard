@@ -15,9 +15,6 @@ export class BoardIssueComponent implements OnInit {
   @Input()
   issue: BoardIssueVm;
 
-  @Input()
-  visible: boolean;
-
   constructor() { }
 
   ngOnInit() {

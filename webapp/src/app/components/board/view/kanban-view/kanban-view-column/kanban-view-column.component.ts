@@ -15,10 +15,6 @@ export class KanbanViewColumnComponent implements OnInit {
   issues: Map<string, BoardIssueVm>;
   @Input()
   issueKeys: List<string>;
-  @Input()
-  issueVisibilities: Map<string, boolean>;
-
-
 
   constructor() { }
 

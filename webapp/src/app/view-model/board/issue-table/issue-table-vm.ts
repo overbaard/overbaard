@@ -5,5 +5,4 @@ import {BoardIssueVm} from './board-issue-vm';
 export interface IssueTableVm {
   issues: Map<string, BoardIssueVm>;
   table: List<List<string>>;
-  issueVisibilities: Map<string, boolean>;
 }
