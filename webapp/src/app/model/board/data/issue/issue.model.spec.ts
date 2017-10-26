@@ -663,6 +663,7 @@ export class IssueChecker {
 
   check() {
     expect(this._issue.key).toEqual(this._key);
+    expect(this._issue.projectCode).toEqual(IssueUtil.productCodeFromKey(this._key));
     if (this._assignee) {
       expect(this._issue.assignee).toBe(this._assignee);
     } else {

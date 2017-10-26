@@ -341,7 +341,7 @@ export class IssueUtil {
     }
     return {
       key: input['key'],
-      projectCode: null,
+      projectCode: IssueUtil.productCodeFromKey(input['key']),
       ownState: input['state'] ? params.getOwnStatesToBoardIndex(input['key']).get(input['state']) : null,
       summary: input['summary'],
       assignee: input['unassigned'] ? NO_ASSIGNEE : params.assignees.get(input['assignee']),
