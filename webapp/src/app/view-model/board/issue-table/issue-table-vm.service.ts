@@ -15,7 +15,6 @@ import {BoardIssueVm} from './board-issue-vm';
 import {BoardIssueVmUtil} from './board-issue-vm.model';
 import {IssueChange} from '../../../model/board/data/issue/issue.model';
 import {AllFilters} from './filter.util';
-import {isDefined} from '@angular/compiler/src/util';
 
 @Injectable()
 export class IssueTableVmService {
@@ -51,13 +50,12 @@ export class IssueTableVmHandler {
       .combineLatest(boardState$, userSettingState$, (boardState, userSettingState) => {
         let issueTable = this.lastIssueTable;
         if (boardState !== this.lastBoardState) {
-          const tableCreator: IssueTableCreator = new IssueTableCreator(boardState, userSettingState);
           if (this.lastBoardState === initialBoardState) {
             // We are populating the table for the first time
-            issueTable = tableCreator.createIssueTable();
+            issueTable = new IssueTableCreator(boardState, userSettingState).createIssueTable();
           } else {
             // We are updating the table
-            issueTable = tableCreator.updateIssueTable(issueTable);
+            issueTable = new IssueTableUpdater(boardState, userSettingState, issueTable).updateIssueTable();
           }
         }
         if (boardState.viewId >= 0) {
@@ -80,15 +78,56 @@ export class IssueTableVmHandler {
         this.lastIssueTable = issueTable;
         this.lastBoardState = boardState;
         this.lastUserSettingState = userSettingState
-        console.log('-----> ' + issueTable.issues.forEach(value => console.log(value.key + ': ' + value.visible)));
         return issueTable;
       });
   }
 }
 
-class IssueTableCreator {
 
-  constructor(private _boardState: BoardState, private _userSettingState: UserSettingState) {
+class BaseIssueTableGenerator {
+  // private readonly _visiblePerState: number[];
+
+  constructor(protected _boardState: BoardState, protected _userSettingState: UserSettingState) {
+    // this._visiblePerState = new Array<number>(this._boardState.headers.states.size);
+  }
+
+  protected makeTableImmutable(table: List<string>[]): List<List<string>> {
+    // Make the table immutable
+    return List<List<string>>().withMutations(mutable => {
+      table.forEach((v, i) => mutable.push(table[i].asImmutable()));
+    });
+  }
+
+  protected createTable(): List<string>[] {
+    const table: List<string>[] = new Array<List<string>>(this._boardState.headers.states.size);
+    for (let i = 0 ; i < table.length ; i++) {
+      table[i] = List<string>().asMutable();
+    }
+
+    this.addProjectIssues(table, this._boardState.projects.boardProjects.get(this._boardState.projects.owner));
+    this._boardState.projects.boardProjects.forEach((project, key) => {
+      if (key !== this._boardState.projects.owner) {
+        this.addProjectIssues(table, project);
+      }
+    });
+    return table;
+  }
+
+  private addProjectIssues(list: List<string>[], project: BoardProject) {
+    const ownToBoardIndex: number[] = ProjectUtil.getOwnIndexToBoardIndex(this._boardState.headers, project);
+    this._boardState.ranks.rankedIssueKeys.get(project.key).forEach((key) => {
+      const issue: BoardIssue = this._boardState.issues.issues.get(key);
+      // find the index and add the issue
+      const boardIndex: number = ownToBoardIndex[issue.ownState];
+      list[boardIndex].push(key);
+    });
+  }
+}
+
+class IssueTableCreator extends BaseIssueTableGenerator {
+
+  constructor(boardState: BoardState, userSettingState: UserSettingState) {
+    super(boardState, userSettingState);
   }
 
   createIssueTable(): IssueTableVm {
@@ -107,85 +146,65 @@ class IssueTableCreator {
     const table: List<string>[] = this.createTable();
     return IssueTableVmUtil.createIssueTableVm(issues.asImmutable(), this.makeTableImmutable(table));
   }
+}
 
-  updateIssueTable(oldState: IssueTableVm): IssueTableVm {
+class IssueTableUpdater extends BaseIssueTableGenerator {
 
-    const noIssueChanges = this._boardState.issues.lastChanged.size > 0;
+  constructor(boardState: BoardState, userSettingState: UserSettingState, private _oldState: IssueTableVm) {
+    super(boardState, userSettingState);
+  }
 
-    let issues: Map<string, BoardIssueVm> = oldState.issues;
+  updateIssueTable(): IssueTableVm {
 
-    if (!noIssueChanges) {
-      issues = issues.asMutable();
-      const filters: AllFilters = new AllFilters(this._userSettingState.filters);
-
-      this._boardState.issues.lastChanged.forEach((change, key) => {
-        if (change.change === IssueChange.DELETE) {
-          issues.delete(key);
-        } else {
-          const issue: BoardIssue = this._boardState.issues.issues.get(key);
-          let issueVm: BoardIssueVm = BoardIssueVmUtil.createBoardIssueVm(issue, true);
-          const visible: boolean = filters.filterVisible(issueVm);
-          if (!visible) {
-            issueVm = BoardIssueVmUtil.updateVisibility(issueVm, false);
-          }
-          issues.set(key, issueVm);
-        }
-      });
-
-      issues = issues.asImmutable();
+    const issueChanges = this._boardState.issues.lastChanged.size > 0;
+    let issues: Map<string, BoardIssueVm> = this._oldState.issues;
+    if (issueChanges) {
+      issues = this.applyIssueChanges(issues);
     }
 
-
-    let noTableChanges = true;
     const newTable: List<string>[] = this.createTable();
+
+    const tableChanges = this.consolidateIssueTable(newTable);
+    if (!issueChanges && !tableChanges) {
+      return this._oldState;
+    }
+    const table: List<List<string>> = !tableChanges ? this._oldState.table : this.makeTableImmutable(newTable);
+    return IssueTableVmUtil.createIssueTableVm(issues, table);
+  }
+
+  private applyIssueChanges(oldIssues: Map<string, BoardIssueVm>): Map<string, BoardIssueVm> {
+    const issues = oldIssues.asMutable();
+    const filters: AllFilters = new AllFilters(this._userSettingState.filters);
+    this._boardState.issues.lastChanged.forEach((change, key) => {
+      if (change.change === IssueChange.DELETE) {
+        issues.delete(key);
+      } else {
+        const issue: BoardIssue = this._boardState.issues.issues.get(key);
+        let issueVm: BoardIssueVm = BoardIssueVmUtil.createBoardIssueVm(issue, true);
+        const visible: boolean = filters.filterVisible(issueVm);
+        if (!visible) {
+          issueVm = BoardIssueVmUtil.updateVisibility(issueVm, false);
+        }
+        issues.set(key, issueVm);
+      }
+    });
+
+    return issues.asImmutable();
+  }
+
+  private consolidateIssueTable(newTable: List<string>[]): boolean {
+    let changed = false;
     for (let i = 0 ; i < newTable.length ; i++) {
-      const oldIssues: List<string> = oldState.table.get(i);
+      const oldIssues: List<string> = this._oldState.table.get(i);
       const newIssues: List<string> = newTable[i];
       if (oldIssues.equals(newIssues)) {
         // If the tables are the same, use the old table here to avoid updating the column components unnecessarily
         newTable[i] = oldIssues;
       } else {
-        noTableChanges = false;
+        changed = true;
       }
     }
-    if (noTableChanges && noIssueChanges) {
-      return oldState;
-    }
-
-    const table: List<List<string>> = noTableChanges ? oldState.table : this.makeTableImmutable(newTable);
-    return IssueTableVmUtil.createIssueTableVm(issues, table);
-  }
-
-  private createTable(): List<string>[] {
-    const table: List<string>[] = new Array<List<string>>(this._boardState.headers.states.size);
-    for (let i = 0 ; i < table.length ; i++) {
-      table[i] = List<string>().asMutable();
-    }
-
-    this.addProjectIssues(table, this._boardState.projects.boardProjects.get(this._boardState.projects.owner));
-    this._boardState.projects.boardProjects.forEach((project, key) => {
-      if (key !== this._boardState.projects.owner) {
-        this.addProjectIssues(table, project);
-      }
-    });
-    return table;
-  }
-
-  private makeTableImmutable(table: List<string>[]): List<List<string>> {
-    // Make the table immutable
-    return List<List<string>>().withMutations(mutable => {
-      table.forEach((v, i) => mutable.push(table[i].asImmutable()));
-    });
-  }
-
-  private addProjectIssues(list: List<string>[], project: BoardProject) {
-    const ownToBoardIndex: number[] = ProjectUtil.getOwnIndexToBoardIndex(this._boardState.headers, project);
-    this._boardState.ranks.rankedIssueKeys.get(project.key).forEach((key) => {
-      const issue: BoardIssue = this._boardState.issues.issues.get(key);
-      // find the index and add the issue
-      const boardIndex: number = ownToBoardIndex[issue.ownState];
-      list[boardIndex].push(key);
-    });
+    return changed;
   }
 }
 

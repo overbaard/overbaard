@@ -205,7 +205,8 @@ describe('Apply filter tests', () => {
       customFields: Map<string, CustomField>(),
       parallelTasks: null,
       linkedIssues: List<Issue>(),
-      ownState: -1
+      ownState: -1,
+      visible: true
     }
   }
 });

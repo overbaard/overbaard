@@ -1,5 +1,4 @@
 import {List, Map, OrderedSet} from 'immutable';
-import {BoardIssue} from '../../../model/board/data/issue/board-issue';
 import {IssueTableVm} from './issue-table-vm';
 import {HeaderState} from '../../../model/board/data/header/header.state';
 import {DeserializeIssueLookupParams, initialIssueState, IssueState} from '../../../model/board/data/issue/issue.model';
@@ -212,7 +211,7 @@ describe('Issue Table observer tests', () => {
 
     it ('New issue', () => {
       util
-        .issueChanges({new: [{key: 'ONE-8', state: '1-1', summary: 'Test', priority: 0, type: 0}]})
+        .issueChanges({new: [{key: 'ONE-8', state: '1-1', summary: 'Test', priority: 'Major', type: 'task'}]})
         .rankChanges({ONE: [{index: 7, key: 'ONE-8'}]})
         .emit()
         .subscribe(
@@ -229,9 +228,7 @@ describe('Issue Table observer tests', () => {
         .emit()
         .subscribe(
           issueTable => {
-            checkTable(issueTable.table,
-              [['ONE-1'], ['ONE-2'], ['ONE-3', 'ONE-5', 'ONE-6'], ['ONE-4', 'ONE-7']]);
-            expect(issueTable).toBe(original);
+            expect(issueTable.table).toBe(original.table);
           });
 
     });
@@ -239,7 +236,7 @@ describe('Issue Table observer tests', () => {
 
     it ('Rerank issue - effect on existing states', () => {
       util
-        .issueChanges({new: [{key: 'ONE-8', state: '1-1', summary: 'Test', priority: 0, type: 0}]})
+        .issueChanges({new: [{key: 'ONE-8', state: '1-1', summary: 'Test', priority: 'Blocker', type: 'bug'}]})
         .rankChanges({ONE: [{index: 6, key: 'ONE-3'}]})
         .emit()
         .subscribe(

@@ -76,7 +76,6 @@ class SimpleFilter {
       if (!key && this._filterAttributes.hasNone) {
         useKey = NONE_FILTER;
       }
-
       return this._filter.contains(useKey);
     }
     return true;
