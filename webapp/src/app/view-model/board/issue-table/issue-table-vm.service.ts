@@ -63,16 +63,21 @@ export class IssueTableVmHandler {
             // Filter all the issues (we can optimise this later)
             const filters: AllFilters = new AllFilters(userSettingState.filters);
             let issues: Map<string, BoardIssueVm> = issueTable.issues;
+            let visibilityChange = false;
             issues = issues.withMutations(mutable => {
               issueTable.issues.forEach((issue, key) => {
                 const visible: boolean = filters.filterVisible(issue);
                 if (visible !== issue.visible) {
                   mutable.set(key, BoardIssueVmUtil.updateVisibility(issue, visible));
+                  visibilityChange = true;
                 }
               });
             });
             issueTable =
-              IssueTableVmUtil.createIssueTableVm(issues, issueTable.table);
+              IssueTableVmUtil.createIssueTableVm(
+                visibilityChange ? issues : issueTable.issues,
+                issueTable.table,
+                visibilityChange ? IssueTableCreator.calculateVisibleIssueCounts(issues, issueTable.table) : issueTable.visibleIssueCounts);
           }
         }
         this.lastIssueTable = issueTable;
@@ -84,8 +89,23 @@ export class IssueTableVmHandler {
 }
 
 
+
 class BaseIssueTableGenerator {
-  // private readonly _visiblePerState: number[];
+
+  static calculateVisibleIssueCounts(issues: Map<string, BoardIssueVm>, table: List<List<string>>): List<number> {
+    // TODO It might be more performant to do this when applying the filters, but also more fiddly and error prone, so let's see how it goes
+    return List<number>().withMutations(mutable => {
+      table.forEach(issueKeys => {
+        let visible = 0;
+        issueKeys.forEach(key => {
+          if (issues.get(key).visible) {
+            visible += 1;
+          }
+        });
+        mutable.push(visible);
+      });
+    });
+  }
 
   constructor(protected _boardState: BoardState, protected _userSettingState: UserSettingState) {
     // this._visiblePerState = new Array<number>(this._boardState.headers.states.size);
@@ -131,7 +151,7 @@ class IssueTableCreator extends BaseIssueTableGenerator {
   }
 
   createIssueTable(): IssueTableVm {
-    const issues: Map<string, BoardIssueVm> = Map<string, BoardIssueVm>().asMutable();
+    let issues: Map<string, BoardIssueVm> = Map<string, BoardIssueVm>().asMutable();
     const filters: AllFilters = new AllFilters(this._userSettingState.filters);
 
     this._boardState.issues.issues.forEach((issue, key) => {
@@ -143,8 +163,9 @@ class IssueTableCreator extends BaseIssueTableGenerator {
       issues.set(key, issueVm);
     });
 
-    const table: List<string>[] = this.createTable();
-    return IssueTableVmUtil.createIssueTableVm(issues.asImmutable(), this.makeTableImmutable(table));
+    const table: List<List<string>> = this.makeTableImmutable(this.createTable());
+    issues = issues.asImmutable();
+    return IssueTableVmUtil.createIssueTableVm(issues, table, IssueTableCreator.calculateVisibleIssueCounts(issues, table));
   }
 }
 
@@ -169,7 +190,7 @@ class IssueTableUpdater extends BaseIssueTableGenerator {
       return this._oldState;
     }
     const table: List<List<string>> = !tableChanges ? this._oldState.table : this.makeTableImmutable(newTable);
-    return IssueTableVmUtil.createIssueTableVm(issues, table);
+    return IssueTableVmUtil.createIssueTableVm(issues, table, IssueTableCreator.calculateVisibleIssueCounts(issues, table));
   }
 
   private applyIssueChanges(oldIssues: Map<string, BoardIssueVm>): Map<string, BoardIssueVm> {

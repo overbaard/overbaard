@@ -1,4 +1,4 @@
-import {List, OrderedSet} from 'immutable';
+import {List, OrderedSet, Set} from 'immutable';
 import {IssueTableVm} from './issue-table-vm';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/take';
@@ -231,7 +231,6 @@ describe('Issue Table observer tests', () => {
 
     it ('Rerank issue - effect on existing states', () => {
       util
-        .issueChanges({new: [{key: 'ONE-8', state: '1-1', summary: 'Test', priority: 'Blocker', type: 'bug'}]})
         .rankChanges({ONE: [{index: 6, key: 'ONE-3'}]})
         .emitBoardChange()
         .tableObserver()
@@ -262,6 +261,8 @@ describe('Issue table filter tests', () => {
       checkTable(issueTable,
         [['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']],
         ['ONE-1', 'ONE-3', 'ONE-5', 'ONE-7', 'ONE-9']);
+      // The visible issue counts are checked automatically in checkTable(), but do a sanity test here
+      expect(issueTable.visibleIssueCounts.toArray()).toEqual([1, 1, 2]);
     });
 
     util.updateUserSettings({priority: 'Major'});
@@ -269,6 +270,8 @@ describe('Issue table filter tests', () => {
       checkTable(issueTable,
         [['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']],
         ['ONE-2', 'ONE-4', 'ONE-6', 'ONE-8']);
+      // The visible issue counts are checked automatically in checkTable(), but do a sanity test here
+      expect(issueTable.visibleIssueCounts.toArray()).toEqual([1, 2, 2]);
     });
   });
 
@@ -360,10 +363,23 @@ export function checkTable(issueTableVm: IssueTableVm, expected: string[][], inv
   });
   expect(actualTable).toEqual(expected);
 
+  // Check the size of the issues map
+  expect(issueTableVm.issues.size).toBe(expected.map(issues => issues.length).reduce((s, c) => s + c));
+
   // Check issue visibilities
   const invisibleKeys: string[] =
     issueTableVm.issues.filter(issue => !issue.visible).keySeq().toArray().sort((a, b) => a.localeCompare(b));
   expect(invisibleKeys).toEqual(invisible.sort((a, b) => a.localeCompare(b)));
+
+  // Check issue counts
+  const invisibleSet: Set<string> = Set<string>(invisible);
+  const visibleIssueCounts: number[] = new Array<number>(expected.length);
+  for (let i = 0 ; i < expected.length ; i++) {
+    visibleIssueCounts[i] = expected[i].reduce((s, v, ind, arr) => {
+      return invisibleSet.contains(arr[ind]) ? s : s + 1;
+      }, 0);
+  }
+  expect(issueTableVm.visibleIssueCounts.toArray()).toEqual(visibleIssueCounts);
 }
 
 function checkSameColumns(oldState: IssueTableVm, newState: IssueTableVm, ...cols: number[]) {

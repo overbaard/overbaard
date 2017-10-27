@@ -71,11 +71,6 @@ describe('Apply filter tests', () => {
         issue['assignee'] = <Assignee>{key: 'bob'} ;
         expect(filtersFromQs({assignee: 'bob,fred'}).filterVisible(issue)).toBe(true);
       });
-      it ('Non Match', () => {
-        const issue: BoardIssueVm = emptyIssue();
-        issue['assignee'] = <Assignee>{key: 'bob'} ;
-        expect(filtersFromQs({assignee: 'fred'}).filterVisible(issue)).toBe(false);
-      });
       it ('Matches one (no assignee)', () => {
         const issue: BoardIssueVm = emptyIssue();
         expect(filtersFromQs({assignee: NONE_FILTER}).filterVisible(issue)).toBe(true);
@@ -84,9 +79,19 @@ describe('Apply filter tests', () => {
         const issue: BoardIssueVm = emptyIssue();
         expect(filtersFromQs({assignee: 'bob,' + NONE_FILTER}).filterVisible(issue)).toBe(true);
       });
+      it ('Non Match', () => {
+        const issue: BoardIssueVm = emptyIssue();
+        issue['assignee'] = <Assignee>{key: 'bob'} ;
+        expect(filtersFromQs({assignee: 'fred'}).filterVisible(issue)).toBe(false);
+      });
       it ('Non Match (no assignee)', () => {
         const issue: BoardIssueVm = emptyIssue();
         expect(filtersFromQs({assignee: 'fred'}).filterVisible(issue)).toBe(false);
+      });
+      it ('Non Match (has assignee)', () => {
+        const issue: BoardIssueVm = emptyIssue();
+        issue['assignee'] = <Assignee>{key: 'bob'} ;
+        expect(filtersFromQs({assignee: NONE_FILTER}).filterVisible(issue)).toBe(false);
       });
     });
     describe('Component', () => {
@@ -180,6 +185,50 @@ describe('Apply filter tests', () => {
       it ('Non Match (no fix versions)', () => {
         const issue: BoardIssueVm = emptyIssue();
         expect(filtersFromQs({'fix-version': NONE_FILTER}).filterVisible(issue)).toBe(false);
+      });
+    });
+    describe('Custom Fields', () => {
+      it ('Matches one (out of one)', () => {
+        const issue: BoardIssueVm = emptyIssue();
+        issue.customFields = Map<string, CustomField>({1: {key: 'C1-1', value: 'One One'}});
+        expect(filtersFromQs({'cf.1': 'C1-1'}).filterVisible(issue)).toBe(true);
+      });
+      it ('Matches one, none (out of one)', () => {
+        const issue: BoardIssueVm = emptyIssue();
+        expect(filtersFromQs({'cf.1': NONE_FILTER}).filterVisible(issue)).toBe(true);
+      });
+      it ('Matches two (out of two)', () => {
+        const issue: BoardIssueVm = emptyIssue();
+        issue.customFields = Map<string, CustomField>({1: {key: 'C1-1', value: 'One One'}, 2: {key: 'C2-2', value: 'Two Two'}});
+        expect(filtersFromQs({'cf.1': 'C1-1', 'cf.2': 'C2-2'}).filterVisible(issue)).toBe(true);
+      });
+      it ('Matches two, none (out of two)', () => {
+        const issue: BoardIssueVm = emptyIssue();
+        expect(filtersFromQs({'cf.1': NONE_FILTER, 'cf.2': NONE_FILTER}).filterVisible(issue)).toBe(true);
+      });
+      it ('Matches two, one none (out of two)', () => {
+        const issue: BoardIssueVm = emptyIssue();
+        issue.customFields = Map<string, CustomField>({1: {key: 'C1-1', value: 'One One'}});
+        expect(filtersFromQs({'cf.1': 'C1-1', 'cf.2': NONE_FILTER}).filterVisible(issue)).toBe(true);
+      });
+      it ('Non match, one out of two', () => {
+        const issue: BoardIssueVm = emptyIssue();
+        issue.customFields = Map<string, CustomField>({1: {key: 'C1-1', value: 'One One'}});
+        expect(filtersFromQs({'cf.1': 'C1-1', 'cf.2': 'C2-2'}).filterVisible(issue)).toBe(false);
+      })
+      it ('Non match, zero out of one', () => {
+        const issue: BoardIssueVm = emptyIssue();
+        issue.customFields = Map<string, CustomField>({1: {key: 'C1-2', value: 'One Two'}});
+        expect(filtersFromQs({'cf.1': 'C1-1'}).filterVisible(issue)).toBe(false);
+      })
+      it ('Non match, no custom field in issue', () => {
+        const issue: BoardIssueVm = emptyIssue();
+        expect(filtersFromQs({'cf.1': 'C1-1'}).filterVisible(issue)).toBe(false);
+      })
+      it ('Non match (none)', () => {
+        const issue: BoardIssueVm = emptyIssue();
+        issue.customFields = Map<string, CustomField>({1: {key: 'C1-1', value: 'One One'}});
+        expect(filtersFromQs({'cf.1': NONE_FILTER}).filterVisible(issue)).toBe(false);
       });
     });
   });
