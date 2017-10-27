@@ -62,9 +62,9 @@ export class IssueTableVmHandler {
           if (userSettingState.filters !== this.lastUserSettingState.filters) {
             // Filter all the issues (we can optimise this later)
             const filters: AllFilters = new AllFilters(userSettingState.filters);
-            let issues: Map<string, BoardIssueVm> = this.lastIssueTable.issues;
+            let issues: Map<string, BoardIssueVm> = issueTable.issues;
             issues = issues.withMutations(mutable => {
-              this.lastIssueTable.issues.forEach((issue, key) => {
+              issueTable.issues.forEach((issue, key) => {
                 const visible: boolean = filters.filterVisible(issue);
                 if (visible !== issue.visible) {
                   mutable.set(key, BoardIssueVmUtil.updateVisibility(issue, visible));
@@ -72,7 +72,7 @@ export class IssueTableVmHandler {
               });
             });
             issueTable =
-              IssueTableVmUtil.createIssueTableVm(issues, this.lastIssueTable.table);
+              IssueTableVmUtil.createIssueTableVm(issues, issueTable.table);
           }
         }
         this.lastIssueTable = issueTable;
