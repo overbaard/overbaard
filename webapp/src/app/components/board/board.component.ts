@@ -84,8 +84,6 @@ export class BoardComponent implements OnInit, OnDestroy {
     // TODO use backlog from querystring (store in the state)
     // TODO turn on/off progress indicator and log errors
 
-    UserSettingActions.createInitialiseFromQueryString(this._route.snapshot.queryParams);
-
     const gotAllData$: Subject<boolean> = new Subject<boolean>();
 
     this._boardService.loadBoardData(this.boardCode, true)

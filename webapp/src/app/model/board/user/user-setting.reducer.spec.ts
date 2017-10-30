@@ -7,17 +7,10 @@ import {PROJECT_ATTRIBUTES} from './board-filter/board-filter.constants';
 
 describe('User setting reducer tests', () => {
   describe('Querystring tests', () => {
-    it('No querystring', () => {
-      const qs: Dictionary<string> = {};
-      const state: UserSettingState = userSettingReducer(
-        initialUserSettingState,
-        UserSettingActions.createInitialiseFromQueryString(qs));
-      expect(state).toBe(initialUserSettingState);
-    });
-
-    it ('With Querystring', () => {
+    it ('With Querystring, no backlog', () => {
       // Just test a few filter fields, the board filter reducer tests test this properly
       const qs: Dictionary<string> = {
+        board: 'TEST',
         project: 'P1',
         swimlane: 'project'
       };
@@ -25,6 +18,42 @@ describe('User setting reducer tests', () => {
         initialUserSettingState,
         UserSettingActions.createInitialiseFromQueryString(qs));
       const settingChecker: SettingChecker = new SettingChecker();
+      settingChecker.boardCode = 'TEST';
+      settingChecker.swimlane = 'project';
+      settingChecker.filterChecker.project = ['P1'];
+      settingChecker.check(state)
+    });
+    it ('With Querystring, bl=false', () => {
+      // Just test a few filter fields, the board filter reducer tests test this properly
+      const qs: Dictionary<string> = {
+        board: 'TEST',
+        bl: 'false',
+        project: 'P1',
+        swimlane: 'project'
+      };
+      const state: UserSettingState = userSettingReducer(
+        initialUserSettingState,
+        UserSettingActions.createInitialiseFromQueryString(qs));
+      const settingChecker: SettingChecker = new SettingChecker();
+      settingChecker.boardCode = 'TEST';
+      settingChecker.swimlane = 'project';
+      settingChecker.filterChecker.project = ['P1'];
+      settingChecker.check(state)
+    });
+    it ('With Querystring, bl=true', () => {
+      // Just test a few filter fields, the board filter reducer tests test this properly
+      const qs: Dictionary<string> = {
+        board: 'TEST',
+        bl: 'true',
+        project: 'P1',
+        swimlane: 'project'
+      };
+      const state: UserSettingState = userSettingReducer(
+        initialUserSettingState,
+        UserSettingActions.createInitialiseFromQueryString(qs));
+      const settingChecker: SettingChecker = new SettingChecker();
+      settingChecker.boardCode = 'TEST';
+      settingChecker.backlog = true;
       settingChecker.swimlane = 'project';
       settingChecker.filterChecker.project = ['P1'];
       settingChecker.check(state)
@@ -35,6 +64,7 @@ describe('User setting reducer tests', () => {
     let state: UserSettingState
     beforeEach(() => {
       const qs: Dictionary<string> = {
+        board: 'TEST',
         project: 'P1'
       };
       state = userSettingReducer(
@@ -46,6 +76,7 @@ describe('User setting reducer tests', () => {
       // Just test a few filter fields, the board filter reducer tests test this properly
       state = userSettingReducer(state, BoardFilterActions.createUpdateFilter(PROJECT_ATTRIBUTES, {P1: false, P2: true, P3: true}));
       const checker: SettingChecker = new SettingChecker();
+      checker.boardCode = 'TEST';
       checker.filterChecker.project = ['P2', 'P3'];
       checker.check(state);
     });
@@ -53,6 +84,7 @@ describe('User setting reducer tests', () => {
     it ('Update swimlane', () => {
       state = userSettingReducer(state, UserSettingActions.createUpdateSwimlane('project'));
       const checker: SettingChecker = new SettingChecker();
+      checker.boardCode = 'TEST';
       checker.swimlane = 'project';
       checker.check(state);
     });
@@ -60,6 +92,8 @@ describe('User setting reducer tests', () => {
 });
 
 class SettingChecker {
+  boardCode: string = null;
+  backlog = false;
   swimlane: string = null;
   filterChecker: FilterChecker = new FilterChecker();
 
@@ -75,6 +109,8 @@ class SettingChecker {
   }
 
   check(state: UserSettingState) {
+    expect(this.boardCode).toEqual(state.boardCode);
+    expect(this.backlog).toEqual(state.backlog);
     if (!this.swimlane) {
       expect(state.swimlane).toBeFalsy();
     } else {

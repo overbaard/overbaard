@@ -77,7 +77,10 @@ export function userSettingReducer(state: UserSettingState = initialUserSettingS
   switch (action.type) {
     case INITIALISE_SETTINGS_FROM_QUERYSTRING: {
       return UserSettingUtil.toStateRecord(state).withMutations( mutable => {
-        mutable.swimlane = (<InitialiseFromQueryStringAction>action).payload['swimlane'];
+        const initAction: InitialiseFromQueryStringAction = <InitialiseFromQueryStringAction>action;
+        mutable.boardCode = initAction.payload['board'];
+        mutable.backlog = initAction.payload['bl'] ? initAction.payload['bl'] === 'true' : false;
+        mutable.swimlane = initAction.payload['swimlane'];
         mutable.filters = boardFilterMetaReducer(state.filters, action);
       });
     }

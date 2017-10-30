@@ -2,11 +2,15 @@ import {BoardFilterState, initialBoardFilterState} from './board-filter/board-fi
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 
 export interface UserSettingState {
+  boardCode: string;
+  backlog: boolean;
   swimlane: string;
   filters: BoardFilterState;
 }
 
 const DEFAULT_STATE: UserSettingState = {
+  boardCode: '',
+  backlog: false,
   swimlane: undefined,
   filters: initialBoardFilterState
 }
