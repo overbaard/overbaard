@@ -5,15 +5,16 @@ import {
   FIX_VERSION_ATTRIBUTES,
   ISSUE_TYPE_ATTRIBUTES,
   LABEL_ATTRIBUTES,
-  NONE_FILTER,
+  NONE_FILTER, PARALLEL_TASK_ATTRIBUTES,
   PRIORITY_ATTRIBUTES,
   PROJECT_ATTRIBUTES
 } from '../../../model/board/user/board-filter/board-filter.constants';
 import {BoardFilterState} from '../../../model/board/user/board-filter/board-filter.model';
 import {BoardIssueVm} from './board-issue-vm';
-import {Map, Set} from 'immutable';
+import {List, Map, Set} from 'immutable';
 import {NO_ASSIGNEE} from '../../../model/board/data/assignee/assignee.model';
 import {CustomField} from '../../../model/board/data/custom-field/custom-field.model';
+import {ParallelTask, ProjectState} from '../../../model/board/data/project/project.model';
 
 export class AllFilters {
   private _project: SimpleFilter;
@@ -24,8 +25,10 @@ export class AllFilters {
   private _label: MultiSelectFilter;
   private _fixVersion: MultiSelectFilter;
   private _customFieldFilters: Map<string, SimpleFilter>;
+  private _parallelTaskFilters: Map<string, SimpleFilter>;
+  private _parallelTaskFilterIndicesByProject: Map<string, Map<string, number>>;
 
-  constructor(boardFilters: BoardFilterState) {
+  constructor(boardFilters: BoardFilterState, private projectState: ProjectState) {
     this._project = new SimpleFilter(PROJECT_ATTRIBUTES, boardFilters.project);
     this._priority = new SimpleFilter(PRIORITY_ATTRIBUTES, boardFilters.priority);
     this._issueType = new SimpleFilter(ISSUE_TYPE_ATTRIBUTES, boardFilters.issueType);
@@ -34,11 +37,32 @@ export class AllFilters {
     this._label = new MultiSelectFilter(LABEL_ATTRIBUTES, boardFilters.label);
     this._fixVersion = new MultiSelectFilter(FIX_VERSION_ATTRIBUTES, boardFilters.fixVersion);
     this._customFieldFilters = Map<string, SimpleFilter>().withMutations(mutable => {
-      boardFilters.customField .forEach((f, k) => {
+      boardFilters.customField.forEach((f, k) => {
         mutable.set(k, new SimpleFilter(FilterAttributesUtil.createCustomFieldFilterAttributes(k), f));
       });
     });
+    this._parallelTaskFilters = Map<string, SimpleFilter>().withMutations(mutable => {
+      boardFilters.parallelTask.forEach((p, k) => {
+        if (p.size > 0) {
+          mutable.set(k, new SimpleFilter(PARALLEL_TASK_ATTRIBUTES, p));
+        }
+      });
+    });
+    this._parallelTaskFilterIndicesByProject = Map<string, Map<string, number>>().withMutations(mutable => {
+      projectState.parallelTasks.forEach((list, project) => {
+        if (list.size > 0) {
+          mutable.set(project, this.createParallelTaskIndices(list));
+        }
+      });
+    });
+  }
 
+  private createParallelTaskIndices(tasksForProject: List<ParallelTask>): Map<string, number> {
+    return Map<string, number>().withMutations(mutable => {
+      tasksForProject.forEach((task, index) => {
+        mutable.set(task.display, index);
+      });
+    });
   }
 
   /**
@@ -71,18 +95,35 @@ export class AllFilters {
     if (!this.filterVisibleCustomFields(issue)) {
       return false;
     }
-    // TODO - parallel tasks
+    if (!this.filterVisibleParallelTasks(issue)) {
+      return false;
+    }
 
     return true;
   }
 
-  private filterVisibleCustomFields(issue: BoardIssueVm) {
+  private filterVisibleCustomFields(issue: BoardIssueVm): boolean {
     let visible = true;
     this._customFieldFilters.forEach((f, k) => {
       const cfv: CustomField = issue.customFields.get(k);
       if (!f.doFilter(cfv ? cfv.key : null)) {
         visible = false;
         return false;
+      }
+    });
+    return visible;
+  }
+
+  private filterVisibleParallelTasks(issue: BoardIssueVm): boolean {
+    let visible = true;
+    const indicesForProject: Map<string, number> = this._parallelTaskFilterIndicesByProject.get(issue.projectCode);
+    this._parallelTaskFilters.forEach((f, k) => {
+      if (indicesForProject) {
+        const index: number = indicesForProject.get(k);
+        if (!issue.parallelTasks || !f.doFilter(issue.parallelTasks.get(index))) {
+          visible = false;
+          return false;
+        }
       }
     });
     return visible;
@@ -141,23 +182,3 @@ class MultiSelectFilter {
   }
 }
 
-class MapFilter {
-  private _filters: Map<string, SimpleFilter>;
-  constructor(private readonly _filterAttributes: FilterAttributes, private readonly _filter: Map<string, Set<string>>) {
-    this._filters = Map<string, SimpleFilter>().withMutations(mutable => {
-      _filter.forEach((f, k) => {
-        mutable.set(k, new SimpleFilter(_filterAttributes, f));
-      });
-    });
-  }
-
-  filterSingle(filterKey: string, key: string) {
-    const filter: SimpleFilter = this._filters.get(filterKey);
-    if (filter) {
-      return filter.doFilter(key);
-    }
-    return true;
-
-  }
-
-}

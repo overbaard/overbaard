@@ -9,6 +9,7 @@ import {CustomField} from '../../../model/board/data/custom-field/custom-field.m
 import {Issue} from '../../../model/board/data/issue/issue';
 import {AllFilters} from './filter.util';
 import {NONE_FILTER} from '../../../model/board/user/board-filter/board-filter.constants';
+import {ParallelTask, ProjectState} from '../../../model/board/data/project/project.model';
 
 describe('Apply filter tests', () => {
 
@@ -231,13 +232,80 @@ describe('Apply filter tests', () => {
         expect(filtersFromQs({'cf.1': NONE_FILTER}).filterVisible(issue)).toBe(false);
       });
     });
+    describe('Parallel Tasks', () => {
+      let projectState: ProjectState;
+      const issue: BoardIssueVm = emptyIssue();
+      beforeEach(() => {
+        const tasks: Map<string, List<ParallelTask>> = Map<string, List<ParallelTask>>().withMutations(map => {
+          const projectTasks: List<ParallelTask> = List<ParallelTask>([
+            {
+              name: 'Community Docs',
+              display: 'CD',
+              options: ['One', 'Two', 'Three']
+            },
+            {
+              name: 'Test Development',
+              display: 'TD',
+              options: ['Uno', 'Dos', 'Tres']
+            }
+          ]);
+          map.set('ISSUE', projectTasks);
+        });
+        projectState = {
+          owner: 'ISSUE',
+          boardProjects: null,
+          linkedProjects: null,
+          parallelTasks: tasks
+        }
+        issue.parallelTasks = List<string>(['One', 'Dos']);
+      });
+      it ('Matches one', () => {
+        expect(filtersFromQs({'pt.CD': 'One'}).filterVisible(issue)).toBe(true);
+      });
+      it ('Matches other', () => {
+        expect(filtersFromQs({'pt.TD': 'Uno'}).filterVisible(issue)).toBe(true);
+      });
+      it ('Matches both', () => {
+        expect(filtersFromQs({'pt.CD': 'One', 'pt.TD': 'Uno'}).filterVisible(issue)).toBe(true);
+      });
+      it ('Matches one of several', () => {
+        expect(filtersFromQs({'pt.CD': 'One, Two, Three'}).filterVisible(issue)).toBe(true);
+      });
+      it ('Matches other of several', () => {
+        expect(filtersFromQs({'pt.TD': 'Uno, Dos, Tres'}).filterVisible(issue)).toBe(true);
+      });
+      it ('Matches both of several', () => {
+        expect(filtersFromQs({'pt.CD': 'One, Two, Three', 'pt.TD': 'Uno,Dos,Tres'}).filterVisible(issue)).toBe(true);
+      });
+      it ('Skip matching for unknown', () => {
+        // Since filters are chosen for the whole board, and parallel tasks are configured per project
+        // we only want to filter ones which belong to the project
+        // TODO think about whether this is correct. Perhaps we should only pick ot ones which have that PT set ups
+        expect(filtersFromQs({'pt.UNKNOWN': 'One'}).filterVisible(issue)).toBe(true);
+      });
+
+      it ('Non Match - one', () => {
+        expect(filtersFromQs({'pt.CD': 'Two'}).filterVisible(issue)).toBe(true);
+      });
+      it ('Non Match - other', () => {
+        expect(filtersFromQs({'pt.TD': 'Tres'}).filterVisible(issue)).toBe(true);
+      });
+
+    });
   });
 
-
-  function filtersFromQs(qs: Dictionary<string>): AllFilters {
+  function filtersFromQs(qs: Dictionary<string>, projectState?: ProjectState): AllFilters {
+    if (!projectState) {
+      projectState = {
+        owner: 'ISSUE',
+        boardProjects: null,
+        linkedProjects: null,
+        parallelTasks: Map<string, List<ParallelTask>>()
+      };
+    }
     const boardFilters: BoardFilterState =
       boardFilterMetaReducer(initialBoardFilterState, UserSettingActions.createInitialiseFromQueryString(qs));
-    return new AllFilters(boardFilters);
+    return new AllFilters(boardFilters, projectState);
   }
 
   function emptyIssue(): BoardIssueVm {

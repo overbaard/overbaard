@@ -61,7 +61,7 @@ export class IssueTableVmHandler {
         if (boardState.viewId >= 0) {
           if (userSettingState.filters !== this.lastUserSettingState.filters) {
             // Filter all the issues (we can optimise this later)
-            const filters: AllFilters = new AllFilters(userSettingState.filters);
+            const filters: AllFilters = new AllFilters(userSettingState.filters, boardState.projects);
             let issues: Map<string, BoardIssueVm> = issueTable.issues;
             let visibilityChange = false;
             issues = issues.withMutations(mutable => {
@@ -152,7 +152,7 @@ class IssueTableCreator extends BaseIssueTableGenerator {
 
   createIssueTable(): IssueTableVm {
     let issues: Map<string, BoardIssueVm> = Map<string, BoardIssueVm>().asMutable();
-    const filters: AllFilters = new AllFilters(this._userSettingState.filters);
+    const filters: AllFilters = new AllFilters(this._userSettingState.filters, this._boardState.projects);
 
     this._boardState.issues.issues.forEach((issue, key) => {
       let issueVm: BoardIssueVm = BoardIssueVmUtil.createBoardIssueVm(issue, true);
@@ -195,7 +195,7 @@ class IssueTableUpdater extends BaseIssueTableGenerator {
 
   private applyIssueChanges(oldIssues: Map<string, BoardIssueVm>): Map<string, BoardIssueVm> {
     const issues = oldIssues.asMutable();
-    const filters: AllFilters = new AllFilters(this._userSettingState.filters);
+    const filters: AllFilters = new AllFilters(this._userSettingState.filters, this._boardState.projects);
     this._boardState.issues.lastChanged.forEach((change, key) => {
       if (change.change === IssueChange.DELETE) {
         issues.delete(key);
