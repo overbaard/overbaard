@@ -95,7 +95,7 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
             labels => labels.map(l => FilterFormEntry(l, l)).toArray(),
             () => userSetting.filters.label);
           this.createGroupFromObservable(this._store.select(fixVersionsSelector), FIX_VERSION_ATTRIBUTES,
-            fixVersions => fixVersions.map(l => FilterFormEntry(l, l)).toArray(),
+            fixVersions => fixVersions.map(f => FilterFormEntry(f, f)).toArray(),
             () => userSetting.filters.fixVersion);
           this.createCustomFieldGroups(userSetting.filters, this._store.select(customFieldsSelector));
           this.createParallelTaskGroup(userSetting.filters, this._store.select(parallelTasksSelector));
@@ -223,6 +223,7 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
 
   processSwimlaneChange(value: any) {
     const sl: string = value['swimlane'];
+
     this._store.dispatch(UserSettingActions.createUpdateSwimlane(sl));
   }
 }

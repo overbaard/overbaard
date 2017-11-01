@@ -1,12 +1,13 @@
 import {List, Map} from 'immutable';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {BoardIssue} from '../../../model/board/data/issue/board-issue';
-import {IssueTableVm} from './issue-table-vm';
+import {IssueTableVm, SwimlaneInfoVm} from './issue-table-vm';
 import {BoardIssueVm} from './board-issue-vm';
 
 const DEFAULT_STATE: IssueTableVm = {
   issues: Map<string, BoardIssueVm>(),
   table: List<List<string>>(),
+  swimlaneInfo: null,
   visibleIssueCounts: List<number>()
 };
 
@@ -26,11 +27,13 @@ export class IssueTableVmUtil {
   static createIssueTableVm(
     issues: Map<string, BoardIssueVm>,
     tableList: List<List<string>>,
+    swimlaneInfo: SwimlaneInfoVm,
     visibleIssueCounts: List<number>) {
 
     const state: IssueTableVm = {
       issues: issues,
       table: tableList,
+      swimlaneInfo: swimlaneInfo,
       visibleIssueCounts: visibleIssueCounts
     };
     return STATE_FACTORY(state);

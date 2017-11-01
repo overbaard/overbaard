@@ -102,23 +102,22 @@ export class IssueTableObservableUtil {
     } else {
       this._boardState = BoardUtil.toStateRecord(this._boardState).withMutations(mutable => {
         mutable.viewId = mutable.viewId + 1;
-        if (this._issueChanges) {
-          mutable.issues = issueMetaReducer(
-            this._boardState.issues,
-            IssueActions.createChangeIssuesAction(
-              this._issueChanges,
-              this.getDeserializeIssueLookupParams(this._boardState.headers, this._boardState.projects)));
-          this._issueChanges = null;
-        }
+        mutable.issues = issueMetaReducer(
+          this._boardState.issues,
+          IssueActions.createChangeIssuesAction(
+            this._issueChanges ? this._issueChanges : {},
+            this.getDeserializeIssueLookupParams(this._boardState.headers, this._boardState.projects)));
         if (this._rankChanges || this._rankDeleted) {
           mutable.ranks = rankMetaReducer(
             this._boardState.ranks,
             RankActions.createRerank(this._rankChanges, this._rankDeleted));
-          this._rankChanges = null;
-          this._rankDeleted = null;
         }
       });
     }
+    this._rankChanges = null;
+    this._rankDeleted = null;
+    this._issueChanges = null;
+
     this._boardStateSubject$.next(this._boardState);
     return this;
   }

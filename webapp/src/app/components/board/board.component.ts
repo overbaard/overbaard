@@ -84,6 +84,9 @@ export class BoardComponent implements OnInit, OnDestroy {
     // TODO use backlog from querystring (store in the state)
     // TODO turn on/off progress indicator and log errors
 
+    // Parse the user settings from the query string first
+    this._store.dispatch(UserSettingActions.createInitialiseFromQueryString(this._route.snapshot.queryParams));
+
     const gotAllData$: Subject<boolean> = new Subject<boolean>();
 
     this._boardService.loadBoardData(this.boardCode, true)
@@ -101,10 +104,7 @@ export class BoardComponent implements OnInit, OnDestroy {
       .subscribe(
         board => {
           // Parse the filters once we have the board
-          this._store.dispatch(
-              UserSettingActions.createInitialiseFromQueryString(this._route.snapshot.queryParams));
-          // Unsubscribe from the subject itself
-          gotAllData$.unsubscribe();
+          gotAllData$.next(true);
         }
       );
 

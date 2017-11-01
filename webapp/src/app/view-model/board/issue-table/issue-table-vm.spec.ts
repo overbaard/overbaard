@@ -223,7 +223,8 @@ describe('Issue Table observer tests', () => {
         .tableObserver()
         .subscribe(
           issueTable => {
-            expect(issueTable.table).toBe(original.table);
+            // Everything should be the same in the issue table
+            expect(issueTable).toBe(original);
           });
 
     });
