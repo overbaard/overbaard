@@ -17,7 +17,6 @@ export interface SwimlaneDataVm {
   key: string;
   display: string;
   table: List<List<string>>;
-  totalIssues: number;
   visibleIssues: number;
 }
 

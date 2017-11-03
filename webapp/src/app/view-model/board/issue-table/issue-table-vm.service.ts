@@ -8,7 +8,7 @@ import 'rxjs/add/observable/combineLatest';
 import {List, Map, OrderedMap, OrderedSet} from 'immutable';
 import {BoardIssue} from '../../../model/board/data/issue/board-issue';
 import {BoardProject, ProjectUtil} from '../../../model/board/data/project/project.model';
-import {IssueTableVm, SwimlaneInfoVm} from './issue-table-vm';
+import {IssueTableVm, SwimlaneDataVm, SwimlaneInfoVm} from './issue-table-vm';
 import {initialUserSettingState, UserSettingState} from '../../../model/board/user/user-setting.model';
 import {initialBoardState} from '../../../model/board/data/board.model';
 import {BoardIssueVm} from './board-issue-vm';
@@ -80,8 +80,6 @@ export class IssueTableVmHandler {
         const issueTableBuilder: IssueTableBuilder = new IssueTableBuilder(
           changeType,
           this.lastIssueTable,
-          this.lastBoardState,
-          this.lastUserSettingState,
           boardState,
           userSettingState);
         const issueTable: IssueTableVm = issueTableBuilder.updateIssueTable();
@@ -105,8 +103,6 @@ class IssueTableBuilder {
   constructor(
     private readonly _changeType: ChangeType,
     private readonly _oldIssueTableState: IssueTableVm,
-    private readonly _oldBoardState: BoardState,
-    private readonly _oldUserSettingState: UserSettingState,
     private readonly _currentBoardState: BoardState,
     private readonly _currentUserSettingState: UserSettingState) {
   }
@@ -256,19 +252,24 @@ class IssueTableBuilder {
     switch (this._changeType) {
       case ChangeType.LOAD_BOARD:
       case ChangeType.CHANGE_SWIMLANE: {
-        swimlaneBuilder = this.createSwimlanes(issues, table);
+        swimlaneBuilder = SwimlaneInfoBuilder.create(this._currentBoardState, this._currentUserSettingState, null);
       }
       break;
+      case ChangeType.APPLY_FILTERS:
       case ChangeType.UPDATE_BOARD: {
-        swimlaneBuilder = this.updateSwimlanes(issues, table);
+        const oldSwimlane = this._oldIssueTableState.swimlaneInfo;
+        swimlaneBuilder = SwimlaneInfoBuilder.create(this._currentBoardState, this._currentUserSettingState, oldSwimlane);
       }
     }
+    this.populateSwimlanes(swimlaneBuilder, issues, table);
     // TODO filter swimlanes
-    return null;
+    this.applySwimlaneFilters(swimlaneBuilder);
+
+    return swimlaneBuilder.build();
   }
 
-  private createSwimlanes(issues: Map<string, BoardIssueVm>, table: List<List<string>>): SwimlaneInfoBuilder {
-    const swimlaneBuilder: SwimlaneInfoBuilder = SwimlaneInfoBuilder.create(this._currentBoardState, this._currentUserSettingState);
+  private populateSwimlanes(swimlaneBuilder: SwimlaneInfoBuilder,
+                            issues: Map<string, BoardIssueVm>, table: List<List<string>>): SwimlaneInfoBuilder {
     for (let i = 0 ; i < table.size ; i++) {
       const column: List<string> = table.get(i);
       column.forEach(key => {
@@ -278,74 +279,76 @@ class IssueTableBuilder {
     }
 
     if (swimlaneBuilder.noneBuilder) {
-      console.log(`${swimlaneBuilder.noneBuilder.key} ${swimlaneBuilder.noneBuilder.name} ${swimlaneBuilder.noneBuilder.table}`)
+      console.log(`${swimlaneBuilder.noneBuilder.key} ${swimlaneBuilder.noneBuilder.display} ${swimlaneBuilder.noneBuilder.table}`)
     }
     for (const key of Object.keys(swimlaneBuilder.dataBuilders)) {
       const builder: SwimlaneDataBuilder = swimlaneBuilder.dataBuilders[key];
-      console.log(`${builder.key} ${builder.name} ${builder.table}`)
+      console.log(`${builder.key} ${builder.display} ${builder.table}`)
     }
+
     return swimlaneBuilder;
   }
 
-  private updateSwimlanes(issues: Map<string, BoardIssueVm>, table: List<List<string>>): SwimlaneInfoBuilder {
-    return null;
+  private applySwimlaneFilters(swimlaneBuilder: SwimlaneInfoBuilder) {
+
+
   }
 }
 
 class SwimlaneInfoBuilder {
-  readonly swimlaneDataBuilders: Dictionary<SwimlaneDataBuilder>;
-
-  static create(boardState: BoardState, userSettingState: UserSettingState): SwimlaneInfoBuilder {
+  static create(boardState: BoardState,
+                userSettingState: UserSettingState, existingInfo: SwimlaneInfoVm): SwimlaneInfoBuilder {
     const states: number = boardState.headers.states.size;
     const builderMap: Dictionary<SwimlaneDataBuilder> = {};
-    let builderNone: SwimlaneDataBuilder = new SwimlaneDataBuilder(NONE_FILTER, 'None', states);
+    let builderNone: SwimlaneDataBuilder = new SwimlaneDataBuilder(NONE_FILTER, 'None', states, existingInfo);
     let issueMatcher:
       (issue: BoardIssueVm, dataBuilders: Dictionary<SwimlaneDataBuilder>, noneBuilder: SwimlaneDataBuilder) => SwimlaneDataBuilder[];
     switch (userSettingState.swimlane) {
       case PROJECT_ATTRIBUTES.key:
         boardState.projects.boardProjects.forEach(
-          p => builderMap[p.key] = new SwimlaneDataBuilder(p.key, p.key, states));
+          p => builderMap[p.key] = new SwimlaneDataBuilder(p.key, p.key, states, existingInfo));
         issueMatcher = ((issue, dataBuilders, noneBuilder) => [dataBuilders[issue.projectCode]]);
         builderNone = null;
         break;
       case ISSUE_TYPE_ATTRIBUTES.key:
         boardState.issueTypes.types.forEach(
-          t => builderMap[t.name] = new SwimlaneDataBuilder(t.name, t.name, states));
+          t => builderMap[t.name] = new SwimlaneDataBuilder(t.name, t.name, states, existingInfo));
         issueMatcher = ((issue, dataBuilders, noneBuilder) => [dataBuilders[issue.type.name]]);
         builderNone = null;
         break;
       case PRIORITY_ATTRIBUTES.key:
         boardState.priorities.priorities.forEach(
-          p => builderMap[p.name] = new SwimlaneDataBuilder(p.name, p.name, states));
+          p => builderMap[p.name] = new SwimlaneDataBuilder(p.name, p.name, states, existingInfo));
         issueMatcher = ((issue, dataBuilders, noneBuilder) => [dataBuilders[issue.priority.name]]);
         builderNone = null;
         break;
       case ASSIGNEE_ATTRIBUTES.key:
         boardState.assignees.assignees.forEach(
-          a => builderMap[a.key] = new SwimlaneDataBuilder(a.key, a.name, states));
+          a => builderMap[a.key] = new SwimlaneDataBuilder(a.key, a.name, states, existingInfo));
         issueMatcher = ((issue, dataBuilders, noneBuilder) => {
           return issue.assignee === NO_ASSIGNEE ? [noneBuilder] : [dataBuilders[issue.assignee.key]];
         } );
         break;
       case COMPONENT_ATTRIBUTES.key:
         boardState.components.components.forEach(
-          c => builderMap[c] = new SwimlaneDataBuilder(c, c, states));
+          c => builderMap[c] = new SwimlaneDataBuilder(c, c, states, existingInfo));
         issueMatcher = ((issue, dataBuilders, noneBuilder) => this.multiStringMatcher(issue.components, dataBuilders, noneBuilder));
         break;
       case LABEL_ATTRIBUTES.key:
         boardState.labels.labels.forEach(
-          l => builderMap[l] = new SwimlaneDataBuilder(l, l, states));
+          l => builderMap[l] = new SwimlaneDataBuilder(l, l, states, existingInfo));
         issueMatcher = ((issue, dataBuilders, noneBuilder) => this.multiStringMatcher(issue.labels, dataBuilders, noneBuilder));
         break;
       case FIX_VERSION_ATTRIBUTES.key:
         boardState.fixVersions.versions.forEach(
-          f => builderMap[f] = new SwimlaneDataBuilder(f, f, states));
+          f => builderMap[f] = new SwimlaneDataBuilder(f, f, states, existingInfo));
         issueMatcher = ((issue, dataBuilders, noneBuilder) => this.multiStringMatcher(issue.fixVersions, dataBuilders, noneBuilder));
         break;
       default: {
         const customFields: OrderedMap<string, CustomField> = boardState.customFields.fields.get(userSettingState.swimlane);
         if (customFields) {
-          customFields.forEach(f => builderMap[f.key] = new SwimlaneDataBuilder(f.key, f.value, states));
+          customFields.forEach(
+            f => builderMap[f.key] = new SwimlaneDataBuilder(f.key, f.value, states, existingInfo));
           issueMatcher = ((issue, dataBuilders, noneBuilder) => {
             const issueField: CustomField = issue.customFields.get(userSettingState.swimlane);
             return issueField ? [dataBuilders[issueField.key]] : [noneBuilder];
@@ -353,7 +356,7 @@ class SwimlaneInfoBuilder {
         }
       }
     }
-    return new SwimlaneInfoBuilder(issueMatcher, builderMap, builderNone);
+    return new SwimlaneInfoBuilder(issueMatcher, builderMap, builderNone, existingInfo);
   }
 
   private static multiStringMatcher(issueSet: OrderedSet<string>,
@@ -369,7 +372,8 @@ class SwimlaneInfoBuilder {
     private readonly _issueMatcher:
       (issue: BoardIssueVm, dataBuilders: Dictionary<SwimlaneDataBuilder>, noneMatcher: SwimlaneDataBuilder) => SwimlaneDataBuilder[],
     private readonly _dataBuilders: Dictionary<SwimlaneDataBuilder>,
-    private readonly _noneBuilder: SwimlaneDataBuilder) {
+    private readonly _noneBuilder: SwimlaneDataBuilder,
+    private readonly _existing: SwimlaneInfoVm) {
   }
 
   indexIssue(issue: BoardIssueVm, boardIndex: number) {
@@ -386,14 +390,43 @@ class SwimlaneInfoBuilder {
   get dataBuilders(): Dictionary<SwimlaneDataBuilder> {
     return this._dataBuilders;
   }
+
+  build(): SwimlaneInfoVm {
+    const keys: string[] = Object.keys(this._dataBuilders);
+    let changed = false;
+    if (!this._existing) {
+      changed = true;
+    } else {
+      changed = keys.length !== this._existing.swimlanes.size;
+    }
+
+    let swimlanes: Map<string, SwimlaneDataVm> = Map<string, SwimlaneDataVm>().asMutable();
+    for (const key of Object.keys(this._dataBuilders)) {
+      const dataBuilder: SwimlaneDataBuilder = this._dataBuilders[key];
+      if (dataBuilder.isChanged()) {
+        changed = true;
+      }
+      swimlanes.set(key, dataBuilder.build());
+    }
+
+    if (!changed) {
+      return this._existing;
+    }
+    swimlanes = swimlanes.sort((a, b) => a.display.localeCompare(b.display)).toOrderedMap().asImmutable();
+    return IssueTableVmUtil.createSwimlaneInfoVm(swimlanes);
+  }
 }
 
 class SwimlaneDataBuilder {
-  private _tableBuilder: TableBuilder;
+  private readonly _existing: SwimlaneDataVm;
+  private readonly _tableBuilder: TableBuilder;
   private _visibleIssuesCount = 0;
+  visible = true;
 
-  constructor(private _key: string, private _name: string, states: number) {
-    this._tableBuilder = new TableBuilder(states, null);
+
+  constructor(private readonly _key: string, private readonly _display: string, states: number, exisitingInfo: SwimlaneInfoVm) {
+    this._existing = exisitingInfo ? exisitingInfo.swimlanes.get(_key) : null;
+    this._tableBuilder = new TableBuilder(states, this._existing ? this._existing.table : null);
   }
 
   addIssue(issue: BoardIssueVm, boardIndex: number) {
@@ -415,8 +448,28 @@ class SwimlaneDataBuilder {
     return this._key;
   }
 
-  get name(): string {
-    return this._name;
+  get display(): string {
+    return this._display;
+  }
+
+  isChanged(): boolean {
+    if (!this._existing) {
+      return true;
+    }
+    return this._key !== this._existing.key ||
+      this._display !== this._existing.display ||
+      this.table !== this._existing.table ||
+      this._visibleIssuesCount !== this._existing.visibleIssues;
+  }
+
+  build(): SwimlaneDataVm {
+    const table: List<List<string>> = this._tableBuilder.getTable();
+    if (this._existing) {
+      if (!this.isChanged()) {
+        return this._existing;
+      }
+    }
+    return IssueTableVmUtil.createSwimlaneDataVm(this._key, this._display, this._tableBuilder.getTable(), this._visibleIssuesCount);
   }
 }
 
