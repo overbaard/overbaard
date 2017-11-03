@@ -45,13 +45,6 @@ export class IssueTableVmService {
   }
 }
 
-function  initMutableTable(states: number): List<string>[] {
-  const table: List<string>[] = new Array<List<string>>(states);
-  for (let i = 0 ; i < table.length ; i++) {
-    table[i] = List<string>().asMutable();
-  }
-  return table;
-}
 
 /**
  * This class is mainly internal for IssueTableVmService, and a hook for testing. When used by IssueTableVmService,
@@ -217,55 +210,27 @@ class IssueTableBuilder {
         return this._oldIssueTableState.table;
     }
 
-    const table: List<string>[] = initMutableTable(this._currentBoardState.headers.states.size);
-    this.addProjectIssues(issues, table, this._currentBoardState.projects.boardProjects.get(this._currentBoardState.projects.owner));
+    const oldTable: List<List<string>> = this._changeType === ChangeType.LOAD_BOARD ? null : this._oldIssueTableState.table;
+    const tableBuilder: TableBuilder = new TableBuilder(this._currentBoardState.headers.states.size, oldTable);
+
+    this.addProjectIssues(issues, tableBuilder, this._currentBoardState.projects.boardProjects.get(this._currentBoardState.projects.owner));
     this._currentBoardState.projects.boardProjects.forEach((project, key) => {
       if (key !== this._currentBoardState.projects.owner) {
-        this.addProjectIssues(issues, table, project);
+        this.addProjectIssues(issues, tableBuilder, project);
       }
     });
 
-    if (this._changeType === ChangeType.LOAD_BOARD) {
-      return this.makeTableImmutable(table);
-    }
-    // It was UPDATE_BOARD
-    if (this.consolidateIssueTable(table)) {
-      return this.makeTableImmutable(table);
-    } else {
-      return this._oldIssueTableState.table;
-    }
+    return tableBuilder.getTable();
   }
 
-  private addProjectIssues(issues: Map<string, BoardIssueVm>, list: List<string>[], project: BoardProject) {
+  private addProjectIssues(issues: Map<string, BoardIssueVm>, tableBuilder: TableBuilder, project: BoardProject) {
     const ownToBoardIndex: number[] = ProjectUtil.getOwnIndexToBoardIndex(this._currentBoardState.headers, project);
     this._currentBoardState.ranks.rankedIssueKeys.get(project.key).forEach((key) => {
       const issue: BoardIssue = this._currentBoardState.issues.issues.get(key);
       // find the index and add the issue
       const boardIndex: number = ownToBoardIndex[issue.ownState];
-      list[boardIndex].push(key);
+      tableBuilder.push(boardIndex, key);
     });
-  }
-
-  private makeTableImmutable(table: List<string>[]): List<List<string>> {
-    // Make the table immutable
-    return List<List<string>>().withMutations(mutable => {
-      table.forEach((v, i) => mutable.push(table[i].asImmutable()));
-    });
-  }
-
-  private consolidateIssueTable(newTable: List<string>[]): boolean {
-    let changed = false;
-    for (let i = 0 ; i < newTable.length ; i++) {
-      const oldIssues: List<string> = this._oldIssueTableState.table.get(i);
-      const newIssues: List<string> = newTable[i];
-      if (oldIssues.equals(newIssues)) {
-        // If the tables are the same, use the old table here to avoid updating the column components unnecessarily
-        newTable[i] = oldIssues;
-      } else {
-        changed = true;
-      }
-    }
-    return changed;
   }
 
   private calculateVisibleIssueCounts(issues: Map<string, BoardIssueVm>, table: List<List<string>>): List<number> {
@@ -287,19 +252,22 @@ class IssueTableBuilder {
     if (!this._currentUserSettingState.swimlane) {
       return null;
     }
+    let swimlaneBuilder: SwimlaneInfoBuilder;
     switch (this._changeType) {
       case ChangeType.LOAD_BOARD:
       case ChangeType.CHANGE_SWIMLANE: {
-        return this.createSwimlanes(issues, table);
+        swimlaneBuilder = this.createSwimlanes(issues, table);
       }
+      break;
       case ChangeType.UPDATE_BOARD: {
-        return this.updateSwimlanes(issues, table);
+        swimlaneBuilder = this.updateSwimlanes(issues, table);
       }
     }
-    const swimlaneBuilder: SwimlaneInfoBuilder = SwimlaneInfoBuilder.create(this._currentBoardState, this._currentUserSettingState);
+    // TODO filter swimlanes
+    return null;
   }
 
-  private createSwimlanes(issues: Map<string, BoardIssueVm>, table: List<List<string>>): SwimlaneInfoVm {
+  private createSwimlanes(issues: Map<string, BoardIssueVm>, table: List<List<string>>): SwimlaneInfoBuilder {
     const swimlaneBuilder: SwimlaneInfoBuilder = SwimlaneInfoBuilder.create(this._currentBoardState, this._currentUserSettingState);
     for (let i = 0 ; i < table.size ; i++) {
       const column: List<string> = table.get(i);
@@ -316,10 +284,10 @@ class IssueTableBuilder {
       const builder: SwimlaneDataBuilder = swimlaneBuilder.dataBuilders[key];
       console.log(`${builder.key} ${builder.name} ${builder.table}`)
     }
-    return null;
+    return swimlaneBuilder;
   }
 
-  private updateSwimlanes(issues: Map<string, BoardIssueVm>, table: List<List<string>>): SwimlaneInfoVm {
+  private updateSwimlanes(issues: Map<string, BoardIssueVm>, table: List<List<string>>): SwimlaneInfoBuilder {
     return null;
   }
 }
@@ -411,32 +379,32 @@ class SwimlaneInfoBuilder {
     }
   }
 
-  get noneBuilder() {
+  get noneBuilder(): SwimlaneDataBuilder {
     return this._noneBuilder;
   }
 
-  get dataBuilders() {
+  get dataBuilders(): Dictionary<SwimlaneDataBuilder> {
     return this._dataBuilders;
   }
 }
 
 class SwimlaneDataBuilder {
-  private _table: List<string>[];
+  private _tableBuilder: TableBuilder;
   private _visibleIssuesCount = 0;
 
   constructor(private _key: string, private _name: string, states: number) {
-    this._table  = initMutableTable(states);
+    this._tableBuilder = new TableBuilder(states, null);
   }
 
   addIssue(issue: BoardIssueVm, boardIndex: number) {
-    this._table[boardIndex].push(issue.key);
+    this._tableBuilder.push(boardIndex, issue.key);
     if (issue.visible) {
       this._visibleIssuesCount++;
     }
   }
 
   get table() {
-    return this._table;
+    return this._tableBuilder.getTable();
   }
 
   get visibleIssuesCount(): number {
@@ -451,5 +419,108 @@ class SwimlaneDataBuilder {
     return this._name;
   }
 }
+
+class TableBuilder {
+  private readonly _current: ColumnBuilder[];
+
+  constructor(states: number, private readonly _existing: List<List<string>>) {
+    this._current = new Array<ColumnBuilder>(states);
+    for (let i = 0 ; i < this._current.length ; i++) {
+      if (_existing) {
+        this._current[i] = new ExistingColumnBuilder(this._existing.get(i));
+      } else {
+        this._current[i] = new NewColumnBuilder();
+      }
+    }
+
+  }
+
+  push(index: number, value: string) {
+    this._current[index].push(value);
+  }
+
+  getTable(): List<List<string>> {
+    if (!this._existing) {
+      return List<List<string>>().withMutations(mutable => {
+        for (const column of this._current) {
+          mutable.push(column.getList());
+        }
+      });
+    } else {
+      let changed = false;
+      const table: List<List<string>> = List<List<string>>().withMutations(mutable => {
+        for (const column of this._current) {
+            changed = changed || column.isChanged();
+            mutable.push(column.getList());
+        }
+      });
+      if (!changed) {
+        return this._existing;
+      }
+      return table;
+    }
+  }
+}
+
+interface ColumnBuilder {
+  push(value: string);
+  isChanged(): boolean;
+  getList(): List<string>;
+}
+
+class ExistingColumnBuilder implements ColumnBuilder {
+  private _current: List<string>;
+  private _index = 0;
+  private _changed = false;
+
+  constructor(private _existing: List<string>) {
+  }
+
+  push(value: string) {
+    if (!this._changed) {
+      if (this._existing.size <= this._index) {
+        this._changed = true;
+      } else {
+        if (this._existing.get(this._index) !== value) {
+          this._changed = true;
+        }
+      }
+      this._index++;
+    }
+    if (!this._current) {
+      this._current = List<string>().asMutable();
+    }
+    this._current.push(value);
+  }
+
+  isChanged(): boolean {
+    return this._changed || this._existing.size !== this._current.size;
+  }
+
+  getList(): List<string> {
+    if (this.isChanged()) {
+      return this._current.asImmutable();
+    }
+    return this._existing;
+  }
+}
+
+class NewColumnBuilder implements ColumnBuilder {
+  private _current: List<string> = List<string>().asMutable();
+  private _changed = true;
+
+  push(value: string) {
+    this._current.push(value);
+  }
+
+  isChanged(): boolean {
+    return this._changed;
+  }
+
+  getList(): List<string> {
+    return this._current.asImmutable();
+  }
+}
+
 
 
