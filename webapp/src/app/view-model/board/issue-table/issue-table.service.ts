@@ -2,17 +2,17 @@ import {Injectable} from '@angular/core';
 import {Store} from '@ngrx/store';
 import {AppState} from '../../../app-store';
 import {Observable} from 'rxjs/Observable';
-import {initialIssueTableVm, IssueTableVmUtil} from './issue-table-vm.model';
+import {initialIssueTable, IssueTableUtil} from './issue-table.model';
 import {BoardState} from '../../../model/board/data/board';
 import 'rxjs/add/observable/combineLatest';
 import {List, Map, OrderedMap, OrderedSet} from 'immutable';
 import {BoardIssue} from '../../../model/board/data/issue/board-issue';
 import {BoardProject, ProjectUtil} from '../../../model/board/data/project/project.model';
-import {IssueTableVm, SwimlaneDataVm, SwimlaneInfoVm} from './issue-table-vm';
+import {IssueTable, SwimlaneData, SwimlaneInfo} from './issue-table';
 import {initialUserSettingState, UserSettingState} from '../../../model/board/user/user-setting.model';
 import {initialBoardState} from '../../../model/board/data/board.model';
-import {BoardIssueVm} from './board-issue-vm';
-import {BoardIssueVmUtil} from './board-issue-vm.model';
+import {BoardIssueView} from './board-issue-view';
+import {BoardIssueViewUtil} from './board-issue-view.model';
 import {IssueChange} from '../../../model/board/data/issue/issue.model';
 import {AllFilters} from './filter.util';
 import {Dictionary} from '../../../common/dictionary';
@@ -30,15 +30,15 @@ import {CustomField} from '../../../model/board/data/custom-field/custom-field.m
 import {NO_ASSIGNEE} from '../../../model/board/data/assignee/assignee.model';
 
 @Injectable()
-export class IssueTableVmService {
+export class IssueTableService {
 
-  private _issueTableVmHandler: IssueTableVmHandler = new IssueTableVmHandler();
+  private _issueTableHandler: IssueTableHandler = new IssueTableHandler();
 
   constructor(private _store: Store<AppState>) {
   }
 
-  getIssueTableVm(): Observable<IssueTableVm> {
-    return this._issueTableVmHandler.getIssueTableVm(
+  getIssueTable(): Observable<IssueTable> {
+    return this._issueTableHandler.getIssueTable(
       this._store.select('board'),
       this._store.select('userSettings')
     );
@@ -47,19 +47,19 @@ export class IssueTableVmService {
 
 
 /**
- * This class is mainly internal for IssueTableVmService, and a hook for testing. When used by IssueTableVmService,
+ * This class is mainly internal for IssueTableService, and a hook for testing. When used by IssueTableService,
  * its lifecycle follows that of the service
  */
-export class IssueTableVmHandler {
+export class IssueTableHandler {
   // Last inputs
   lastBoardState: BoardState = initialBoardState;
   lastUserSettingState: UserSettingState = initialUserSettingState;
   // Last result
-  lastIssueTable: IssueTableVm = initialIssueTableVm;
+  lastIssueTable: IssueTable = initialIssueTable;
 
-  getIssueTableVm(
+  getIssueTable(
     boardState$: Observable<BoardState>,
-    userSettingState$: Observable<UserSettingState>):  Observable<IssueTableVm> {
+    userSettingState$: Observable<UserSettingState>):  Observable<IssueTable> {
     return Observable
       .combineLatest(boardState$, userSettingState$, (boardState, userSettingState) => {
         let changeType: ChangeType = null;
@@ -82,7 +82,7 @@ export class IssueTableVmHandler {
           this.lastIssueTable,
           boardState,
           userSettingState);
-        const issueTable: IssueTableVm = issueTableBuilder.updateIssueTable();
+        const issueTable: IssueTable = issueTableBuilder.updateIssueTable();
         this.lastIssueTable = issueTable;
         this.lastBoardState = boardState;
         this.lastUserSettingState = userSettingState;
@@ -102,17 +102,17 @@ class IssueTableBuilder {
 
   constructor(
     private readonly _changeType: ChangeType,
-    private readonly _oldIssueTableState: IssueTableVm,
+    private readonly _oldIssueTableState: IssueTable,
     private readonly _currentBoardState: BoardState,
     private readonly _currentUserSettingState: UserSettingState) {
   }
 
-  updateIssueTable (): IssueTableVm {
-    let issues: Map<string, BoardIssueVm> = this.populateIssues();
+  updateIssueTable (): IssueTable {
+    let issues: Map<string, BoardIssueView> = this.populateIssues();
     issues = this.filterIssues(issues);
     const table: List<List<string>> = this.createTable(issues);
     const visibleIssueCounts: List<number> = this.calculateVisibleIssueCounts(issues, table);
-    const swimlaneInfo: SwimlaneInfoVm = this.calculateSwimlane(issues, table);
+    const swimlaneInfo: SwimlaneInfo = this.calculateSwimlane(issues, table);
 
     if (issues === this._oldIssueTableState.issues &&
         table === this._oldIssueTableState.table &&
@@ -121,22 +121,22 @@ class IssueTableBuilder {
       return this._oldIssueTableState;
     }
 
-    return IssueTableVmUtil.createIssueTableVm(issues, table, swimlaneInfo, visibleIssueCounts);
+    return IssueTableUtil.createIssueTable(issues, table, swimlaneInfo, visibleIssueCounts);
   }
 
-  private populateIssues(): Map<string, BoardIssueVm> {
+  private populateIssues(): Map<string, BoardIssueView> {
     switch (this._changeType) {
       case ChangeType.LOAD_BOARD: {
-        const issues: Map<string, BoardIssueVm> = Map<string, BoardIssueVm>().asMutable();
+        const issues: Map<string, BoardIssueView> = Map<string, BoardIssueView>().asMutable();
         this._currentBoardState.issues.issues.forEach((issue, key) => {
-          const issueVm: BoardIssueVm = BoardIssueVmUtil.createBoardIssueVm(issue, true);
-          issues.set(key, issueVm);
+          const issueView: BoardIssueView = BoardIssueViewUtil.createBoardIssue(issue, true);
+          issues.set(key, issueView);
         });
         return issues.asImmutable();
       }
       case ChangeType.UPDATE_BOARD: {
         const issueChanges = this._currentBoardState.issues.lastChanged.size > 0;
-        let issues: Map<string, BoardIssueVm> = this._oldIssueTableState.issues;
+        let issues: Map<string, BoardIssueView> = this._oldIssueTableState.issues;
         if (issueChanges) {
           issues = this._oldIssueTableState.issues;
           this._currentBoardState.issues.lastChanged.forEach((change, key) => {
@@ -146,8 +146,8 @@ class IssueTableBuilder {
             } else {
               issues = issues.asMutable();
               const issue: BoardIssue = this._currentBoardState.issues.issues.get(key);
-              const issueVm: BoardIssueVm = BoardIssueVmUtil.createBoardIssueVm(issue, true);
-              issues.set(key, issueVm);
+              const issueView: BoardIssueView = BoardIssueViewUtil.createBoardIssue(issue, true);
+              issues.set(key, issueView);
             }
           });
           issues = issues.asImmutable();
@@ -159,7 +159,7 @@ class IssueTableBuilder {
     }
   }
 
-  private filterIssues(issues: Map<string, BoardIssueVm>): Map<string, BoardIssueVm> {
+  private filterIssues(issues: Map<string, BoardIssueView>): Map<string, BoardIssueView> {
     switch (this._changeType) {
       case ChangeType.LOAD_BOARD:
       case ChangeType.APPLY_FILTERS: {
@@ -168,7 +168,7 @@ class IssueTableBuilder {
           const visible = filters.filterVisible(issue);
           if (visible !== issue.visible) {
             issues = issues.asMutable();
-            issue = BoardIssueVmUtil.updateVisibility(issue, visible);
+            issue = BoardIssueViewUtil.updateVisibility(issue, visible);
             issues.set(key, issue);
           }
         });
@@ -181,11 +181,11 @@ class IssueTableBuilder {
             issues = issues.asMutable();
             issues.delete(key);
           } else {
-            let issue: BoardIssueVm = issues.get(key);
+            let issue: BoardIssueView = issues.get(key);
             const visible: boolean = filters.filterVisible(issue);
             if (visible !== issue.visible) {
               issues = issues.asMutable();
-              issue = BoardIssueVmUtil.updateVisibility(issue, visible);
+              issue = BoardIssueViewUtil.updateVisibility(issue, visible);
               issues.set(key, issue);
             }
           }
@@ -199,7 +199,7 @@ class IssueTableBuilder {
     return issues;
   }
 
-  private createTable(issues: Map<string, BoardIssueVm>): List<List<string>> {
+  private createTable(issues: Map<string, BoardIssueView>): List<List<string>> {
     switch (this._changeType) {
       case ChangeType.APPLY_FILTERS:
       case ChangeType.CHANGE_SWIMLANE:
@@ -219,7 +219,7 @@ class IssueTableBuilder {
     return tableBuilder.getTable();
   }
 
-  private addProjectIssues(issues: Map<string, BoardIssueVm>, tableBuilder: TableBuilder, project: BoardProject) {
+  private addProjectIssues(issues: Map<string, BoardIssueView>, tableBuilder: TableBuilder, project: BoardProject) {
     const ownToBoardIndex: number[] = ProjectUtil.getOwnIndexToBoardIndex(this._currentBoardState.headers, project);
     this._currentBoardState.ranks.rankedIssueKeys.get(project.key).forEach((key) => {
       const issue: BoardIssue = this._currentBoardState.issues.issues.get(key);
@@ -229,7 +229,7 @@ class IssueTableBuilder {
     });
   }
 
-  private calculateVisibleIssueCounts(issues: Map<string, BoardIssueVm>, table: List<List<string>>): List<number> {
+  private calculateVisibleIssueCounts(issues: Map<string, BoardIssueView>, table: List<List<string>>): List<number> {
     const visibilities: List<number> = List<number>().withMutations(mutable => {
       table.forEach(issueKeys => {
         let visible = 0;
@@ -244,7 +244,7 @@ class IssueTableBuilder {
     return visibilities.equals(this._oldIssueTableState.visibleIssueCounts) ? this._oldIssueTableState.visibleIssueCounts : visibilities;
   }
 
-  private calculateSwimlane(issues: Map<string, BoardIssueVm>, table: List<List<string>>): SwimlaneInfoVm {
+  private calculateSwimlane(issues: Map<string, BoardIssueView>, table: List<List<string>>): SwimlaneInfo {
     if (!this._currentUserSettingState.swimlane) {
       return null;
     }
@@ -269,11 +269,11 @@ class IssueTableBuilder {
   }
 
   private populateSwimlanes(swimlaneBuilder: SwimlaneInfoBuilder,
-                            issues: Map<string, BoardIssueVm>, table: List<List<string>>): SwimlaneInfoBuilder {
+                            issues: Map<string, BoardIssueView>, table: List<List<string>>): SwimlaneInfoBuilder {
     for (let i = 0 ; i < table.size ; i++) {
       const column: List<string> = table.get(i);
       column.forEach(key => {
-        const issue: BoardIssueVm = issues.get(key);
+        const issue: BoardIssueView = issues.get(key);
         swimlaneBuilder.indexIssue(issue, i);
       });
     }
@@ -297,12 +297,12 @@ class IssueTableBuilder {
 
 class SwimlaneInfoBuilder {
   static create(boardState: BoardState,
-                userSettingState: UserSettingState, existingInfo: SwimlaneInfoVm): SwimlaneInfoBuilder {
+                userSettingState: UserSettingState, existingInfo: SwimlaneInfo): SwimlaneInfoBuilder {
     const states: number = boardState.headers.states.size;
     const builderMap: Dictionary<SwimlaneDataBuilder> = {};
     let builderNone: SwimlaneDataBuilder = new SwimlaneDataBuilder(NONE_FILTER, 'None', states, existingInfo);
     let issueMatcher:
-      (issue: BoardIssueVm, dataBuilders: Dictionary<SwimlaneDataBuilder>, noneBuilder: SwimlaneDataBuilder) => SwimlaneDataBuilder[];
+      (issue: BoardIssueView, dataBuilders: Dictionary<SwimlaneDataBuilder>, noneBuilder: SwimlaneDataBuilder) => SwimlaneDataBuilder[];
     switch (userSettingState.swimlane) {
       case PROJECT_ATTRIBUTES.key:
         boardState.projects.boardProjects.forEach(
@@ -370,13 +370,13 @@ class SwimlaneInfoBuilder {
 
   private constructor(
     private readonly _issueMatcher:
-      (issue: BoardIssueVm, dataBuilders: Dictionary<SwimlaneDataBuilder>, noneMatcher: SwimlaneDataBuilder) => SwimlaneDataBuilder[],
+      (issue: BoardIssueView, dataBuilders: Dictionary<SwimlaneDataBuilder>, noneMatcher: SwimlaneDataBuilder) => SwimlaneDataBuilder[],
     private readonly _dataBuilders: Dictionary<SwimlaneDataBuilder>,
     private readonly _noneBuilder: SwimlaneDataBuilder,
-    private readonly _existing: SwimlaneInfoVm) {
+    private readonly _existing: SwimlaneInfo) {
   }
 
-  indexIssue(issue: BoardIssueVm, boardIndex: number) {
+  indexIssue(issue: BoardIssueView, boardIndex: number) {
     const swimlaneBuilders: SwimlaneDataBuilder[] = this._issueMatcher(issue, this._dataBuilders, this._noneBuilder);
     for (const swimlaneDataBuilder of swimlaneBuilders) {
       swimlaneDataBuilder.addIssue(issue, boardIndex);
@@ -391,7 +391,7 @@ class SwimlaneInfoBuilder {
     return this._dataBuilders;
   }
 
-  build(): SwimlaneInfoVm {
+  build(): SwimlaneInfo {
     const keys: string[] = Object.keys(this._dataBuilders);
     let changed = false;
     if (!this._existing) {
@@ -400,7 +400,7 @@ class SwimlaneInfoBuilder {
       changed = keys.length !== this._existing.swimlanes.size;
     }
 
-    let swimlanes: Map<string, SwimlaneDataVm> = Map<string, SwimlaneDataVm>().asMutable();
+    let swimlanes: Map<string, SwimlaneData> = Map<string, SwimlaneData>().asMutable();
     for (const key of Object.keys(this._dataBuilders)) {
       const dataBuilder: SwimlaneDataBuilder = this._dataBuilders[key];
       if (dataBuilder.isChanged()) {
@@ -413,23 +413,23 @@ class SwimlaneInfoBuilder {
       return this._existing;
     }
     swimlanes = swimlanes.sort((a, b) => a.display.localeCompare(b.display)).toOrderedMap().asImmutable();
-    return IssueTableVmUtil.createSwimlaneInfoVm(swimlanes);
+    return IssueTableUtil.createSwimlaneInfoView(swimlanes);
   }
 }
 
 class SwimlaneDataBuilder {
-  private readonly _existing: SwimlaneDataVm;
+  private readonly _existing: SwimlaneData;
   private readonly _tableBuilder: TableBuilder;
   private _visibleIssuesCount = 0;
   visible = true;
 
 
-  constructor(private readonly _key: string, private readonly _display: string, states: number, exisitingInfo: SwimlaneInfoVm) {
+  constructor(private readonly _key: string, private readonly _display: string, states: number, exisitingInfo: SwimlaneInfo) {
     this._existing = exisitingInfo ? exisitingInfo.swimlanes.get(_key) : null;
     this._tableBuilder = new TableBuilder(states, this._existing ? this._existing.table : null);
   }
 
-  addIssue(issue: BoardIssueVm, boardIndex: number) {
+  addIssue(issue: BoardIssueView, boardIndex: number) {
     this._tableBuilder.push(boardIndex, issue.key);
     if (issue.visible) {
       this._visibleIssuesCount++;
@@ -462,14 +462,14 @@ class SwimlaneDataBuilder {
       this._visibleIssuesCount !== this._existing.visibleIssues;
   }
 
-  build(): SwimlaneDataVm {
+  build(): SwimlaneData {
     const table: List<List<string>> = this._tableBuilder.getTable();
     if (this._existing) {
       if (!this.isChanged()) {
         return this._existing;
       }
     }
-    return IssueTableVmUtil.createSwimlaneDataVm(this._key, this._display, this._tableBuilder.getTable(), this._visibleIssuesCount);
+    return IssueTableUtil.createSwimlaneDataView(this._key, this._display, this._tableBuilder.getTable(), this._visibleIssuesCount);
   }
 }
 

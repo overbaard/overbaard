@@ -1,5 +1,5 @@
 import {List, Map} from 'immutable';
-import {IssueTableVm} from './issue-table-vm';
+import {IssueTable} from './issue-table';
 import {HeaderState} from '../../../model/board/data/header/header.state';
 import {DeserializeIssueLookupParams, initialIssueState, IssueState} from '../../../model/board/data/issue/issue.model';
 import {BoardProject, LinkedProject, ParallelTask, ProjectState} from '../../../model/board/data/project/project.model';
@@ -14,7 +14,7 @@ import {RankActions, rankMetaReducer} from '../../../model/board/data/rank/rank.
 import {getTestIssueTypeState} from '../../../model/board/data/issue-type/issue-type.reducer.spec';
 import {getTestPriorityState} from '../../../model/board/data/priority/priority.reducer.spec';
 import {getTestAssigneeState} from '../../../model/board/data/assignee/assignee.reducer.spec';
-import {IssueTableVmHandler} from './issue-table-vm.service';
+import {IssueTableHandler} from './issue-table.service';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/take';
 import {initialUserSettingState, UserSettingState} from '../../../model/board/user/user-setting.model';
@@ -27,12 +27,12 @@ export class IssueTableObservableUtil {
   _rankedIssueKeys: any = {};
   _stateMap: Map<string, StateMapping[]> = Map<string, StateMapping[]>();
 
-  _service: IssueTableVmHandler = new IssueTableVmHandler();
+  _service: IssueTableHandler = new IssueTableHandler();
   _userSettingState: UserSettingState = initialUserSettingState;
   _boardState: BoardState = initialBoardState;
   _boardStateSubject$: BehaviorSubject<BoardState> = new BehaviorSubject(initialBoardState);
   _userSettingSubject$: BehaviorSubject<UserSettingState> = new BehaviorSubject(initialUserSettingState);
-  _issueTableVm$: Observable<IssueTableVm>;
+  _issueTable$: Observable<IssueTable>;
 
   // Used for the update tests
   private _issueChanges: any;
@@ -40,7 +40,7 @@ export class IssueTableObservableUtil {
   private _rankDeleted: string[];
 
   constructor(private _owner: string, private _numberStates: number, userSettingQueryParams?: Dictionary<string>) {
-    this._issueTableVm$ = this._service.getIssueTableVm(this._boardStateSubject$, this._userSettingSubject$);
+    this._issueTable$ = this._service.getIssueTable(this._boardStateSubject$, this._userSettingSubject$);
     if (userSettingQueryParams) {
       this.updateUserSettings(userSettingQueryParams);
       this._userSettingSubject$.take(1).subscribe(table => {
@@ -128,8 +128,8 @@ export class IssueTableObservableUtil {
     this._userSettingSubject$.next(this._userSettingState);
   }
 
-  tableObserver(): Observable<IssueTableVm> {
-    return this._issueTableVm$;
+  tableObserver(): Observable<IssueTable> {
+    return this._issueTable$;
   }
 
   getDeserializeIssueLookupParams(headerState: HeaderState, projectState: ProjectState): DeserializeIssueLookupParams {

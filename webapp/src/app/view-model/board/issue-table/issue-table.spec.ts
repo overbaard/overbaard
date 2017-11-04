@@ -1,8 +1,8 @@
 import {List, OrderedSet, Set} from 'immutable';
-import {IssueTableVm} from './issue-table-vm';
+import {IssueTable} from './issue-table';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/take';
-import {IssueTableObservableUtil} from './issue-table-vm.util.spec';
+import {IssueTableObservableUtil} from './issue-table.common.spec';
 import {Dictionary} from '../../../common/dictionary';
 
 
@@ -131,7 +131,7 @@ describe('Issue Table observer tests', () => {
 
   describe('Update tests', () => {
     let util: IssueTableObservableUtil;
-    let original: IssueTableVm;
+    let original: IssueTable;
     beforeEach(() => {
       util = new IssueTableObservableUtil('ONE', 4)
         .addIssue('ONE-1', 0)
@@ -356,20 +356,20 @@ describe('Issue table filter tests', () => {
   }
 });
 
-export function checkTable(issueTableVm: IssueTableVm, expected: string[][], invisible: string[]) {
+export function checkTable(issueTable: IssueTable, expected: string[][], invisible: string[]) {
   // Check table layout
   const actualTable: string[][] = [];
-  issueTableVm.table.forEach((v, i) => {
-    actualTable.push(issueTableVm.table.get(i).toArray());
+  issueTable.table.forEach((v, i) => {
+    actualTable.push(issueTable.table.get(i).toArray());
   });
   expect(actualTable).toEqual(expected);
 
   // Check the size of the issues map
-  expect(issueTableVm.issues.size).toBe(expected.map(issues => issues.length).reduce((s, c) => s + c));
+  expect(issueTable.issues.size).toBe(expected.map(issues => issues.length).reduce((s, c) => s + c));
 
   // Check issue visibilities
   const invisibleKeys: string[] =
-    issueTableVm.issues.filter(issue => !issue.visible).keySeq().toArray().sort((a, b) => a.localeCompare(b));
+    issueTable.issues.filter(issue => !issue.visible).keySeq().toArray().sort((a, b) => a.localeCompare(b));
   expect(invisibleKeys).toEqual(invisible.sort((a, b) => a.localeCompare(b)));
 
   // Check issue counts
@@ -380,10 +380,10 @@ export function checkTable(issueTableVm: IssueTableVm, expected: string[][], inv
       return invisibleSet.contains(arr[ind]) ? s : s + 1;
       }, 0);
   }
-  expect(issueTableVm.visibleIssueCounts.toArray()).toEqual(visibleIssueCounts);
+  expect(issueTable.visibleIssueCounts.toArray()).toEqual(visibleIssueCounts);
 }
 
-function checkSameColumns(oldState: IssueTableVm, newState: IssueTableVm, ...cols: number[]) {
+function checkSameColumns(oldState: IssueTable, newState: IssueTable, ...cols: number[]) {
   const expectedEqual: OrderedSet<number> = OrderedSet<number>(cols);
   expect(oldState.table.size).toBe(newState.table.size);
   for (let i = 0 ; i < oldState.table.size ; i++) {

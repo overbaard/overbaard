@@ -1,13 +1,13 @@
 import {is, List, Map} from 'immutable';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {BoardIssue} from '../../../model/board/data/issue/board-issue';
-import {IssueTableVm} from './issue-table-vm';
-import {BoardIssueVm} from './board-issue-vm';
+import {IssueTable} from './issue-table';
+import {BoardIssueView} from './board-issue-view';
 import {NO_ASSIGNEE} from '../../../model/board/data/assignee/assignee.model';
 import {CustomField} from '../../../model/board/data/custom-field/custom-field.model';
 import {Issue} from '../../../model/board/data/issue/issue';
 
-const DEFAULT_STATE: BoardIssueVm = {
+const DEFAULT_STATE: BoardIssueView = {
   // Fields from core issue
   key: null,
   projectCode: null,
@@ -25,19 +25,19 @@ const DEFAULT_STATE: BoardIssueVm = {
   visible: true
 };
 
-interface BoardIssueVmRecord extends TypedRecord<BoardIssueVmRecord>, BoardIssueVm {
+interface BoardIssueViewRecord extends TypedRecord<BoardIssueViewRecord>, BoardIssueView {
 }
 
-const ISSUE_FACTORY = makeTypedFactory<BoardIssueVm, BoardIssueVmRecord>(DEFAULT_STATE);
+const ISSUE_FACTORY = makeTypedFactory<BoardIssueView, BoardIssueViewRecord>(DEFAULT_STATE);
 
-export class BoardIssueVmUtil {
+export class BoardIssueViewUtil {
 
-  static toIssueRecord(s: BoardIssueVm): BoardIssueVmRecord {
+  static toIssueRecord(s: BoardIssueView): BoardIssueViewRecord {
     // TODO do some checks. TS does not allow use of instanceof when the type is an interface (since they are compiled away)
-    return <BoardIssueVmRecord>s;
+    return <BoardIssueViewRecord>s;
   }
 
-  static createBoardIssueVm(issue: BoardIssue, visible: boolean): BoardIssueVmRecord {
+  static createBoardIssue(issue: BoardIssue, visible: boolean): BoardIssueViewRecord {
     return ISSUE_FACTORY({
       key: issue.key,
       projectCode: issue.projectCode,
@@ -56,12 +56,12 @@ export class BoardIssueVmUtil {
     });
   }
 
-  static equals(one: BoardIssueVm, two: BoardIssueVm) {
-    return BoardIssueVmUtil.toIssueRecord(one).equals(BoardIssueVmUtil.toIssueRecord(two));
+  static equals(one: BoardIssueView, two: BoardIssueView) {
+    return BoardIssueViewUtil.toIssueRecord(one).equals(BoardIssueViewUtil.toIssueRecord(two));
   }
 
-  static updateVisibility(issue: BoardIssueVm, visible: boolean): BoardIssueVm {
-    return BoardIssueVmUtil.toIssueRecord(issue).withMutations(mutable => {
+  static updateVisibility(issue: BoardIssueView, visible: boolean): BoardIssueView {
+    return BoardIssueViewUtil.toIssueRecord(issue).withMutations(mutable => {
       mutable.visible = visible;
     })
   }

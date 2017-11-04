@@ -16,8 +16,8 @@ import {Subject} from 'rxjs/Subject';
 import {List} from 'immutable';
 import {headersSelector} from '../../model/board/data/header/header.reducer';
 import {Header} from '../../model/board/data/header/header';
-import {IssueTableVmService} from '../../view-model/board/issue-table/issue-table-vm.service';
-import {IssueTableVm} from '../../view-model/board/issue-table/issue-table-vm';
+import {IssueTableService} from '../../view-model/board/issue-table/issue-table.service';
+import {IssueTable} from '../../view-model/board/issue-table/issue-table';
 import {UserSettingActions} from '../../model/board/user/user-setting.reducer';
 
 
@@ -28,7 +28,7 @@ export const VIEW_RANK = 'rv';
   selector: 'app-board',
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss'],
-  providers: [BoardService, IssueTableVmService],
+  providers: [BoardService, IssueTableService],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BoardComponent implements OnInit, OnDestroy {
@@ -39,7 +39,7 @@ export class BoardComponent implements OnInit, OnDestroy {
   private _wasBacklogForced = false;
 
   headers$: Observable<List<List<Header>>>;
-  issueTable$: Observable<IssueTableVm>;
+  issueTable$: Observable<IssueTable>;
   windowHeight: number;
   windowWidth: number;
 
@@ -51,7 +51,7 @@ export class BoardComponent implements OnInit, OnDestroy {
     private _boardService: BoardService,
     private _appHeaderService: AppHeaderService,
     private _store: Store<AppState>,
-    private _issueTableVmService: IssueTableVmService) {
+    private _issueTableVmService: IssueTableService) {
 
     this.setWindowSize();
 
@@ -109,7 +109,7 @@ export class BoardComponent implements OnInit, OnDestroy {
       );
 
     this.headers$ = this._store.select(headersSelector);
-    this.issueTable$ = this._issueTableVmService.getIssueTableVm();
+    this.issueTable$ = this._issueTableVmService.getIssueTable();
   }
 
 

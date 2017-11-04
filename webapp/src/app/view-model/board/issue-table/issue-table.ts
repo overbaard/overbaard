@@ -1,19 +1,19 @@
 import {List, Map, OrderedMap} from 'immutable';
 import {BoardIssue} from '../../../model/board/data/issue/board-issue';
-import {BoardIssueVm} from './board-issue-vm';
+import {BoardIssueView} from './board-issue-view';
 
-export interface IssueTableVm {
-  issues: Map<string, BoardIssueVm>;
+export interface IssueTable {
+  issues: Map<string, BoardIssueView>;
   table: List<List<string>>;
-  swimlaneInfo: SwimlaneInfoVm;
+  swimlaneInfo: SwimlaneInfo;
   visibleIssueCounts: List<number>;
 }
 
-export interface SwimlaneInfoVm {
-  swimlanes: OrderedMap<string, SwimlaneDataVm>;
+export interface SwimlaneInfo {
+  swimlanes: OrderedMap<string, SwimlaneData>;
 }
 
-export interface SwimlaneDataVm {
+export interface SwimlaneData {
   key: string;
   display: string;
   table: List<List<string>>;

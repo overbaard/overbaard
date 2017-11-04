@@ -10,7 +10,7 @@ import {
   PROJECT_ATTRIBUTES
 } from '../../../model/board/user/board-filter/board-filter.constants';
 import {BoardFilterState} from '../../../model/board/user/board-filter/board-filter.model';
-import {BoardIssueVm} from './board-issue-vm';
+import {BoardIssueView} from './board-issue-view';
 import {List, Map, Set} from 'immutable';
 import {NO_ASSIGNEE} from '../../../model/board/data/assignee/assignee.model';
 import {CustomField} from '../../../model/board/data/custom-field/custom-field.model';
@@ -67,10 +67,10 @@ export class AllFilters {
 
   /**
    *
-   * @param {BoardIssueVm} issue
+   * @param {BoardIssueView} issue
    * @return {true} if it is visible, {false} otherwise
    */
-  filterVisible(issue: BoardIssueVm): boolean {
+  filterVisible(issue: BoardIssueView): boolean {
     if (!this._project.doFilter(issue.projectCode)) {
       return false;
     }
@@ -102,7 +102,7 @@ export class AllFilters {
     return true;
   }
 
-  private filterVisibleCustomFields(issue: BoardIssueVm): boolean {
+  private filterVisibleCustomFields(issue: BoardIssueView): boolean {
     let visible = true;
     this._customFieldFilters.forEach((f, k) => {
       const cfv: CustomField = issue.customFields.get(k);
@@ -114,7 +114,7 @@ export class AllFilters {
     return visible;
   }
 
-  private filterVisibleParallelTasks(issue: BoardIssueVm): boolean {
+  private filterVisibleParallelTasks(issue: BoardIssueView): boolean {
     let visible = true;
     const indicesForProject: Map<string, number> = this._parallelTaskFilterIndicesByProject.get(issue.projectCode);
     this._parallelTaskFilters.forEach((f, k) => {
