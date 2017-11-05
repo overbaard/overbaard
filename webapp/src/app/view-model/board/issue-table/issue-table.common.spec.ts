@@ -22,24 +22,23 @@ import {Dictionary} from '../../../common/dictionary';
 import {UserSettingActions, userSettingReducer} from '../../../model/board/user/user-setting.reducer';
 
 export class IssueTableObservableUtil {
-  _issueKeys: string[] = [];
-  _issueStates: number[] = [];
-  _rankedIssueKeys: any = {};
-  _stateMap: Map<string, StateMapping[]> = Map<string, StateMapping[]>();
+  private _rankedIssueKeys: any = {};
+  private _stateMap: Map<string, StateMapping[]> = Map<string, StateMapping[]>();
 
-  _service: IssueTableHandler = new IssueTableHandler();
-  _userSettingState: UserSettingState = initialUserSettingState;
-  _boardState: BoardState = initialBoardState;
-  _boardStateSubject$: BehaviorSubject<BoardState> = new BehaviorSubject(initialBoardState);
-  _userSettingSubject$: BehaviorSubject<UserSettingState> = new BehaviorSubject(initialUserSettingState);
-  _issueTable$: Observable<IssueTable>;
+  private _service: IssueTableHandler = new IssueTableHandler();
+  private _userSettingState: UserSettingState = initialUserSettingState;
+  private _boardState: BoardState = initialBoardState;
+  private _boardStateSubject$: BehaviorSubject<BoardState> = new BehaviorSubject(initialBoardState);
+  private _userSettingSubject$: BehaviorSubject<UserSettingState> = new BehaviorSubject(initialUserSettingState);
+  private _issueTable$: Observable<IssueTable>;
 
   // Used for the update tests
   private _issueChanges: any;
   private _rankChanges: any;
   private _rankDeleted: string[];
 
-  constructor(private _owner: string, private _numberStates: number, userSettingQueryParams?: Dictionary<string>) {
+  constructor(private _owner: string, private _issuesFactory: IssuesFactory,
+              private _numberStates: number, userSettingQueryParams?: Dictionary<string>) {
     this._issueTable$ = this._service.getIssueTable(this._boardStateSubject$, this._userSettingSubject$);
     if (userSettingQueryParams) {
       this.updateUserSettings(userSettingQueryParams);
@@ -47,12 +46,6 @@ export class IssueTableObservableUtil {
         // Consume the initial event with the empty table
       });
     }
-  }
-
-  addIssue(key: string, state: number, ): IssueTableObservableUtil {
-    this._issueKeys.push(key);
-    this._issueStates.push(state);
-    return this;
   }
 
   setRank(projectKey: string, ...keys: number[]): IssueTableObservableUtil {
@@ -152,17 +145,7 @@ export class IssueTableObservableUtil {
   }
 
   private createIssueState(params: DeserializeIssueLookupParams): IssueState {
-    const input: any = {};
-    for (let i = 0 ; i < this._issueKeys.length ; i++) {
-      const id = Number(this._issueKeys[i].substr(this._issueKeys[i].indexOf('-') + 1));
-      input[this._issueKeys[i]] = {
-        key: this._issueKeys[i],
-        type: id % 2,
-        priority: id % 2,
-        summary: '-',
-        state: this._issueStates[i]
-      };
-    }
+    const input: any = this._issuesFactory.createIssueStateInput(params);
     return issueMetaReducer(
       initialIssueState,
       IssueActions.createDeserializeIssuesAction(input, params));
@@ -204,3 +187,8 @@ class StateMapping {
   constructor(public board, public own) {
   }
 }
+
+export interface IssuesFactory {
+  createIssueStateInput(params: DeserializeIssueLookupParams): any;
+}
+

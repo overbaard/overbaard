@@ -2,8 +2,9 @@ import {List, OrderedSet, Set} from 'immutable';
 import {IssueTable} from './issue-table';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/take';
-import {IssueTableObservableUtil} from './issue-table.common.spec';
+import {IssuesFactory, IssueTableObservableUtil} from './issue-table.common.spec';
 import {Dictionary} from '../../../common/dictionary';
+import {DeserializeIssueLookupParams} from '../../../model/board/data/issue/issue.model';
 
 
 describe('Issue Table observer tests', () => {
@@ -11,13 +12,16 @@ describe('Issue Table observer tests', () => {
   describe('Create tests', () => {
     describe('One project issues', () => {
       it('All states mapped, issues in all states', () => {
-        new IssueTableObservableUtil('ONE', 4)
-          .addIssue('ONE-1', 0)
-          .addIssue('ONE-2', 1)
-          .addIssue('ONE-3', 2)
-          .addIssue('ONE-4', 3)
-          .addIssue('ONE-5', 2)
-          .addIssue('ONE-6', 2)
+        new IssueTableObservableUtil(
+          'ONE',
+          new SimpleIssueFactory()
+            .addIssue('ONE-1', 0)
+            .addIssue('ONE-2', 1)
+            .addIssue('ONE-3', 2)
+            .addIssue('ONE-4', 3)
+            .addIssue('ONE-5', 2)
+            .addIssue('ONE-6', 2),
+          4)
           .setRank('ONE', 5, 1, 2, 3, 4, 6)
           .mapState('ONE', 'S-1', '1-1')
           .mapState('ONE', 'S-2', '1-2')
@@ -30,12 +34,14 @@ describe('Issue Table observer tests', () => {
             []));
       });
       it('All states mapped, issues in some states', () => {
-        new IssueTableObservableUtil('ONE', 4)
-          .addIssue('ONE-1', 1)
-          .addIssue('ONE-2', 1)
-          .addIssue('ONE-3', 2)
-          .addIssue('ONE-4', 3)
-          .addIssue('ONE-5', 2)
+        new IssueTableObservableUtil('ONE',
+          new SimpleIssueFactory()
+            .addIssue('ONE-1', 1)
+            .addIssue('ONE-2', 1)
+            .addIssue('ONE-3', 2)
+            .addIssue('ONE-4', 3)
+            .addIssue('ONE-5', 2),
+          4)
           .setRank('ONE', 5, 1, 2, 3, 4)
           .mapState('ONE', 'S-1', '1-1')
           .mapState('ONE', 'S-2', '1-2')
@@ -49,11 +55,13 @@ describe('Issue Table observer tests', () => {
       });
 
       it('Not all states mapped, issues in all states', () => {
-        new IssueTableObservableUtil('ONE', 4)
-          .addIssue('ONE-1', 0)
-          .addIssue('ONE-2', 0)
-          .addIssue('ONE-3', 1)
-          .addIssue('ONE-4', 1)
+        new IssueTableObservableUtil('ONE',
+          new SimpleIssueFactory()
+            .addIssue('ONE-1', 0)
+            .addIssue('ONE-2', 0)
+            .addIssue('ONE-3', 1)
+            .addIssue('ONE-4', 1),
+          4)
           .setRank('ONE', 4, 3, 2, 1)
           .mapState('ONE', 'S-2', '1-1')
           .mapState('ONE', 'S-4', '1-2')
@@ -67,24 +75,26 @@ describe('Issue Table observer tests', () => {
 
     describe('Two project issues', () => {
       it('All states mapped, issues in all states', () => {
-        new IssueTableObservableUtil('ONE', 4)
-          .addIssue('ONE-1', 0)
-          .addIssue('ONE-2', 1)
-          .addIssue('ONE-3', 2)
-          .addIssue('ONE-4', 3)
-          .addIssue('ONE-5', 2)
-          .addIssue('ONE-6', 2)
+        new IssueTableObservableUtil('ONE',
+          new SimpleIssueFactory()
+            .addIssue('ONE-1', 0)
+            .addIssue('ONE-2', 1)
+            .addIssue('ONE-3', 2)
+            .addIssue('ONE-4', 3)
+            .addIssue('ONE-5', 2)
+            .addIssue('ONE-6', 2)
+            .addIssue('TWO-1', 0)
+            .addIssue('TWO-2', 1)
+            .addIssue('TWO-3', 2)
+            .addIssue('TWO-4', 3)
+            .addIssue('TWO-5', 2)
+            .addIssue('TWO-6', 2),
+          4)
           .setRank('ONE', 1, 2, 3, 4, 5, 6)
           .mapState('ONE', 'S-1', '1-1')
           .mapState('ONE', 'S-2', '1-2')
           .mapState('ONE', 'S-3', '1-3')
           .mapState('ONE', 'S-4', '1-4')
-          .addIssue('TWO-1', 0)
-          .addIssue('TWO-2', 1)
-          .addIssue('TWO-3', 2)
-          .addIssue('TWO-4', 3)
-          .addIssue('TWO-5', 2)
-          .addIssue('TWO-6', 2)
           .setRank('TWO', 6, 5, 4, 3, 2, 1)
           .mapState('TWO', 'S-1', '2-1')
           .mapState('TWO', 'S-2', '2-2')
@@ -102,16 +112,18 @@ describe('Issue Table observer tests', () => {
       });
 
       it('Not all states mapped, issues in all states', () => {
-        new IssueTableObservableUtil('ONE', 5)
-          .addIssue('ONE-1', 0)
-          .addIssue('ONE-2', 0)
-          .addIssue('ONE-3', 1)
+        new IssueTableObservableUtil('ONE',
+          new SimpleIssueFactory()
+            .addIssue('ONE-1', 0)
+            .addIssue('ONE-2', 0)
+            .addIssue('ONE-3', 1)
+            .addIssue('TWO-1', 0)
+            .addIssue('TWO-2', 1)
+            .addIssue('TWO-3', 1)
+          , 5)
           .setRank('ONE', 3, 2, 1)
           .mapState('ONE', 'S-2', '1-1')
           .mapState('ONE', 'S-3', '1-2')
-          .addIssue('TWO-1', 0)
-          .addIssue('TWO-2', 1)
-          .addIssue('TWO-3', 1)
           .setRank('TWO', 3, 2, 1)
           .mapState('TWO', 'S-3', '2-1')
           .mapState('TWO', 'S-4', '2-2')
@@ -133,14 +145,16 @@ describe('Issue Table observer tests', () => {
     let util: IssueTableObservableUtil;
     let original: IssueTable;
     beforeEach(() => {
-      util = new IssueTableObservableUtil('ONE', 4)
-        .addIssue('ONE-1', 0)
-        .addIssue('ONE-2', 1)
-        .addIssue('ONE-3', 2)
-        .addIssue('ONE-4', 3)
-        .addIssue('ONE-5', 2)
-        .addIssue('ONE-6', 2)
-        .addIssue('ONE-7', 3)
+      util = new IssueTableObservableUtil('ONE',
+        new SimpleIssueFactory()
+          .addIssue('ONE-1', 0)
+          .addIssue('ONE-2', 1)
+          .addIssue('ONE-3', 2)
+          .addIssue('ONE-4', 3)
+          .addIssue('ONE-5', 2)
+          .addIssue('ONE-6', 2)
+          .addIssue('ONE-7', 3),
+        4)
         .setRank('ONE', 1, 2, 3, 4, 5, 6, 7)
         .mapState('ONE', 'S-1', '1-1')
         .mapState('ONE', 'S-2', '1-2')
@@ -336,16 +350,18 @@ describe('Issue table filter tests', () => {
 
   function setupTable(filter: boolean): IssueTableObservableUtil {
     const params: Dictionary<string> = filter ? {priority: 'Major'} : null;
-    const util: IssueTableObservableUtil = new IssueTableObservableUtil('ONE', 3, params)
-      .addIssue('ONE-1', 0)
-      .addIssue('ONE-2', 0)
-      .addIssue('ONE-3', 1)
-      .addIssue('ONE-4', 1)
-      .addIssue('ONE-5', 1)
-      .addIssue('ONE-6', 2)
-      .addIssue('ONE-7', 2)
-      .addIssue('ONE-8', 2)
-      .addIssue('ONE-9', 2)
+    const util: IssueTableObservableUtil = new IssueTableObservableUtil('ONE',
+      new SimpleIssueFactory()
+        .addIssue('ONE-1', 0)
+        .addIssue('ONE-2', 0)
+        .addIssue('ONE-3', 1)
+        .addIssue('ONE-4', 1)
+        .addIssue('ONE-5', 1)
+        .addIssue('ONE-6', 2)
+        .addIssue('ONE-7', 2)
+        .addIssue('ONE-8', 2)
+        .addIssue('ONE-9', 2),
+      3, params)
       .setRank('ONE', 1, 2, 3, 4, 5, 6, 7, 8, 9)
       .mapState('ONE', 'S-1', '1-1')
       .mapState('ONE', 'S-2', '1-2')
@@ -397,6 +413,31 @@ function checkSameColumns(oldState: IssueTable, newState: IssueTable, ...cols: n
   }
 }
 
+class SimpleIssueFactory implements IssuesFactory {
+  _issueKeys: string[] = [];
+  _issueStates: number[] = [];
+
+  addIssue(key: string, state: number, ): SimpleIssueFactory {
+    this._issueKeys.push(key);
+    this._issueStates.push(state);
+    return this;
+  }
+
+  createIssueStateInput(params: DeserializeIssueLookupParams): any {
+    const input: any = {};
+    for (let i = 0 ; i < this._issueKeys.length ; i++) {
+      const id = Number(this._issueKeys[i].substr(this._issueKeys[i].indexOf('-') + 1));
+      input[this._issueKeys[i]] = {
+        key: this._issueKeys[i],
+        type: id % 2,
+        priority: id % 2,
+        summary: '-',
+        state: this._issueStates[i]
+      };
+    }
+    return input;
+  }
+}
 
 
 
