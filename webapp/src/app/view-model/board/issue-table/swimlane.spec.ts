@@ -255,7 +255,7 @@ describe('Swimlane observer tests', () => {
       });
     });
 
-    describe('Update issues', () => {
+    describe('Add issues', () => {
       it ('Project', () => {
         // Project is a bit different from the others in this test.
         let originalState: IssueTable;
@@ -602,20 +602,351 @@ describe('Swimlane observer tests', () => {
 
     describe('Update Issue', () => {
       describe('Remain in same swimlane', () => {
-        // TODO Change state
-        // TODO Change rank without affecting states - swimlane state should be the same
-        // TODO Delete issue
+        it ('Change state', () => {
+          let originalState: IssueTable;
+          const util: IssueTableObservableUtil = createUtilWithStandardIssues({swimlane: 'issue-type'});
+          util.tableObserver().take(1).subscribe(issueTable => originalState = issueTable);
+          util
+            .issueChanges({update: [{key: 'ONE-1',  state: '1-3'}]})
+            .emitBoardChange()
+            .tableObserver().take(1).subscribe(
+            issueTable => {
+              new IssueTableChecker([['ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], ['ONE-1']], [])
+                .setSwimlanes([
+                  {key: 'task', name: 'task', issues: ['ONE-2', 'ONE-4']},
+                  {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3', 'ONE-5']}])
+                .checkTable(issueTable);
+              // TODO check equality of not changed swimlanes and columns
+            });
+        });
+        it ('Change rank - not affecting states or swimlanes', () => {
+          let originalState: IssueTable;
+          const util: IssueTableObservableUtil = createUtilWithStandardIssues({swimlane: 'issue-type'});
+          util.tableObserver().take(1).subscribe(issueTable => originalState = issueTable);
+          util
+            .rankChanges({ONE: [{index: 4, key: 'ONE-3'}]})
+            .emitBoardChange()
+            .tableObserver().take(1).subscribe(
+            issueTable => {
+              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
+                .setSwimlanes([
+                  {key: 'task', name: 'task', issues: ['ONE-2', 'ONE-4']},
+                  {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3', 'ONE-5']}])
+                .checkTable(issueTable);
+              // TODO check equality of not changed swimlanes and columns
+            });
+        });
+        it ('Delete issue', () => {
+          let originalState: IssueTable;
+          const util: IssueTableObservableUtil = createUtilWithStandardIssues({swimlane: 'issue-type'});
+          util.tableObserver().take(1).subscribe(issueTable => originalState = issueTable);
+          util
+            .issueChanges({delete: ['ONE-5']})
+            .emitBoardChange()
+            .tableObserver().take(1).subscribe(
+            issueTable => {
+              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4'], []], [])
+                .setSwimlanes([
+                  {key: 'task', name: 'task', issues: ['ONE-2', 'ONE-4']},
+                  {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3']}])
+                .checkTable(issueTable);
+              // TODO check equality of not changed swimlanes and columns
+            });
+        });
       });
 
       describe('Change swimlane', () => {
-        // TODO Project
-        // TODO Type
-        // TODO Priority
-        // TODO Assignee
-        // TODO Components
-        // TODO Fix Versions
-        // TODO Labels
-        // TODO Custom Field
+        // Don't do project since a move there is basically a delete and an add which we test elsew
+
+        it ('Issue Type', () => {
+          let originalState: IssueTable;
+          const util: IssueTableObservableUtil = createUtilWithStandardIssues({swimlane: 'issue-type'});
+          util.tableObserver().take(1).subscribe(issueTable => originalState = issueTable);
+          util
+            .issueChanges({update: [{key: 'ONE-1', type: 'task'}]})
+            .emitBoardChange()
+            .tableObserver().take(1).subscribe(
+            issueTable => {
+              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
+                .setSwimlanes([
+                  {key: 'task', name: 'task', issues: ['ONE-1', 'ONE-2', 'ONE-4']},
+                  {key: 'bug', name: 'bug', issues: ['ONE-3', 'ONE-5']}])
+                .checkTable(issueTable);
+              // TODO check equality of not changed swimlanes and columns
+            });
+        });
+
+        it ('Priority', () => {
+          let originalState: IssueTable;
+          const util: IssueTableObservableUtil = createUtilWithStandardIssues({swimlane: 'priority'});
+          util.tableObserver().take(1).subscribe(issueTable => originalState = issueTable);
+          util
+            .issueChanges({update: [{key: 'ONE-2', priority: 'Blocker'}]})
+            .emitBoardChange()
+            .tableObserver().take(1).subscribe(
+            issueTable => {
+              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
+                .setSwimlanes([
+                  {key: 'Blocker', name: 'Blocker', issues: ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-5']},
+                  {key: 'Major', name: 'Major', issues: ['ONE-4']}])
+                .checkTable(issueTable);
+              // TODO check equality of not changed swimlanes and columns
+            });
+        });
+        describe('Assignee', () => {
+          let originalState: IssueTable;
+          let util: IssueTableObservableUtil;
+          beforeEach(() => {
+            util = createUtilWithStandardIssues({swimlane: 'assignee'});
+            util.tableObserver().take(1).subscribe(issueTable => originalState = issueTable);
+
+          });
+          it ('None', () => {
+            util
+              .issueChanges({update: [{key: 'ONE-1', state: '1-1', summary: 'Test', priority: 'Major', type: 'task', unassigned: true}]})
+              .emitBoardChange()
+              .tableObserver().take(1).subscribe(
+              issueTable => {
+                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
+                  .setSwimlanes([
+                    {key: 'bob', name: 'Bob Brent Barlow', issues: ['ONE-3']},
+                    {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-4']},
+                    {key: NONE_FILTER, name: 'None', issues: ['ONE-1', 'ONE-2', 'ONE-5']}])
+                  .checkTable(issueTable);
+                // TODO check equality of not changed swimlanes and columns
+              });
+          });
+          it ('Set', () => {
+            util
+              .issueChanges({update: [{key: 'ONE-2', assignee: 'bob'}]})
+              .emitBoardChange()
+              .tableObserver().take(1).subscribe(
+              issueTable => {
+                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
+                  .setSwimlanes([
+                    {key: 'bob', name: 'Bob Brent Barlow', issues: ['ONE-2', 'ONE-3']},
+                    {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4']},
+                    {key: NONE_FILTER, name: 'None', issues: ['ONE-5']}])
+                  .checkTable(issueTable);
+                // TODO check equality of not changed swimlanes and columns
+              });
+          });
+        });
+        describe('Components', () => {
+          let originalState: IssueTable;
+          let util: IssueTableObservableUtil;
+          beforeEach(() => {
+            util = createUtilWithStandardIssues({swimlane: 'component'});
+            util.tableObserver().take(1).subscribe(issueTable => originalState = issueTable);
+
+          });
+          it ('None', () => {
+            util
+              .issueChanges({update: [{key: 'ONE-4', 'clear-components': true}]})
+              .emitBoardChange()
+              .tableObserver().take(1).subscribe(
+              issueTable => {
+                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
+                  .setSwimlanes([
+                    {key: 'C-10', name: 'C-10', issues: ['ONE-1']},
+                    {key: 'C-20', name: 'C-20', issues: ['ONE-2']},
+                    {key: 'C-30', name: 'C-30', issues: ['ONE-3']},
+                    {key: NONE_FILTER, name: 'None', issues: ['ONE-4', 'ONE-5']}])
+                  .checkTable(issueTable);
+                // TODO check equality of not changed swimlanes and columns
+              });
+          });
+          it ('One', () => {
+            util
+              .issueChanges({update: [{key: 'ONE-3', components: ['C-10']}]})
+              .emitBoardChange()
+              .tableObserver().take(1).subscribe(
+              issueTable => {
+                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
+                  .setSwimlanes([
+                    {key: 'C-10', name: 'C-10', issues: ['ONE-1', 'ONE-3', 'ONE-4']},
+                    {key: 'C-20', name: 'C-20', issues: ['ONE-2', 'ONE-4']},
+                    {key: 'C-30', name: 'C-30', issues: ['ONE-4']},
+                    {key: NONE_FILTER, name: 'None', issues: ['ONE-5']}])
+                  .checkTable(issueTable);
+                // TODO check equality of not changed swimlanes and columns
+              });
+          });
+          it ('Several', () => {
+            util
+              .issueChanges({update:
+                [{key: 'ONE-3', components: ['C-10', 'C-20']}]})
+              .emitBoardChange()
+              .tableObserver().take(1).subscribe(
+              issueTable => {
+                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
+                  .setSwimlanes([
+                    {key: 'C-10', name: 'C-10', issues: ['ONE-1', 'ONE-3', 'ONE-4']},
+                    {key: 'C-20', name: 'C-20', issues: ['ONE-2', 'ONE-3', 'ONE-4']},
+                    {key: 'C-30', name: 'C-30', issues: ['ONE-4']},
+                    {key: NONE_FILTER, name: 'None', issues: ['ONE-5']}])
+                  .checkTable(issueTable);
+                // TODO check equality of not changed swimlanes and columns
+              });
+          });
+        });
+        describe('Fix Versions', () => {
+          let originalState: IssueTable;
+          let util: IssueTableObservableUtil;
+          beforeEach(() => {
+            util = createUtilWithStandardIssues({swimlane: 'fix-version'});
+            util.tableObserver().take(1).subscribe(issueTable => originalState = issueTable);
+
+          });
+          it ('None', () => {
+            util
+              .issueChanges({update: [{key: 'ONE-2', 'clear-fix-versions': true}]})
+              .emitBoardChange()
+              .tableObserver().take(1).subscribe(
+              issueTable => {
+                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
+                  .setSwimlanes([
+                    {key: 'F-10', name: 'F-10', issues: ['ONE-1']},
+                    {key: 'F-20', name: 'F-20', issues: ['ONE-1', 'ONE-3']},
+                    {key: 'F-30', name: 'F-30', issues: ['ONE-1', 'ONE-5']},
+                    {key: NONE_FILTER, name: 'None', issues: ['ONE-2', 'ONE-4']}])
+                  .checkTable(issueTable);
+                // TODO check equality of not changed swimlanes and columns
+              });
+          });
+          it ('One', () => {
+            util
+              .issueChanges({update:
+                [{key: 'ONE-2', state: '1-1', summary: 'Test', priority: 'Major', type: 'task', 'fix-versions': ['F-20']}]})
+              .emitBoardChange()
+              .tableObserver().take(1).subscribe(
+              issueTable => {
+                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
+                  .setSwimlanes([
+                    {key: 'F-10', name: 'F-10', issues: ['ONE-1']},
+                    {key: 'F-20', name: 'F-20', issues: ['ONE-1', 'ONE-2', 'ONE-3']},
+                    {key: 'F-30', name: 'F-30', issues: ['ONE-1', 'ONE-5']},
+                    {key: NONE_FILTER, name: 'None', issues: ['ONE-4']}])
+                  .checkTable(issueTable);
+                // TODO check equality of not changed swimlanes and columns
+              });
+          });
+          it ('Several', () => {
+            util
+              .issueChanges({update:
+                [{key: 'ONE-2', 'fix-versions': ['F-10', 'F-20']}]})
+              .emitBoardChange()
+              .tableObserver().take(1).subscribe(
+              issueTable => {
+                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
+                  .setSwimlanes([
+                    {key: 'F-10', name: 'F-10', issues: ['ONE-1', 'ONE-2']},
+                    {key: 'F-20', name: 'F-20', issues: ['ONE-1', 'ONE-2', 'ONE-3']},
+                    {key: 'F-30', name: 'F-30', issues: ['ONE-1', 'ONE-5']},
+                    {key: NONE_FILTER, name: 'None', issues: ['ONE-4']}])
+                  .checkTable(issueTable);
+                // TODO check equality of not changed swimlanes and columns
+              });
+          });
+        });
+        describe('Labels', () => {
+          let originalState: IssueTable;
+          let util: IssueTableObservableUtil;
+          beforeEach(() => {
+            util = createUtilWithStandardIssues({swimlane: 'label'});
+            util.tableObserver().take(1).subscribe(issueTable => originalState = issueTable);
+
+          });
+          it ('None', () => {
+            util
+              .issueChanges({update: [{key: 'ONE-4', 'clear-labels': true}]})
+              .emitBoardChange()
+              .tableObserver().take(1).subscribe(
+              issueTable => {
+                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
+                  .setSwimlanes([
+                    {key: 'L-10', name: 'L-10', issues: ['ONE-2', 'ONE-3']},
+                    {key: 'L-20', name: 'L-20', issues: ['ONE-2']},
+                    {key: 'L-30', name: 'L-30', issues: ['ONE-2', 'ONE-5']},
+                    {key: NONE_FILTER, name: 'None', issues: ['ONE-1', 'ONE-4']}])
+                  .checkTable(issueTable);
+                // TODO check equality of not changed swimlanes and columns
+              });
+          });
+          it ('One', () => {
+            util
+              .issueChanges({update: [{key: 'ONE-4', labels: ['L-10']}]})
+              .emitBoardChange()
+              .tableObserver().take(1).subscribe(
+              issueTable => {
+                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
+                  .setSwimlanes([
+                    {key: 'L-10', name: 'L-10', issues: ['ONE-2', 'ONE-3', 'ONE-4']},
+                    {key: 'L-20', name: 'L-20', issues: ['ONE-2']},
+                    {key: 'L-30', name: 'L-30', issues: ['ONE-2', 'ONE-5']},
+                    {key: NONE_FILTER, name: 'None', issues: ['ONE-1']}])
+                  .checkTable(issueTable);
+                // TODO check equality of not changed swimlanes and columns
+              });
+          });
+          it ('Several', () => {
+            util
+              .issueChanges({update:
+                [{key: 'ONE-5', labels: ['L-10', 'L-20']}]})
+              .emitBoardChange()
+              .tableObserver().take(1).subscribe(
+              issueTable => {
+                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
+                  .setSwimlanes([
+                    {key: 'L-10', name: 'L-10', issues: ['ONE-2', 'ONE-3', 'ONE-5']},
+                    {key: 'L-20', name: 'L-20', issues: ['ONE-2', 'ONE-4', 'ONE-5']},
+                    {key: 'L-30', name: 'L-30', issues: ['ONE-2']},
+                    {key: NONE_FILTER, name: 'None', issues: ['ONE-1']}])
+                  .checkTable(issueTable);
+                // TODO check equality of not changed swimlanes and columns
+              });
+          });
+        });
+        describe('CustomField', () => {
+          let originalState: IssueTable;
+          let util: IssueTableObservableUtil;
+          beforeEach(() => {
+            util = createUtilWithStandardIssues({swimlane: 'Custom-2'});
+            util.tableObserver().take(1).subscribe(issueTable => originalState = issueTable);
+
+          });
+          it ('None', () => {
+            util
+              .issueChanges({update: [{key: 'ONE-2', custom: {'Custom-2': null}}]})
+              .emitBoardChange()
+              .tableObserver().take(1).subscribe(
+              issueTable => {
+                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
+                  .setSwimlanes([
+                    {key: 'c2-A', name: 'First C2', issues: ['ONE-1', 'ONE-3']},
+                    {key: 'c2-B', name: 'Second C2', issues: ['ONE-4']},
+                    {key: NONE_FILTER, name: 'None', issues: ['ONE-2', 'ONE-5']}])
+                  .checkTable(issueTable);
+                // TODO check equality of not changed swimlanes and columns
+              });
+          });
+          it ('Set', () => {
+            util
+              .issueChanges({update:
+                [{key: 'ONE-3', custom: {'Custom-2': 'c2-B'}}]})
+              .emitBoardChange()
+              .tableObserver().take(1).subscribe(
+              issueTable => {
+                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
+                  .setSwimlanes([
+                    {key: 'c2-A', name: 'First C2', issues: ['ONE-1', 'ONE-2']},
+                    {key: 'c2-B', name: 'Second C2', issues: ['ONE-4', 'ONE-3']},
+                    {key: NONE_FILTER, name: 'None', issues: ['ONE-5']}])
+                  .checkTable(issueTable);
+                // TODO check equality of not changed swimlanes and columns
+              });
+          });
+        });
       });
     });
 

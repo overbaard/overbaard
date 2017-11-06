@@ -551,7 +551,7 @@ class ExistingColumnBuilder implements ColumnBuilder {
 
   getList(): List<string> {
     if (this.isChanged()) {
-      return this._current.asImmutable();
+      return this._current ? this._current.asImmutable() : List<string>();
     }
     return this._existing;
   }

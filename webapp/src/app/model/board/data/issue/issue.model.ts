@@ -276,13 +276,14 @@ export class IssueUtil {
     }
     if (input['custom']) {
       const custom = input['custom'];
-      for (const key of Object.keys(custom)) {
-        const value = params.customFieldsListMap.get(key).get(custom[key]);
-        if (value) {
-          custom[key] = value;
+      input['customFields'] = Map<string, CustomField>().withMutations(mutable => {
+        for (const key of Object.keys(custom)) {
+          const value = params.customFieldsListMap.get(key).get(custom[key]);
+          if (value) {
+            mutable.set(key, value);
+          }
         }
-      }
-      input['customFields'] = custom;
+      });
       delete input['custom'];
     } else {
       input['customFields'] = Map<string, CustomField>();

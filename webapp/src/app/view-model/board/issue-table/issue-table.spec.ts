@@ -190,28 +190,64 @@ describe('Issue Table observer tests', () => {
       util
         .issueChanges({update: [{key: 'ONE-5', state: '1-2'}]})
         .emitBoardChange()
-        .tableObserver()
-        .subscribe(
+        .tableObserver().take(1).subscribe(
           issueTable => {
             checkTable(issueTable,
               [['ONE-1'], ['ONE-2', 'ONE-5'], ['ONE-3', 'ONE-6'], ['ONE-4', 'ONE-7']],
               []);
             checkSameColumns(original, issueTable, 0, 3);
+            original = issueTable;
           });
+      // Empty a state completely
+      util
+        .issueChanges({update: [{key: 'ONE-1', state: '1-2'}]})
+        .emitBoardChange()
+        .tableObserver().take(1).subscribe(
+        issueTable => {
+          checkTable(issueTable,
+            [[], ['ONE-1', 'ONE-2', 'ONE-5'], ['ONE-3', 'ONE-6'], ['ONE-4', 'ONE-7']],
+            []);
+          checkSameColumns(original, issueTable, 2, 3);
+          original = issueTable;
+        });
+      // Populate an empty state again
+      util
+        .issueChanges({update: [{key: 'ONE-1', state: '1-1'}]})
+        .emitBoardChange()
+        .tableObserver().take(1).subscribe(
+        issueTable => {
+          checkTable(issueTable,
+            [['ONE-1'], ['ONE-2', 'ONE-5'], ['ONE-3', 'ONE-6'], ['ONE-4', 'ONE-7']],
+            []);
+          checkSameColumns(original, issueTable, 2, 3);
+        });
+
     });
 
     it ('Delete issue', () => {
       util
         .issueChanges({delete: ['ONE-5']})
         .emitBoardChange()
-        .tableObserver()
-        .subscribe(
+        .tableObserver().take(1).subscribe(
           issueTable => {
             checkTable(issueTable,
               [['ONE-1'], ['ONE-2'], ['ONE-3', 'ONE-6'], ['ONE-4', 'ONE-7']],
               []);
             checkSameColumns(original, issueTable, 0, 1, 3);
+            original = issueTable;
           });
+      // Empty a state completely
+      util
+        .issueChanges({delete: ['ONE-1']})
+        .emitBoardChange()
+        .tableObserver().take(1).subscribe(
+        issueTable => {
+          checkTable(issueTable,
+            [[], ['ONE-2'], ['ONE-3', 'ONE-6'], ['ONE-4', 'ONE-7']],
+            []);
+          checkSameColumns(original, issueTable, 1, 2, 3);
+          original = issueTable;
+        });
 
     });
 
