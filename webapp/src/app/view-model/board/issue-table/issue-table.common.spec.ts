@@ -126,10 +126,11 @@ export class IssueTableObservableUtil {
     return this;
   }
 
-  updateUserSettings(userSettingQueryParams?: Dictionary<string>) {
+  updateUserSettings(userSettingQueryParams?: Dictionary<string>): IssueTableObservableUtil {
     this._userSettingState =
       userSettingReducer(this._userSettingState, UserSettingActions.createInitialiseFromQueryString(userSettingQueryParams));
     this._userSettingSubject$.next(this._userSettingState);
+    return this;
   }
 
   tableObserver(): Observable<IssueTable> {
