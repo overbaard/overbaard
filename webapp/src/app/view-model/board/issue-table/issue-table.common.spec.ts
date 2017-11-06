@@ -146,6 +146,7 @@ export class IssueTableObservableUtil {
 
   private createIssueState(params: DeserializeIssueLookupParams): IssueState {
     const input: any = this._issuesFactory.createIssueStateInput(params);
+    this._issuesFactory.clear()
     return issueMetaReducer(
       initialIssueState,
       IssueActions.createDeserializeIssuesAction(input, params));
@@ -189,6 +190,7 @@ class StateMapping {
 }
 
 export interface IssuesFactory {
+  clear();
   createIssueStateInput(params: DeserializeIssueLookupParams): any;
 }
 

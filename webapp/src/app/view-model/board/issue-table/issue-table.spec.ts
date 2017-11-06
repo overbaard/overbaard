@@ -414,13 +414,22 @@ function checkSameColumns(oldState: IssueTable, newState: IssueTable, ...cols: n
 }
 
 class SimpleIssueFactory implements IssuesFactory {
-  _issueKeys: string[] = [];
-  _issueStates: number[] = [];
+  _issueKeys: string[];
+  _issueStates: number[];
 
-  addIssue(key: string, state: number, ): SimpleIssueFactory {
+  addIssue(key: string, state: number): SimpleIssueFactory {
+    if (!this._issueKeys) {
+      this._issueKeys = [];
+      this._issueStates = [];
+    }
     this._issueKeys.push(key);
     this._issueStates.push(state);
     return this;
+  }
+
+  clear() {
+    this._issueKeys = null;
+    this._issueStates = null;
   }
 
   createIssueStateInput(params: DeserializeIssueLookupParams): any {
