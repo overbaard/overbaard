@@ -5,6 +5,7 @@ import 'rxjs/add/operator/take';
 import {IssuesFactory, IssueTableObservableUtil} from './issue-table.common.spec';
 import {Dictionary} from '../../../common/dictionary';
 import {DeserializeIssueLookupParams} from '../../../model/board/data/issue/issue.model';
+import {NONE_FILTER} from '../../../model/board/user/board-filter/board-filter.constants';
 
 
 describe('Swimlane observer tests', () => {
@@ -12,7 +13,7 @@ describe('Swimlane observer tests', () => {
   describe('Create with swimlane selected', () => {
     describe('No filters', () => {
       it('Project', () => {
-        const util: IssueTableObservableUtil = createUtil(
+        createUtil(
           {swimlane: 'project'},
           {'ONE' : [4, 3, 2, 1], 'TWO': [3, 2, 1]},
           new SwimlaneIssueFactory()
@@ -22,9 +23,8 @@ describe('Swimlane observer tests', () => {
             .addIssue('ONE-4', 2)
             .addIssue('TWO-1', 0)
             .addIssue('TWO-2', 1)
-            .addIssue('TWO-3', 1)
-        );
-        util.tableObserver().subscribe(
+            .addIssue('TWO-3', 1))
+        .tableObserver().take(1).subscribe(
           issueTable => {
             new IssueTableChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']], [])
               .setSwimlanes([
@@ -32,6 +32,162 @@ describe('Swimlane observer tests', () => {
                 {key: 'TWO', name: 'TWO', issues: ['TWO-1', 'TWO-2', 'TWO-3']}])
               .checkTable(issueTable);
         });
+      });
+
+      it('Issue Type', () => {
+        createUtil(
+          {swimlane: 'issue-type'},
+          {'ONE': [1, 2, 3, 4, 5]},
+          new SwimlaneIssueFactory()
+            // Use the default issue type values
+            .addIssue('ONE-1', 0)
+            .addIssue('ONE-2', 0)
+            .addIssue('ONE-3', 0)
+            .addIssue('ONE-4', 1)
+            .addIssue('ONE-5', 1))
+        .tableObserver().take(1).subscribe(
+          issueTable => {
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
+              .setSwimlanes([
+                {key: 'task', name: 'task', issues: ['ONE-2', 'ONE-4']},
+                {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3', 'ONE-5']}])
+              .checkTable(issueTable);
+          });
+      });
+
+      it('Priority', () => {
+        createUtil(
+          {swimlane: 'priority'},
+          {'ONE': [1, 2, 3, 4, 5]},
+          new SwimlaneIssueFactory()
+          // Use the default priorities values
+            .addIssue('ONE-1', 0)
+            .addIssue('ONE-2', 0)
+            .addIssue('ONE-3', 0)
+            .addIssue('ONE-4', 1)
+            .addIssue('ONE-5', 1))
+          .tableObserver().take(1).subscribe(
+          issueTable => {
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
+              .setSwimlanes([
+                {key: 'Blocker', name: 'Blocker', issues: ['ONE-1', 'ONE-3', 'ONE-5']},
+                {key: 'Major', name: 'Major', issues: ['ONE-2', 'ONE-4']}])
+              .checkTable(issueTable);
+          });
+      });
+
+      it('Assignee', () => {
+        createUtil(
+          {swimlane: 'assignee'},
+          {'ONE': [1, 2, 3, 4, 5]},
+          new SwimlaneIssueFactory()
+          // Use the default priorities values
+            .addIssue('ONE-1', 0)
+            .addIssue('ONE-2', 0)
+            .addIssue('ONE-3', 0)
+            .addIssue('ONE-4', 1)
+            .addIssue('ONE-5', 1))
+          .tableObserver().take(1).subscribe(
+          issueTable => {
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
+              .setSwimlanes([
+                {key: 'bob', name: 'Bob Brent Barlow', issues: ['ONE-3']},
+                {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4']},
+                {key: NONE_FILTER, name: 'None', issues: ['ONE-2', 'ONE-5']}])
+              .checkTable(issueTable);
+          });
+      });
+
+      it ('Components', () => {
+        createUtil(
+          {swimlane: 'component'},
+          {'ONE': [1, 2, 3, 4, 5]},
+          new SwimlaneIssueFactory()
+          // Use the default priorities values
+            .addIssue('ONE-1', 0, {components: [0]})
+            .addIssue('ONE-2', 0, {components: [1]})
+            .addIssue('ONE-3', 0, {components: [2]})
+            .addIssue('ONE-4', 1, {components: [0, 1, 2]})
+            .addIssue('ONE-5', 1))
+          .tableObserver().take(1).subscribe(
+          issueTable => {
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
+              .setSwimlanes([
+                {key: 'C-10', name: 'C-10', issues: ['ONE-1', 'ONE-4']},
+                {key: 'C-20', name: 'C-20', issues: ['ONE-2', 'ONE-4']},
+                {key: 'C-30', name: 'C-30', issues: ['ONE-3', 'ONE-4']},
+                {key: NONE_FILTER, name: 'None', issues: ['ONE-5']}])
+              .checkTable(issueTable);
+          });
+      });
+
+      it ('Fix Versions', () => {
+        createUtil(
+          {swimlane: 'fix-version'},
+          {'ONE': [1, 2, 3, 4, 5]},
+          new SwimlaneIssueFactory()
+          // Use the default priorities values
+            .addIssue('ONE-1', 0, {'fix-versions': [0]})
+            .addIssue('ONE-2', 0, {'fix-versions': [1]})
+            .addIssue('ONE-3', 0, {'fix-versions': [2]})
+            .addIssue('ONE-4', 1, {'fix-versions': [0, 1, 2]})
+            .addIssue('ONE-5', 1))
+          .tableObserver().take(1).subscribe(
+          issueTable => {
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
+              .setSwimlanes([
+                {key: 'F-10', name: 'F-10', issues: ['ONE-1', 'ONE-4']},
+                {key: 'F-20', name: 'F-20', issues: ['ONE-2', 'ONE-4']},
+                {key: 'F-30', name: 'F-30', issues: ['ONE-3', 'ONE-4']},
+                {key: NONE_FILTER, name: 'None', issues: ['ONE-5']}])
+              .checkTable(issueTable);
+          });
+      });
+
+      it ('Labels', () => {
+        createUtil(
+          {swimlane: 'label'},
+          {'ONE': [1, 2, 3, 4, 5]},
+          new SwimlaneIssueFactory()
+          // Use the default priorities values
+            .addIssue('ONE-1', 0, {labels: [0]})
+            .addIssue('ONE-2', 0, {labels: [1]})
+            .addIssue('ONE-3', 0, {labels: [2]})
+            .addIssue('ONE-4', 1, {labels: [0, 1, 2]})
+            .addIssue('ONE-5', 1))
+          .tableObserver().take(1).subscribe(
+          issueTable => {
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
+              .setSwimlanes([
+                {key: 'L-10', name: 'L-10', issues: ['ONE-1', 'ONE-4']},
+                {key: 'L-20', name: 'L-20', issues: ['ONE-2', 'ONE-4']},
+                {key: 'L-30', name: 'L-30', issues: ['ONE-3', 'ONE-4']},
+                {key: NONE_FILTER, name: 'None', issues: ['ONE-5']}])
+              .checkTable(issueTable);
+          });
+      });
+
+      it ('Custom Field', () => {
+        createUtil(
+          {swimlane: 'Custom-2'},
+          {'ONE': [1, 2, 3, 4, 5]},
+          new SwimlaneIssueFactory()
+          // Use the default priorities values
+            .addIssue('ONE-1', 0, {custom: {'Custom-2': 0}})
+            .addIssue('ONE-2', 0, {custom: {'Custom-2': 1}})
+            .addIssue('ONE-3', 0, {custom: {'Custom-2': 0}})
+            .addIssue('ONE-4', 1, {custom: {'Custom-2': 1}})
+            .addIssue('ONE-5', 1))
+          .tableObserver().take(1).subscribe(
+          issueTable => {
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
+              .setSwimlanes([
+                {key: 'c2-A', name: 'First C2', issues: ['ONE-1', 'ONE-3']},
+                {key: 'c2-B', name: 'Second C2', issues: ['ONE-2', 'ONE-4']},
+                {key: NONE_FILTER, name: 'None', issues: ['ONE-5']}])
+              .checkTable(issueTable);
+
+          });
       });
 
       function createUtil(params: Dictionary<string>, ranks: Dictionary<number[]>, issueFactory: SwimlaneIssueFactory) {

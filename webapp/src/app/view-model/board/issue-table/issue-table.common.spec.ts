@@ -20,6 +20,10 @@ import 'rxjs/add/operator/take';
 import {initialUserSettingState, UserSettingState} from '../../../model/board/user/user-setting.model';
 import {Dictionary} from '../../../common/dictionary';
 import {UserSettingActions, userSettingReducer} from '../../../model/board/user/user-setting.reducer';
+import {getTestComponentState} from '../../../model/board/data/component/component.reducer.spec';
+import {getTestFixVersionState} from '../../../model/board/data/fix-version/fix-version.reducer.spec';
+import {getTestLabelState} from '../../../model/board/data/label/label.reducer.spec';
+import {getTestCustomFieldState} from '../../../model/board/data/custom-field/custom-field.reducer.spec';
 
 export class IssueTableObservableUtil {
   private _rankedIssueKeys: any = {};
@@ -89,6 +93,13 @@ export class IssueTableObservableUtil {
         mutable.viewId = 1;
         mutable.headers = headerState;
         mutable.projects = projectState;
+        mutable.issueTypes = getTestIssueTypeState();
+        mutable.priorities = getTestPriorityState();
+        mutable.assignees = getTestAssigneeState();
+        mutable.components = getTestComponentState();
+        mutable.fixVersions = getTestFixVersionState();
+        mutable.labels = getTestLabelState();
+        mutable.customFields = getTestCustomFieldState();
         mutable.ranks = this.createRankState();
         mutable.issues = this.createIssueState(this.getDeserializeIssueLookupParams(headerState, projectState));
       });
@@ -131,7 +142,11 @@ export class IssueTableObservableUtil {
       .setIssueTypes(getTestIssueTypeState().types)
       .setPriorities(getTestPriorityState().priorities)
       .setBoardProjects(projectState.boardProjects)
-      .setAssignees(getTestAssigneeState().assignees);
+      .setAssignees(getTestAssigneeState().assignees)
+      .setComponents(getTestComponentState().components)
+      .setFixVersions(getTestFixVersionState().versions)
+      .setLabels(getTestLabelState().labels)
+      .setCustomFields(getTestCustomFieldState().fields);
   }
 
   private createHeaderState(): HeaderState {

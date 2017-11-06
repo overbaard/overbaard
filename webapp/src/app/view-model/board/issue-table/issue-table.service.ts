@@ -15,7 +15,6 @@ import {BoardIssueView} from './board-issue-view';
 import {BoardIssueViewUtil} from './board-issue-view.model';
 import {IssueChange} from '../../../model/board/data/issue/issue.model';
 import {AllFilters} from './filter.util';
-import {Dictionary} from '../../../common/dictionary';
 import {
   ASSIGNEE_ATTRIBUTES,
   COMPONENT_ATTRIBUTES,
@@ -220,8 +219,12 @@ class IssueTableBuilder {
   }
 
   private addProjectIssues(issues: Map<string, BoardIssueView>, tableBuilder: TableBuilder, project: BoardProject) {
+    const rankedKeysForProject: List<string> = this._currentBoardState.ranks.rankedIssueKeys.get(project.key);
+    if (!rankedKeysForProject) {
+      return;
+    }
     const ownToBoardIndex: number[] = ProjectUtil.getOwnIndexToBoardIndex(this._currentBoardState.headers, project);
-    this._currentBoardState.ranks.rankedIssueKeys.get(project.key).forEach((key) => {
+    rankedKeysForProject.forEach((key) => {
       const issue: BoardIssue = this._currentBoardState.issues.issues.get(key);
       // find the index and add the issue
       const boardIndex: number = ownToBoardIndex[issue.ownState];
@@ -278,14 +281,6 @@ class IssueTableBuilder {
       });
     }
 
-    if (swimlaneBuilder.noneBuilder) {
-      console.log(`${swimlaneBuilder.noneBuilder.key} ${swimlaneBuilder.noneBuilder.display} ${swimlaneBuilder.noneBuilder.table}`)
-    }
-    for (const key of Object.keys(swimlaneBuilder.dataBuilders)) {
-      const builder: SwimlaneDataBuilder = swimlaneBuilder.dataBuilders[key];
-      console.log(`${builder.key} ${builder.display} ${builder.table}`)
-    }
-
     return swimlaneBuilder;
   }
 
@@ -299,100 +294,98 @@ class SwimlaneInfoBuilder {
   static create(boardState: BoardState,
                 userSettingState: UserSettingState, existingInfo: SwimlaneInfo): SwimlaneInfoBuilder {
     const states: number = boardState.headers.states.size;
-    const builderMap: Dictionary<SwimlaneDataBuilder> = {};
+    let builderMap: OrderedMap<string, SwimlaneDataBuilder> = OrderedMap<string, SwimlaneDataBuilder>().asMutable();
     let builderNone: SwimlaneDataBuilder = new SwimlaneDataBuilder(NONE_FILTER, 'None', states, existingInfo);
     let issueMatcher:
-      (issue: BoardIssueView, dataBuilders: Dictionary<SwimlaneDataBuilder>, noneBuilder: SwimlaneDataBuilder) => SwimlaneDataBuilder[];
+      (issue: BoardIssueView, dataBuilders: Map<string, SwimlaneDataBuilder>) => SwimlaneDataBuilder[];
     switch (userSettingState.swimlane) {
       case PROJECT_ATTRIBUTES.key:
         boardState.projects.boardProjects.forEach(
-          p => builderMap[p.key] = new SwimlaneDataBuilder(p.key, p.key, states, existingInfo));
-        issueMatcher = ((issue, dataBuilders, noneBuilder) => [dataBuilders[issue.projectCode]]);
+          p => builderMap.set(p.key, new SwimlaneDataBuilder(p.key, p.key, states, existingInfo)));
+        issueMatcher = ((issue, dataBuilders) => [dataBuilders.get(issue.projectCode)]);
         builderNone = null;
         break;
       case ISSUE_TYPE_ATTRIBUTES.key:
         boardState.issueTypes.types.forEach(
-          t => builderMap[t.name] = new SwimlaneDataBuilder(t.name, t.name, states, existingInfo));
-        issueMatcher = ((issue, dataBuilders, noneBuilder) => [dataBuilders[issue.type.name]]);
+          t => builderMap.set(t.name, new SwimlaneDataBuilder(t.name, t.name, states, existingInfo)));
+        issueMatcher = ((issue, dataBuilders) => [dataBuilders.get(issue.type.name)]);
         builderNone = null;
         break;
       case PRIORITY_ATTRIBUTES.key:
         boardState.priorities.priorities.forEach(
-          p => builderMap[p.name] = new SwimlaneDataBuilder(p.name, p.name, states, existingInfo));
-        issueMatcher = ((issue, dataBuilders, noneBuilder) => [dataBuilders[issue.priority.name]]);
+          p => builderMap.set(p.name, new SwimlaneDataBuilder(p.name, p.name, states, existingInfo)));
+        issueMatcher = ((issue, dataBuilders) => [dataBuilders.get(issue.priority.name)]);
         builderNone = null;
         break;
       case ASSIGNEE_ATTRIBUTES.key:
         boardState.assignees.assignees.forEach(
-          a => builderMap[a.key] = new SwimlaneDataBuilder(a.key, a.name, states, existingInfo));
-        issueMatcher = ((issue, dataBuilders, noneBuilder) => {
-          return issue.assignee === NO_ASSIGNEE ? [noneBuilder] : [dataBuilders[issue.assignee.key]];
-        } );
+          a => builderMap.set(a.key, new SwimlaneDataBuilder(a.key, a.name, states, existingInfo)));
+        issueMatcher = ((issue, dataBuilders) =>
+          [dataBuilders.get(issue.assignee === NO_ASSIGNEE ? NONE_FILTER : issue.assignee.key)]);
         break;
       case COMPONENT_ATTRIBUTES.key:
         boardState.components.components.forEach(
-          c => builderMap[c] = new SwimlaneDataBuilder(c, c, states, existingInfo));
-        issueMatcher = ((issue, dataBuilders, noneBuilder) => this.multiStringMatcher(issue.components, dataBuilders, noneBuilder));
+          c => builderMap.set(c, new SwimlaneDataBuilder(c, c, states, existingInfo)));
+        issueMatcher = ((issue, dataBuilders) => this.multiStringMatcher(issue.components, dataBuilders));
         break;
       case LABEL_ATTRIBUTES.key:
         boardState.labels.labels.forEach(
-          l => builderMap[l] = new SwimlaneDataBuilder(l, l, states, existingInfo));
-        issueMatcher = ((issue, dataBuilders, noneBuilder) => this.multiStringMatcher(issue.labels, dataBuilders, noneBuilder));
+          l => builderMap.set(l, new SwimlaneDataBuilder(l, l, states, existingInfo)));
+        issueMatcher = ((issue, dataBuilders) => this.multiStringMatcher(issue.labels, dataBuilders));
         break;
       case FIX_VERSION_ATTRIBUTES.key:
         boardState.fixVersions.versions.forEach(
-          f => builderMap[f] = new SwimlaneDataBuilder(f, f, states, existingInfo));
-        issueMatcher = ((issue, dataBuilders, noneBuilder) => this.multiStringMatcher(issue.fixVersions, dataBuilders, noneBuilder));
+          f => builderMap.set(f, new SwimlaneDataBuilder(f, f, states, existingInfo)));
+        issueMatcher = ((issue, dataBuilders) => this.multiStringMatcher(issue.fixVersions, dataBuilders));
         break;
       default: {
         const customFields: OrderedMap<string, CustomField> = boardState.customFields.fields.get(userSettingState.swimlane);
         if (customFields) {
           customFields.forEach(
-            f => builderMap[f.key] = new SwimlaneDataBuilder(f.key, f.value, states, existingInfo));
-          issueMatcher = ((issue, dataBuilders, noneBuilder) => {
+            f => builderMap.set(f.key, new SwimlaneDataBuilder(f.key, f.value, states, existingInfo)));
+          issueMatcher = ((issue, dataBuilders) => {
             const issueField: CustomField = issue.customFields.get(userSettingState.swimlane);
-            return issueField ? [dataBuilders[issueField.key]] : [noneBuilder];
+            return [dataBuilders.get(issueField ? issueField.key : NONE_FILTER)];
           });
         }
       }
     }
-    return new SwimlaneInfoBuilder(issueMatcher, builderMap, builderNone, existingInfo);
+    if (builderNone) {
+      builderMap.set(builderNone.key, builderNone);
+    }
+    builderMap = builderMap.asImmutable();
+    return new SwimlaneInfoBuilder(issueMatcher, builderMap, existingInfo);
   }
 
   private static multiStringMatcher(issueSet: OrderedSet<string>,
-                                    dataBuilders: Dictionary<SwimlaneDataBuilder>,
-                                    noneBuilder: SwimlaneDataBuilder): SwimlaneDataBuilder[] {
+                                    dataBuilders: OrderedMap<string, SwimlaneDataBuilder>): SwimlaneDataBuilder[] {
     if (!issueSet || issueSet.size === 0) {
-      return [noneBuilder];
+      return [dataBuilders.get(NONE_FILTER)];
     }
-    return issueSet.map(v => dataBuilders[v]).toArray();
+    return issueSet.map(v => dataBuilders.get(v)).toArray();
   }
 
   private constructor(
     private readonly _issueMatcher:
-      (issue: BoardIssueView, dataBuilders: Dictionary<SwimlaneDataBuilder>, noneMatcher: SwimlaneDataBuilder) => SwimlaneDataBuilder[],
-    private readonly _dataBuilders: Dictionary<SwimlaneDataBuilder>,
-    private readonly _noneBuilder: SwimlaneDataBuilder,
+      (issue: BoardIssueView, dataBuilders:
+        OrderedMap<string, SwimlaneDataBuilder>) => SwimlaneDataBuilder[],
+    private readonly _dataBuilders: Map<string, SwimlaneDataBuilder>,
     private readonly _existing: SwimlaneInfo) {
   }
 
   indexIssue(issue: BoardIssueView, boardIndex: number) {
-    const swimlaneBuilders: SwimlaneDataBuilder[] = this._issueMatcher(issue, this._dataBuilders, this._noneBuilder);
+    const swimlaneBuilders: SwimlaneDataBuilder[] = this._issueMatcher(issue, this._dataBuilders);
     for (const swimlaneDataBuilder of swimlaneBuilders) {
       swimlaneDataBuilder.addIssue(issue, boardIndex);
     }
   }
 
-  get noneBuilder(): SwimlaneDataBuilder {
-    return this._noneBuilder;
-  }
-
-  get dataBuilders(): Dictionary<SwimlaneDataBuilder> {
+  get dataBuilders(): Map<string, SwimlaneDataBuilder> {
     return this._dataBuilders;
   }
 
   build(): SwimlaneInfo {
-    const keys: string[] = Object.keys(this._dataBuilders);
+    const keys: string[] = this._dataBuilders.keySeq().toArray();
     let changed = false;
     if (!this._existing) {
       changed = true;
@@ -400,9 +393,9 @@ class SwimlaneInfoBuilder {
       changed = keys.length !== this._existing.swimlanes.size;
     }
 
-    let swimlanes: Map<string, SwimlaneData> = Map<string, SwimlaneData>().asMutable();
-    for (const key of Object.keys(this._dataBuilders)) {
-      const dataBuilder: SwimlaneDataBuilder = this._dataBuilders[key];
+    const swimlanes: OrderedMap<string, SwimlaneData> = OrderedMap<string, SwimlaneData>().asMutable();
+    for (const key of keys) {
+      const dataBuilder: SwimlaneDataBuilder = this._dataBuilders.get(key);
       if (dataBuilder.isChanged()) {
         changed = true;
       }
@@ -412,8 +405,7 @@ class SwimlaneInfoBuilder {
     if (!changed) {
       return this._existing;
     }
-    swimlanes = swimlanes.sort((a, b) => a.display.localeCompare(b.display)).toOrderedMap().asImmutable();
-    return IssueTableUtil.createSwimlaneInfoView(swimlanes);
+    return IssueTableUtil.createSwimlaneInfoView(swimlanes.asImmutable());
   }
 }
 
