@@ -95,7 +95,7 @@ export class DeserializeIssueLookupParams {
   private _boardProjects: Map<string, BoardProject> = Map<string, BoardProject>();
   private _boardStates: List<string>;
 
-  private _ownStatesToBoardIndex: Map<string, Map<string, number>>;
+  private _ownStateNameToOwnIndexByProject: Map<string, Map<string, number>>;
 
   setAssignees(value: OrderedMap<string, Assignee>): DeserializeIssueLookupParams {
     this._assignees = value;
@@ -210,26 +210,29 @@ export class DeserializeIssueLookupParams {
     return this._parallelTasks;
   }
 
-  getOwnStatesToBoardIndex(issueKey: string): Map<string, number> {
-    if (!this._ownStatesToBoardIndex) {
-      this._ownStatesToBoardIndex = Map<string, Map<string, number>>();
+  getOwnStateNameToOwnIndex(issueKey: string): Map<string, number> {
+    if (!this._ownStateNameToOwnIndexByProject) {
+      this._ownStateNameToOwnIndexByProject = Map<string, Map<string, number>>();
     }
     const projectCode = IssueUtil.productCodeFromKey(issueKey);
+    let ownStateToOwnIndex: Map<string, number> = this._ownStateNameToOwnIndexByProject.get(projectCode);
+    if (ownStateToOwnIndex) {
+      return ownStateToOwnIndex;
+    }
     const boardProject: BoardProject = this._boardProjects.get(projectCode);
-    const boardStateIndices: Map<string, number> = Map<string, number>().withMutations(mutable => {
-      this._boardStates.forEach((v, i) => {
-        mutable.set(v, i);
+    let currentOwnIndex = 0;
+    ownStateToOwnIndex = Map<string, number>().withMutations(mutable => {
+      this._boardStates.forEach((v) => {
+        const ownName: string = boardProject.boardStateNameToOwnStateName.get(v);
+        if (ownName) {
+          mutable.set(ownName, currentOwnIndex++);
+        }
       });
     });
-    const ownStatesToBoardIndexForProject: Map<string, number> = Map<string, number>().withMutations(mutable => {
-      boardProject.boardStateNameToOwnStateName.forEach((o, b) => {
-        mutable.set(o, boardStateIndices.get(b));
-      });
+    this._ownStateNameToOwnIndexByProject = this._ownStateNameToOwnIndexByProject.withMutations(mutable => {
+      mutable.set(projectCode, ownStateToOwnIndex);
     });
-
-    this._ownStatesToBoardIndex.set(projectCode, ownStatesToBoardIndexForProject);
-
-    return ownStatesToBoardIndexForProject;
+    return ownStateToOwnIndex;
   }
 }
 
@@ -342,7 +345,7 @@ export class IssueUtil {
     return {
       key: input['key'],
       projectCode: IssueUtil.productCodeFromKey(input['key']),
-      ownState: input['state'] ? params.getOwnStatesToBoardIndex(input['key']).get(input['state']) : null,
+      ownState: input['state'] ? params.getOwnStateNameToOwnIndex(input['key']).get(input['state']) : null,
       summary: input['summary'],
       assignee: input['unassigned'] ? NO_ASSIGNEE : params.assignees.get(input['assignee']),
       priority: params.priorities.get(input['priority']),

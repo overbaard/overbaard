@@ -215,20 +215,67 @@ describe('Issue Table observer tests', () => {
 
     });
 
-    it ('New issue', () => {
-      util
-        .issueChanges({new: [{key: 'ONE-8', state: '1-1', summary: 'Test', priority: 'Major', type: 'task'}]})
-        .rankChanges({ONE: [{index: 7, key: 'ONE-8'}]})
-        .emitBoardChange()
-        .tableObserver()
-        .subscribe(
-          issueTable => {
-            checkTable(issueTable,
-              [['ONE-1', 'ONE-8'], ['ONE-2'], ['ONE-3', 'ONE-5', 'ONE-6'], ['ONE-4', 'ONE-7']],
-              []);
-            checkSameColumns(original, issueTable, 1, 2, 3);
-          });
+    describe('New issue', () => {
+      it ('Main project', () => {
+        util
+          .issueChanges({new: [{key: 'ONE-8', state: '1-1', summary: 'Test', priority: 'Major', type: 'task'}]})
+          .rankChanges({ONE: [{index: 7, key: 'ONE-8'}]})
+          .emitBoardChange()
+          .tableObserver()
+          .subscribe(
+            issueTable => {
+              checkTable(issueTable,
+                [['ONE-1', 'ONE-8'], ['ONE-2'], ['ONE-3', 'ONE-5', 'ONE-6'], ['ONE-4', 'ONE-7']],
+                []);
+              checkSameColumns(original, issueTable, 1, 2, 3);
+            });
+      });
+      it ('Other project', () => {
+        util = new IssueTableObservableUtil('ONE',
+          new SimpleIssueFactory()
+            .addIssue('ONE-1', 0)
+            .addIssue('ONE-2', 1)
+            .addIssue('ONE-3', 2)
+            .addIssue('ONE-4', 3)
+            .addIssue('ONE-5', 2)
+            .addIssue('ONE-6', 2)
+            .addIssue('ONE-7', 3)
+            .addIssue('TWO-1', 0)
+            .addIssue('TWO-2', 1),
+          4)
+          .setRank('ONE', 1, 2, 3, 4, 5, 6, 7)
+          .setRank('TWO', 1, 2)
+          .mapState('ONE', 'S-1', '1-1')
+          .mapState('ONE', 'S-2', '1-2')
+          .mapState('ONE', 'S-3', '1-3')
+          .mapState('ONE', 'S-4', '1-4')
+          .mapState('TWO', 'S-3', '2-1')
+          .mapState('TWO', 'S-4', '2-2');
+        util.emitBoardChange()
+          .tableObserver()
+          .take(1)
+          .subscribe(
+            issueTable => {
+              checkTable(issueTable,
+                [['ONE-1'], ['ONE-2'], ['ONE-3', 'ONE-5', 'ONE-6', 'TWO-1'], ['ONE-4', 'ONE-7', 'TWO-2']],
+                [])
+              original = issueTable;
+            });
+        util
+          .issueChanges({new: [{key: 'TWO-3', state: '2-1', summary: 'Test', priority: 'Major', type: 'task'}]})
+          .rankChanges({TWO: [{index: 2, key: 'TWO-3'}]})
+          .emitBoardChange()
+          .tableObserver()
+          .subscribe(
+            issueTable => {
+              checkTable(issueTable,
+                [['ONE-1'], ['ONE-2'], ['ONE-3', 'ONE-5', 'ONE-6', 'TWO-1', 'TWO-3'], ['ONE-4', 'ONE-7', 'TWO-2']],
+                []);
+              checkSameColumns(original, issueTable, 0, 1, 3);
+            });
+      });
     });
+
 
     it ('Rerank issue - no effect on existing states', () => {
       util
