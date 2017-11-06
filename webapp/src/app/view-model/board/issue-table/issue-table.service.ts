@@ -539,7 +539,14 @@ class ExistingColumnBuilder implements ColumnBuilder {
   }
 
   isChanged(): boolean {
-    return this._changed || this._existing.size !== this._current.size;
+      return this._changed || this.safeSize(this._existing) !== this.safeSize(this._current);
+  }
+
+  private safeSize(list: List<string>): number {
+    if (!list) {
+      return 0;
+    }
+    return list.size;
   }
 
   getList(): List<string> {
