@@ -24,6 +24,14 @@ import {getTestComponentState} from '../../../model/board/data/component/compone
 import {getTestFixVersionState} from '../../../model/board/data/fix-version/fix-version.reducer.spec';
 import {getTestLabelState} from '../../../model/board/data/label/label.reducer.spec';
 import {getTestCustomFieldState} from '../../../model/board/data/custom-field/custom-field.reducer.spec';
+import {
+  ASSIGNEE_ATTRIBUTES, COMPONENT_ATTRIBUTES,
+  FilterAttributes, FilterAttributesUtil, FIX_VERSION_ATTRIBUTES, ISSUE_TYPE_ATTRIBUTES, LABEL_ATTRIBUTES,
+  PARALLEL_TASK_ATTRIBUTES,
+  PRIORITY_ATTRIBUTES,
+  PROJECT_ATTRIBUTES
+} from '../../../model/board/user/board-filter/board-filter.constants';
+import {BoardFilterActions} from '../../../model/board/user/board-filter/board-filter.reducer';
 
 export class IssueTableObservableUtil {
   private _rankedIssueKeys: any = {};
@@ -45,7 +53,9 @@ export class IssueTableObservableUtil {
               private _numberStates: number, userSettingQueryParams?: Dictionary<string>) {
     this._issueTable$ = this._service.getIssueTable(this._boardStateSubject$, this._userSettingSubject$);
     if (userSettingQueryParams) {
-      this.updateUserSettings(userSettingQueryParams);
+      this._userSettingState =
+        userSettingReducer(this._userSettingState, UserSettingActions.createInitialiseFromQueryString(userSettingQueryParams));
+      this._userSettingSubject$.next(this._userSettingState);
       this._userSettingSubject$.take(1).subscribe(table => {
         // Consume the initial event with the empty table
       });
@@ -126,12 +136,66 @@ export class IssueTableObservableUtil {
     return this;
   }
 
-  updateUserSettings(userSettingQueryParams?: Dictionary<string>): IssueTableObservableUtil {
+  updateSwimlane(swimlane: string): IssueTableObservableUtil {
     this._userSettingState =
-      userSettingReducer(this._userSettingState, UserSettingActions.createInitialiseFromQueryString(userSettingQueryParams));
+      userSettingReducer(this._userSettingState, UserSettingActions.createUpdateSwimlane(swimlane));
     this._userSettingSubject$.next(this._userSettingState);
     return this;
   }
+
+  updateFilters(name: string, ...keys: string[]): IssueTableObservableUtil {
+    let atributes: FilterAttributes;
+    switch (name) {
+      case PROJECT_ATTRIBUTES.key:
+        atributes = PROJECT_ATTRIBUTES;
+        break;
+      case ISSUE_TYPE_ATTRIBUTES.key:
+        atributes = ISSUE_TYPE_ATTRIBUTES;
+        break;
+      case PRIORITY_ATTRIBUTES.key:
+        atributes = PRIORITY_ATTRIBUTES;
+        break;
+      case ASSIGNEE_ATTRIBUTES.key:
+        atributes = ASSIGNEE_ATTRIBUTES;
+        break;
+      case COMPONENT_ATTRIBUTES.key:
+        atributes = COMPONENT_ATTRIBUTES;
+        break;
+      case LABEL_ATTRIBUTES.key:
+        atributes = LABEL_ATTRIBUTES;
+        break;
+      case FIX_VERSION_ATTRIBUTES.key:
+        atributes = FIX_VERSION_ATTRIBUTES;
+        break;
+      case PARALLEL_TASK_ATTRIBUTES.key:
+        // TODO implement another way if we need this
+        throw new Error('Parallel Task filters cannot be changed using this method');
+        // atributes = PARALLEL_TASK_ATTRIBUTES;
+    }
+    if (atributes) {
+      const values: object = {};
+      for (const key of keys) {
+        values[key] = true;
+      }
+      this._userSettingState =
+        userSettingReducer(this._userSettingState, BoardFilterActions.createUpdateFilter(atributes, values));
+      this._userSettingSubject$.next(this._userSettingState);
+    } else {
+      if (this._boardState.customFields.fields.get(name)) {
+        atributes = FilterAttributesUtil.createCustomFieldFilterAttributes(name);
+        const values: object = {};
+        for (const key of keys) {
+          values[key] = true;
+        }
+        this._userSettingState =
+          userSettingReducer(this._userSettingState, BoardFilterActions.createUpdateFilter(atributes, values));
+        this._userSettingSubject$.next(this._userSettingState);
+      }
+    }
+
+    return this;
+  }
+
 
   tableObserver(): Observable<IssueTable> {
     return this._issueTable$;
@@ -209,4 +273,3 @@ export interface IssuesFactory {
   clear();
   createIssueStateInput(params: DeserializeIssueLookupParams): any;
 }
-

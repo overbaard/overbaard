@@ -19,7 +19,8 @@ const DEFAULT_SWIMLANE_DATA_STATE: SwimlaneData = {
   key: null,
   display: null,
   table: List<List<string>>(),
-  visibleIssues: 0
+  visibleIssues: 0,
+  filterVisible: true
 };
 
 interface IssueTableRecord extends TypedRecord<IssueTableRecord>, IssueTable {
@@ -63,12 +64,14 @@ export class IssueTableUtil {
     key: string,
     display: string,
     table: List<List<string>>,
-    visibleIssues: number): SwimlaneData {
+    visibleIssues: number,
+    filterVisible: boolean): SwimlaneData {
     const state: SwimlaneData = {
       key: key,
       display: display,
       table: table,
-      visibleIssues: visibleIssues
+      visibleIssues: visibleIssues,
+      filterVisible: filterVisible
     }
     return SWIMLANE_DATA_STATE_FACTORY(state);
   }

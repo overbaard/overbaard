@@ -18,6 +18,7 @@ export interface SwimlaneData {
   display: string;
   table: List<List<string>>;
   visibleIssues: number;
+  filterVisible: boolean;
 }
 
 

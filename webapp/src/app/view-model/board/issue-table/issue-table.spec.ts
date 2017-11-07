@@ -354,7 +354,7 @@ describe('Issue table filter tests', () => {
         []);
     });
 
-    util.updateUserSettings({priority: 'Blocker'});
+    util.updateFilters('priority', 'Blocker');
     util.tableObserver().take(1).subscribe(issueTable => {
       checkTable(issueTable,
         [['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']],
@@ -363,7 +363,7 @@ describe('Issue table filter tests', () => {
       expect(issueTable.visibleIssueCounts.toArray()).toEqual([1, 1, 2]);
     });
 
-    util.updateUserSettings({priority: 'Major'});
+    util.updateFilters('priority', 'Major');
     util.tableObserver().take(1).subscribe(issueTable => {
       checkTable(issueTable,
         [['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']],

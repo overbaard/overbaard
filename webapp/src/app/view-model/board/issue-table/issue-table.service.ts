@@ -5,7 +5,7 @@ import {Observable} from 'rxjs/Observable';
 import {initialIssueTable, IssueTableUtil} from './issue-table.model';
 import {BoardState} from '../../../model/board/data/board';
 import 'rxjs/add/observable/combineLatest';
-import {List, Map, OrderedMap, OrderedSet} from 'immutable';
+import {List, Map, OrderedMap, OrderedSet, Set} from 'immutable';
 import {BoardIssue} from '../../../model/board/data/issue/board-issue';
 import {BoardProject, ProjectUtil} from '../../../model/board/data/project/project.model';
 import {IssueTable, SwimlaneData, SwimlaneInfo} from './issue-table';
@@ -264,9 +264,9 @@ class IssueTableBuilder {
         swimlaneBuilder = SwimlaneInfoBuilder.create(this._currentBoardState, this._currentUserSettingState, oldSwimlane);
       }
     }
+
     this.populateSwimlanes(swimlaneBuilder, issues, table);
-    // TODO filter swimlanes
-    this.applySwimlaneFilters(swimlaneBuilder);
+    swimlaneBuilder.applySwimlaneFilters();
 
     return swimlaneBuilder.build();
   }
@@ -282,11 +282,6 @@ class IssueTableBuilder {
     }
 
     return swimlaneBuilder;
-  }
-
-  private applySwimlaneFilters(swimlaneBuilder: SwimlaneInfoBuilder) {
-
-
   }
 }
 
@@ -354,7 +349,7 @@ class SwimlaneInfoBuilder {
       builderMap.set(builderNone.key, builderNone);
     }
     builderMap = builderMap.asImmutable();
-    return new SwimlaneInfoBuilder(issueMatcher, builderMap, existingInfo);
+    return new SwimlaneInfoBuilder(boardState, userSettingState, issueMatcher, builderMap, existingInfo);
   }
 
   private static multiStringMatcher(issueSet: OrderedSet<string>,
@@ -366,6 +361,8 @@ class SwimlaneInfoBuilder {
   }
 
   private constructor(
+    private _boardState: BoardState,
+    private _userSettingState: UserSettingState,
     private readonly _issueMatcher:
       (issue: BoardIssueView, dataBuilders:
         OrderedMap<string, SwimlaneDataBuilder>) => SwimlaneDataBuilder[],
@@ -382,6 +379,56 @@ class SwimlaneInfoBuilder {
 
   get dataBuilders(): Map<string, SwimlaneDataBuilder> {
     return this._dataBuilders;
+  }
+
+  applySwimlaneFilters() {
+    this._dataBuilders.forEach(swimlaneBuilder => {
+      swimlaneBuilder.filterVisible = this.filterSwimlane(swimlaneBuilder);
+    });
+  }
+
+  private filterSwimlane(swimlaneBuilder: SwimlaneDataBuilder) {
+    switch (this._userSettingState.swimlane) {
+      case PROJECT_ATTRIBUTES.key: {
+        return this.applyFilterToSwimlaneKey(this._userSettingState.filters.project, swimlaneBuilder.key);
+      }
+      case ISSUE_TYPE_ATTRIBUTES.key: {
+        return this.applyFilterToSwimlaneKey(this._userSettingState.filters.issueType, swimlaneBuilder.key);
+      }
+      case PRIORITY_ATTRIBUTES.key: {
+        return this.applyFilterToSwimlaneKey(this._userSettingState.filters.priority, swimlaneBuilder.key);
+      }
+      case ASSIGNEE_ATTRIBUTES.key: {
+        return this.applyFilterToSwimlaneKey(this._userSettingState.filters.assignee, swimlaneBuilder.key);
+      }
+      case COMPONENT_ATTRIBUTES.key: {
+        return this.applyFilterToSwimlaneKey(this._userSettingState.filters.component, swimlaneBuilder.key);
+      }
+      case LABEL_ATTRIBUTES.key: {
+        return this.applyFilterToSwimlaneKey(this._userSettingState.filters.label, swimlaneBuilder.key);
+      }
+      case FIX_VERSION_ATTRIBUTES.key: {
+        return this.applyFilterToSwimlaneKey(this._userSettingState.filters.fixVersion, swimlaneBuilder.key);
+      }
+      default: {
+        const customFields: OrderedMap<string, CustomField> =
+          this._boardState.customFields.fields.get(this._userSettingState.swimlane);
+        if (customFields) {
+          const filterSet: Set<string> = this._userSettingState.filters.customField.get(this._userSettingState.swimlane);
+          if (filterSet) {
+            return this.applyFilterToSwimlaneKey(filterSet, swimlaneBuilder.key);
+          }
+        }
+      }
+        return true;
+    }
+  }
+
+  private applyFilterToSwimlaneKey(filterSet: Set<string>, key: string): boolean {
+    if (filterSet.size > 0 && !filterSet.contains(key)) {
+      return false;
+    }
+    return true;
   }
 
   build(): SwimlaneInfo {
@@ -413,7 +460,7 @@ class SwimlaneDataBuilder {
   private readonly _existing: SwimlaneData;
   private readonly _tableBuilder: TableBuilder;
   private _visibleIssuesCount = 0;
-  visible = true;
+  filterVisible = true;
 
 
   constructor(private readonly _key: string, private readonly _display: string, states: number, exisitingInfo: SwimlaneInfo) {
@@ -440,11 +487,14 @@ class SwimlaneDataBuilder {
     return this._key;
   }
 
-  get display(): string {
-    return this._display;
+  private isChangedFilterVisibility(): boolean {
+    if (!this._existing) {
+      return true;
+    }
+    return this._existing.filterVisible !== this.filterVisible;
   }
 
-  isChanged(): boolean {
+  private isChangedTable(): boolean {
     if (!this._existing) {
       return true;
     }
@@ -454,6 +504,10 @@ class SwimlaneDataBuilder {
       this._visibleIssuesCount !== this._existing.visibleIssues;
   }
 
+  isChanged(): boolean {
+    return this.isChangedTable() || this.isChangedFilterVisibility();
+  }
+
   build(): SwimlaneData {
     const table: List<List<string>> = this._tableBuilder.getTable();
     if (this._existing) {
@@ -461,7 +515,8 @@ class SwimlaneDataBuilder {
         return this._existing;
       }
     }
-    return IssueTableUtil.createSwimlaneDataView(this._key, this._display, this._tableBuilder.getTable(), this._visibleIssuesCount);
+    return IssueTableUtil.createSwimlaneDataView(
+      this._key, this._display, this._tableBuilder.getTable(), this._visibleIssuesCount, this.filterVisible);
   }
 }
 
