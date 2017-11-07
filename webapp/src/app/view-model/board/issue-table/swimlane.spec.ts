@@ -1,4 +1,4 @@
-import {List, OrderedSet, Set} from 'immutable';
+import {List, Map, OrderedSet, Set} from 'immutable';
 import {IssueTable, SwimlaneData, SwimlaneInfo} from './issue-table';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/take';
@@ -9,6 +9,11 @@ import {NONE_FILTER} from '../../../model/board/user/board-filter/board-filter.c
 
 
 describe('Swimlane observer tests', () => {
+
+  // TODO Filter swimlanes
+  // TODO Some tests of changing when swimlane is theres
+  // The swimlane/table equality tests mentioned below
+
 
   describe('No Filters', () => {
     describe('Create swimlane', () => {
@@ -285,7 +290,11 @@ describe('Swimlane observer tests', () => {
                   {key: 'ONE', name: 'ONE', issues: ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5']},
                   {key: 'TWO', name: 'TWO', issues: ['TWO-1', 'TWO-2', 'TWO-3', 'TWO-4']}])
                 .checkTable(issueTable);
-              // TODO check equality of not changed swimlanes and columns
+
+              new EqualityChecker()
+                .addChangedSwimlaneColumns('ONE', 0)
+                .addChangedSwimlaneColumns('TWO', 1)
+                .check(originalState, issueTable);
             });
       });
 
@@ -304,7 +313,11 @@ describe('Swimlane observer tests', () => {
                   {key: 'task', name: 'task', issues: ['ONE-2', 'ONE-4', 'ONE-6']},
                   {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3', 'ONE-5']}])
                 .checkTable(issueTable);
-              // TODO check equality of not changed swimlanes and columns
+
+              new EqualityChecker()
+                .cleanSwimlanes('bug')
+                .addChangedSwimlaneColumns('task', 0)
+                .check(originalState, issueTable);
             });
       });
 
@@ -323,7 +336,11 @@ describe('Swimlane observer tests', () => {
                 {key: 'Blocker', name: 'Blocker', issues: ['ONE-1', 'ONE-3', 'ONE-5']},
                 {key: 'Major', name: 'Major', issues: ['ONE-2', 'ONE-4', 'ONE-6']}])
               .checkTable(issueTable);
-            // TODO check equality of not changed swimlanes and columns
+
+            new EqualityChecker()
+              .cleanSwimlanes('Blocker')
+              .addChangedSwimlaneColumns('Major', 0)
+              .check(originalState, issueTable);
           });
       });
 
@@ -348,7 +365,11 @@ describe('Swimlane observer tests', () => {
                   {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4']},
                   {key: NONE_FILTER, name: 'None', issues: ['ONE-2', 'ONE-5', 'ONE-6']}])
                 .checkTable(issueTable);
-              // TODO check equality of not changed swimlanes and columns
+
+              new EqualityChecker()
+                .cleanSwimlanes('bob', 'kabir')
+                .addChangedSwimlaneColumns(NONE_FILTER, 0)
+                .check(originalState, issueTable);
             });
         });
         it ('Set', () => {
@@ -364,7 +385,11 @@ describe('Swimlane observer tests', () => {
                   {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4']},
                   {key: NONE_FILTER, name: 'None', issues: ['ONE-2', 'ONE-5']}])
                 .checkTable(issueTable);
-              // TODO check equality of not changed swimlanes and columns
+
+              new EqualityChecker()
+                .cleanSwimlanes('kabir', NONE_FILTER)
+                .addChangedSwimlaneColumns('bob', 0)
+                .check(originalState, issueTable);
             });
         });
       });
@@ -391,7 +416,11 @@ describe('Swimlane observer tests', () => {
                   {key: 'C-30', name: 'C-30', issues: ['ONE-3', 'ONE-4']},
                   {key: NONE_FILTER, name: 'None', issues: ['ONE-5', 'ONE-6']}])
                 .checkTable(issueTable);
-              // TODO check equality of not changed swimlanes and columns
+
+              new EqualityChecker()
+                .cleanSwimlanes('C-10', 'C-20', 'C-30')
+                .addChangedSwimlaneColumns(NONE_FILTER, 0)
+                .check(originalState, issueTable);
             });
         });
         it ('One', () => {
@@ -408,7 +437,12 @@ describe('Swimlane observer tests', () => {
                   {key: 'C-30', name: 'C-30', issues: ['ONE-3', 'ONE-4']},
                   {key: NONE_FILTER, name: 'None', issues: ['ONE-5']}])
                 .checkTable(issueTable);
-              // TODO check equality of not changed swimlanes and columns
+
+              new EqualityChecker()
+                .cleanSwimlanes( 'C-20', 'C-30', NONE_FILTER)
+                .addChangedSwimlaneColumns('C-10', 0)
+                .check(originalState, issueTable);
+
             });
         });
         it ('Several', () => {
@@ -426,7 +460,12 @@ describe('Swimlane observer tests', () => {
                   {key: 'C-30', name: 'C-30', issues: ['ONE-3', 'ONE-4']},
                   {key: NONE_FILTER, name: 'None', issues: ['ONE-5']}])
                 .checkTable(issueTable);
-              // TODO check equality of not changed swimlanes and columns
+
+              new EqualityChecker()
+                .cleanSwimlanes('C-30', NONE_FILTER)
+                .addChangedSwimlaneColumns('C-10', 0)
+                .addChangedSwimlaneColumns('C-20', 0)
+                .check(originalState, issueTable);
             });
         });
       });
@@ -453,7 +492,11 @@ describe('Swimlane observer tests', () => {
                   {key: 'F-30', name: 'F-30', issues: ['ONE-1', 'ONE-5']},
                   {key: NONE_FILTER, name: 'None', issues: ['ONE-4', 'ONE-6']}])
                 .checkTable(issueTable);
-              // TODO check equality of not changed swimlanes and columns
+
+              new EqualityChecker()
+                .cleanSwimlanes('F-10', 'F-20', 'F-30')
+                .addChangedSwimlaneColumns(NONE_FILTER, 0)
+                .check(originalState, issueTable);
             });
         });
         it ('One', () => {
@@ -470,7 +513,11 @@ describe('Swimlane observer tests', () => {
                   {key: 'F-30', name: 'F-30', issues: ['ONE-1', 'ONE-5']},
                   {key: NONE_FILTER, name: 'None', issues: ['ONE-4']}])
                 .checkTable(issueTable);
-              // TODO check equality of not changed swimlanes and columns
+
+              new EqualityChecker()
+                .cleanSwimlanes('F-20', 'F-30', NONE_FILTER)
+                .addChangedSwimlaneColumns('F-10', 0)
+                .check(originalState, issueTable);
             });
         });
         it ('Several', () => {
@@ -488,7 +535,12 @@ describe('Swimlane observer tests', () => {
                   {key: 'F-30', name: 'F-30', issues: ['ONE-1', 'ONE-5']},
                   {key: NONE_FILTER, name: 'None', issues: ['ONE-4']}])
                 .checkTable(issueTable);
-              // TODO check equality of not changed swimlanes and columns
+
+              new EqualityChecker()
+                .cleanSwimlanes('F-30', NONE_FILTER)
+                .addChangedSwimlaneColumns('F-10', 0)
+                .addChangedSwimlaneColumns('F-20', 0)
+                .check(originalState, issueTable);
             });
         });
       });
@@ -515,7 +567,11 @@ describe('Swimlane observer tests', () => {
                   {key: 'L-30', name: 'L-30', issues: ['ONE-2', 'ONE-5']},
                   {key: NONE_FILTER, name: 'None', issues: ['ONE-1', 'ONE-6']}])
                 .checkTable(issueTable);
-              // TODO check equality of not changed swimlanes and columns
+
+              new EqualityChecker()
+                .cleanSwimlanes('L-10', 'L-20', 'L-30')
+                .addChangedSwimlaneColumns(NONE_FILTER, 0)
+                .check(originalState, issueTable);
             });
         });
         it ('One', () => {
@@ -532,7 +588,11 @@ describe('Swimlane observer tests', () => {
                   {key: 'L-30', name: 'L-30', issues: ['ONE-2', 'ONE-5']},
                   {key: NONE_FILTER, name: 'None', issues: ['ONE-1']}])
                 .checkTable(issueTable);
-              // TODO check equality of not changed swimlanes and columns
+
+              new EqualityChecker()
+                .cleanSwimlanes('L-20', 'L-30', NONE_FILTER)
+                .addChangedSwimlaneColumns('L-10', 0)
+                .check(originalState, issueTable);
             });
         });
         it ('Several', () => {
@@ -550,7 +610,12 @@ describe('Swimlane observer tests', () => {
                   {key: 'L-30', name: 'L-30', issues: ['ONE-2', 'ONE-5']},
                   {key: NONE_FILTER, name: 'None', issues: ['ONE-1']}])
                 .checkTable(issueTable);
-              // TODO check equality of not changed swimlanes and columns
+
+              new EqualityChecker()
+                .cleanSwimlanes('L-30', NONE_FILTER)
+                .addChangedSwimlaneColumns('L-10', 0)
+                .addChangedSwimlaneColumns('L-20', 0)
+                .check(originalState, issueTable);
             });
         });
       });
@@ -576,7 +641,11 @@ describe('Swimlane observer tests', () => {
                   {key: 'c2-B', name: 'Second C2', issues: ['ONE-4']},
                   {key: NONE_FILTER, name: 'None', issues: ['ONE-5', 'ONE-6']}])
                 .checkTable(issueTable);
-              // TODO check equality of not changed swimlanes and columns
+
+              new EqualityChecker()
+                .cleanSwimlanes('c2-A', 'c2-B')
+                .addChangedSwimlaneColumns(NONE_FILTER, 0)
+                .check(originalState, issueTable);
             });
         });
         it ('Set', () => {
@@ -593,7 +662,11 @@ describe('Swimlane observer tests', () => {
                   {key: 'c2-B', name: 'Second C2', issues: ['ONE-4', 'ONE-6']},
                   {key: NONE_FILTER, name: 'None', issues: ['ONE-5']}])
                 .checkTable(issueTable);
-              // TODO check equality of not changed swimlanes and columns
+
+              new EqualityChecker()
+                .cleanSwimlanes('c2-A', NONE_FILTER)
+                .addChangedSwimlaneColumns('c2-B', 0)
+                .check(originalState, issueTable);
             });
         });
       });
@@ -616,7 +689,11 @@ describe('Swimlane observer tests', () => {
                   {key: 'task', name: 'task', issues: ['ONE-2', 'ONE-4']},
                   {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3', 'ONE-5']}])
                 .checkTable(issueTable);
-              // TODO check equality of not changed swimlanes and columns
+
+              new EqualityChecker()
+                .cleanSwimlanes('task')
+                .addChangedSwimlaneColumns('bug', 0, 2)
+                .check(originalState, issueTable);
             });
         });
         it ('Change rank - not affecting states or swimlanes', () => {
@@ -633,7 +710,8 @@ describe('Swimlane observer tests', () => {
                   {key: 'task', name: 'task', issues: ['ONE-2', 'ONE-4']},
                   {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3', 'ONE-5']}])
                 .checkTable(issueTable);
-              // TODO check equality of not changed swimlanes and columns
+
+              expect(issueTable).toBe(originalState);
             });
         });
         it ('Delete issue', () => {
@@ -650,7 +728,11 @@ describe('Swimlane observer tests', () => {
                   {key: 'task', name: 'task', issues: ['ONE-2', 'ONE-4']},
                   {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3']}])
                 .checkTable(issueTable);
-              // TODO check equality of not changed swimlanes and columns
+
+              new EqualityChecker()
+                .cleanSwimlanes('task')
+                .addChangedSwimlaneColumns('bug', 1)
+                .check(originalState, issueTable);
             });
         });
       });
@@ -672,7 +754,11 @@ describe('Swimlane observer tests', () => {
                   {key: 'task', name: 'task', issues: ['ONE-1', 'ONE-2', 'ONE-4']},
                   {key: 'bug', name: 'bug', issues: ['ONE-3', 'ONE-5']}])
                 .checkTable(issueTable);
-              // TODO check equality of not changed swimlanes and columns
+
+              new EqualityChecker()
+                .addChangedSwimlaneColumns('task', 0)
+                .addChangedSwimlaneColumns('bug', 0)
+                .check(originalState, issueTable);
             });
         });
 
@@ -690,7 +776,11 @@ describe('Swimlane observer tests', () => {
                   {key: 'Blocker', name: 'Blocker', issues: ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-5']},
                   {key: 'Major', name: 'Major', issues: ['ONE-4']}])
                 .checkTable(issueTable);
-              // TODO check equality of not changed swimlanes and columns
+
+              new EqualityChecker()
+                .addChangedSwimlaneColumns('Blocker', 0)
+                .addChangedSwimlaneColumns('Major', 0)
+                .check(originalState, issueTable);
             });
         });
         describe('Assignee', () => {
@@ -713,7 +803,12 @@ describe('Swimlane observer tests', () => {
                     {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-4']},
                     {key: NONE_FILTER, name: 'None', issues: ['ONE-1', 'ONE-2', 'ONE-5']}])
                   .checkTable(issueTable);
-                // TODO check equality of not changed swimlanes and columns
+
+                new EqualityChecker()
+                  .cleanSwimlanes('bob')
+                  .addChangedSwimlaneColumns('kabir', 0)
+                  .addChangedSwimlaneColumns(NONE_FILTER, 0)
+                  .check(originalState, issueTable);
               });
           });
           it ('Set', () => {
@@ -728,7 +823,12 @@ describe('Swimlane observer tests', () => {
                     {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4']},
                     {key: NONE_FILTER, name: 'None', issues: ['ONE-5']}])
                   .checkTable(issueTable);
-                // TODO check equality of not changed swimlanes and columns
+
+                new EqualityChecker()
+                  .cleanSwimlanes('kabir')
+                  .addChangedSwimlaneColumns('bob', 0)
+                  .addChangedSwimlaneColumns(NONE_FILTER, 0)
+                  .check(originalState, issueTable);
               });
           });
         });
@@ -753,7 +853,13 @@ describe('Swimlane observer tests', () => {
                     {key: 'C-30', name: 'C-30', issues: ['ONE-3']},
                     {key: NONE_FILTER, name: 'None', issues: ['ONE-4', 'ONE-5']}])
                   .checkTable(issueTable);
-                // TODO check equality of not changed swimlanes and columns
+
+                new EqualityChecker()
+                  .addChangedSwimlaneColumns('C-10', 1)
+                  .addChangedSwimlaneColumns('C-20', 1)
+                  .addChangedSwimlaneColumns('C-30', 1)
+                  .addChangedSwimlaneColumns(NONE_FILTER, 1)
+                  .check(originalState, issueTable);
               });
           });
           it ('One', () => {
@@ -769,7 +875,12 @@ describe('Swimlane observer tests', () => {
                     {key: 'C-30', name: 'C-30', issues: ['ONE-4']},
                     {key: NONE_FILTER, name: 'None', issues: ['ONE-5']}])
                   .checkTable(issueTable);
-                // TODO check equality of not changed swimlanes and columns
+
+                new EqualityChecker()
+                  .cleanSwimlanes('C-20', NONE_FILTER)
+                  .addChangedSwimlaneColumns('C-10', 0)
+                  .addChangedSwimlaneColumns('C-30', 0)
+                  .check(originalState, issueTable);
               });
           });
           it ('Several', () => {
@@ -786,7 +897,13 @@ describe('Swimlane observer tests', () => {
                     {key: 'C-30', name: 'C-30', issues: ['ONE-4']},
                     {key: NONE_FILTER, name: 'None', issues: ['ONE-5']}])
                   .checkTable(issueTable);
-                // TODO check equality of not changed swimlanes and columns
+
+                new EqualityChecker()
+                  .cleanSwimlanes(NONE_FILTER)
+                  .addChangedSwimlaneColumns('C-10', 0)
+                  .addChangedSwimlaneColumns('C-20', 0)
+                  .addChangedSwimlaneColumns('C-30', 0)
+                  .check(originalState, issueTable);
               });
           });
         });
@@ -811,7 +928,12 @@ describe('Swimlane observer tests', () => {
                     {key: 'F-30', name: 'F-30', issues: ['ONE-1', 'ONE-5']},
                     {key: NONE_FILTER, name: 'None', issues: ['ONE-2', 'ONE-4']}])
                   .checkTable(issueTable);
-                // TODO check equality of not changed swimlanes and columns
+
+                new EqualityChecker()
+                  .cleanSwimlanes('F-20', 'F-30')
+                  .addChangedSwimlaneColumns('F-10', 0)
+                  .addChangedSwimlaneColumns(NONE_FILTER, 0)
+                  .check(originalState, issueTable);
               });
           });
           it ('One', () => {
@@ -828,7 +950,12 @@ describe('Swimlane observer tests', () => {
                     {key: 'F-30', name: 'F-30', issues: ['ONE-1', 'ONE-5']},
                     {key: NONE_FILTER, name: 'None', issues: ['ONE-4']}])
                   .checkTable(issueTable);
-                // TODO check equality of not changed swimlanes and columns
+
+                new EqualityChecker()
+                  .cleanSwimlanes('F-30', NONE_FILTER)
+                  .addChangedSwimlaneColumns('F-10', 0)
+                  .addChangedSwimlaneColumns('F-20', 0)
+                  .check(originalState, issueTable);
               });
           });
           it ('Several', () => {
@@ -845,7 +972,12 @@ describe('Swimlane observer tests', () => {
                     {key: 'F-30', name: 'F-30', issues: ['ONE-1', 'ONE-5']},
                     {key: NONE_FILTER, name: 'None', issues: ['ONE-4']}])
                   .checkTable(issueTable);
-                // TODO check equality of not changed swimlanes and columns
+
+                new EqualityChecker()
+                  // Although we set F-10, it was used in the original data
+                  .cleanSwimlanes('F-10', 'F-30', NONE_FILTER)
+                  .addChangedSwimlaneColumns('F-20', 0)
+                  .check(originalState, issueTable);
               });
           });
         });
@@ -870,7 +1002,12 @@ describe('Swimlane observer tests', () => {
                     {key: 'L-30', name: 'L-30', issues: ['ONE-2', 'ONE-5']},
                     {key: NONE_FILTER, name: 'None', issues: ['ONE-1', 'ONE-4']}])
                   .checkTable(issueTable);
-                // TODO check equality of not changed swimlanes and columns
+
+                new EqualityChecker()
+                  .cleanSwimlanes('L-10', 'L-30')
+                  .addChangedSwimlaneColumns('L-20', 1)
+                  .addChangedSwimlaneColumns(NONE_FILTER, 1)
+                  .check(originalState, issueTable);
               });
           });
           it ('One', () => {
@@ -886,7 +1023,13 @@ describe('Swimlane observer tests', () => {
                     {key: 'L-30', name: 'L-30', issues: ['ONE-2', 'ONE-5']},
                     {key: NONE_FILTER, name: 'None', issues: ['ONE-1']}])
                   .checkTable(issueTable);
-                // TODO check equality of not changed swimlanes and columns
+
+
+                new EqualityChecker()
+                  .cleanSwimlanes('L-30', NONE_FILTER)
+                  .addChangedSwimlaneColumns('L-10', 1)
+                  .addChangedSwimlaneColumns('L-20', 1)
+                  .check(originalState, issueTable);
               });
           });
           it ('Several', () => {
@@ -903,7 +1046,13 @@ describe('Swimlane observer tests', () => {
                     {key: 'L-30', name: 'L-30', issues: ['ONE-2']},
                     {key: NONE_FILTER, name: 'None', issues: ['ONE-1']}])
                   .checkTable(issueTable);
-                // TODO check equality of not changed swimlanes and columns
+
+                new EqualityChecker()
+                  .cleanSwimlanes(NONE_FILTER)
+                  .addChangedSwimlaneColumns('L-10', 1)
+                  .addChangedSwimlaneColumns('L-20', 1)
+                  .addChangedSwimlaneColumns('L-30', 1)
+                  .check(originalState, issueTable);
               });
           });
         });
@@ -927,7 +1076,13 @@ describe('Swimlane observer tests', () => {
                     {key: 'c2-B', name: 'Second C2', issues: ['ONE-4']},
                     {key: NONE_FILTER, name: 'None', issues: ['ONE-2', 'ONE-5']}])
                   .checkTable(issueTable);
-                // TODO check equality of not changed swimlanes and columns
+
+
+                new EqualityChecker()
+                  .cleanSwimlanes('c2-B')
+                  .addChangedSwimlaneColumns('c2-A', 0)
+                  .addChangedSwimlaneColumns(NONE_FILTER, 0)
+                  .check(originalState, issueTable);
               });
           });
           it ('Set', () => {
@@ -943,16 +1098,17 @@ describe('Swimlane observer tests', () => {
                     {key: 'c2-B', name: 'Second C2', issues: ['ONE-4', 'ONE-3']},
                     {key: NONE_FILTER, name: 'None', issues: ['ONE-5']}])
                   .checkTable(issueTable);
-                // TODO check equality of not changed swimlanes and columns
+
+                new EqualityChecker()
+                  .cleanSwimlanes(NONE_FILTER)
+                  .addChangedSwimlaneColumns('c2-A', 0)
+                  .addChangedSwimlaneColumns('c2-B', 0)
+                  .check(originalState, issueTable);
               });
           });
         });
       });
     });
-
-    // TODO Filter swimlanes
-    // TODO Some tests of changing when swimlane is theres
-
 
     function createUtilWithStandardIssues(params: Dictionary<string>): IssueTableObservableUtil {
       return createUtil(params, {'ONE': [1, 2, 3, 4, 5]},
@@ -1070,19 +1226,79 @@ interface SwimlaneCheck {
   issues: string[]
 }
 
-function checkSameColumns(oldState: IssueTable, newState: IssueTable, ...cols: number[]) {
-  const expectedEqual: OrderedSet<number> = OrderedSet<number>(cols);
-  expect(oldState.table.size).toBe(newState.table.size);
-  for (let i = 0 ; i < oldState.table.size ; i++) {
-    const oldCol: List<string> = oldState.table.get(i);
-    const newCol: List<string> = newState.table.get(i);
-    if (expectedEqual.contains(i)) {
-      expect(oldCol).toBe(newCol, 'Column ' + i);
-    } else {
-      expect(oldCol).not.toBe(newCol, 'Column ' + i);
+class EqualityChecker {
+  private _unchangedSwimlanes: string[];
+  private _unchangedSwimlaneTables: string[];
+  private _changedSwimlaneColumns: Dictionary<number[]> = {};
+
+  cleanSwimlanes(...unchangedSwimlanes: string[]): EqualityChecker {
+    this._unchangedSwimlanes = unchangedSwimlanes;
+    return this;
+  }
+
+  cleanSwimlaneTables(...unchangedSwimlaneTables: string[]): EqualityChecker {
+    this._unchangedSwimlaneTables = unchangedSwimlaneTables;
+    return this;
+  }
+
+  addChangedSwimlaneColumns(key: string, ...changedColumns: number[]): EqualityChecker {
+    this._changedSwimlaneColumns[key] = changedColumns;
+    return this;
+  }
+
+  check(oldTable: IssueTable, currTable: IssueTable) {
+    const old: SwimlaneInfo = oldTable.swimlaneInfo;
+    const curr: SwimlaneInfo = currTable.swimlaneInfo;
+    const unchangedSwimlanes: Set<string> =
+      this._unchangedSwimlanes ? Set<string>(this._unchangedSwimlanes) : Set<string>();
+    const unchangedSwimlaneTables: Set<string> =
+      this._unchangedSwimlaneTables ? Set<string>(this._unchangedSwimlaneTables) : Set<string>();
+    const changedSwimlaneColumns: Map<string, List<number>> = Map<string, List<number>>(this._changedSwimlaneColumns);
+    // Do some validation of user errors
+    unchangedSwimlanes.forEach(v => {
+      if (changedSwimlaneColumns.has(v)) {
+        fail(`'${v}' appears in both clean swimlanes and where we are expecting a change`);
+      }
+    });
+    unchangedSwimlaneTables.forEach(v => {
+      if (changedSwimlaneColumns.has(v)) {
+        fail(`'${v}' appears in both clean swimlane tables and where we are expecting a change`);
+      }
+    });
+    const allKeys: Set<string> =
+      Set<string>().intersect(unchangedSwimlanes, unchangedSwimlaneTables, changedSwimlaneColumns.keySeq());
+    const missingChecks: Set<string> =
+      Set<string>().subtract(curr.swimlanes.keySeq(), allKeys);
+    if (missingChecks.size > 0) {
+      fail(`The swimlane contains values ${missingChecks.toArray()}, for which there are no checks configured`);
     }
+
+    unchangedSwimlanes.forEach(k => {
+      expect(curr.swimlanes.get(k)).toBeTruthy();
+      expect(old.swimlanes.get(k)).toBe(curr.swimlanes.get(k), `Different swimlane: ${k}`);
+    });
+    unchangedSwimlaneTables.forEach(k => {
+      expect(curr.swimlanes.get(k)).toBeTruthy();
+      expect(old.swimlanes.get(k).table).toBe(curr.swimlanes.get(k).table, `Different swimlane table: ${k}`);
+    });
+    changedSwimlaneColumns.forEach((changedColumns, k) => {
+      expect(curr.swimlanes.get(k)).toBeTruthy();
+      const oldSlTable: List<List<string>> = old.swimlanes.get(k) ? old.swimlanes.get(k).table : null;
+      const newTable: List<List<string>> = curr.swimlanes.get(k).table;
+      const expectedChanged: Set<number> = Set<number>(changedColumns);
+      for (let i = 0 ; i < newTable.size ; i++) {
+        const oldCol: List<string> = oldSlTable ? oldSlTable.get(i) : null;
+        const newCol: List<string> = newTable.get(i);
+        if (expectedChanged.contains(i)) {
+          expect(oldCol).not.toBe(newCol, `Column ${i} of ${k} should not have been the same`);
+        } else {
+          expect(oldCol).toBe(newCol, `Column ${i} of ${k} should have been the same`);
+        }
+      }
+    });
   }
 }
+
 
 class SwimlaneIssueFactory implements IssuesFactory {
   _issues: Dictionary<any>;
