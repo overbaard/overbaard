@@ -1147,7 +1147,8 @@ describe('Swimlane observer tests', () => {
                 {key: 'TWO', name: 'TWO', issues: ['TWO-1', 'TWO-2', 'TWO-3'], visibleFilter: true}])
               .checkTable(issueTable);
             new EqualityChecker()
-              .cleanSwimlaneTables('ONE', 'TWO')
+              .cleanSwimlanes('ONE')
+              .cleanSwimlaneTables('TWO')
               .check(originalState, issueTable);
             originalState = issueTable;
           });
@@ -1162,7 +1163,8 @@ describe('Swimlane observer tests', () => {
                   {key: 'TWO', name: 'TWO', issues: ['TWO-1', 'TWO-2', 'TWO-3'], visibleFilter: true}])
                 .checkTable(issueTable);
               new EqualityChecker()
-                .cleanSwimlaneTables('ONE', 'TWO')
+                .cleanSwimlanes('TWO')
+                .cleanSwimlaneTables('ONE')
                 .check(originalState, issueTable);
               originalState = issueTable;
             });
@@ -1175,7 +1177,8 @@ describe('Swimlane observer tests', () => {
                 {key: 'TWO', name: 'TWO', issues: ['TWO-1', 'TWO-2', 'TWO-3'], visibleFilter: true}])
               .checkTable(issueTable);
             new EqualityChecker()
-              .cleanSwimlaneTables('ONE', 'TWO')
+              .cleanSwimlanes('TWO')
+              .cleanSwimlaneTables('ONE')
               .check(originalState, issueTable);
           });
       });
@@ -1255,7 +1258,8 @@ describe('Swimlane observer tests', () => {
               {key: NONE_FILTER, name: 'None', issues: ['ONE-2', 'ONE-5'], visibleFilter: true}])
             .checkTable(issueTable);
           new EqualityChecker()
-            .cleanSwimlaneTables('bob', 'kabir', NONE_FILTER)
+            .cleanSwimlanes('bob', 'kabir')
+            .cleanSwimlaneTables( NONE_FILTER)
             .check(originalState, issueTable);
         });
       });
@@ -1344,7 +1348,8 @@ describe('Swimlane observer tests', () => {
               {key: NONE_FILTER, name: 'None', issues: ['ONE-1'], visibleFilter: true}])
             .checkTable(issueTable);
           new EqualityChecker()
-            .cleanSwimlaneTables('L-10', 'L-20', 'L-30', NONE_FILTER)
+            .cleanSwimlanes(NONE_FILTER)
+            .cleanSwimlaneTables('L-10', 'L-20', 'L-30')
             .check(originalState, issueTable);
         });
       });
@@ -1372,7 +1377,8 @@ describe('Swimlane observer tests', () => {
               {key: NONE_FILTER, name: 'None', issues: ['ONE-5'], visibleFilter: false}])
             .checkTable(issueTable);
           new EqualityChecker()
-            .cleanSwimlaneTables('c2-A', 'c2-B', NONE_FILTER)
+            .cleanSwimlanes(NONE_FILTER)
+            .cleanSwimlaneTables('c2-A', 'c2-B')
             .check(originalState, issueTable);
           });
       });
@@ -1408,9 +1414,9 @@ describe('Swimlane observer tests', () => {
                 {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4'], visibleFilter: true},
                 {key: NONE_FILTER, name: 'None', issues: ['ONE-2', 'ONE-5'], visibleFilter: false}])
               .checkTable(issueTable);
+
             new EqualityChecker()
-              .cleanSwimlanes('bob')
-              .cleanSwimlaneTables('kabir', NONE_FILTER)
+              .cleanSwimlanes('bob', NONE_FILTER, 'kabir')
               .check(originalState, issueTable);
           });
       });
@@ -1607,10 +1613,16 @@ class EqualityChecker {
       if (changedSwimlaneColumns.has(v)) {
         fail(`'${v}' appears in both clean swimlanes and where we are expecting a change`);
       }
+      if (unchangedSwimlaneTables.has(v)) {
+        fail(`'${v}' appears in both clean swimlanes and clean tables`);
+      }
     });
     unchangedSwimlaneTables.forEach(v => {
       if (changedSwimlaneColumns.has(v)) {
         fail(`'${v}' appears in both clean swimlane tables and where we are expecting a change`);
+      }
+      if (unchangedSwimlanes.has(v)) {
+        fail(`'${v}' appears in both clean swimlanes and clean tables`);
       }
     });
     const allKeys: Set<string> =
@@ -1623,11 +1635,12 @@ class EqualityChecker {
 
     unchangedSwimlanes.forEach(k => {
       expect(curr.swimlanes.get(k)).toBeTruthy();
-      expect(old.swimlanes.get(k)).toBe(curr.swimlanes.get(k), `Different swimlane: ${k}`);
+      expect(curr.swimlanes.get(k)).toBe(old.swimlanes.get(k), `Different swimlane: ${k}`);
     });
     unchangedSwimlaneTables.forEach(k => {
       expect(curr.swimlanes.get(k)).toBeTruthy();
-      expect(old.swimlanes.get(k).table).toBe(curr.swimlanes.get(k).table, `Different swimlane table: ${k}`);
+      expect(curr.swimlanes.get(k).table).toBe(old.swimlanes.get(k).table, `Different swimlane table: ${k}`);
+      expect(curr.swimlanes.get(k)).not.toBe(old.swimlanes.get(k), `Same swimlane: ${k}`);
     });
     changedSwimlaneColumns.forEach((changedColumns, k) => {
       expect(curr.swimlanes.get(k)).toBeTruthy();
