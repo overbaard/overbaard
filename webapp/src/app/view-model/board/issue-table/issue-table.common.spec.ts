@@ -196,6 +196,12 @@ export class IssueTableObservableUtil {
     return this;
   }
 
+  toggleColumnVisibility(...states: number[]): IssueTableObservableUtil {
+    this._userSettingState =
+      userSettingReducer(this._userSettingState, UserSettingActions.toggleVisibility(List<number>(states)));
+    this._userSettingSubject$.next(this._userSettingState);
+    return this;
+  }
 
   tableObserver(): Observable<IssueTable> {
     return this._issueTable$;

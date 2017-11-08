@@ -1,6 +1,5 @@
 import {List, OrderedSet, Set} from 'immutable';
 import {IssueTable} from './issue-table';
-import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/take';
 import {IssuesFactory, IssueTableObservableUtil} from './issue-table.common.spec';
 import {Dictionary} from '../../../common/dictionary';
@@ -28,10 +27,10 @@ describe('Issue Table observer tests', () => {
           .mapState('ONE', 'S-3', '1-3')
           .mapState('ONE', 'S-4', '1-4')
           .emitBoardChange()
-          .tableObserver().subscribe(
-          issueTable => checkTable(issueTable,
-            [['ONE-1'], ['ONE-2'], ['ONE-5', 'ONE-3', 'ONE-6'], ['ONE-4']],
-            []));
+          .tableObserver().take(1).subscribe(
+          issueTable =>
+            new TableChecker([['ONE-1'], ['ONE-2'], ['ONE-5', 'ONE-3', 'ONE-6'], ['ONE-4']])
+              .checkTable(issueTable));
       });
       it('All states mapped, issues in some states', () => {
         new IssueTableObservableUtil('ONE',
@@ -48,10 +47,10 @@ describe('Issue Table observer tests', () => {
           .mapState('ONE', 'S-3', '1-3')
           .mapState('ONE', 'S-4', '1-4')
           .emitBoardChange()
-          .tableObserver().subscribe(
-          issueTable => checkTable(issueTable,
-            [[], ['ONE-1', 'ONE-2'], ['ONE-5', 'ONE-3'], ['ONE-4']],
-            []));
+          .tableObserver().take(1).subscribe(
+          issueTable =>
+            new TableChecker([[], ['ONE-1', 'ONE-2'], ['ONE-5', 'ONE-3'], ['ONE-4']])
+              .checkTable(issueTable));
       });
 
       it('Not all states mapped, issues in all states', () => {
@@ -66,10 +65,10 @@ describe('Issue Table observer tests', () => {
           .mapState('ONE', 'S-2', '1-1')
           .mapState('ONE', 'S-4', '1-2')
           .emitBoardChange()
-          .tableObserver().subscribe(
-          issueTable => checkTable(issueTable,
-            [[], ['ONE-2', 'ONE-1'], [], ['ONE-4', 'ONE-3']],
-            []));
+          .tableObserver().take(1).subscribe(
+          issueTable =>
+            new TableChecker([[], ['ONE-2', 'ONE-1'], [], ['ONE-4', 'ONE-3']])
+              .checkTable(issueTable));
       });
     });
 
@@ -101,14 +100,14 @@ describe('Issue Table observer tests', () => {
           .mapState('TWO', 'S-3', '2-3')
           .mapState('TWO', 'S-4', '2-4')
           .emitBoardChange()
-          .tableObserver().subscribe(
-          issueTable => checkTable(issueTable,
-            [
+          .tableObserver().take(1).subscribe(
+          issueTable =>
+            new TableChecker([
               ['ONE-1', 'TWO-1'],
               ['ONE-2', 'TWO-2'],
               ['ONE-3', 'ONE-5', 'ONE-6', 'TWO-6', 'TWO-5', 'TWO-3'],
-              ['ONE-4', 'TWO-4']],
-            []));
+              ['ONE-4', 'TWO-4']])
+              .checkTable(issueTable));
       });
 
       it('Not all states mapped, issues in all states', () => {
@@ -128,15 +127,15 @@ describe('Issue Table observer tests', () => {
           .mapState('TWO', 'S-3', '2-1')
           .mapState('TWO', 'S-4', '2-2')
           .emitBoardChange()
-          .tableObserver().subscribe(
-          issueTable => checkTable(issueTable,
-            [
+          .tableObserver().take(1).subscribe(
+          issueTable =>
+            new TableChecker([
               [],
               ['ONE-2', 'ONE-1'],
               ['ONE-3', 'TWO-1'],
               ['TWO-3', 'TWO-2'],
-              []],
-            []));
+              []])
+              .checkTable(issueTable));
       });
     });
   });
@@ -165,9 +164,8 @@ describe('Issue Table observer tests', () => {
         .take(1)
         .subscribe(
         issueTable => {
-          checkTable(issueTable,
-            [['ONE-1'], ['ONE-2'], ['ONE-3', 'ONE-5', 'ONE-6'], ['ONE-4', 'ONE-7']],
-            [])
+          new TableChecker([['ONE-1'], ['ONE-2'], ['ONE-3', 'ONE-5', 'ONE-6'], ['ONE-4', 'ONE-7']])
+            .checkTable(issueTable);
           original = issueTable;
         });
     });
@@ -177,11 +175,11 @@ describe('Issue Table observer tests', () => {
         .issueChanges({update: [{key: 'ONE-2', summary: 'Test summary'}]})
         .emitBoardChange()
         .tableObserver()
+        .take(1)
         .subscribe(
         issueTable => {
-          checkTable(issueTable,
-            [['ONE-1'], ['ONE-2'], ['ONE-3', 'ONE-5', 'ONE-6'], ['ONE-4', 'ONE-7']],
-            []);
+          new TableChecker([['ONE-1'], ['ONE-2'], ['ONE-3', 'ONE-5', 'ONE-6'], ['ONE-4', 'ONE-7']])
+            .checkTable(issueTable);
           expect(issueTable.table).toBe(original.table)
         });
     });
@@ -192,10 +190,8 @@ describe('Issue Table observer tests', () => {
         .emitBoardChange()
         .tableObserver().take(1).subscribe(
           issueTable => {
-            checkTable(issueTable,
-              [['ONE-1'], ['ONE-2', 'ONE-5'], ['ONE-3', 'ONE-6'], ['ONE-4', 'ONE-7']],
-              []);
-            checkSameColumns(original, issueTable, 0, 3);
+            new TableChecker([['ONE-1'], ['ONE-2', 'ONE-5'], ['ONE-3', 'ONE-6'], ['ONE-4', 'ONE-7']])
+              .checkTable(issueTable);
             original = issueTable;
           });
       // Empty a state completely
@@ -204,9 +200,8 @@ describe('Issue Table observer tests', () => {
         .emitBoardChange()
         .tableObserver().take(1).subscribe(
         issueTable => {
-          checkTable(issueTable,
-            [[], ['ONE-1', 'ONE-2', 'ONE-5'], ['ONE-3', 'ONE-6'], ['ONE-4', 'ONE-7']],
-            []);
+          new TableChecker([[], ['ONE-1', 'ONE-2', 'ONE-5'], ['ONE-3', 'ONE-6'], ['ONE-4', 'ONE-7']])
+            .checkTable(issueTable);
           checkSameColumns(original, issueTable, 2, 3);
           original = issueTable;
         });
@@ -216,9 +211,8 @@ describe('Issue Table observer tests', () => {
         .emitBoardChange()
         .tableObserver().take(1).subscribe(
         issueTable => {
-          checkTable(issueTable,
-            [['ONE-1'], ['ONE-2', 'ONE-5'], ['ONE-3', 'ONE-6'], ['ONE-4', 'ONE-7']],
-            []);
+          new TableChecker([['ONE-1'], ['ONE-2', 'ONE-5'], ['ONE-3', 'ONE-6'], ['ONE-4', 'ONE-7']])
+            .checkTable(issueTable);
           checkSameColumns(original, issueTable, 2, 3);
         });
 
@@ -230,9 +224,8 @@ describe('Issue Table observer tests', () => {
         .emitBoardChange()
         .tableObserver().take(1).subscribe(
           issueTable => {
-            checkTable(issueTable,
-              [['ONE-1'], ['ONE-2'], ['ONE-3', 'ONE-6'], ['ONE-4', 'ONE-7']],
-              []);
+            new TableChecker([['ONE-1'], ['ONE-2'], ['ONE-3', 'ONE-6'], ['ONE-4', 'ONE-7']])
+              .checkTable(issueTable);
             checkSameColumns(original, issueTable, 0, 1, 3);
             original = issueTable;
           });
@@ -242,9 +235,8 @@ describe('Issue Table observer tests', () => {
         .emitBoardChange()
         .tableObserver().take(1).subscribe(
         issueTable => {
-          checkTable(issueTable,
-            [[], ['ONE-2'], ['ONE-3', 'ONE-6'], ['ONE-4', 'ONE-7']],
-            []);
+          new TableChecker([[], ['ONE-2'], ['ONE-3', 'ONE-6'], ['ONE-4', 'ONE-7']])
+            .checkTable(issueTable);
           checkSameColumns(original, issueTable, 1, 2, 3);
           original = issueTable;
         });
@@ -258,11 +250,11 @@ describe('Issue Table observer tests', () => {
           .rankChanges({ONE: [{index: 7, key: 'ONE-8'}]})
           .emitBoardChange()
           .tableObserver()
+          .take(1)
           .subscribe(
             issueTable => {
-              checkTable(issueTable,
-                [['ONE-1', 'ONE-8'], ['ONE-2'], ['ONE-3', 'ONE-5', 'ONE-6'], ['ONE-4', 'ONE-7']],
-                []);
+              new TableChecker([['ONE-1', 'ONE-8'], ['ONE-2'], ['ONE-3', 'ONE-5', 'ONE-6'], ['ONE-4', 'ONE-7']])
+                .checkTable(issueTable);
               checkSameColumns(original, issueTable, 1, 2, 3);
             });
       });
@@ -292,9 +284,8 @@ describe('Issue Table observer tests', () => {
           .take(1)
           .subscribe(
             issueTable => {
-              checkTable(issueTable,
-                [['ONE-1'], ['ONE-2'], ['ONE-3', 'ONE-5', 'ONE-6', 'TWO-1'], ['ONE-4', 'ONE-7', 'TWO-2']],
-                [])
+              new TableChecker([['ONE-1'], ['ONE-2'], ['ONE-3', 'ONE-5', 'ONE-6', 'TWO-1'], ['ONE-4', 'ONE-7', 'TWO-2']])
+                .checkTable(issueTable);
               original = issueTable;
             });
         util
@@ -302,11 +293,11 @@ describe('Issue Table observer tests', () => {
           .rankChanges({TWO: [{index: 2, key: 'TWO-3'}]})
           .emitBoardChange()
           .tableObserver()
+          .take(1)
           .subscribe(
             issueTable => {
-              checkTable(issueTable,
-                [['ONE-1'], ['ONE-2'], ['ONE-3', 'ONE-5', 'ONE-6', 'TWO-1', 'TWO-3'], ['ONE-4', 'ONE-7', 'TWO-2']],
-                []);
+              new TableChecker([['ONE-1'], ['ONE-2'], ['ONE-3', 'ONE-5', 'ONE-6', 'TWO-1', 'TWO-3'], ['ONE-4', 'ONE-7', 'TWO-2']])
+                .checkTable(issueTable);
               checkSameColumns(original, issueTable, 0, 1, 3);
             });
       });
@@ -318,6 +309,7 @@ describe('Issue Table observer tests', () => {
         .rankChanges({ONE: [{index: 0, key: 'ONE-3'}]})
         .emitBoardChange()
         .tableObserver()
+        .take(1)
         .subscribe(
           issueTable => {
             // Everything should be the same in the issue table
@@ -332,11 +324,11 @@ describe('Issue Table observer tests', () => {
         .rankChanges({ONE: [{index: 6, key: 'ONE-3'}]})
         .emitBoardChange()
         .tableObserver()
+        .take(1)
         .subscribe(
           issueTable => {
-            checkTable(issueTable,
-              [['ONE-1'], ['ONE-2'], ['ONE-5', 'ONE-6', 'ONE-3'], ['ONE-4', 'ONE-7']],
-              []);
+            new TableChecker([['ONE-1'], ['ONE-2'], ['ONE-5', 'ONE-6', 'ONE-3'], ['ONE-4', 'ONE-7']])
+              .checkTable(issueTable)
             checkSameColumns(original, issueTable, 0, 1, 3);
           });
     });
@@ -347,92 +339,161 @@ describe('Issue table filter tests', () => {
   // We only test filtering on priority here - we have other tests doing in-depth testing of the filters
 
   it('Update filter for existing table', () => {
-    const util: IssueTableObservableUtil = setupTable(false);
+    const util: IssueTableObservableUtil = setupTable();
     util.tableObserver().take(1).subscribe(issueTable => {
-      checkTable(issueTable,
-        [['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']],
-        []);
+      new TableChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']])
+        .checkTable(issueTable)
     });
 
     util.updateFilters('priority', 'Blocker');
     util.tableObserver().take(1).subscribe(issueTable => {
-      checkTable(issueTable,
-        [['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']],
-        ['ONE-1', 'ONE-3', 'ONE-5', 'ONE-7', 'ONE-9']);
+      new TableChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']])
+        .invisibleIssues('ONE-1', 'ONE-3', 'ONE-5', 'ONE-7', 'ONE-9')
+        .checkTable(issueTable);
       // The visible issue counts are checked automatically in checkTable(), but do a sanity test here
       expect(issueTable.visibleIssueCounts.toArray()).toEqual([1, 1, 2]);
     });
 
     util.updateFilters('priority', 'Major');
     util.tableObserver().take(1).subscribe(issueTable => {
-      checkTable(issueTable,
-        [['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']],
-        ['ONE-2', 'ONE-4', 'ONE-6', 'ONE-8']);
+      new TableChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']])
+        .invisibleIssues('ONE-2', 'ONE-4', 'ONE-6', 'ONE-8')
+        .checkTable(issueTable);
       // The visible issue counts are checked automatically in checkTable(), but do a sanity test here
       expect(issueTable.visibleIssueCounts.toArray()).toEqual([1, 2, 2]);
     });
   });
 
   it('Filter exists when creating table', () => {
-    const util: IssueTableObservableUtil = setupTable(true);
-    util.tableObserver().subscribe(issueTable => {
-      checkTable(issueTable,
-        [['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']],
-        ['ONE-2', 'ONE-4', 'ONE-6', 'ONE-8']);
+    const util: IssueTableObservableUtil = setupTable({priority: 'Major'});
+    util.tableObserver().take(1).subscribe(issueTable => {
+      new TableChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']])
+        .invisibleIssues('ONE-2', 'ONE-4', 'ONE-6', 'ONE-8')
+        .checkTable(issueTable);
     });
   });
 
   describe('Update table when filter exists ', () => {
     describe('New Issue', () => {
       it('Matching filter', () => {
-        setupTable(true)
+        setupTable({priority: 'Major'})
           .issueChanges({new: [{key: 'ONE-10', state: '1-1', summary: 'Test', priority: 'Major', type: 'task'}]})
           .rankChanges({ONE: [{index: 9, key: 'ONE-10'}]})
           .emitBoardChange()
-          .tableObserver().subscribe(issueTable => {
-          checkTable(issueTable,
-            [['ONE-1', 'ONE-2', 'ONE-10'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']],
-            ['ONE-2', 'ONE-4', 'ONE-6', 'ONE-8']);
+          .tableObserver().take(1).subscribe(issueTable => {
+          new TableChecker([['ONE-1', 'ONE-2', 'ONE-10'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']])
+            .invisibleIssues('ONE-2', 'ONE-4', 'ONE-6', 'ONE-8')
+            .checkTable(issueTable);
         });
       });
       it('Not matching filter', () => {
-        setupTable(true)
+        setupTable({priority: 'Major'})
           .issueChanges({new: [{key: 'ONE-10', state: '1-1', summary: 'Test', priority: 'Blocker', type: 'task'}]})
           .rankChanges({ONE: [{index: 9, key: 'ONE-10'}]})
           .emitBoardChange()
-          .tableObserver().subscribe(issueTable => {
-          checkTable(issueTable,
-            [['ONE-1', 'ONE-2', 'ONE-10'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']],
-            ['ONE-2', 'ONE-4', 'ONE-6', 'ONE-8', 'ONE-10']);
+          .tableObserver().take(1).subscribe(issueTable => {
+          new TableChecker([['ONE-1', 'ONE-2', 'ONE-10'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']])
+            .invisibleIssues('ONE-2', 'ONE-4', 'ONE-6', 'ONE-8', 'ONE-10')
+            .checkTable(issueTable);
         });
       });
     });
     describe('Update Issue', () => {
       it('Matching filter', () => {
-        setupTable(true)
+        setupTable({priority: 'Major'})
           .issueChanges({update: [{key: 'ONE-2', priority: 'Major'}]})
           .emitBoardChange()
-          .tableObserver().subscribe(issueTable => {
-          checkTable(issueTable,
-            [['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']],
-            ['ONE-4', 'ONE-6', 'ONE-8']);
+          .tableObserver().take(1).subscribe(issueTable => {
+          new TableChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']])
+            .invisibleIssues('ONE-4', 'ONE-6', 'ONE-8')
+            .checkTable(issueTable);
         });
       });
       it('Not matching filter', () => {
-        setupTable(true)
+        setupTable({priority: 'Major'})
           .issueChanges({update: [{key: 'ONE-1', priority: 'Blocker'}]})
           .emitBoardChange()
-          .tableObserver().subscribe(issueTable => {
-          checkTable(issueTable,
-            [['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']],
-            ['ONE-1', 'ONE-2', 'ONE-4', 'ONE-6', 'ONE-8']);
+          .tableObserver().take(1).subscribe(issueTable => {
+          new TableChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']])
+            .invisibleIssues('ONE-1', 'ONE-2', 'ONE-4', 'ONE-6', 'ONE-8')
+            .checkTable(issueTable);
         });
       });
     });
   });
 
-  function setupTable(filter: boolean): IssueTableObservableUtil {
-    const params: Dictionary<string> = filter ? {priority: 'Major'} : null;
+  describe('Visible column counts', () => {
+    it ('No initial columns hidden', () => {
+      let original: IssueTable;
+      const util: IssueTableObservableUtil = setupTable()
+        .emitBoardChange();
+      util.tableObserver().take(1).subscribe(issueTable => {
+        new TableChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']])
+          .checkTable(issueTable);
+        original = issueTable;
+      });
+
+      util.toggleColumnVisibility(1, 2)
+        .tableObserver().take(1).subscribe(issueTable => {
+        new TableChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']])
+          .invisibleColumns(1, 2)
+          .checkTable(issueTable);
+        expect(issueTable.table).toBe(original.table);
+        original = issueTable;
+      });
+
+      util.toggleColumnVisibility(2, 3)
+        .tableObserver().take(1).subscribe(issueTable => {
+        new TableChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']])
+          .invisibleColumns(1, 3)
+          .checkTable(issueTable);
+        expect(issueTable.table).toBe(original.table);
+      });
+    });
+    it ('Initial columns hidden (param: hidden); no filter', () => {
+      let original: IssueTable;
+      const util: IssueTableObservableUtil = setupTable({hidden: '1,2'})
+        .emitBoardChange();
+      util.tableObserver().take(1).subscribe(issueTable => {
+        new TableChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']])
+          .invisibleColumns(1, 2)
+          .checkTable(issueTable);
+        original = issueTable;
+      });
+      util.toggleColumnVisibility(2, 3)
+        .tableObserver().take(1).subscribe(issueTable => {
+        new TableChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']])
+          .invisibleColumns(1, 3)
+          .checkTable(issueTable);
+        expect(issueTable.table).toBe(original.table);
+        original = issueTable;
+      });
+    });
+    it ('Initial columns hidden (param: visible); filter', () => {
+      let original: IssueTable;
+      const util: IssueTableObservableUtil = setupTable({priority: 'Major', visible: '1,2'})
+        .issueChanges({update: [{key: 'ONE-2', priority: 'Major'}]})
+        .emitBoardChange();
+      util.tableObserver().take(1).subscribe(issueTable => {
+        new TableChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']])
+          .invisibleIssues('ONE-4', 'ONE-6', 'ONE-8')
+          .invisibleColumns(0, 3)
+          .checkTable(issueTable);
+        original = issueTable;
+      });
+      util.toggleColumnVisibility(2, 3)
+        .tableObserver().take(1).subscribe(issueTable => {
+        new TableChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']])
+          .invisibleIssues('ONE-4', 'ONE-6', 'ONE-8')
+          .invisibleColumns(0, 2)
+          .checkTable(issueTable);
+        expect(issueTable.table).toBe(original.table);
+        original = issueTable;
+      });
+    });
+  })
+
+  function setupTable(params?: Dictionary<string>): IssueTableObservableUtil {
     const util: IssueTableObservableUtil = new IssueTableObservableUtil('ONE',
       new SimpleIssueFactory()
         .addIssue('ONE-1', 0)
@@ -455,34 +516,59 @@ describe('Issue table filter tests', () => {
   }
 });
 
-export function checkTable(issueTable: IssueTable, expected: string[][], invisible: string[]) {
-  // Check table layout
-  const actualTable: string[][] = [];
-  issueTable.table.forEach((v, i) => {
-    actualTable.push(issueTable.table.get(i).toArray());
-  });
-  expect(actualTable).toEqual(expected);
+class TableChecker {
+  private _invisibleIssues: string[] = [];
+  private _invisibleColumns: number[] = [];
 
-  // Check the size of the issues map
-  expect(issueTable.issues.size).toBe(expected.map(issues => issues.length).reduce((s, c) => s + c));
-
-  // Check issue visibilities
-  const invisibleKeys: string[] =
-    issueTable.issues.filter(issue => !issue.visible).keySeq().toArray().sort((a, b) => a.localeCompare(b));
-  expect(invisibleKeys).toEqual(invisible.sort((a, b) => a.localeCompare(b)));
-
-  // Check issue counts
-  const invisibleSet: Set<string> = Set<string>(invisible);
-  const visibleIssueCounts: number[] = new Array<number>(expected.length);
-  for (let i = 0 ; i < expected.length ; i++) {
-    visibleIssueCounts[i] = expected[i].reduce((s, v, ind, arr) => {
-      return invisibleSet.contains(arr[ind]) ? s : s + 1;
-      }, 0);
+  constructor(private _expected: string[][]) {
   }
-  expect(issueTable.visibleIssueCounts.toArray()).toEqual(visibleIssueCounts);
+
+  invisibleIssues(...invisible: string[]): TableChecker {
+    this._invisibleIssues = invisible;
+    return this;
+  }
+
+  invisibleColumns(...invisibleColumns: number[]): TableChecker {
+    this._invisibleColumns = invisibleColumns;
+    return this;
+  }
+
+  checkTable(issueTable: IssueTable) {
+    // Check table layout
+    const actualTable: string[][] = [];
+    issueTable.table.forEach((v, i) => {
+      actualTable.push(issueTable.table.get(i).toArray());
+    });
+    expect(actualTable).toEqual(this._expected);
+
+    // Check the size of the issues map
+    expect(issueTable.issues.size).toBe(this._expected.map(issues => issues.length).reduce((s, c) => s + c));
+
+    // Check issue visibilities
+    const invisibleKeys: string[] =
+      issueTable.issues.filter(issue => !issue.visible).keySeq().toArray().sort((a, b) => a.localeCompare(b));
+    expect(invisibleKeys).toEqual(this._invisibleIssues.sort((a, b) => a.localeCompare(b)));
+
+    // Check issue counts
+    const invisibleIssueSet: Set<string> = Set<string>(this._invisibleIssues);
+    const visibleIssueCounts: number[] = new Array<number>(this._expected.length);
+    for (let i = 0 ; i < this._expected.length ; i++) {
+      visibleIssueCounts[i] = this._expected[i].reduce((s, v, ind, arr) => {
+        return invisibleIssueSet.contains(arr[ind]) ? s : s + 1;
+      }, 0);
+    }
+    expect(issueTable.visibleIssueCounts.toArray()).toEqual(visibleIssueCounts);
+
+    const invisibleColumnSet: Set<number> = Set<number>(this._invisibleColumns);
+    const visibleColumns: boolean[] = new Array<boolean>(this._expected.length);
+    for (let i = 0 ; i < this._expected.length ; i++) {
+      visibleColumns[i] = !invisibleColumnSet.contains(i);
+    }
+    expect(issueTable.visibleColumns.toArray()).toEqual(visibleColumns);
+  }
 }
 
-function checkSameColumns(oldState: IssueTable, newState: IssueTable, ...cols: number[]) {
+function  checkSameColumns(oldState: IssueTable, newState: IssueTable, ...cols: number[]) {
   const expectedEqual: OrderedSet<number> = OrderedSet<number>(cols);
   expect(oldState.table.size).toBe(newState.table.size);
   for (let i = 0 ; i < oldState.table.size ; i++) {
@@ -495,6 +581,8 @@ function checkSameColumns(oldState: IssueTable, newState: IssueTable, ...cols: n
     }
   }
 }
+
+
 
 class SimpleIssueFactory implements IssuesFactory {
   _issueKeys: string[];

@@ -30,8 +30,8 @@ describe('Swimlane observer tests', () => {
             .addIssue('TWO-3', 1))
         .tableObserver().take(1).subscribe(
           issueTable => {
-            new IssueTableChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']], [])
-              .setSwimlanes([
+            new IssueTableChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']])
+              .swimlanes([
                 {key: 'ONE', name: 'ONE', issues: ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4']},
                 {key: 'TWO', name: 'TWO', issues: ['TWO-1', 'TWO-2', 'TWO-3']}])
               .checkTable(issueTable);
@@ -42,8 +42,8 @@ describe('Swimlane observer tests', () => {
         createUtilWithStandardIssues({swimlane: 'issue-type'})
           .tableObserver().take(1).subscribe(
             issueTable => {
-              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-                .setSwimlanes([
+              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                .swimlanes([
                   {key: 'task', name: 'task', issues: ['ONE-2', 'ONE-4']},
                   {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3', 'ONE-5']}])
                 .checkTable(issueTable);
@@ -54,8 +54,8 @@ describe('Swimlane observer tests', () => {
         createUtilWithStandardIssues({swimlane: 'priority'})
           .tableObserver().take(1).subscribe(
           issueTable => {
-            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-              .setSwimlanes([
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+              .swimlanes([
                 {key: 'Blocker', name: 'Blocker', issues: ['ONE-1', 'ONE-3', 'ONE-5']},
                 {key: 'Major', name: 'Major', issues: ['ONE-2', 'ONE-4']}])
               .checkTable(issueTable);
@@ -66,8 +66,8 @@ describe('Swimlane observer tests', () => {
         createUtilWithStandardIssues({swimlane: 'assignee'})
           .tableObserver().take(1).subscribe(
           issueTable => {
-            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-              .setSwimlanes([
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+              .swimlanes([
                 {key: 'bob', name: 'Bob Brent Barlow', issues: ['ONE-3']},
                 {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4']},
                 {key: NONE_FILTER, name: 'None', issues: ['ONE-2', 'ONE-5']}])
@@ -79,8 +79,8 @@ describe('Swimlane observer tests', () => {
         createUtilWithStandardIssues({swimlane: 'component'})
           .tableObserver().take(1).subscribe(
           issueTable => {
-            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-              .setSwimlanes([
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+              .swimlanes([
                 {key: 'C-10', name: 'C-10', issues: ['ONE-1', 'ONE-4']},
                 {key: 'C-20', name: 'C-20', issues: ['ONE-2', 'ONE-4']},
                 {key: 'C-30', name: 'C-30', issues: ['ONE-3', 'ONE-4']},
@@ -93,8 +93,8 @@ describe('Swimlane observer tests', () => {
         createUtilWithStandardIssues({swimlane: 'fix-version'})
           .tableObserver().take(1).subscribe(
           issueTable => {
-            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-              .setSwimlanes([
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+              .swimlanes([
                 {key: 'F-10', name: 'F-10', issues: ['ONE-1', 'ONE-2']},
                 {key: 'F-20', name: 'F-20', issues: ['ONE-1', 'ONE-3']},
                 {key: 'F-30', name: 'F-30', issues: ['ONE-1', 'ONE-5']},
@@ -107,8 +107,8 @@ describe('Swimlane observer tests', () => {
         createUtilWithStandardIssues({swimlane: 'label'})
           .tableObserver().take(1).subscribe(
           issueTable => {
-            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-              .setSwimlanes([
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+              .swimlanes([
                 {key: 'L-10', name: 'L-10', issues: ['ONE-2', 'ONE-3']},
                 {key: 'L-20', name: 'L-20', issues: ['ONE-2', 'ONE-4']},
                 {key: 'L-30', name: 'L-30', issues: ['ONE-2', 'ONE-5']},
@@ -121,8 +121,8 @@ describe('Swimlane observer tests', () => {
         createUtilWithStandardIssues({swimlane: 'Custom-2'})
           .tableObserver().take(1).subscribe(
           issueTable => {
-            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-              .setSwimlanes([
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+              .swimlanes([
                 {key: 'c2-A', name: 'First C2', issues: ['ONE-1', 'ONE-2', 'ONE-3']},
                 {key: 'c2-B', name: 'Second C2', issues: ['ONE-4']},
                 {key: NONE_FILTER, name: 'None', issues: ['ONE-5']}])
@@ -148,14 +148,14 @@ describe('Swimlane observer tests', () => {
             .addIssue('TWO-3', 1));
           util.tableObserver().take(1).subscribe(
           issueTable => {
-            new IssueTableChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']], [])
+            new IssueTableChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']])
               .checkTable(issueTable);
           });
           util.updateSwimlane('project')
             .tableObserver().take(1).subscribe(
             issueTable => {
-              new IssueTableChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']], [])
-                .setSwimlanes([
+              new IssueTableChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']])
+                .swimlanes([
                   {key: 'ONE', name: 'ONE', issues: ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4']},
                   {key: 'TWO', name: 'TWO', issues: ['TWO-1', 'TWO-2', 'TWO-3']}])
                 .checkTable(issueTable);
@@ -164,7 +164,7 @@ describe('Swimlane observer tests', () => {
           util.updateSwimlane(null)
             .tableObserver().take(1).subscribe(
               issueTable => {
-                new IssueTableChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']], [])
+                new IssueTableChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']])
                   .checkTable(issueTable);
               });
       });
@@ -174,15 +174,15 @@ describe('Swimlane observer tests', () => {
         const util: IssueTableObservableUtil = createUtilWithStandardIssues({});
         util.tableObserver().take(1).subscribe(
           issueTable => {
-            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .checkTable(issueTable);
           });
 
         util.updateSwimlane('issue-type')
           .tableObserver().take(1).subscribe(
           issueTable => {
-            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-              .setSwimlanes([
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+              .swimlanes([
                 {key: 'task', name: 'task', issues: ['ONE-2', 'ONE-4']},
                 {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3', 'ONE-5']}])
               .checkTable(issueTable);
@@ -191,8 +191,8 @@ describe('Swimlane observer tests', () => {
         util.updateSwimlane('priority')
           .tableObserver().take(1).subscribe(
           issueTable => {
-            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-              .setSwimlanes([
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+              .swimlanes([
                 {key: 'Blocker', name: 'Blocker', issues: ['ONE-1', 'ONE-3', 'ONE-5']},
                 {key: 'Major', name: 'Major', issues: ['ONE-2', 'ONE-4']}])
               .checkTable(issueTable);
@@ -201,8 +201,8 @@ describe('Swimlane observer tests', () => {
         util.updateSwimlane('assignee')
           .tableObserver().take(1).subscribe(
           issueTable => {
-            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-              .setSwimlanes([
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+              .swimlanes([
                 {key: 'bob', name: 'Bob Brent Barlow', issues: ['ONE-3']},
                 {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4']},
                 {key: NONE_FILTER, name: 'None', issues: ['ONE-2', 'ONE-5']}])
@@ -212,8 +212,8 @@ describe('Swimlane observer tests', () => {
         util.updateSwimlane('component')
           .tableObserver().take(1).subscribe(
           issueTable => {
-            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-              .setSwimlanes([
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+              .swimlanes([
                 {key: 'C-10', name: 'C-10', issues: ['ONE-1', 'ONE-4']},
                 {key: 'C-20', name: 'C-20', issues: ['ONE-2', 'ONE-4']},
                 {key: 'C-30', name: 'C-30', issues: ['ONE-3', 'ONE-4']},
@@ -224,8 +224,8 @@ describe('Swimlane observer tests', () => {
         util.updateSwimlane('fix-version')
           .tableObserver().take(1).subscribe(
           issueTable => {
-            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-              .setSwimlanes([
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+              .swimlanes([
                 {key: 'F-10', name: 'F-10', issues: ['ONE-1', 'ONE-2']},
                 {key: 'F-20', name: 'F-20', issues: ['ONE-1', 'ONE-3']},
                 {key: 'F-30', name: 'F-30', issues: ['ONE-1', 'ONE-5']},
@@ -236,8 +236,8 @@ describe('Swimlane observer tests', () => {
         util.updateSwimlane('label')
           .tableObserver().take(1).subscribe(
           issueTable => {
-            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-              .setSwimlanes([
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+              .swimlanes([
                 {key: 'L-10', name: 'L-10', issues: ['ONE-2', 'ONE-3']},
                 {key: 'L-20', name: 'L-20', issues: ['ONE-2', 'ONE-4']},
                 {key: 'L-30', name: 'L-30', issues: ['ONE-2', 'ONE-5']},
@@ -248,8 +248,8 @@ describe('Swimlane observer tests', () => {
         util.updateSwimlane('Custom-2')
           .tableObserver().take(1).subscribe(
           issueTable => {
-            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-              .setSwimlanes([
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+              .swimlanes([
                 {key: 'c2-A', name: 'First C2', issues: ['ONE-1', 'ONE-2', 'ONE-3']},
                 {key: 'c2-B', name: 'Second C2', issues: ['ONE-4']},
                 {key: NONE_FILTER, name: 'None', issues: ['ONE-5']}])
@@ -283,8 +283,8 @@ describe('Swimlane observer tests', () => {
           .emitBoardChange()
           .tableObserver().take(1).subscribe(
             issueTable => {
-              new IssueTableChecker([['ONE-2', 'ONE-1', 'ONE-5'], ['ONE-3', 'TWO-1', 'TWO-4'], ['ONE-4', 'TWO-3', 'TWO-2']], [])
-                .setSwimlanes([
+              new IssueTableChecker([['ONE-2', 'ONE-1', 'ONE-5'], ['ONE-3', 'TWO-1', 'TWO-4'], ['ONE-4', 'TWO-3', 'TWO-2']])
+                .swimlanes([
                   {key: 'ONE', name: 'ONE', issues: ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5']},
                   {key: 'TWO', name: 'TWO', issues: ['TWO-1', 'TWO-2', 'TWO-3', 'TWO-4']}])
                 .checkTable(issueTable);
@@ -306,8 +306,8 @@ describe('Swimlane observer tests', () => {
           .emitBoardChange()
           .tableObserver().take(1).subscribe(
             issueTable => {
-              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []], [])
-                .setSwimlanes([
+              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
+                .swimlanes([
                   {key: 'task', name: 'task', issues: ['ONE-2', 'ONE-4', 'ONE-6']},
                   {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3', 'ONE-5']}])
                 .checkTable(issueTable);
@@ -329,8 +329,8 @@ describe('Swimlane observer tests', () => {
           .emitBoardChange()
           .tableObserver().take(1).subscribe(
           issueTable => {
-            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []], [])
-              .setSwimlanes([
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
+              .swimlanes([
                 {key: 'Blocker', name: 'Blocker', issues: ['ONE-1', 'ONE-3', 'ONE-5']},
                 {key: 'Major', name: 'Major', issues: ['ONE-2', 'ONE-4', 'ONE-6']}])
               .checkTable(issueTable);
@@ -357,8 +357,8 @@ describe('Swimlane observer tests', () => {
             .emitBoardChange()
             .tableObserver().take(1).subscribe(
             issueTable => {
-              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []], [])
-                .setSwimlanes([
+              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
+                .swimlanes([
                   {key: 'bob', name: 'Bob Brent Barlow', issues: ['ONE-3']},
                   {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4']},
                   {key: NONE_FILTER, name: 'None', issues: ['ONE-2', 'ONE-5', 'ONE-6']}])
@@ -377,8 +377,8 @@ describe('Swimlane observer tests', () => {
             .emitBoardChange()
             .tableObserver().take(1).subscribe(
             issueTable => {
-              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []], [])
-                .setSwimlanes([
+              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
+                .swimlanes([
                   {key: 'bob', name: 'Bob Brent Barlow', issues: ['ONE-3', 'ONE-6']},
                   {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4']},
                   {key: NONE_FILTER, name: 'None', issues: ['ONE-2', 'ONE-5']}])
@@ -407,8 +407,8 @@ describe('Swimlane observer tests', () => {
             .emitBoardChange()
             .tableObserver().take(1).subscribe(
             issueTable => {
-              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []], [])
-                .setSwimlanes([
+              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
+                .swimlanes([
                   {key: 'C-10', name: 'C-10', issues: ['ONE-1', 'ONE-4']},
                   {key: 'C-20', name: 'C-20', issues: ['ONE-2', 'ONE-4']},
                   {key: 'C-30', name: 'C-30', issues: ['ONE-3', 'ONE-4']},
@@ -428,8 +428,8 @@ describe('Swimlane observer tests', () => {
             .emitBoardChange()
             .tableObserver().take(1).subscribe(
             issueTable => {
-              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []], [])
-                .setSwimlanes([
+              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
+                .swimlanes([
                   {key: 'C-10', name: 'C-10', issues: ['ONE-1', 'ONE-4', 'ONE-6']},
                   {key: 'C-20', name: 'C-20', issues: ['ONE-2', 'ONE-4']},
                   {key: 'C-30', name: 'C-30', issues: ['ONE-3', 'ONE-4']},
@@ -451,8 +451,8 @@ describe('Swimlane observer tests', () => {
             .emitBoardChange()
             .tableObserver().take(1).subscribe(
             issueTable => {
-              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []], [])
-                .setSwimlanes([
+              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
+                .swimlanes([
                   {key: 'C-10', name: 'C-10', issues: ['ONE-1', 'ONE-4', 'ONE-6']},
                   {key: 'C-20', name: 'C-20', issues: ['ONE-2', 'ONE-4', 'ONE-6']},
                   {key: 'C-30', name: 'C-30', issues: ['ONE-3', 'ONE-4']},
@@ -483,8 +483,8 @@ describe('Swimlane observer tests', () => {
             .emitBoardChange()
             .tableObserver().take(1).subscribe(
             issueTable => {
-              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []], [])
-                .setSwimlanes([
+              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
+                .swimlanes([
                   {key: 'F-10', name: 'F-10', issues: ['ONE-1', 'ONE-2']},
                   {key: 'F-20', name: 'F-20', issues: ['ONE-1', 'ONE-3']},
                   {key: 'F-30', name: 'F-30', issues: ['ONE-1', 'ONE-5']},
@@ -504,8 +504,8 @@ describe('Swimlane observer tests', () => {
             .emitBoardChange()
             .tableObserver().take(1).subscribe(
             issueTable => {
-              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []], [])
-                .setSwimlanes([
+              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
+                .swimlanes([
                   {key: 'F-10', name: 'F-10', issues: ['ONE-1', 'ONE-2', 'ONE-6']},
                   {key: 'F-20', name: 'F-20', issues: ['ONE-1', 'ONE-3']},
                   {key: 'F-30', name: 'F-30', issues: ['ONE-1', 'ONE-5']},
@@ -526,8 +526,8 @@ describe('Swimlane observer tests', () => {
             .emitBoardChange()
             .tableObserver().take(1).subscribe(
             issueTable => {
-              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []], [])
-                .setSwimlanes([
+              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
+                .swimlanes([
                   {key: 'F-10', name: 'F-10', issues: ['ONE-1', 'ONE-2', 'ONE-6']},
                   {key: 'F-20', name: 'F-20', issues: ['ONE-1', 'ONE-3', 'ONE-6']},
                   {key: 'F-30', name: 'F-30', issues: ['ONE-1', 'ONE-5']},
@@ -558,8 +558,8 @@ describe('Swimlane observer tests', () => {
             .emitBoardChange()
             .tableObserver().take(1).subscribe(
             issueTable => {
-              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []], [])
-                .setSwimlanes([
+              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
+                .swimlanes([
                   {key: 'L-10', name: 'L-10', issues: ['ONE-2', 'ONE-3']},
                   {key: 'L-20', name: 'L-20', issues: ['ONE-2', 'ONE-4']},
                   {key: 'L-30', name: 'L-30', issues: ['ONE-2', 'ONE-5']},
@@ -579,8 +579,8 @@ describe('Swimlane observer tests', () => {
             .emitBoardChange()
             .tableObserver().take(1).subscribe(
             issueTable => {
-              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []], [])
-                .setSwimlanes([
+              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
+                .swimlanes([
                   {key: 'L-10', name: 'L-10', issues: ['ONE-2', 'ONE-3', 'ONE-6']},
                   {key: 'L-20', name: 'L-20', issues: ['ONE-2', 'ONE-4']},
                   {key: 'L-30', name: 'L-30', issues: ['ONE-2', 'ONE-5']},
@@ -601,8 +601,8 @@ describe('Swimlane observer tests', () => {
             .emitBoardChange()
             .tableObserver().take(1).subscribe(
             issueTable => {
-              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []], [])
-                .setSwimlanes([
+              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
+                .swimlanes([
                   {key: 'L-10', name: 'L-10', issues: ['ONE-2', 'ONE-3', 'ONE-6']},
                   {key: 'L-20', name: 'L-20', issues: ['ONE-2', 'ONE-4', 'ONE-6']},
                   {key: 'L-30', name: 'L-30', issues: ['ONE-2', 'ONE-5']},
@@ -633,8 +633,8 @@ describe('Swimlane observer tests', () => {
             .emitBoardChange()
             .tableObserver().take(1).subscribe(
             issueTable => {
-              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []], [])
-                .setSwimlanes([
+              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
+                .swimlanes([
                   {key: 'c2-A', name: 'First C2', issues: ['ONE-1', 'ONE-2', 'ONE-3']},
                   {key: 'c2-B', name: 'Second C2', issues: ['ONE-4']},
                   {key: NONE_FILTER, name: 'None', issues: ['ONE-5', 'ONE-6']}])
@@ -654,8 +654,8 @@ describe('Swimlane observer tests', () => {
             .emitBoardChange()
             .tableObserver().take(1).subscribe(
             issueTable => {
-              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []], [])
-                .setSwimlanes([
+              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
+                .swimlanes([
                   {key: 'c2-A', name: 'First C2', issues: ['ONE-1', 'ONE-2', 'ONE-3']},
                   {key: 'c2-B', name: 'Second C2', issues: ['ONE-4', 'ONE-6']},
                   {key: NONE_FILTER, name: 'None', issues: ['ONE-5']}])
@@ -682,8 +682,8 @@ describe('Swimlane observer tests', () => {
             .emitBoardChange()
             .tableObserver().take(1).subscribe(
             issueTable => {
-              new IssueTableChecker([['ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], ['ONE-1']], [])
-                .setSwimlanes([
+              new IssueTableChecker([['ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], ['ONE-1']])
+                .swimlanes([
                   {key: 'task', name: 'task', issues: ['ONE-2', 'ONE-4']},
                   {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3', 'ONE-5']}])
                 .checkTable(issueTable);
@@ -703,8 +703,8 @@ describe('Swimlane observer tests', () => {
             .emitBoardChange()
             .tableObserver().take(1).subscribe(
             issueTable => {
-              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-                .setSwimlanes([
+              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                .swimlanes([
                   {key: 'task', name: 'task', issues: ['ONE-2', 'ONE-4']},
                   {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3', 'ONE-5']}])
                 .checkTable(issueTable);
@@ -721,8 +721,8 @@ describe('Swimlane observer tests', () => {
             .emitBoardChange()
             .tableObserver().take(1).subscribe(
             issueTable => {
-              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4'], []], [])
-                .setSwimlanes([
+              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4'], []])
+                .swimlanes([
                   {key: 'task', name: 'task', issues: ['ONE-2', 'ONE-4']},
                   {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3']}])
                 .checkTable(issueTable);
@@ -747,8 +747,8 @@ describe('Swimlane observer tests', () => {
             .emitBoardChange()
             .tableObserver().take(1).subscribe(
             issueTable => {
-              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-                .setSwimlanes([
+              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                .swimlanes([
                   {key: 'task', name: 'task', issues: ['ONE-1', 'ONE-2', 'ONE-4']},
                   {key: 'bug', name: 'bug', issues: ['ONE-3', 'ONE-5']}])
                 .checkTable(issueTable);
@@ -769,8 +769,8 @@ describe('Swimlane observer tests', () => {
             .emitBoardChange()
             .tableObserver().take(1).subscribe(
             issueTable => {
-              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-                .setSwimlanes([
+              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                .swimlanes([
                   {key: 'Blocker', name: 'Blocker', issues: ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-5']},
                   {key: 'Major', name: 'Major', issues: ['ONE-4']}])
                 .checkTable(issueTable);
@@ -795,8 +795,8 @@ describe('Swimlane observer tests', () => {
               .emitBoardChange()
               .tableObserver().take(1).subscribe(
               issueTable => {
-                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-                  .setSwimlanes([
+                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                  .swimlanes([
                     {key: 'bob', name: 'Bob Brent Barlow', issues: ['ONE-3']},
                     {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-4']},
                     {key: NONE_FILTER, name: 'None', issues: ['ONE-1', 'ONE-2', 'ONE-5']}])
@@ -815,8 +815,8 @@ describe('Swimlane observer tests', () => {
               .emitBoardChange()
               .tableObserver().take(1).subscribe(
               issueTable => {
-                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-                  .setSwimlanes([
+                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                  .swimlanes([
                     {key: 'bob', name: 'Bob Brent Barlow', issues: ['ONE-2', 'ONE-3']},
                     {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4']},
                     {key: NONE_FILTER, name: 'None', issues: ['ONE-5']}])
@@ -844,8 +844,8 @@ describe('Swimlane observer tests', () => {
               .emitBoardChange()
               .tableObserver().take(1).subscribe(
               issueTable => {
-                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-                  .setSwimlanes([
+                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                  .swimlanes([
                     {key: 'C-10', name: 'C-10', issues: ['ONE-1']},
                     {key: 'C-20', name: 'C-20', issues: ['ONE-2']},
                     {key: 'C-30', name: 'C-30', issues: ['ONE-3']},
@@ -866,8 +866,8 @@ describe('Swimlane observer tests', () => {
               .emitBoardChange()
               .tableObserver().take(1).subscribe(
               issueTable => {
-                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-                  .setSwimlanes([
+                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                  .swimlanes([
                     {key: 'C-10', name: 'C-10', issues: ['ONE-1', 'ONE-3', 'ONE-4']},
                     {key: 'C-20', name: 'C-20', issues: ['ONE-2', 'ONE-4']},
                     {key: 'C-30', name: 'C-30', issues: ['ONE-4']},
@@ -888,8 +888,8 @@ describe('Swimlane observer tests', () => {
               .emitBoardChange()
               .tableObserver().take(1).subscribe(
               issueTable => {
-                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-                  .setSwimlanes([
+                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                  .swimlanes([
                     {key: 'C-10', name: 'C-10', issues: ['ONE-1', 'ONE-3', 'ONE-4']},
                     {key: 'C-20', name: 'C-20', issues: ['ONE-2', 'ONE-3', 'ONE-4']},
                     {key: 'C-30', name: 'C-30', issues: ['ONE-4']},
@@ -919,8 +919,8 @@ describe('Swimlane observer tests', () => {
               .emitBoardChange()
               .tableObserver().take(1).subscribe(
               issueTable => {
-                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-                  .setSwimlanes([
+                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                  .swimlanes([
                     {key: 'F-10', name: 'F-10', issues: ['ONE-1']},
                     {key: 'F-20', name: 'F-20', issues: ['ONE-1', 'ONE-3']},
                     {key: 'F-30', name: 'F-30', issues: ['ONE-1', 'ONE-5']},
@@ -941,8 +941,8 @@ describe('Swimlane observer tests', () => {
               .emitBoardChange()
               .tableObserver().take(1).subscribe(
               issueTable => {
-                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-                  .setSwimlanes([
+                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                  .swimlanes([
                     {key: 'F-10', name: 'F-10', issues: ['ONE-1']},
                     {key: 'F-20', name: 'F-20', issues: ['ONE-1', 'ONE-2', 'ONE-3']},
                     {key: 'F-30', name: 'F-30', issues: ['ONE-1', 'ONE-5']},
@@ -963,8 +963,8 @@ describe('Swimlane observer tests', () => {
               .emitBoardChange()
               .tableObserver().take(1).subscribe(
               issueTable => {
-                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-                  .setSwimlanes([
+                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                  .swimlanes([
                     {key: 'F-10', name: 'F-10', issues: ['ONE-1', 'ONE-2']},
                     {key: 'F-20', name: 'F-20', issues: ['ONE-1', 'ONE-2', 'ONE-3']},
                     {key: 'F-30', name: 'F-30', issues: ['ONE-1', 'ONE-5']},
@@ -993,8 +993,8 @@ describe('Swimlane observer tests', () => {
               .emitBoardChange()
               .tableObserver().take(1).subscribe(
               issueTable => {
-                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-                  .setSwimlanes([
+                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                  .swimlanes([
                     {key: 'L-10', name: 'L-10', issues: ['ONE-2', 'ONE-3']},
                     {key: 'L-20', name: 'L-20', issues: ['ONE-2']},
                     {key: 'L-30', name: 'L-30', issues: ['ONE-2', 'ONE-5']},
@@ -1014,8 +1014,8 @@ describe('Swimlane observer tests', () => {
               .emitBoardChange()
               .tableObserver().take(1).subscribe(
               issueTable => {
-                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-                  .setSwimlanes([
+                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                  .swimlanes([
                     {key: 'L-10', name: 'L-10', issues: ['ONE-2', 'ONE-3', 'ONE-4']},
                     {key: 'L-20', name: 'L-20', issues: ['ONE-2']},
                     {key: 'L-30', name: 'L-30', issues: ['ONE-2', 'ONE-5']},
@@ -1037,8 +1037,8 @@ describe('Swimlane observer tests', () => {
               .emitBoardChange()
               .tableObserver().take(1).subscribe(
               issueTable => {
-                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-                  .setSwimlanes([
+                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                  .swimlanes([
                     {key: 'L-10', name: 'L-10', issues: ['ONE-2', 'ONE-3', 'ONE-5']},
                     {key: 'L-20', name: 'L-20', issues: ['ONE-2', 'ONE-4', 'ONE-5']},
                     {key: 'L-30', name: 'L-30', issues: ['ONE-2']},
@@ -1068,8 +1068,8 @@ describe('Swimlane observer tests', () => {
               .emitBoardChange()
               .tableObserver().take(1).subscribe(
               issueTable => {
-                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-                  .setSwimlanes([
+                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                  .swimlanes([
                     {key: 'c2-A', name: 'First C2', issues: ['ONE-1', 'ONE-3']},
                     {key: 'c2-B', name: 'Second C2', issues: ['ONE-4']},
                     {key: NONE_FILTER, name: 'None', issues: ['ONE-2', 'ONE-5']}])
@@ -1090,8 +1090,8 @@ describe('Swimlane observer tests', () => {
               .emitBoardChange()
               .tableObserver().take(1).subscribe(
               issueTable => {
-                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-                  .setSwimlanes([
+                new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                  .swimlanes([
                     {key: 'c2-A', name: 'First C2', issues: ['ONE-1', 'ONE-2']},
                     {key: 'c2-B', name: 'Second C2', issues: ['ONE-4', 'ONE-3']},
                     {key: NONE_FILTER, name: 'None', issues: ['ONE-5']}])
@@ -1130,9 +1130,9 @@ describe('Swimlane observer tests', () => {
             .addIssue('TWO-3', 1));
           util.tableObserver().take(1).subscribe(
           issueTable => {
-            new IssueTableChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']],
-              ['TWO-1', 'TWO-2', 'TWO-3'])
-              .setSwimlanes([
+            new IssueTableChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']])
+              .invisibleIssues(['TWO-1', 'TWO-2', 'TWO-3'])
+              .swimlanes([
                 {key: 'ONE', name: 'ONE', issues: ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4'], visibleFilter: true},
                 {key: 'TWO', name: 'TWO', issues: ['TWO-1', 'TWO-2', 'TWO-3'], visibleFilter: false}])
               .checkTable(issueTable);
@@ -1141,8 +1141,8 @@ describe('Swimlane observer tests', () => {
         util.updateFilters('project')
           .tableObserver().take(1).subscribe(
           issueTable => {
-            new IssueTableChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']], [])
-              .setSwimlanes([
+            new IssueTableChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']])
+              .swimlanes([
                 {key: 'ONE', name: 'ONE', issues: ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4'], visibleFilter: true},
                 {key: 'TWO', name: 'TWO', issues: ['TWO-1', 'TWO-2', 'TWO-3'], visibleFilter: true}])
               .checkTable(issueTable);
@@ -1156,9 +1156,9 @@ describe('Swimlane observer tests', () => {
         util.updateFilters('project', 'TWO')
             .tableObserver().take(1).subscribe(
             issueTable => {
-              new IssueTableChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']],
-                ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4'])
-                .setSwimlanes([
+              new IssueTableChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']])
+                .invisibleIssues(['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4'])
+                .swimlanes([
                   {key: 'ONE', name: 'ONE', issues: ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4'], visibleFilter: false},
                   {key: 'TWO', name: 'TWO', issues: ['TWO-1', 'TWO-2', 'TWO-3'], visibleFilter: true}])
                 .checkTable(issueTable);
@@ -1171,8 +1171,8 @@ describe('Swimlane observer tests', () => {
         util.updateFilters('project', 'ONE', 'TWO')
           .tableObserver().take(1).subscribe(
           issueTable => {
-            new IssueTableChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']], [])
-              .setSwimlanes([
+            new IssueTableChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']])
+              .swimlanes([
                 {key: 'ONE', name: 'ONE', issues: ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4'], visibleFilter: true},
                 {key: 'TWO', name: 'TWO', issues: ['TWO-1', 'TWO-2', 'TWO-3'], visibleFilter: true}])
               .checkTable(issueTable);
@@ -1187,9 +1187,9 @@ describe('Swimlane observer tests', () => {
         const util: IssueTableObservableUtil = createUtilWithStandardIssues({swimlane: 'issue-type', 'issue-type': 'bug'});
         util.tableObserver().take(1).subscribe(
           issueTable => {
-            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []],
-              ['ONE-2', 'ONE-4'])
-              .setSwimlanes([
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+              .invisibleIssues(['ONE-2', 'ONE-4'])
+              .swimlanes([
                 {key: 'task', name: 'task', issues: ['ONE-2', 'ONE-4'], visibleFilter: false},
                 {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3', 'ONE-5'], visibleFilter: true}])
               .checkTable(issueTable);
@@ -1197,9 +1197,9 @@ describe('Swimlane observer tests', () => {
           });
         util.updateFilters('issue-type', 'task')
           .tableObserver().take(1).subscribe(issueTable => {
-          new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []],
-            ['ONE-1', 'ONE-3', 'ONE-5'])
-            .setSwimlanes([
+          new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+            .invisibleIssues(['ONE-1', 'ONE-3', 'ONE-5'])
+            .swimlanes([
               {key: 'task', name: 'task', issues: ['ONE-2', 'ONE-4'], visibleFilter: true},
               {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3', 'ONE-5'], visibleFilter: false}])
             .checkTable(issueTable);
@@ -1213,9 +1213,9 @@ describe('Swimlane observer tests', () => {
         const util: IssueTableObservableUtil = createUtilWithStandardIssues({swimlane: 'priority', 'priority': 'Blocker'});
         util.tableObserver().take(1).subscribe(
           issueTable => {
-            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []],
-              ['ONE-2', 'ONE-4'])
-              .setSwimlanes([
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+              .invisibleIssues(['ONE-2', 'ONE-4'])
+              .swimlanes([
                 {key: 'Blocker', name: 'Blocker', issues: ['ONE-1', 'ONE-3', 'ONE-5'], visibleFilter: true},
                 {key: 'Major', name: 'Major', issues: ['ONE-2', 'ONE-4'], visibleFilter: false}])
               .checkTable(issueTable);
@@ -1223,9 +1223,9 @@ describe('Swimlane observer tests', () => {
           });
         util.updateFilters('priority', 'Major')
           .tableObserver().take(1).subscribe(issueTable => {
-          new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []],
-            ['ONE-1', 'ONE-3', 'ONE-5'])
-            .setSwimlanes([
+          new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+            .invisibleIssues(['ONE-1', 'ONE-3', 'ONE-5'])
+            .swimlanes([
               {key: 'Blocker', name: 'Blocker', issues: ['ONE-1', 'ONE-3', 'ONE-5'], visibleFilter: false},
               {key: 'Major', name: 'Major', issues: ['ONE-2', 'ONE-4'], visibleFilter: true}])
             .checkTable(issueTable);
@@ -1239,9 +1239,9 @@ describe('Swimlane observer tests', () => {
         const util: IssueTableObservableUtil = createUtilWithStandardIssues({swimlane: 'assignee', 'assignee': 'kabir'});
         util.tableObserver().take(1).subscribe(
           issueTable => {
-              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []],
-                ['ONE-3', 'ONE-2', 'ONE-5'])
-                .setSwimlanes([
+              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                .invisibleIssues(['ONE-3', 'ONE-2', 'ONE-5'])
+                .swimlanes([
                   {key: 'bob', name: 'Bob Brent Barlow', issues: ['ONE-3'], visibleFilter: false},
                   {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4'], visibleFilter: true},
                   {key: NONE_FILTER, name: 'None', issues: ['ONE-2', 'ONE-5'], visibleFilter: false}])
@@ -1250,9 +1250,9 @@ describe('Swimlane observer tests', () => {
           });
         util.updateFilters('assignee', 'kabir', NONE_FILTER)
           .tableObserver().take(1).subscribe(issueTable => {
-          new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []],
-            ['ONE-3'])
-            .setSwimlanes([
+          new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+            .invisibleIssues(['ONE-3'])
+            .swimlanes([
               {key: 'bob', name: 'Bob Brent Barlow', issues: ['ONE-3'], visibleFilter: false},
               {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4'], visibleFilter: true},
               {key: NONE_FILTER, name: 'None', issues: ['ONE-2', 'ONE-5'], visibleFilter: true}])
@@ -1268,9 +1268,9 @@ describe('Swimlane observer tests', () => {
         const util: IssueTableObservableUtil = createUtilWithStandardIssues({swimlane: 'component', 'component': NONE_FILTER});
         util.tableObserver().take(1).subscribe(
           issueTable => {
-            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []],
-              ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4'])
-              .setSwimlanes([
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+              .invisibleIssues(['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4'])
+              .swimlanes([
                 {key: 'C-10', name: 'C-10', issues: ['ONE-1', 'ONE-4'], visibleFilter: false},
                 {key: 'C-20', name: 'C-20', issues: ['ONE-2', 'ONE-4'], visibleFilter: false},
                 {key: 'C-30', name: 'C-30', issues: ['ONE-3', 'ONE-4'], visibleFilter: false},
@@ -1280,9 +1280,9 @@ describe('Swimlane observer tests', () => {
           });
         util.updateFilters('component', 'C-10', 'C-20')
           .tableObserver().take(1).subscribe(issueTable => {
-          new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []],
-            ['ONE-3', 'ONE-5'])
-            .setSwimlanes([
+          new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+            .invisibleIssues(['ONE-3', 'ONE-5'])
+            .swimlanes([
               {key: 'C-10', name: 'C-10', issues: ['ONE-1', 'ONE-4'], visibleFilter: true},
               {key: 'C-20', name: 'C-20', issues: ['ONE-2', 'ONE-4'], visibleFilter: true},
               {key: 'C-30', name: 'C-30', issues: ['ONE-3', 'ONE-4'], visibleFilter: false},
@@ -1298,9 +1298,9 @@ describe('Swimlane observer tests', () => {
         const util: IssueTableObservableUtil = createUtilWithStandardIssues({swimlane: 'fix-version', 'fix-version': NONE_FILTER});
         util.tableObserver().take(1).subscribe(
           issueTable => {
-            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []],
-              ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-5'])
-              .setSwimlanes([
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+              .invisibleIssues(['ONE-1', 'ONE-2', 'ONE-3', 'ONE-5'])
+              .swimlanes([
                 {key: 'F-10', name: 'F-10', issues: ['ONE-1', 'ONE-2'], visibleFilter: false},
                 {key: 'F-20', name: 'F-20', issues: ['ONE-1', 'ONE-3'], visibleFilter: false},
                 {key: 'F-30', name: 'F-30', issues: ['ONE-1', 'ONE-5'], visibleFilter: false},
@@ -1310,9 +1310,9 @@ describe('Swimlane observer tests', () => {
           });
         util.updateFilters('fix-version', 'F-10')
           .tableObserver().take(1).subscribe(issueTable => {
-          new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []],
-            ['ONE-3', 'ONE-4', 'ONE-5'])
-            .setSwimlanes([
+          new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+            .invisibleIssues(['ONE-3', 'ONE-4', 'ONE-5'])
+            .swimlanes([
               {key: 'F-10', name: 'F-10', issues: ['ONE-1', 'ONE-2'], visibleFilter: true},
               {key: 'F-20', name: 'F-20', issues: ['ONE-1', 'ONE-3'], visibleFilter: false},
               {key: 'F-30', name: 'F-30', issues: ['ONE-1', 'ONE-5'], visibleFilter: false},
@@ -1328,9 +1328,9 @@ describe('Swimlane observer tests', () => {
         const util: IssueTableObservableUtil = createUtilWithStandardIssues({swimlane: 'label', 'label': NONE_FILTER});
         util.tableObserver().take(1).subscribe(
           issueTable => {
-            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []],
-              ['ONE-2', 'ONE-3', 'ONE-4', 'ONE-5'])
-              .setSwimlanes([
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+              .invisibleIssues(['ONE-2', 'ONE-3', 'ONE-4', 'ONE-5'])
+              .swimlanes([
                 {key: 'L-10', name: 'L-10', issues: ['ONE-2', 'ONE-3'], visibleFilter: false},
                 {key: 'L-20', name: 'L-20', issues: ['ONE-2', 'ONE-4'], visibleFilter: false},
                 {key: 'L-30', name: 'L-30', issues: ['ONE-2', 'ONE-5'], visibleFilter: false},
@@ -1340,8 +1340,8 @@ describe('Swimlane observer tests', () => {
           });
         util.updateFilters('label')
           .tableObserver().take(1).subscribe(issueTable => {
-          new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []], [])
-            .setSwimlanes([
+          new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+            .swimlanes([
               {key: 'L-10', name: 'L-10', issues: ['ONE-2', 'ONE-3'], visibleFilter: true},
               {key: 'L-20', name: 'L-20', issues: ['ONE-2', 'ONE-4'], visibleFilter: true},
               {key: 'L-30', name: 'L-30', issues: ['ONE-2', 'ONE-5'], visibleFilter: true},
@@ -1358,9 +1358,9 @@ describe('Swimlane observer tests', () => {
         const util: IssueTableObservableUtil = createUtilWithStandardIssues({swimlane: 'Custom-2', 'cf.Custom-2': 'c2-A'});
         util.tableObserver().take(1).subscribe(
           issueTable => {
-            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []],
-              ['ONE-4', 'ONE-5'])
-              .setSwimlanes([
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+              .invisibleIssues(['ONE-4', 'ONE-5'])
+              .swimlanes([
                 {key: 'c2-A', name: 'First C2', issues: ['ONE-1', 'ONE-2', 'ONE-3'], visibleFilter: true},
                 {key: 'c2-B', name: 'Second C2', issues: ['ONE-4'], visibleFilter: false},
                 {key: NONE_FILTER, name: 'None', issues: ['ONE-5'], visibleFilter: false}])
@@ -1369,9 +1369,9 @@ describe('Swimlane observer tests', () => {
           });
         util.updateFilters('Custom-2', 'c2-B')
           .tableObserver().take(1).subscribe(issueTable => {
-          new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []],
-            ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-5'])
-            .setSwimlanes([
+          new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+            .invisibleIssues(['ONE-1', 'ONE-2', 'ONE-3', 'ONE-5'])
+            .swimlanes([
               {key: 'c2-A', name: 'First C2', issues: ['ONE-1', 'ONE-2', 'ONE-3'], visibleFilter: false},
               {key: 'c2-B', name: 'Second C2', issues: ['ONE-4'], visibleFilter: true},
               {key: NONE_FILTER, name: 'None', issues: ['ONE-5'], visibleFilter: false}])
@@ -1394,9 +1394,9 @@ describe('Swimlane observer tests', () => {
           createUtilWithStandardIssues({swimlane: 'assignee', 'assignee': 'kabir', 'issue-type': 'task'});
         util.tableObserver().take(1).subscribe(
           issueTable => {
-            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []],
-              ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-5'])
-              .setSwimlanes([
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+              .invisibleIssues(['ONE-1', 'ONE-2', 'ONE-3', 'ONE-5'])
+              .swimlanes([
                 {key: 'bob', name: 'Bob Brent Barlow', issues: ['ONE-3'], visibleFilter: false},
                 {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4'], visibleFilter: true},
                 {key: NONE_FILTER, name: 'None', issues: ['ONE-2', 'ONE-5'], visibleFilter: false}])
@@ -1407,9 +1407,9 @@ describe('Swimlane observer tests', () => {
         util.updateFilters('priority', 'Blocker')
           .tableObserver().take(1).subscribe(
           issueTable => {
-            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []],
-              ['ONE-2', 'ONE-3', 'ONE-4', 'ONE-5'])
-              .setSwimlanes([
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+              .invisibleIssues(['ONE-2', 'ONE-3', 'ONE-4', 'ONE-5'])
+              .swimlanes([
                 {key: 'bob', name: 'Bob Brent Barlow', issues: ['ONE-3'], visibleFilter: false},
                 {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4'], visibleFilter: true},
                 {key: NONE_FILTER, name: 'None', issues: ['ONE-2', 'ONE-5'], visibleFilter: false}])
@@ -1420,15 +1420,17 @@ describe('Swimlane observer tests', () => {
               .check(originalState, issueTable);
           });
       });
-      it ('Update issue', () => {
+      it ('Update issue, with hidden columns', () => {
         let originalState: IssueTable;
         const util: IssueTableObservableUtil =
-          createUtilWithStandardIssues({swimlane: 'assignee', 'assignee': 'kabir', 'issue-type': 'task'});
+          createUtilWithStandardIssues(
+            {swimlane: 'assignee', 'assignee': 'kabir', 'issue-type': 'task', visible: '2'});
         util.tableObserver().take(1).subscribe(
           issueTable => {
-            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []],
-              ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-5'])
-              .setSwimlanes([
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+              .invisibleIssues(['ONE-1', 'ONE-2', 'ONE-3', 'ONE-5'])
+              .invisibleColumns(0, 1)
+              .swimlanes([
                 {key: 'bob', name: 'Bob Brent Barlow', issues: ['ONE-3'], visibleFilter: false},
                 {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4'], visibleFilter: true},
                 {key: NONE_FILTER, name: 'None', issues: ['ONE-2', 'ONE-5'], visibleFilter: false}])
@@ -1440,9 +1442,10 @@ describe('Swimlane observer tests', () => {
           .emitBoardChange()
           .tableObserver().take(1).subscribe(
             issueTable => {
-              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []],
-                ['ONE-1', 'ONE-2', 'ONE-5'])
-                .setSwimlanes([
+              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                .invisibleIssues(['ONE-1', 'ONE-2', 'ONE-5'])
+                .invisibleColumns(0, 1)
+                .swimlanes([
                   {key: 'bob', name: 'Bob Brent Barlow', issues: [], visibleFilter: false},
                   {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-3', 'ONE-4'], visibleFilter: true},
                   {key: NONE_FILTER, name: 'None', issues: ['ONE-2', 'ONE-5'], visibleFilter: false}])
@@ -1452,9 +1455,14 @@ describe('Swimlane observer tests', () => {
                 .addChangedSwimlaneColumns('bob', 0)
                 .addChangedSwimlaneColumns('kabir', 0)
                 .check(originalState, issueTable);
-
+              originalState = issueTable;
             });
 
+        // Update column visibilities
+        util.toggleColumnVisibility(1, 2)
+          .tableObserver().take(1).subscribe(issueTable => {
+
+        });
       });
     });
   });
@@ -1491,22 +1499,25 @@ describe('Swimlane observer tests', () => {
 });
 
 class IssueTableChecker {
+  private _expectedInvisible: string[] = [];
   private _expectedSwimlanes: SwimlaneCheck[];
-  constructor(private _expectedTable: string[][], private _expectedInvisible: string[]) {
+  private _invisibleColumns: number[] = [];
+
+  constructor(private _expectedTable: string[][]) {
   }
 
-  setTable(table: string[][]): IssueTableChecker {
-    this._expectedTable = table;
-    return this;
-  }
-
-  setInvisible(invisible: string[]): IssueTableChecker {
+  invisibleIssues(invisible: string[]): IssueTableChecker {
     this._expectedInvisible = invisible;
     return this;
   }
 
-  setSwimlanes(swimlanes: SwimlaneCheck[]): IssueTableChecker {
+  swimlanes(swimlanes: SwimlaneCheck[]): IssueTableChecker {
     this._expectedSwimlanes = swimlanes;
+    return this;
+  }
+
+  invisibleColumns(...invisibleColumns: number[]): IssueTableChecker {
+    this._invisibleColumns = invisibleColumns;
     return this;
   }
 
@@ -1534,6 +1545,14 @@ class IssueTableChecker {
       }, 0);
     }
     expect(issueTable.visibleIssueCounts.toArray()).toEqual(visibleIssueCounts);
+
+    const invisibleColumnSet: Set<number> = Set<number>(this._invisibleColumns);
+    const visibleColumns: boolean[] = new Array<boolean>(this._expectedTable.length);
+    for (let i = 0 ; i < this._expectedTable.length ; i++) {
+      visibleColumns[i] = !invisibleColumnSet.contains(i);
+    }
+    expect(issueTable.visibleColumns.toArray()).toEqual(visibleColumns);
+
 
     if (!this._expectedSwimlanes) {
       expect(issueTable.swimlaneInfo).toBeFalsy();

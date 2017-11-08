@@ -7,6 +7,7 @@ export interface IssueTable {
   table: List<List<string>>;
   swimlaneInfo: SwimlaneInfo;
   visibleIssueCounts: List<number>;
+  visibleColumns: List<boolean>;
 }
 
 export interface SwimlaneInfo {

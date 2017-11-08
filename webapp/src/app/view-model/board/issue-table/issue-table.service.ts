@@ -69,6 +69,8 @@ export class IssueTableHandler {
             changeType = ChangeType.APPLY_FILTERS;
           } else if (userSettingState.swimlane !== this.lastUserSettingState.swimlane) {
             changeType = ChangeType.CHANGE_SWIMLANE;
+          } else if (userSettingState.columnVisibilities !== this.lastUserSettingState.columnVisibilities) {
+            changeType = ChangeType.CHANGE_COLUMN_VISIBILITY;
           }
         }
 
@@ -94,7 +96,8 @@ enum ChangeType {
   LOAD_BOARD,
   UPDATE_BOARD,
   APPLY_FILTERS,
-  CHANGE_SWIMLANE
+  CHANGE_SWIMLANE,
+  CHANGE_COLUMN_VISIBILITY
 }
 
 class IssueTableBuilder {
@@ -112,15 +115,16 @@ class IssueTableBuilder {
     const table: List<List<string>> = this.createTable(issues);
     const visibleIssueCounts: List<number> = this.calculateVisibleIssueCounts(issues, table);
     const swimlaneInfo: SwimlaneInfo = this.calculateSwimlane(issues, table);
+    const visibleColumns: List<boolean> = this.calculateVisibleColumns(table.size);
 
     if (issues === this._oldIssueTableState.issues &&
         table === this._oldIssueTableState.table &&
         swimlaneInfo === this._oldIssueTableState.swimlaneInfo &&
-        visibleIssueCounts === this._oldIssueTableState.visibleIssueCounts) {
+        visibleIssueCounts === this._oldIssueTableState.visibleIssueCounts &&
+        visibleColumns === this._oldIssueTableState.visibleColumns) {
       return this._oldIssueTableState;
     }
-
-    return IssueTableUtil.createIssueTable(issues, table, swimlaneInfo, visibleIssueCounts);
+    return IssueTableUtil.createIssueTable(issues, table, swimlaneInfo, visibleIssueCounts, visibleColumns);
   }
 
   private populateIssues(): Map<string, BoardIssueView> {
@@ -202,6 +206,7 @@ class IssueTableBuilder {
     switch (this._changeType) {
       case ChangeType.APPLY_FILTERS:
       case ChangeType.CHANGE_SWIMLANE:
+      case ChangeType.CHANGE_COLUMN_VISIBILITY:
         return this._oldIssueTableState.table;
     }
 
@@ -247,12 +252,33 @@ class IssueTableBuilder {
     return visibilities.equals(this._oldIssueTableState.visibleIssueCounts) ? this._oldIssueTableState.visibleIssueCounts : visibilities;
   }
 
+  private calculateVisibleColumns(numColumns: number): List<boolean> {
+    if (this._changeType === ChangeType.LOAD_BOARD || this._changeType === ChangeType.CHANGE_COLUMN_VISIBILITY) {
+      const visibleMap: Map<number, boolean> = this._currentUserSettingState.columnVisibilities;
+      const visibilities: List<boolean> = List<boolean>().withMutations(mutable => {
+        for (let i = 0 ; i < numColumns ; i++) {
+          if (!visibleMap.has(i)) {
+            mutable.push(this._currentUserSettingState.defaultColumnVisibility);
+          } else {
+            mutable.push(visibleMap.get(i));
+          }
+        }
+      });
+      if (!visibilities.equals(this._oldIssueTableState.visibleColumns)) {
+        return visibilities;
+      }
+    }
+    return this._oldIssueTableState.visibleColumns;
+  }
+
   private calculateSwimlane(issues: Map<string, BoardIssueView>, table: List<List<string>>): SwimlaneInfo {
     if (!this._currentUserSettingState.swimlane) {
       return null;
     }
     let swimlaneBuilder: SwimlaneInfoBuilder;
     switch (this._changeType) {
+      case ChangeType.CHANGE_COLUMN_VISIBILITY:
+        return this._oldIssueTableState.swimlaneInfo;
       case ChangeType.LOAD_BOARD:
       case ChangeType.CHANGE_SWIMLANE: {
         swimlaneBuilder = SwimlaneInfoBuilder.create(this._currentBoardState, this._currentUserSettingState, null);

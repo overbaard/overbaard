@@ -8,7 +8,8 @@ const DEFAULT_ISSUE_STATE: IssueTable = {
   issues: Map<string, BoardIssueView>(),
   table: List<List<string>>(),
   swimlaneInfo: null,
-  visibleIssueCounts: List<number>()
+  visibleIssueCounts: List<number>(),
+  visibleColumns: List<boolean>()
 };
 
 const DEFAULT_SWIMLANE_INFO_STATE: SwimlaneInfo = {
@@ -49,13 +50,15 @@ export class IssueTableUtil {
     issues: Map<string, BoardIssueView>,
     tableList: List<List<string>>,
     swimlaneInfo: SwimlaneInfo,
-    visibleIssueCounts: List<number>): IssueTable {
+    visibleIssueCounts: List<number>,
+    visibleColumns: List<boolean>): IssueTable {
 
     const state: IssueTable = {
       issues: issues,
       table: tableList,
       swimlaneInfo: swimlaneInfo,
-      visibleIssueCounts: visibleIssueCounts
+      visibleIssueCounts: visibleIssueCounts,
+      visibleColumns: visibleColumns
     };
     return ISSUE_TABLE_STATE_FACTORY(state);
   }

@@ -1,18 +1,27 @@
 import {BoardFilterState, initialBoardFilterState} from './board-filter/board-filter.model';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
+import {Map} from 'immutable';
 
 export interface UserSettingState {
   boardCode: string;
   backlog: boolean;
   swimlane: string;
   filters: BoardFilterState;
+  defaultColumnVisibility: boolean;
+  /*
+    This will only contain values for column visibilities explicitly set. It is the callers responsibility to account for misses.
+    A non-existent entry should count as {defaultColumnVisibility}
+   */
+  columnVisibilities: Map<number, boolean>;
 }
 
 const DEFAULT_STATE: UserSettingState = {
   boardCode: '',
   backlog: false,
   swimlane: undefined,
-  filters: initialBoardFilterState
+  filters: initialBoardFilterState,
+  defaultColumnVisibility: true,
+  columnVisibilities: Map<number, boolean>()
 }
 
 interface UserSettingStateRecord extends TypedRecord<UserSettingStateRecord>, UserSettingState {

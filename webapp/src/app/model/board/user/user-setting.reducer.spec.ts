@@ -7,7 +7,7 @@ import {PROJECT_ATTRIBUTES} from './board-filter/board-filter.constants';
 
 describe('User setting reducer tests', () => {
   describe('Querystring tests', () => {
-    it ('With Querystring, no backlog', () => {
+    it ('With Querystring, no backlog or column visibilties', () => {
       // Just test a few filter fields, the board filter reducer tests test this properly
       const qs: Dictionary<string> = {
         board: 'TEST',
@@ -23,13 +23,14 @@ describe('User setting reducer tests', () => {
       settingChecker.filterChecker.project = ['P1'];
       settingChecker.check(state)
     });
-    it ('With Querystring, bl=false', () => {
+    it ('With Querystring, bl=false and visible columns', () => {
       // Just test a few filter fields, the board filter reducer tests test this properly
       const qs: Dictionary<string> = {
         board: 'TEST',
         bl: 'false',
         project: 'P1',
-        swimlane: 'project'
+        swimlane: 'project',
+        visible: '1,5,7'
       };
       const state: UserSettingState = userSettingReducer(
         initialUserSettingState,
@@ -38,15 +39,18 @@ describe('User setting reducer tests', () => {
       settingChecker.boardCode = 'TEST';
       settingChecker.swimlane = 'project';
       settingChecker.filterChecker.project = ['P1'];
+      settingChecker.visibleColumns = {1: true, 5: true, 7: true}
+      settingChecker.defaultColumnVisibility = false;
       settingChecker.check(state)
     });
-    it ('With Querystring, bl=true', () => {
+    it ('With Querystring, bl=true and hidden columns', () => {
       // Just test a few filter fields, the board filter reducer tests test this properly
       const qs: Dictionary<string> = {
         board: 'TEST',
         bl: 'true',
         project: 'P1',
-        swimlane: 'project'
+        swimlane: 'project',
+        hidden: '2,6,8'
       };
       const state: UserSettingState = userSettingReducer(
         initialUserSettingState,
@@ -56,6 +60,7 @@ describe('User setting reducer tests', () => {
       settingChecker.backlog = true;
       settingChecker.swimlane = 'project';
       settingChecker.filterChecker.project = ['P1'];
+      settingChecker.visibleColumns = {2: false, 6: false, 8: false}
       settingChecker.check(state)
     });
   });
@@ -96,6 +101,8 @@ class SettingChecker {
   backlog = false;
   swimlane: string = null;
   filterChecker: FilterChecker = new FilterChecker();
+  defaultColumnVisibility = true;
+  visibleColumns: any;
 
   constructor() {
     for (const key of Object.keys(this.filterChecker)) {
@@ -117,5 +124,11 @@ class SettingChecker {
       expect(state.swimlane).toEqual(this.swimlane);
     }
     this.filterChecker.check(state.filters);
+    expect(state.defaultColumnVisibility).toBe(this.defaultColumnVisibility);
+    if (!this.visibleColumns) {
+      expect(state.columnVisibilities.size).toBe(0);
+    } else {
+      expect(state.columnVisibilities.toObject()).toEqual(this.visibleColumns);
+    }
   }
 }

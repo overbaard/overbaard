@@ -21,7 +21,9 @@ import {KanbanViewHeaderComponent} from './components/board/view/kanban-view/kan
 import {KanbanViewColumnComponent} from './components/board/view/kanban-view/kanban-view-column/kanban-view-column.component';
 import {BoardIssueComponent} from './components/board/issue/board-issue.component';
 import {ControlPanelComponent} from './components/board/control-panel/control-panel.component';
-
+import {KanbanNormalViewComponent} from './components/board/view/kanban-view/kanban-normal-view/kanban-normal-view.component';
+import {KanbanSwimlaneViewComponent} from './components/board/view/kanban-view/kanban-view-swimlane/kanban-swimlane-view.component';
+import {KanbanSwimlaneEntryComponent} from './components/board/view/kanban-view/kanban-view-swimlane/kanban-swimlane-entry.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +31,9 @@ import {ControlPanelComponent} from './components/board/control-panel/control-pa
     BoardsComponent,
     BoardComponent,
     KanbanViewComponent,
+    KanbanNormalViewComponent,
+    KanbanSwimlaneViewComponent,
+    KanbanSwimlaneEntryComponent,
     RankViewComponent,
     KanbanViewHeadersComponent,
     KanbanViewHeaderRowComponent,

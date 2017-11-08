@@ -1,12 +1,13 @@
 import {Action} from '@ngrx/store';
 import {Dictionary} from '../../../common/dictionary';
-import {Map, Set} from 'immutable';
+import {List, Map, Set} from 'immutable';
 import {initialUserSettingState, UserSettingState, UserSettingUtil} from './user-setting.model';
 import {boardFilterMetaReducer} from './board-filter/board-filter.reducer';
 
 const CLEAR_SETTINGS = 'CLEAR_SETTINGS';
 export const INITIALISE_SETTINGS_FROM_QUERYSTRING = 'INITIALISE_SETTINGS_FROM_QUERYSTRING';
 const UPDATE_SWIMLANE = 'UPDATE_SWIMLANE';
+const TOGGLE_COLUMN_VISIBILITY = 'TOGGLE_COLUMN_VISIBILITY';
 
 export class ClearSettingsAction implements Action {
   readonly type = CLEAR_SETTINGS;
@@ -57,6 +58,42 @@ export class InitialiseFromQueryStringAction implements Action {
     }
     return set;
   }
+
+  getVisibleColumnDefault(): boolean {
+    if (this.payload['visible']) {
+      return false;
+    } else if (this.payload['hidden']) {
+      return true;
+    } else {
+      return true;
+    }
+  }
+
+  parseVisibleColumns(): Map<number, boolean> {
+    let visible: boolean;
+    let valueString: string;
+    if (this.payload['visible']) {
+      valueString = this.payload['visible'];
+      visible = true;
+    } else if (this.payload['hidden']) {
+      valueString = this.payload['hidden'];
+      visible = false;
+    }
+    return Map<number, boolean>().withMutations(mutable => {
+      if (valueString) {
+        const values: string[] = valueString.split(',');
+        for (const value of values) {
+          mutable.set(Number(value), visible);
+        }
+      }
+    });
+  }
+}
+
+export class ToggleVisibilityAction implements Action {
+  readonly type = TOGGLE_COLUMN_VISIBILITY;
+  constructor(readonly payload: List<number>) {
+  }
 }
 
 export class UserSettingActions {
@@ -68,8 +105,12 @@ export class UserSettingActions {
     return new InitialiseFromQueryStringAction(queryParams);
   }
 
-  static createUpdateSwimlane(swimlane: string) {
+  static createUpdateSwimlane(swimlane: string): Action {
     return new UpdateSwimlaneAction(swimlane);
+  }
+
+  static toggleVisibility(states: List<number>): Action {
+    return new ToggleVisibilityAction(states);
   }
 }
 
@@ -82,11 +123,25 @@ export function userSettingReducer(state: UserSettingState = initialUserSettingS
         mutable.backlog = initAction.payload['bl'] ? initAction.payload['bl'] === 'true' : false;
         mutable.swimlane = initAction.payload['swimlane'];
         mutable.filters = boardFilterMetaReducer(state.filters, action);
+        mutable.defaultColumnVisibility = initAction.getVisibleColumnDefault();
+        mutable.columnVisibilities = initAction.parseVisibleColumns();
       });
     }
     case UPDATE_SWIMLANE: {
       return UserSettingUtil.toStateRecord(state).withMutations(mutable => {
         mutable.swimlane = (<UpdateSwimlaneAction>action).payload;
+      });
+    }
+    case TOGGLE_COLUMN_VISIBILITY: {
+      const toggleAction: ToggleVisibilityAction = <ToggleVisibilityAction>action;
+      const states: List<number> = toggleAction.payload;
+      return UserSettingUtil.toStateRecord(state).withMutations(settingsState => {
+        settingsState.columnVisibilities = settingsState.columnVisibilities.withMutations(visibilities => {
+          states.forEach(s => {
+            const currentVisibility = !visibilities.has(s) ? settingsState.defaultColumnVisibility : visibilities.get(s);
+            visibilities.set(s, !currentVisibility);
+          });
+        });
       });
     }
   }
@@ -95,3 +150,5 @@ export function userSettingReducer(state: UserSettingState = initialUserSettingS
     mutable.filters = boardFilterMetaReducer(state.filters, action);
   });
 }
+
+

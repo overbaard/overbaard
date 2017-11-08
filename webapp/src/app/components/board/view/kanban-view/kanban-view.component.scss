@@ -18,10 +18,4 @@
   overflow: auto;
   height: 100px; /** This will get calculated and set by the component code */
 }
-#body-table table, td{
-  font-weight: normal;
-  table-layout: fixed;
-  vertical-align: top;
-  text-align: left;
-}
 

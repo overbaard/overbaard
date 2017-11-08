@@ -5,6 +5,9 @@ import {KanbanViewHeaderRowComponent} from './kanban-view-headers/kanban-view-he
 import {KanbanViewHeaderComponent} from './kanban-view-headers/kanban-view-header.component';
 import {KanbanViewColumnComponent} from './kanban-view-column/kanban-view-column.component';
 import {BoardIssueComponent} from '../../issue/board-issue.component';
+import {KanbanNormalViewComponent} from './kanban-normal-view/kanban-normal-view.component';
+import {KanbanSwimlaneViewComponent} from './kanban-view-swimlane/kanban-swimlane-view.component';
+import {KanbanSwimlaneEntryComponent} from './kanban-view-swimlane/kanban-swimlane-entry.component';
 
 describe('KanbanViewComponent', () => {
   let component: KanbanViewComponent;
@@ -15,6 +18,9 @@ describe('KanbanViewComponent', () => {
       declarations: [
         BoardIssueComponent,
         KanbanViewComponent,
+        KanbanNormalViewComponent,
+        KanbanSwimlaneViewComponent,
+        KanbanSwimlaneEntryComponent,
         KanbanViewHeadersComponent,
         KanbanViewHeaderRowComponent,
         KanbanViewHeaderComponent,

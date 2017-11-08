@@ -8,20 +8,13 @@
     <div id="table-body"
          [style.height]="boardBodyHeight+'px'"
          (scroll)="scrollTableBodyX($event)">
-      <table *ngIf="!issueTable.swimlaneInfo" id="body-table" class="board">
-        <tr>
-          <!-- trackBy is a hint to angular to be able to keep (i.e. don't destroy and recreate) as many components as possible -->
-          <td app-kanban-view-column
-              class="cell visible"
-              *ngFor="let issuesForState of issueTable.table ; trackBy: columnTrackByFn "
-              [issues]="issueTable.issues"
-              [issueKeys]="issuesForState">
-          </td>
-        </tr>
-      </table>
-      <div *ngIf="issueTable.swimlaneInfo">
-        SWIMLANES!
-      </div>
+      <app-kanban-normal-view *ngIf="!issueTable.swimlaneInfo"
+        [issueTable]="issueTable">
+      </app-kanban-normal-view>
+      <app-kanban-swimlane-view *ngIf="issueTable.swimlaneInfo"
+        [swimlaneInfo]="issueTable.swimlaneInfo"
+        [issues]="issueTable.issues">
+      </app-kanban-swimlane-view>
     </div>
   </div>
 </div>

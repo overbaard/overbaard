@@ -1,0 +1,13 @@
+<table *ngIf="swimlane.filterVisible" id="body-table" class="board">
+  <tr>
+    <td [attr.colspan]="swimlane.table.size">{{swimlane.display}}</td>
+  </tr>
+  <tr>
+    <td app-kanban-view-column
+        class="cell visible"
+        *ngFor="let issuesForState of swimlane.table ; trackBy: columnTrackByFn "
+        [issues]="issues"
+        [issueKeys]="issuesForState">
+    </td>
+  </tr>
+</table>
