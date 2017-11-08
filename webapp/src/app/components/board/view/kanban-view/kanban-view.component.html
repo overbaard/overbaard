@@ -8,7 +8,7 @@
     <div id="table-body"
          [style.height]="boardBodyHeight+'px'"
          (scroll)="scrollTableBodyX($event)">
-      <table id="body-table" class="board">
+      <table *ngIf="!issueTable.swimlaneInfo" id="body-table" class="board">
         <tr>
           <!-- trackBy is a hint to angular to be able to keep (i.e. don't destroy and recreate) as many components as possible -->
           <td app-kanban-view-column
@@ -19,6 +19,9 @@
           </td>
         </tr>
       </table>
+      <div *ngIf="issueTable.swimlaneInfo">
+        SWIMLANES!
+      </div>
     </div>
   </div>
 </div>
