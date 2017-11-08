@@ -1377,9 +1377,81 @@ describe('Swimlane observer tests', () => {
           });
       });
     });
-  });
 
-  // TODO combine filter changing and swimlane switching
+    describe('Swimlane and non-swimlane filters', () => {
+
+      // We have tested everything else pretty extensively, so don't test all combinations here
+
+      it ('Update non-swimlane filter', () => {
+        let originalState: IssueTable;
+        const util: IssueTableObservableUtil =
+          createUtilWithStandardIssues({swimlane: 'assignee', 'assignee': 'kabir', 'issue-type': 'task'});
+        util.tableObserver().take(1).subscribe(
+          issueTable => {
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []],
+              ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-5'])
+              .setSwimlanes([
+                {key: 'bob', name: 'Bob Brent Barlow', issues: ['ONE-3'], visibleFilter: false},
+                {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4'], visibleFilter: true},
+                {key: NONE_FILTER, name: 'None', issues: ['ONE-2', 'ONE-5'], visibleFilter: false}])
+              .checkTable(issueTable);
+            originalState = issueTable;
+          });
+        util.updateFilters('issue-type');
+        util.updateFilters('priority', 'Blocker')
+          .tableObserver().take(1).subscribe(
+          issueTable => {
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []],
+              ['ONE-2', 'ONE-3', 'ONE-4', 'ONE-5'])
+              .setSwimlanes([
+                {key: 'bob', name: 'Bob Brent Barlow', issues: ['ONE-3'], visibleFilter: false},
+                {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4'], visibleFilter: true},
+                {key: NONE_FILTER, name: 'None', issues: ['ONE-2', 'ONE-5'], visibleFilter: false}])
+              .checkTable(issueTable);
+            new EqualityChecker()
+              .cleanSwimlanes('bob')
+              .cleanSwimlaneTables('kabir', NONE_FILTER)
+              .check(originalState, issueTable);
+          });
+      });
+      it ('Update issue', () => {
+        let originalState: IssueTable;
+        const util: IssueTableObservableUtil =
+          createUtilWithStandardIssues({swimlane: 'assignee', 'assignee': 'kabir', 'issue-type': 'task'});
+        util.tableObserver().take(1).subscribe(
+          issueTable => {
+            new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []],
+              ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-5'])
+              .setSwimlanes([
+                {key: 'bob', name: 'Bob Brent Barlow', issues: ['ONE-3'], visibleFilter: false},
+                {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4'], visibleFilter: true},
+                {key: NONE_FILTER, name: 'None', issues: ['ONE-2', 'ONE-5'], visibleFilter: false}])
+              .checkTable(issueTable);
+            originalState = issueTable;
+          });
+        // Move to visible swimlane and issue type
+        util.issueChanges({update: [{key: 'ONE-3',  type: 'task', assignee: 'kabir'}]})
+          .emitBoardChange()
+          .tableObserver().take(1).subscribe(
+            issueTable => {
+              new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []],
+                ['ONE-1', 'ONE-2', 'ONE-5'])
+                .setSwimlanes([
+                  {key: 'bob', name: 'Bob Brent Barlow', issues: [], visibleFilter: false},
+                  {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-3', 'ONE-4'], visibleFilter: true},
+                  {key: NONE_FILTER, name: 'None', issues: ['ONE-2', 'ONE-5'], visibleFilter: false}])
+                .checkTable(issueTable);
+              new EqualityChecker()
+                .cleanSwimlanes(NONE_FILTER)
+                .addChangedSwimlaneColumns('bob', 0)
+                .addChangedSwimlaneColumns('kabir', 0)
+                .check(originalState, issueTable);
+
+            });
+
+      });
+    });
+  });
 
   function createUtilWithStandardIssues(params: Dictionary<string>): IssueTableObservableUtil {
     return createUtil(params, {'ONE': [1, 2, 3, 4, 5]},
@@ -1570,6 +1642,7 @@ class EqualityChecker {
         } else {
           expect(oldCol).toBe(newCol, `Column ${i} of ${k} should have been the same`);
         }
+
       }
     });
   }
