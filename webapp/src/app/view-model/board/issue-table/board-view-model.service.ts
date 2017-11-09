@@ -130,6 +130,12 @@ export class HeadersViewModelHandler {
       totalIssues += issueTable.table.get(stateIndex).size;
       visibleIssues += issueTable.visibleIssueCounts.get(stateIndex);
     });
+    if (oldHeader === header &&
+      oldHeaderView.visibleColumn === visibleColumn &&
+      oldHeaderView.visibleIssues === visibleIssues &&
+      oldHeaderView.totalIssues === totalIssues) {
+      return oldHeaderView;
+    }
     const headerView: HeaderView = HeaderViewUtil.createHeaderView(header, visibleColumn, totalIssues, visibleIssues);
     return headerView;
   }
