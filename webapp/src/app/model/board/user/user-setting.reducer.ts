@@ -137,10 +137,25 @@ export function userSettingReducer(state: UserSettingState = initialUserSettingS
       const states: List<number> = toggleAction.payload;
       return UserSettingUtil.toStateRecord(state).withMutations(settingsState => {
         settingsState.columnVisibilities = settingsState.columnVisibilities.withMutations(visibilities => {
-          states.forEach(s => {
+          if (states.size === 1) {
+            // With just one state is is a state header
+            const s = states.get(0);
             const currentVisibility = !visibilities.has(s) ? settingsState.defaultColumnVisibility : visibilities.get(s);
             visibilities.set(s, !currentVisibility);
-          });
+          } else {
+            // If it has several states it is a category header. If all are false, make them all true. Otherwise make them all false.
+            let allFalse = true;
+            states.forEach(s => {
+              const currentVisibility: boolean = !visibilities.has(s) ? settingsState.defaultColumnVisibility : visibilities.get(s);
+              if (currentVisibility) {
+                allFalse = false;
+                return false;
+              }
+            });
+            states.forEach(s => {
+              visibilities.set(s, allFalse);
+            });
+          }
         });
       });
     }

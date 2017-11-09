@@ -1,6 +1,6 @@
-import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
-import {Header} from '../../../../../model/board/data/header/header';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {HeaderView} from '../../../../../view-model/board/issue-table/headers-view';
+import {List} from 'immutable';
 
 /**
  * This uses an attribute selector, i.e. the 'selector' value is wrapped in square quotes. See
@@ -15,11 +15,18 @@ import {HeaderView} from '../../../../../view-model/board/issue-table/headers-vi
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class KanbanViewHeaderComponent implements OnInit {
-  @Input() header: HeaderView;
+  @Input()
+  header: HeaderView;
+
+  @Output()
+  toggleColumnVisibility: EventEmitter<HeaderView> = new EventEmitter<HeaderView>();
 
   constructor() { }
 
   ngOnInit() {
   }
 
+  onToggleVisibility(header: HeaderView) {
+    this.toggleColumnVisibility.emit(header);
+  }
 }

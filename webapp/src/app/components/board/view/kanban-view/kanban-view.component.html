@@ -3,7 +3,8 @@
 
     <app-kanban-view-headers
       [headers]="headers"
-      [boardLeftOffset]="boardLeftOffset">
+      [boardLeftOffset]="boardLeftOffset"
+      (toggleColumnVisibility)="onToggleVisibility($event)">
     </app-kanban-view-headers>
     <div id="table-body"
          [style.height]="boardBodyHeight+'px'"

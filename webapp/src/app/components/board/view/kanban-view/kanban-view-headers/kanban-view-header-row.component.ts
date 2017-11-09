@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Header} from '../../../../../model/board/data/header/header';
 import {List} from 'immutable';
 import {HeaderView} from '../../../../../view-model/board/issue-table/headers-view';
@@ -20,9 +20,17 @@ export class KanbanViewHeaderRowComponent implements OnInit {
   @Input()
   headerRow: List<HeaderView>;
 
+  @Output()
+  toggleColumnVisibility: EventEmitter<HeaderView> = new EventEmitter<HeaderView>();
+
   constructor() { }
 
   ngOnInit() {
+  }
+
+
+  onToggleVisibility(header: HeaderView) {
+    this.toggleColumnVisibility.emit(header);
   }
 
 }

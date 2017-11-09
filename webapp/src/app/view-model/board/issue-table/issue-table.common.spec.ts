@@ -32,6 +32,7 @@ import {
   PROJECT_ATTRIBUTES
 } from '../../../model/board/user/board-filter/board-filter.constants';
 import {BoardFilterActions} from '../../../model/board/user/board-filter/board-filter.reducer';
+import {Header} from '../../../model/board/data/header/header';
 
 export class IssueTableObservableUtil {
   private _rankedIssueKeys: any = {};
@@ -196,9 +197,22 @@ export class IssueTableObservableUtil {
     return this;
   }
 
-  toggleColumnVisibility(...states: number[]): IssueTableObservableUtil {
+  toggleColumnVisibility(headerName: string): IssueTableObservableUtil {
+    let actualHeader: Header = null;
+    this._boardState.headers.headers.forEach(row => {
+      row.forEach(header => {
+        if (header.name === headerName) {
+          actualHeader = header;
+          return false;
+        }
+      })
+      if (actualHeader) {
+        return false;
+      }
+    });
+    expect(actualHeader).toBeTruthy(`Could not find header called ${headerName}`);
     this._userSettingState =
-      userSettingReducer(this._userSettingState, UserSettingActions.toggleVisibility(List<number>(states)));
+      userSettingReducer(this._userSettingState, UserSettingActions.toggleVisibility(List<number>(actualHeader.states)));
     this._userSettingSubject$.next(this._userSettingState);
     return this;
   }

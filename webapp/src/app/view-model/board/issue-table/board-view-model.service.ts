@@ -131,7 +131,7 @@ export class HeadersViewModelHandler {
       visibleIssues += issueTable.visibleIssueCounts.get(stateIndex);
     });
     if (oldHeader === header &&
-      oldHeaderView.visibleColumn === visibleColumn &&
+      oldHeaderView.visible === visibleColumn &&
       oldHeaderView.visibleIssues === visibleIssues &&
       oldHeaderView.totalIssues === totalIssues) {
       return oldHeaderView;

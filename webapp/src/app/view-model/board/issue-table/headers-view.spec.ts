@@ -9,6 +9,8 @@ import {HeadersView, HeaderView} from './headers-view';
 import {List, Map} from 'immutable';
 import {BoardIssueView} from './board-issue-view';
 import {HeaderActions, headerMetaReducer} from '../../../model/board/data/header/header.reducer';
+import {Header} from '../../../model/board/data/header/header';
+import {UserSettingState} from '../../../model/board/user/user-setting.model';
 
 describe('Headers view model Tests', () => {
   let issueTable: IssueTable;
@@ -56,47 +58,48 @@ describe('Headers view model Tests', () => {
       })
       util.updateIssueTable(issueTable)
         .headersViewObserver().take(1).subscribe(headers => {
-        expect(headers).toBe(original)
+          expect(headers).toBe(original)
       });
     });
 
     it('Update total issues', () => {
       util.updateTotalIssues(10, 11, 7)
         .headersViewObserver().take(1).subscribe(headersView => {
-        expect(headersView.headers.size).toBe(1);
-        const headers: List<HeaderView> = headersView.headers.get(0);
-        expect(headers.size).toBe(3);
-        checkTotalIssues(headers, 10, 11, 7);
-        checkVisibleIssues(headers, 5, 6, 7);
-        checkColumnVisibilities(headers, true, true, true);
-        expect(headers.get(2)).toBe(original.headers.get(0).get(2));
-      });
+          expect(headersView.headers.size).toBe(1);
+          const headers: List<HeaderView> = headersView.headers.get(0);
+          expect(headers.size).toBe(3);
+          checkTotalIssues(headers, 10, 11, 7);
+          checkVisibleIssues(headers, 5, 6, 7);
+          checkColumnVisibilities(headers, true, true, true);
+          expect(headers.get(2)).toBe(original.headers.get(0).get(2));
+        });
     });
 
     it('Update visible issues', () => {
       util.updateVisibleIssues(1, 2, 7)
         .headersViewObserver().take(1).subscribe(headersView => {
-        expect(headersView.headers.size).toBe(1);
-        const headers: List<HeaderView> = headersView.headers.get(0);
-        expect(headers.size).toBe(3);
-        checkTotalIssues(headers, 5, 6, 7);
-        checkVisibleIssues(headers, 1, 2, 7);
-        checkColumnVisibilities(headers, true, true, true);
-        expect(headers.get(2)).toBe(original.headers.get(0).get(2));
-      });
+          expect(headersView.headers.size).toBe(1);
+          const headers: List<HeaderView> = headersView.headers.get(0);
+          expect(headers.size).toBe(3);
+          checkTotalIssues(headers, 5, 6, 7);
+          checkVisibleIssues(headers, 1, 2, 7);
+          checkColumnVisibilities(headers, true, true, true);
+          expect(headers.get(2)).toBe(original.headers.get(0).get(2));
+        });
     });
 
     it('Update column visibility', () => {
-      util.updateColumnVisibilities(true, false, false)
+      util.updateColumnVisibilities(originalHeaderState, 'S2', false)
         .headersViewObserver().take(1).subscribe(headersView => {
-        expect(headersView.headers.size).toBe(1);
-        const headers: List<HeaderView> = headersView.headers.get(0);
-        expect(headers.size).toBe(3);
-        checkTotalIssues(headers, 5, 6, 7);
-        checkVisibleIssues(headers, 5, 6, 7);
-        checkColumnVisibilities(headers, true, false, false);
-        expect(headers.get(0)).toBe(original.headers.get(0).get(0));
-      });
+          expect(headersView.headers.size).toBe(1);
+          const headers: List<HeaderView> = headersView.headers.get(0);
+          expect(headers.size).toBe(3);
+          checkTotalIssues(headers, 5, 6, 7);
+          checkVisibleIssues(headers, 5, 6, 7);
+          checkColumnVisibilities(headers, true, false, true);
+          expect(headers.get(0)).toBe(original.headers.get(0).get(0));
+          expect(headers.get(2)).toBe(original.headers.get(0).get(2));
+        });
     });
 
     it ('Update header', () => {
@@ -110,18 +113,18 @@ describe('Headers view model Tests', () => {
           originalHeaderState,
           HeaderActions.createDeserializeHeaders(states, [], 0, 0)))
         .headersViewObserver().take(1).subscribe(headersView => {
-        expect(headersView.headers.size).toBe(1);
-        const headers: List<HeaderView> = headersView.headers.get(0);
-        expect(headers.size).toBe(3);
-        checkTotalIssues(headers, 5, 6, 7);
-        checkVisibleIssues(headers, 5, 6, 7);
-        checkColumnVisibilities(headers, true, true, true);
+          expect(headersView.headers.size).toBe(1);
+          const headers: List<HeaderView> = headersView.headers.get(0);
+          expect(headers.size).toBe(3);
+          checkTotalIssues(headers, 5, 6, 7);
+          checkVisibleIssues(headers, 5, 6, 7);
+          checkColumnVisibilities(headers, true, true, true);
 
-        // TODO perhaps tighten up the stuff in header reducer to return equal issues?
-        // expect(headers.get(0)).toBe(original.headers.get(0).get(0));
-        // expect(headers.get(1)).toBe(original.headers.get(0).get(1));
-        expect(headers.get(2)).not.toBe(original.headers.get(0).get(2));
-        expect(headers.get(2).name).toEqual('S3-1');
+          // TODO perhaps tighten up the stuff in header reducer to return equal issues?
+          // expect(headers.get(0)).toBe(original.headers.get(0).get(0));
+          // expect(headers.get(1)).toBe(original.headers.get(0).get(1));
+          expect(headers.get(2)).not.toBe(original.headers.get(0).get(2));
+          expect(headers.get(2).name).toEqual('S3-1');
       });
     });
   });
@@ -138,7 +141,7 @@ describe('Headers view model Tests', () => {
       ];
       originalHeaderState = headerMetaReducer(
         initialHeaderState,
-        HeaderActions.createDeserializeHeaders(states, ['H-1'], 0, 0));
+        HeaderActions.createDeserializeHeaders(states, ['H1'], 0, 0));
       util = new HeadersViewObservableUtil(originalHeaderState, issueTable);
       util.headersViewObserver().take(1).subscribe(view => {
         original = view;
@@ -205,23 +208,41 @@ describe('Headers view model Tests', () => {
       });
     });
 
-    it('Update column visibility', () => {
-      util.updateColumnVisibilities(false, false, true)
+    it('Update column visibility - non category', () => {
+      util.updateColumnVisibilities(originalHeaderState, 'S1', false)
+        .headersViewObserver().take(1).subscribe(headersView => {
+          let headers: List<HeaderView> = headersView.headers.get(0);
+          expect(headers.size).toBe(2);
+          checkTotalIssues(headers, 5, 13);
+          checkVisibleIssues(headers, 5, 13);
+          checkColumnVisibilities(headers, false, true);
+
+          headers = headersView.headers.get(1);
+          expect(headers.size).toBe(2);
+          checkTotalIssues(headers, 6, 7);
+          checkVisibleIssues(headers, 6, 7);
+          checkColumnVisibilities(headers, true, true);
+        });
+
+      util.updateColumnVisibilities(originalHeaderState, 'S1', true)
         .headersViewObserver().take(1).subscribe(headersView => {
         let headers: List<HeaderView> = headersView.headers.get(0);
         expect(headers.size).toBe(2);
         checkTotalIssues(headers, 5, 13);
         checkVisibleIssues(headers, 5, 13);
-        checkColumnVisibilities(headers, false, true);
+        checkColumnVisibilities(headers, true, true);
 
         headers = headersView.headers.get(1);
         expect(headers.size).toBe(2);
         checkTotalIssues(headers, 6, 7);
         checkVisibleIssues(headers, 6, 7);
-        checkColumnVisibilities(headers, false, true);
+        checkColumnVisibilities(headers, true, true);
       });
-      // Do some more checks to make sure that the category header visibility is deduced properly
-      util.updateColumnVisibilities(true, false, false)
+    });
+
+    it('Update column visibility - category', () => {
+      // Since we have not set up the full wiring, we test the actual toggling in user-setting.reducer.spec.ts
+      util.updateColumnVisibilities(originalHeaderState, 'H1', false)
         .headersViewObserver().take(1).subscribe(headersView => {
         let headers: List<HeaderView> = headersView.headers.get(0);
         expect(headers.size).toBe(2);
@@ -235,7 +256,8 @@ describe('Headers view model Tests', () => {
         checkVisibleIssues(headers, 6, 7);
         checkColumnVisibilities(headers, false, false);
       });
-      util.updateColumnVisibilities(true, true, true)
+
+      util.updateColumnVisibilities(originalHeaderState, 'S2', true)
         .headersViewObserver().take(1).subscribe(headersView => {
         let headers: List<HeaderView> = headersView.headers.get(0);
         expect(headers.size).toBe(2);
@@ -247,7 +269,22 @@ describe('Headers view model Tests', () => {
         expect(headers.size).toBe(2);
         checkTotalIssues(headers, 6, 7);
         checkVisibleIssues(headers, 6, 7);
-        checkColumnVisibilities(headers, true, true);
+        checkColumnVisibilities(headers, true, false);
+      });
+
+      util.updateColumnVisibilities(originalHeaderState, 'H1', false)
+        .headersViewObserver().take(1).subscribe(headersView => {
+        let headers: List<HeaderView> = headersView.headers.get(0);
+        expect(headers.size).toBe(2);
+        checkTotalIssues(headers, 5, 13);
+        checkVisibleIssues(headers, 5, 13);
+        checkColumnVisibilities(headers, true, false);
+
+        headers = headersView.headers.get(1);
+        expect(headers.size).toBe(2);
+        checkTotalIssues(headers, 6, 7);
+        checkVisibleIssues(headers, 6, 7);
+        checkColumnVisibilities(headers, false, false);
       });
     });
   });
@@ -264,7 +301,7 @@ function checkVisibleIssues(headers: List<HeaderView>, ...visible: number[]) {
 }
 
 function checkColumnVisibilities(headers: List<HeaderView>, ...visibilities: boolean[]) {
-  const actual: boolean[] = headers.map(headerView => headerView.visibleColumn).toArray();
+  const actual: boolean[] = headers.map(headerView => headerView.visible).toArray();
   expect(actual).toEqual(visibilities);
 }
 
@@ -273,6 +310,8 @@ class HeadersViewObservableUtil {
   private _headerStateSubject$: BehaviorSubject<HeaderState> = new BehaviorSubject(initialHeaderState);
   private _issueTableSubject$: BehaviorSubject<IssueTable> = new BehaviorSubject(initialIssueTable);
   private _headersView$: Observable<HeadersView>;
+
+  private _currentUserSettingStage: UserSettingState;
 
   constructor(private _headerState: HeaderState, private _issueTable: IssueTable) {
     expect(_headerState.states.size).toBe(_issueTable.table.size);
@@ -300,15 +339,25 @@ class HeadersViewObservableUtil {
     });
   }
 
-  updateColumnVisibilities(...visibilities: boolean[]): HeadersViewObservableUtil {
+  updateColumnVisibilities(headerState: HeaderState, headerName: string, visible: boolean): HeadersViewObservableUtil {
+    let actualHeader: Header = null;
+    headerState.headers.forEach(row => {
+      row.forEach(header => {
+        if (header.name === headerName) {
+          actualHeader = header;
+          return false;
+        }
+      })
+      if (actualHeader) {
+        return false;
+      }
+    });
+    expect(actualHeader).toBeTruthy(`Could not find header called ${headerName}`);
     return this.changeIssueTableAndUpdate(table => {
       table.visibleColumns = table.visibleColumns.withMutations(mutable => {
-        expect(visibilities.length).toBe(this._headerState.states.size);
-        for (let i = 0 ; i < visibilities.length ; i++) {
-          if (visibilities[i] !==  this._issueTable.visibleColumns.get(i)) {
-            mutable.set(i, visibilities[i]);
-          }
-        }
+        actualHeader.states.forEach(state => {
+          mutable.set(state, visible);
+        });
       });
     });
   }

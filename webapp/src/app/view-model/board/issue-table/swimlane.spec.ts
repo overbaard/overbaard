@@ -1459,10 +1459,28 @@ describe('Swimlane observer tests', () => {
             });
 
         // Update column visibilities
-        util.toggleColumnVisibility(1, 2)
+        util.toggleColumnVisibility('S-3')
           .tableObserver().take(1).subscribe(issueTable => {
+          new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+            .invisibleIssues(['ONE-1', 'ONE-2', 'ONE-5'])
+            .invisibleColumns(0, 1, 2)
+            .swimlanes([
+              {key: 'bob', name: 'Bob Brent Barlow', issues: [], visibleFilter: false},
+              {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-3', 'ONE-4'], visibleFilter: true},
+              {key: NONE_FILTER, name: 'None', issues: ['ONE-2', 'ONE-5'], visibleFilter: false}])
+            .checkTable(issueTable);        });
 
-        });
+        util.toggleColumnVisibility('S-1')
+          .tableObserver().take(1).subscribe(issueTable => {
+          new IssueTableChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+            .invisibleIssues(['ONE-1', 'ONE-2', 'ONE-5'])
+            .invisibleColumns(1, 2)
+            .swimlanes([
+              {key: 'bob', name: 'Bob Brent Barlow', issues: [], visibleFilter: false},
+              {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-3', 'ONE-4'], visibleFilter: true},
+              {key: NONE_FILTER, name: 'None', issues: ['ONE-2', 'ONE-5'], visibleFilter: false}])
+            .checkTable(issueTable);
+          });
       });
     });
   });

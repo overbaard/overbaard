@@ -26,7 +26,7 @@ describe('KanbanViewHeaderComponent', () => {
       wip: 0,
       backlog: false,
       states: List<number>(),
-      visibleColumn: true,
+      visible: true,
       visibleIssues: 5,
       totalIssues: 10
     }

@@ -3,9 +3,10 @@
     <!-- trackBy is a hint to angular to be able to keep (i.e. don't destroy and recreate) as many components as possible -->
     <td app-kanban-view-column
         class="cell visible"
-        *ngFor="let issuesForState of issueTable.table ; trackBy: columnTrackByFn "
+        *ngFor="let issuesForState of issueTable.table ; trackBy: columnTrackByFn ; let i = index"
         [issues]="issueTable.issues"
-        [issueKeys]="issuesForState">
+        [issueKeys]="issuesForState"
+        [visible]="issueTable.visibleColumns.get(i)">
     </td>
   </tr>
 </table>

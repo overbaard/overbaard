@@ -1,6 +1,8 @@
-<div>
+<div (click)="onToggleVisibility(header)">
+  <div>
   {{header.name}}
-<div>
-<div>
-  {{header.visibleIssues}}/{{header.totalIssues}}/{{header.wip}}
+  <div>
+  <div>
+    {{header.visibleIssues}}/{{header.totalIssues}}/{{header.wip}} ({{header.visible}})
+  </div>
 </div>

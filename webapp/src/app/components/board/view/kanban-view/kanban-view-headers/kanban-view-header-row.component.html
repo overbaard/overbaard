@@ -4,6 +4,7 @@
     [attr.colspan]="header.cols"
     [attr.rowspan]="header.rows"
     [header]="header"
+    (toggleColumnVisibility)="onToggleVisibility($event)"
     >
 </td>
 

@@ -20,7 +20,7 @@ import {BoardViewModelService} from '../../view-model/board/issue-table/board-vi
 import {IssueTable} from '../../view-model/board/issue-table/issue-table';
 import {UserSettingActions} from '../../model/board/user/user-setting.reducer';
 import {initialHeadersView} from '../../view-model/board/issue-table/headers-view.model';
-import {HeadersView} from '../../view-model/board/issue-table/headers-view';
+import {HeadersView, HeaderView} from '../../view-model/board/issue-table/headers-view';
 
 
 const VIEW_KANBAN = 'kbv';
@@ -112,16 +112,6 @@ export class BoardComponent implements OnInit, OnDestroy {
 
     this.issueTable$ = this._issueTableVmService.getIssueTable();
     this.headers$ = this._issueTableVmService.getHeaders(this.issueTable$);
-
-    // Temp code - REMOVE THIS
-    this._issueTableVmService.getHeaders(this.issueTable$)
-      .skipWhile(headersView => headersView === initialHeadersView)
-      .subscribe(
-        headersView => {
-          console.log('Headers are: ' + headersView.headers.toString());
-          console.log('States are: ' + headersView.states.toArray());
-        }
-      );
   }
 
 
@@ -149,5 +139,9 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   onToggleControlPanel($event: Event) {
     this.showControlPanel = !this.showControlPanel;
+  }
+
+  onToggleVisibility(header: HeaderView) {
+    this._store.dispatch(UserSettingActions.toggleVisibility(header.states));
   }
 }

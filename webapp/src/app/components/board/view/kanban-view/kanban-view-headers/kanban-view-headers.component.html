@@ -2,7 +2,9 @@
   <table class="board">
     <tr app-kanban-view-header-row
       *ngFor="let row of headers.headers"
-      [headerRow]="row">
+      [headerRow]="row"
+      (toggleColumnVisibility)="onToggleVisibility($event)"
+    >
     </tr>
   </table>
 </div>

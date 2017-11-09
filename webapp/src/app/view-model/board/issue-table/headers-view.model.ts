@@ -16,7 +16,7 @@ const DEFAULT_HEADER: HeaderView = {
   wip: 0,
   backlog: false,
   states: List<number>(),
-  visibleColumn: true,
+  visible: true,
   totalIssues: 0,
   visibleIssues: 0
 }
@@ -49,7 +49,7 @@ export class HeaderViewUtil {
       wip: header.wip,
       backlog: header.backlog,
       states: header.states,
-      visibleColumn: visibleColumn,
+      visible: visibleColumn,
       totalIssues: totalIssues,
       visibleIssues: visibleIssues
     });

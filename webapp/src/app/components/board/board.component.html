@@ -4,7 +4,8 @@
     [headers]="headers$ | async"
     [issueTable]="issueTable$ | async"
     [windowWidth]="windowWidth"
-    [windowHeight]="windowHeight">
+    [windowHeight]="windowHeight"
+    (toggleColumnVisibility)="onToggleVisibility($event)">
   </app-kanban-view>
   <app-rank-view
     *ngIf="view === 'rv'"

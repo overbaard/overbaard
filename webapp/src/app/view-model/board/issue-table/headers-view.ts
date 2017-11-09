@@ -7,7 +7,7 @@ export interface HeadersView {
 }
 
 export interface HeaderView extends Header {
-  visibleColumn: boolean;
+  visible: boolean;
   totalIssues: number;
   visibleIssues: number;
 }

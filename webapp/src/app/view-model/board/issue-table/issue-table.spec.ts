@@ -433,7 +433,16 @@ describe('Issue table filter tests', () => {
         original = issueTable;
       });
 
-      util.toggleColumnVisibility(1, 2)
+      util.toggleColumnVisibility('S-2')
+        .tableObserver().take(1).subscribe(issueTable => {
+        new TableChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']])
+          .invisibleColumns(1)
+          .checkTable(issueTable);
+        expect(issueTable.table).toBe(original.table);
+        original = issueTable;
+      });
+
+      util.toggleColumnVisibility('S-3')
         .tableObserver().take(1).subscribe(issueTable => {
         new TableChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']])
           .invisibleColumns(1, 2)
@@ -442,13 +451,14 @@ describe('Issue table filter tests', () => {
         original = issueTable;
       });
 
-      util.toggleColumnVisibility(2, 3)
+      util.toggleColumnVisibility('S-2')
         .tableObserver().take(1).subscribe(issueTable => {
         new TableChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']])
-          .invisibleColumns(1, 3)
+          .invisibleColumns(2)
           .checkTable(issueTable);
         expect(issueTable.table).toBe(original.table);
       });
+
     });
     it ('Initial columns hidden (param: hidden); no filter', () => {
       let original: IssueTable;
@@ -460,14 +470,23 @@ describe('Issue table filter tests', () => {
           .checkTable(issueTable);
         original = issueTable;
       });
-      util.toggleColumnVisibility(2, 3)
+      util.toggleColumnVisibility('S-1')
         .tableObserver().take(1).subscribe(issueTable => {
         new TableChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']])
-          .invisibleColumns(1, 3)
+          .invisibleColumns(0, 1, 2)
           .checkTable(issueTable);
         expect(issueTable.table).toBe(original.table);
         original = issueTable;
       });
+      util.toggleColumnVisibility('S-2')
+        .tableObserver().take(1).subscribe(issueTable => {
+        new TableChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']])
+          .invisibleColumns(0, 2)
+          .checkTable(issueTable);
+        expect(issueTable.table).toBe(original.table);
+        original = issueTable;
+      });
+
     });
     it ('Initial columns hidden (param: visible); filter', () => {
       let original: IssueTable;
@@ -477,15 +496,24 @@ describe('Issue table filter tests', () => {
       util.tableObserver().take(1).subscribe(issueTable => {
         new TableChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']])
           .invisibleIssues('ONE-4', 'ONE-6', 'ONE-8')
-          .invisibleColumns(0, 3)
+          .invisibleColumns(0)
           .checkTable(issueTable);
         original = issueTable;
       });
-      util.toggleColumnVisibility(2, 3)
+      util.toggleColumnVisibility('S-3')
         .tableObserver().take(1).subscribe(issueTable => {
         new TableChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']])
           .invisibleIssues('ONE-4', 'ONE-6', 'ONE-8')
           .invisibleColumns(0, 2)
+          .checkTable(issueTable);
+        expect(issueTable.table).toBe(original.table);
+        original = issueTable;
+      });
+      util.toggleColumnVisibility('S-1')
+        .tableObserver().take(1).subscribe(issueTable => {
+        new TableChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9']])
+          .invisibleIssues('ONE-4', 'ONE-6', 'ONE-8')
+          .invisibleColumns(2)
           .checkTable(issueTable);
         expect(issueTable.table).toBe(original.table);
         original = issueTable;
