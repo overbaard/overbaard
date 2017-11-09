@@ -223,7 +223,7 @@ class TempHeader implements Header {
   }
 }
 
-const getHeadersState = (state: AppState) => state.board.headers;
+export const getHeadersState = (state: AppState) => state.board.headers;
 const getHeaders = (state: HeaderState) => state.headers;
 export const headersSelector = createSelector(getHeadersState, getHeaders);
 

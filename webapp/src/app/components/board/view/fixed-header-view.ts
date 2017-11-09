@@ -4,11 +4,12 @@
 import {Input} from '@angular/core';
 import {List} from 'immutable';
 import {Header} from '../../../model/board/data/header/header';
+import {HeadersView} from '../../../view-model/board/issue-table/headers-view';
 
 export class FixedHeaderView {
 
   @Input()
-  headers: List<List<Header>>;
+  headers: HeadersView;
 
   @Input()
   windowHeight: number;

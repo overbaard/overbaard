@@ -19,6 +19,8 @@ import {Header} from '../../model/board/data/header/header';
 import {IssueTableService} from '../../view-model/board/issue-table/issue-table.service';
 import {IssueTable} from '../../view-model/board/issue-table/issue-table';
 import {UserSettingActions} from '../../model/board/user/user-setting.reducer';
+import {initialHeadersView} from '../../view-model/board/issue-table/headers-view.model';
+import {HeadersView} from '../../view-model/board/issue-table/headers-view';
 
 
 const VIEW_KANBAN = 'kbv';
@@ -38,7 +40,7 @@ export class BoardComponent implements OnInit, OnDestroy {
   view: string = VIEW_KANBAN;
   private _wasBacklogForced = false;
 
-  headers$: Observable<List<List<Header>>>;
+  headers$: Observable<HeadersView>;
   issueTable$: Observable<IssueTable>;
   windowHeight: number;
   windowWidth: number;
@@ -108,8 +110,18 @@ export class BoardComponent implements OnInit, OnDestroy {
         }
       );
 
-    this.headers$ = this._store.select(headersSelector);
     this.issueTable$ = this._issueTableVmService.getIssueTable();
+    this.headers$ = this._issueTableVmService.getHeaders(this.issueTable$);
+
+    // Temp code - REMOVE THIS
+    this._issueTableVmService.getHeaders(this.issueTable$)
+      .skipWhile(headersView => headersView === initialHeadersView)
+      .subscribe(
+        headersView => {
+          console.log('Headers are: ' + headersView.headers.toString());
+          console.log('States are: ' + headersView.states.toArray());
+        }
+      );
   }
 
 

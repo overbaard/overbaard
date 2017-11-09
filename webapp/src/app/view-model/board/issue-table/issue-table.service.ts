@@ -27,11 +27,18 @@ import {
 } from '../../../model/board/user/board-filter/board-filter.constants';
 import {CustomField} from '../../../model/board/data/custom-field/custom-field.model';
 import {NO_ASSIGNEE} from '../../../model/board/data/assignee/assignee.model';
+import {HeaderState} from '../../../model/board/data/header/header.state';
+import {HeadersView, HeaderView} from './headers-view';
+import {initialHeaderState} from '../../../model/board/data/header/header.model';
+import {getHeadersState} from '../../../model/board/data/header/header.reducer';
+import {HeaderViewUtil, initialHeadersView} from './headers-view.model';
+import {Header} from '../../../model/board/data/header/header';
 
 @Injectable()
 export class IssueTableService {
 
   private _issueTableHandler: IssueTableHandler = new IssueTableHandler();
+  private _headersHandler: HeadersHandler = new HeadersHandler()
 
   constructor(private _store: Store<AppState>) {
   }
@@ -42,19 +49,101 @@ export class IssueTableService {
       this._store.select('userSettings')
     );
   }
+
+  getHeaders(issueTable$: Observable<IssueTable>): Observable<HeadersView> {
+    const headerState: Observable<HeaderState> = this._store.select(getHeadersState);
+    return this._headersHandler.getHeaders(
+      headerState,
+      issueTable$
+    )
+  }
 }
 
+export class HeadersHandler {
+  private _lastHeaderState: HeaderState = initialHeaderState;
+  private _lastIssueTable: IssueTable = initialIssueTable;
+  private _lastHeadersView: HeadersView = initialHeadersView;
 
+  getHeaders(
+    headerState$: Observable<HeaderState>,
+    issueTable$: Observable<IssueTable>): Observable<HeadersView>  {
+    return Observable.combineLatest(headerState$, issueTable$, (headerState, issueTable) => {
+      let headersView: HeadersView = this._lastHeadersView;
+      if (issueTable !== initialIssueTable && headerState !== initialHeaderState) {
+        if (headerState !== this._lastHeaderState) {
+          headersView = this.populateHeaders(headerState, issueTable);
+        } else if (issueTable !== this._lastIssueTable) {
+          if (issueTable.visibleIssueCounts !== this._lastIssueTable.visibleIssueCounts ||
+            issueTable.table !== this._lastIssueTable.table ||
+            issueTable.visibleColumns !== this._lastIssueTable.visibleColumns) {
+
+            headersView = this.populateHeaders(headerState, issueTable);
+          }
+        }
+      }
+      this._lastHeaderState = headerState;
+      this._lastIssueTable = issueTable;
+      this._lastHeadersView = headersView;
+      return this._lastHeadersView;
+    });
+  }
+
+  private populateHeaders(headerState: HeaderState, issueTable: IssueTable): HeadersView {
+    const headerList: List<List<HeaderView>> = List<List<HeaderView>>().asMutable();
+
+    let changed = false;
+    for (let i = 0 ; i < headerState.headers.size ; i++) {
+      const headerRow: List<Header> = headerState.headers.get(i);
+      const row: List<HeaderView> = List<HeaderView>().asMutable();
+
+      let changedRow = false;
+      for (let j = 0 ; j < headerRow.size ; j++) {
+        let oldHeader: Header = null;
+        let oldHeaderView: HeaderView = null;
+
+        if (this._lastHeadersView.headers.size > i && this._lastHeadersView.headers.get(i).size > j) {
+          oldHeader = this._lastHeaderState.headers.get(i).get(j);
+          oldHeaderView = this._lastHeadersView.headers.get(i).get(j);
+        }
+
+        const headerView: HeaderView = this.createHeaderView(issueTable, headerRow.get(j), oldHeader, oldHeaderView);
+        if (headerView !== oldHeaderView) {
+          changedRow = true;
+        }
+        row.push(headerView);
+      }
+      headerList.push(changedRow ? row.asImmutable() : this._lastHeadersView.headers.get(i));
+      changed = changedRow || changed;
+    }
+
+    return changed ? HeaderViewUtil.creaateHeadersView(headerList.asImmutable(), headerState.states) : this._lastHeadersView;
+  }
+
+  private createHeaderView(issueTable: IssueTable, header: Header, oldHeader: Header, oldHeaderView: HeaderView): HeaderView {
+    let visibleColumn = false;
+    let totalIssues = 0;
+    let visibleIssues = 0;
+    header.states.forEach(stateIndex => {
+      if (issueTable.visibleColumns.get(stateIndex)) {
+        visibleColumn = true;
+      }
+      totalIssues += issueTable.table.get(stateIndex).size;
+      visibleIssues += issueTable.visibleIssueCounts.get(stateIndex);
+    });
+    const headerView: HeaderView = HeaderViewUtil.createHeaderView(header, visibleColumn, totalIssues, visibleIssues);
+    return headerView;
+  }
+}
 /**
  * This class is mainly internal for IssueTableService, and a hook for testing. When used by IssueTableService,
  * its lifecycle follows that of the service
  */
 export class IssueTableHandler {
   // Last inputs
-  lastBoardState: BoardState = initialBoardState;
-  lastUserSettingState: UserSettingState = initialUserSettingState;
+  private _lastBoardState: BoardState = initialBoardState;
+  private _lastUserSettingState: UserSettingState = initialUserSettingState;
   // Last result
-  lastIssueTable: IssueTable = initialIssueTable;
+  private _lastIssueTable: IssueTable = initialIssueTable;
 
   getIssueTable(
     boardState$: Observable<BoardState>,
@@ -62,31 +151,31 @@ export class IssueTableHandler {
     return Observable
       .combineLatest(boardState$, userSettingState$, (boardState, userSettingState) => {
         let changeType: ChangeType = null;
-        if (boardState !== this.lastBoardState) {
-          changeType = this.lastBoardState === initialBoardState ? ChangeType.LOAD_BOARD : ChangeType.UPDATE_BOARD;
+        if (boardState !== this._lastBoardState) {
+          changeType = this._lastBoardState === initialBoardState ? ChangeType.LOAD_BOARD : ChangeType.UPDATE_BOARD;
         } else if (boardState.viewId >= 0) {
-          if (userSettingState.filters !== this.lastUserSettingState.filters) {
+          if (userSettingState.filters !== this._lastUserSettingState.filters) {
             changeType = ChangeType.APPLY_FILTERS;
-          } else if (userSettingState.swimlane !== this.lastUserSettingState.swimlane) {
+          } else if (userSettingState.swimlane !== this._lastUserSettingState.swimlane) {
             changeType = ChangeType.CHANGE_SWIMLANE;
-          } else if (userSettingState.columnVisibilities !== this.lastUserSettingState.columnVisibilities) {
+          } else if (userSettingState.columnVisibilities !== this._lastUserSettingState.columnVisibilities) {
             changeType = ChangeType.CHANGE_COLUMN_VISIBILITY;
           }
         }
 
         if (changeType === null) {
-          return this.lastIssueTable;
+          return this._lastIssueTable;
         }
 
         const issueTableBuilder: IssueTableBuilder = new IssueTableBuilder(
           changeType,
-          this.lastIssueTable,
+          this._lastIssueTable,
           boardState,
           userSettingState);
         const issueTable: IssueTable = issueTableBuilder.updateIssueTable();
-        this.lastIssueTable = issueTable;
-        this.lastBoardState = boardState;
-        this.lastUserSettingState = userSettingState;
+        this._lastIssueTable = issueTable;
+        this._lastBoardState = boardState;
+        this._lastUserSettingState = userSettingState;
         return issueTable;
       });
   }

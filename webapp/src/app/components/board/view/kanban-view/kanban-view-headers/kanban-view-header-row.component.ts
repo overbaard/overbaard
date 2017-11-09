@@ -1,6 +1,7 @@
 import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
 import {Header} from '../../../../../model/board/data/header/header';
 import {List} from 'immutable';
+import {HeaderView} from '../../../../../view-model/board/issue-table/headers-view';
 
 /**
  * This uses an attribute selector, i.e. the 'selector' value is wrapped in square quotes. See
@@ -17,7 +18,7 @@ import {List} from 'immutable';
 export class KanbanViewHeaderRowComponent implements OnInit {
 
   @Input()
-  headerRow: List<Header>;
+  headerRow: List<HeaderView>;
 
   constructor() { }
 
