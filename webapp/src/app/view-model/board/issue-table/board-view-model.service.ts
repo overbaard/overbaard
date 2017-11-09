@@ -35,10 +35,10 @@ import {HeaderViewUtil, initialHeadersView} from './headers-view.model';
 import {Header} from '../../../model/board/data/header/header';
 
 @Injectable()
-export class IssueTableService {
+export class BoardViewModelService {
 
-  private _issueTableHandler: IssueTableHandler = new IssueTableHandler();
-  private _headersHandler: HeadersHandler = new HeadersHandler()
+  private _issueTableHandler: IssueTableViewModelHandler = new IssueTableViewModelHandler();
+  private _headersHandler: HeadersViewModelHandler = new HeadersViewModelHandler()
 
   constructor(private _store: Store<AppState>) {
   }
@@ -59,7 +59,7 @@ export class IssueTableService {
   }
 }
 
-export class HeadersHandler {
+export class HeadersViewModelHandler {
   private _lastHeaderState: HeaderState = initialHeaderState;
   private _lastIssueTable: IssueTable = initialIssueTable;
   private _lastHeadersView: HeadersView = initialHeadersView;
@@ -135,10 +135,10 @@ export class HeadersHandler {
   }
 }
 /**
- * This class is mainly internal for IssueTableService, and a hook for testing. When used by IssueTableService,
+ * This class is mainly internal for BoardViewModelService, and a hook for testing. When used by BoardViewModelService,
  * its lifecycle follows that of the service
  */
-export class IssueTableHandler {
+export class IssueTableViewModelHandler {
   // Last inputs
   private _lastBoardState: BoardState = initialBoardState;
   private _lastUserSettingState: UserSettingState = initialUserSettingState;

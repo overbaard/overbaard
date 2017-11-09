@@ -16,7 +16,7 @@ import {Subject} from 'rxjs/Subject';
 import {List} from 'immutable';
 import {headersSelector} from '../../model/board/data/header/header.reducer';
 import {Header} from '../../model/board/data/header/header';
-import {IssueTableService} from '../../view-model/board/issue-table/issue-table.service';
+import {BoardViewModelService} from '../../view-model/board/issue-table/board-view-model.service';
 import {IssueTable} from '../../view-model/board/issue-table/issue-table';
 import {UserSettingActions} from '../../model/board/user/user-setting.reducer';
 import {initialHeadersView} from '../../view-model/board/issue-table/headers-view.model';
@@ -30,7 +30,7 @@ export const VIEW_RANK = 'rv';
   selector: 'app-board',
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss'],
-  providers: [BoardService, IssueTableService],
+  providers: [BoardService, BoardViewModelService],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BoardComponent implements OnInit, OnDestroy {
@@ -53,7 +53,7 @@ export class BoardComponent implements OnInit, OnDestroy {
     private _boardService: BoardService,
     private _appHeaderService: AppHeaderService,
     private _store: Store<AppState>,
-    private _issueTableVmService: IssueTableService) {
+    private _issueTableVmService: BoardViewModelService) {
 
     this.setWindowSize();
 

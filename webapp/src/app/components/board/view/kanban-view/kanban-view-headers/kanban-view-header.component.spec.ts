@@ -25,7 +25,10 @@ describe('KanbanViewHeaderComponent', () => {
       cols: 1,
       wip: 0,
       backlog: false,
-      states: List<number>()
+      states: List<number>(),
+      visibleColumn: true,
+      visibleIssues: 5,
+      totalIssues: 10
     }
     fixture.detectChanges();
   });

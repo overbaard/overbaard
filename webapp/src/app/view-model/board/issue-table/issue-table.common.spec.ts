@@ -14,7 +14,7 @@ import {RankActions, rankMetaReducer} from '../../../model/board/data/rank/rank.
 import {getTestIssueTypeState} from '../../../model/board/data/issue-type/issue-type.reducer.spec';
 import {getTestPriorityState} from '../../../model/board/data/priority/priority.reducer.spec';
 import {getTestAssigneeState} from '../../../model/board/data/assignee/assignee.reducer.spec';
-import {IssueTableHandler} from './issue-table.service';
+import {IssueTableViewModelHandler} from './board-view-model.service';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/take';
 import {initialUserSettingState, UserSettingState} from '../../../model/board/user/user-setting.model';
@@ -37,7 +37,7 @@ export class IssueTableObservableUtil {
   private _rankedIssueKeys: any = {};
   private _stateMap: Map<string, StateMapping[]> = Map<string, StateMapping[]>();
 
-  private _service: IssueTableHandler = new IssueTableHandler();
+  private _service: IssueTableViewModelHandler = new IssueTableViewModelHandler();
   private _userSettingState: UserSettingState = initialUserSettingState;
   private _boardState: BoardState = initialBoardState;
   private _boardStateSubject$: BehaviorSubject<BoardState> = new BehaviorSubject(initialBoardState);
