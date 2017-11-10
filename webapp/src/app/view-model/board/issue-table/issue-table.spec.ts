@@ -547,6 +547,7 @@ describe('Issue table filter tests', () => {
 class TableChecker {
   private _invisibleIssues: string[] = [];
   private _invisibleColumns: number[] = [];
+  private _backlog = 0;
 
   constructor(private _expected: string[][]) {
   }
@@ -558,6 +559,11 @@ class TableChecker {
 
   invisibleColumns(...invisibleColumns: number[]): TableChecker {
     this._invisibleColumns = invisibleColumns;
+    return this;
+  }
+
+  backlog(backlog: number): TableChecker {
+    this._backlog = backlog;
     return this;
   }
 
@@ -593,6 +599,18 @@ class TableChecker {
       visibleColumns[i] = !invisibleColumnSet.contains(i);
     }
     expect(issueTable.visibleColumns.toArray()).toEqual(visibleColumns);
+
+    const expectedBacklogStateIndices: number[] = [];
+    const expectedNormalStateIndices: number[] = [];
+    for (let i = 0 ; i < this._expected.length ; i++) {
+      if (i < this._backlog) {
+        expectedBacklogStateIndices.push(i);
+      } else {
+        expectedNormalStateIndices.push(i);
+      }
+    }
+    expect(issueTable.backlogStates.toArray()).toEqual(expectedBacklogStateIndices);
+    expect(issueTable.normalStates.toArray()).toEqual(expectedNormalStateIndices);
   }
 }
 

@@ -231,7 +231,7 @@ class IssueTableBuilder {
 
 
     return IssueTableUtil.createIssueTable(showBacklog,
-      normalStates, backlogStates, issues, table, swimlaneInfo, visibleIssueCounts, visibleColumns);
+      backlogStates, normalStates, issues, table, swimlaneInfo, visibleIssueCounts, visibleColumns);
   }
 
   private populateIssues(): Map<string, BoardIssueView> {
@@ -427,11 +427,8 @@ class IssueTableBuilder {
       if (headerState.backlog === 0) {
         return this._oldIssueTableState.backlogStates;
       }
-      if (this._currentUserSettingState.showBacklog) {
-
-      } else {
-
-      }
+      // TODO some stuff here
+      return this._oldIssueTableState.backlogStates;
     } else {
       return List<number>().withMutations(mutable => {
         for (let i = headerState.backlog ; i < headerState.states.size ; i++) {
