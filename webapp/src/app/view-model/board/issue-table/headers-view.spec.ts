@@ -16,6 +16,9 @@ describe('Headers view model Tests', () => {
   let issueTable: IssueTable;
   beforeEach(() => {
     issueTable = IssueTableUtil.createIssueTable(
+      false,
+      List<number>(),
+      List<number>(),
       null,
       List<List<string>>([List<string>().setSize(5), List<string>().setSize(6), List<string>().setSize(7)]),
       null,

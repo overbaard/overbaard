@@ -5,7 +5,8 @@ import {Header} from './header';
 
 const DEFAULT_STATE: HeaderState = {
   headers: List<List<Header>>(),
-  states: List<string>()
+  states: List<string>(),
+  backlog: 0
 };
 
 const DEFAULT_HEADER: Header = {

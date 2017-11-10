@@ -4,4 +4,5 @@ import {Header} from './header';
 export interface HeaderState {
   headers: List<List<Header>>;
   states: List<string>;
+  backlog: number;
 }

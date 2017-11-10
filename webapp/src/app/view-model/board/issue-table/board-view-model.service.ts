@@ -166,6 +166,8 @@ export class IssueTableViewModelHandler {
             changeType = ChangeType.CHANGE_SWIMLANE;
           } else if (userSettingState.columnVisibilities !== this._lastUserSettingState.columnVisibilities) {
             changeType = ChangeType.CHANGE_COLUMN_VISIBILITY;
+          } else if (userSettingState.backlog !== this._lastUserSettingState.backlog) {
+            changeType = userSettingState.backlog ? ChangeType.ENABLE_BACKLOG : ChangeType.DISABLE_BACKLOG;
           }
         }
 
@@ -192,7 +194,9 @@ enum ChangeType {
   UPDATE_BOARD,
   APPLY_FILTERS,
   CHANGE_SWIMLANE,
-  CHANGE_COLUMN_VISIBILITY
+  CHANGE_COLUMN_VISIBILITY,
+  ENABLE_BACKLOG,
+  DISABLE_BACKLOG
 }
 
 class IssueTableBuilder {
@@ -211,7 +215,9 @@ class IssueTableBuilder {
     const visibleIssueCounts: List<number> = this.calculateVisibleIssueCounts(issues, table);
     const swimlaneInfo: SwimlaneInfo = this.calculateSwimlane(issues, table);
     const visibleColumns: List<boolean> = this.calculateVisibleColumns(table.size);
-
+    const showBacklog: boolean = this._currentUserSettingState.backlog;
+    const backlogStates: List<number> = initialIssueTable.backlogStates;
+    const normalStates: List<number> = initialIssueTable.normalStates;
     if (issues === this._oldIssueTableState.issues &&
         table === this._oldIssueTableState.table &&
         swimlaneInfo === this._oldIssueTableState.swimlaneInfo &&
@@ -219,7 +225,8 @@ class IssueTableBuilder {
         visibleColumns === this._oldIssueTableState.visibleColumns) {
       return this._oldIssueTableState;
     }
-    return IssueTableUtil.createIssueTable(issues, table, swimlaneInfo, visibleIssueCounts, visibleColumns);
+    return IssueTableUtil.createIssueTable(showBacklog,
+      normalStates, backlogStates, issues, table, swimlaneInfo, visibleIssueCounts, visibleColumns);
   }
 
   private populateIssues(): Map<string, BoardIssueView> {
@@ -404,6 +411,22 @@ class IssueTableBuilder {
 
     return swimlaneBuilder;
   }
+
+  /*private populateStates(forBacklog: boolean) : List<number> {
+    if (this._changeType !== ChangeType.LOAD_BOARD && this._changeType !== ChangeType.ENABLE_BACKLOG &&
+      this._changeType !== ChangeType.DISABLE_BACKLOG) {
+      return forBacklog ? this._oldIssueTableState.backlogStates : this._oldIssueTableState.normalStates;
+    }
+    if (forBacklog) {
+      if (this._currentUserSettingState.backlog) {
+
+      }
+    } else {
+      return List<number>().withMutations(mutable => {
+        for (let i = this._currentBoardState.headers.headers.)
+      });
+    }
+  }*/
 }
 
 class SwimlaneInfoBuilder {

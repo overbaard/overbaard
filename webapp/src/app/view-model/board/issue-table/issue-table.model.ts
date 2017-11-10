@@ -5,6 +5,9 @@ import {IssueTable, SwimlaneData, SwimlaneInfo} from './issue-table';
 import {BoardIssueView} from './board-issue-view';
 
 const DEFAULT_ISSUE_STATE: IssueTable = {
+  showBacklog: false,
+  backlogStates: List<number>(),
+  normalStates: List<number>(),
   issues: Map<string, BoardIssueView>(),
   table: List<List<string>>(),
   swimlaneInfo: null,
@@ -47,6 +50,9 @@ export class IssueTableUtil {
   }
 
   static createIssueTable(
+    showBacklog: boolean,
+    backlogStates: List<number>,
+    normalStates: List<number>,
     issues: Map<string, BoardIssueView>,
     tableList: List<List<string>>,
     swimlaneInfo: SwimlaneInfo,
@@ -54,6 +60,9 @@ export class IssueTableUtil {
     visibleColumns: List<boolean>): IssueTable {
 
     const state: IssueTable = {
+      showBacklog: showBacklog,
+      backlogStates: backlogStates,
+      normalStates: normalStates,
       issues: issues,
       table: tableList,
       swimlaneInfo: swimlaneInfo,

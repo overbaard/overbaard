@@ -8,6 +8,7 @@ const CLEAR_SETTINGS = 'CLEAR_SETTINGS';
 export const INITIALISE_SETTINGS_FROM_QUERYSTRING = 'INITIALISE_SETTINGS_FROM_QUERYSTRING';
 const UPDATE_SWIMLANE = 'UPDATE_SWIMLANE';
 const TOGGLE_COLUMN_VISIBILITY = 'TOGGLE_COLUMN_VISIBILITY';
+const TOGGLE_BACKLOG = 'TOGGLE_BACKLOG';
 
 export class ClearSettingsAction implements Action {
   readonly type = CLEAR_SETTINGS;
@@ -90,9 +91,15 @@ export class InitialiseFromQueryStringAction implements Action {
   }
 }
 
-export class ToggleVisibilityAction implements Action {
+class ToggleVisibilityAction implements Action {
   readonly type = TOGGLE_COLUMN_VISIBILITY;
   constructor(readonly payload: List<number>) {
+  }
+}
+
+class ToggleBacklogAction implements Action {
+  readonly type = TOGGLE_BACKLOG;
+  constructor() {
   }
 }
 
@@ -112,6 +119,10 @@ export class UserSettingActions {
   static toggleVisibility(states: List<number>): Action {
     return new ToggleVisibilityAction(states);
   }
+
+  static toggleBacklog(): Action {
+    return new ToggleBacklogAction();
+  }
 }
 
 export function userSettingReducer(state: UserSettingState = initialUserSettingState, action: Action): UserSettingState {
@@ -130,6 +141,11 @@ export function userSettingReducer(state: UserSettingState = initialUserSettingS
     case UPDATE_SWIMLANE: {
       return UserSettingUtil.toStateRecord(state).withMutations(mutable => {
         mutable.swimlane = (<UpdateSwimlaneAction>action).payload;
+      });
+    }
+    case TOGGLE_BACKLOG: {
+      return UserSettingUtil.toStateRecord(state).withMutations(mutable => {
+        mutable.backlog = !mutable.backlog;
       });
     }
     case TOGGLE_COLUMN_VISIBILITY: {

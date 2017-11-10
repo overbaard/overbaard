@@ -7,10 +7,10 @@ import {Header} from './header';
 import {AppState} from '../../../../app-store';
 import {createSelector} from 'reselect';
 
-const DESERIALIZE_PRIORITIES = 'DESERIALIZE_HEADERS';
+const DESERIALIZE_HEADERS = 'DESERIALIZE_HEADERS';
 
 class DeserializeHeadersAction implements Action {
-  readonly type = DESERIALIZE_PRIORITIES;
+  readonly type = DESERIALIZE_HEADERS;
   constructor(readonly payload: HeaderTableCreator) {
   }
 }
@@ -25,7 +25,7 @@ class HeaderTableCreator {
   // The raw input
   private _states: any[];
   private headers: string[];
-  private backlog: number;
+  private _backlog: number;
   private done: number;
 
   // The states contained in the backlog
@@ -38,7 +38,7 @@ class HeaderTableCreator {
     // Only use the visible states
     this._states = states.slice(0, states.length - done);
     this.headers = headers;
-    this.backlog = backlog;
+    this._backlog = backlog;
     this.done = done;
 
     this.backlogStates = backlog && backlog > 0 ? [] : null;
@@ -50,6 +50,10 @@ class HeaderTableCreator {
 
   get states(): any[] {
     return this._states;
+  }
+
+  get backlog(): number {
+    return this._backlog;
   }
 
   private hasHeaders(): boolean {
@@ -73,12 +77,12 @@ class HeaderTableCreator {
       const state: any = this._states[i];
       const header: number = state['header'];
       const rows = this.calculateRows(i, header);
-      const stateHeader = new TempHeader(state['name'], i < this.backlog, rows, state['wip']);
+      const stateHeader = new TempHeader(state['name'], i < this._backlog, rows, state['wip']);
       stateHeader.addState(i);
       stateHeaders[i] = stateHeader;
 
       // Add this state to the relevant headers
-      if (this.backlogStates && i < this.backlog) {
+      if (this.backlogStates && i < this._backlog) {
         this.backlogStates.push(i);
       } else if (this.hasHeaders() && !isNaN(header)) {
         this.headerStates[this.headers[header]].push(i);
@@ -88,7 +92,7 @@ class HeaderTableCreator {
   }
 
   private calculateRows(index: number, header: number) {
-    if (index < this.backlog) {
+    if (index < this._backlog) {
       return 1;
     }
     return (this.hasHeaders() && isNaN(header)) ? 2 : 1;
@@ -158,7 +162,7 @@ class HeaderTableCreator {
 // 'meta-reducer here means it is not called directly by the store, rather from the boardReducer
 export function headerMetaReducer(state: HeaderState = initialHeaderState, action: Action): HeaderState {
   switch (action.type) {
-    case DESERIALIZE_PRIORITIES: {
+    case DESERIALIZE_HEADERS: {
       const payload: HeaderTableCreator = (<DeserializeHeadersAction>action).payload;
 
       const exisitingHeaders = state.headers;
@@ -170,6 +174,7 @@ export function headerMetaReducer(state: HeaderState = initialHeaderState, actio
       const newState: HeaderState = HeaderUtil.toStateRecord(state).withMutations( mutable => {
         mutable.states = List<string>(payload.states.map(value => value['name']));
         mutable.headers = headers;
+        mutable.backlog = payload.backlog;
       });
       if (HeaderUtil.toStateRecord(newState).equals(HeaderUtil.toStateRecord(state))) {
         return state;

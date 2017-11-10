@@ -17,6 +17,7 @@ describe('Header reducer tests', () => {
       initialHeaderState,
       HeaderActions.createDeserializeHeaders(states, [], 0, 0));
     expect(headerState.states.toArray()).toEqual(['S1', 'S2', 'S3']);
+    expect(headerState.backlog).toEqual(0);
     const headers: List<List<Header>> = headerState.headers;
     expect(headers.size).toBe(1);
 
@@ -40,6 +41,7 @@ describe('Header reducer tests', () => {
       initialHeaderState,
       HeaderActions.createDeserializeHeaders(states, ['H1', 'H2'], 0, 0));
     expect(headerState.states.toArray()).toEqual(['S1', 'S2', 'S3', 'S4']);
+    expect(headerState.backlog).toEqual(0);
     const headers: List<List<Header>> = headerState.headers;
 
     expect(headers.size).toBe(2);
@@ -72,6 +74,7 @@ describe('Header reducer tests', () => {
       initialHeaderState,
       HeaderActions.createDeserializeHeaders(states, ['H1', 'H2'], 0, 0));
     expect(headerState.states.toArray()).toEqual(['S1', 'S2', 'S3', 'S4']);
+    expect(headerState.backlog).toEqual(0);
     const headers: List<List<Header>> = headerState.headers;
 
     expect(headers.size).toBe(2);
@@ -104,6 +107,7 @@ describe('Header reducer tests', () => {
       initialHeaderState,
       HeaderActions.createDeserializeHeaders(states, ['H1', 'H2'], 0, 0));
     expect(headerState.states.toArray()).toEqual(['S1', 'S2', 'S3', 'S4']);
+    expect(headerState.backlog).toEqual(0);
     const headers: List<List<Header>> = headerState.headers;
 
     expect(headers.size).toBe(2);
@@ -136,6 +140,7 @@ describe('Header reducer tests', () => {
       initialHeaderState,
       HeaderActions.createDeserializeHeaders(states, ['H1', 'H2'], 0, 0));
     expect(headerState.states.toArray()).toEqual(['S1', 'S2', 'S3', 'S4']);
+    expect(headerState.backlog).toEqual(0);
     const headers: List<List<Header>> = headerState.headers;
 
     expect(headers.size).toBe(2);
@@ -167,6 +172,7 @@ describe('Header reducer tests', () => {
       initialHeaderState,
       HeaderActions.createDeserializeHeaders(states, [], 2, 0));
     expect(headerState.states.toArray()).toEqual(['S1', 'S2', 'S3', 'S4']);
+    expect(headerState.backlog).toEqual(2);
     const headers: List<List<Header>> = headerState.headers;
 
     expect(headers.size).toBe(2);
@@ -198,6 +204,7 @@ describe('Header reducer tests', () => {
       initialHeaderState,
       HeaderActions.createDeserializeHeaders(states, ['H1', 'H2'], 1, 0));
     expect(headerState.states.toArray()).toEqual(['S1', 'S2', 'S3', 'S4', 'S5']);
+    expect(headerState.backlog).toEqual(1);
     const headers: List<List<Header>> = headerState.headers;
 
     expect(headers.size).toBe(2);
@@ -268,6 +275,7 @@ describe('Header reducer tests', () => {
       initialHeaderState,
       HeaderActions.createDeserializeHeaders(states, ['Short Header', 'A much longer header'], 0, 0));
     expect(headerState.states.toArray()).toEqual(['Backlog', 'Analysis', 'Dev in Progress', 'More work is needed']);
+    expect(headerState.backlog).toEqual(0);
     const headers: List<List<Header>> = headerState.headers;
 
     expect(headers.size).toBe(2);
