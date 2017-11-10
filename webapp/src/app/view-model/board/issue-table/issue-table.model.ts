@@ -51,8 +51,8 @@ export class IssueTableUtil {
 
   static createIssueTable(
     showBacklog: boolean,
-    backlogStates: List<number>,
-    normalStates: List<number>,
+    backlogStateIndices: List<number>,
+    normalStateIndices: List<number>,
     issues: Map<string, BoardIssueView>,
     tableList: List<List<string>>,
     swimlaneInfo: SwimlaneInfo,
@@ -61,8 +61,8 @@ export class IssueTableUtil {
 
     const state: IssueTable = {
       showBacklog: showBacklog,
-      backlogStates: backlogStates,
-      normalStates: normalStates,
+      backlogStates: backlogStateIndices,
+      normalStates: normalStateIndices,
       issues: issues,
       table: tableList,
       swimlaneInfo: swimlaneInfo,

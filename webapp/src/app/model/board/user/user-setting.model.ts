@@ -4,7 +4,7 @@ import {Map} from 'immutable';
 
 export interface UserSettingState {
   boardCode: string;
-  backlog: boolean;
+  showBacklog: boolean;
   swimlane: string;
   filters: BoardFilterState;
   defaultColumnVisibility: boolean;
@@ -17,7 +17,7 @@ export interface UserSettingState {
 
 const DEFAULT_STATE: UserSettingState = {
   boardCode: '',
-  backlog: false,
+  showBacklog: false,
   swimlane: undefined,
   filters: initialBoardFilterState,
   defaultColumnVisibility: true,

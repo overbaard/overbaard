@@ -58,7 +58,7 @@ describe('User setting reducer tests', () => {
         UserSettingActions.createInitialiseFromQueryString(qs));
       const settingChecker: SettingChecker = new SettingChecker();
       settingChecker.boardCode = 'TEST';
-      settingChecker.backlog = true;
+      settingChecker.showBacklog = true;
       settingChecker.swimlane = 'project';
       settingChecker.filterChecker.project = ['P1'];
       settingChecker.visibleColumns = {2: false, 6: false, 8: false}
@@ -291,7 +291,7 @@ describe('User setting reducer tests', () => {
 
 class SettingChecker {
   boardCode: string = null;
-  backlog = false;
+  showBacklog = false;
   swimlane: string = null;
   filterChecker: FilterChecker = new FilterChecker();
   defaultColumnVisibility = true;
@@ -310,7 +310,7 @@ class SettingChecker {
 
   check(state: UserSettingState) {
     expect(this.boardCode).toEqual(state.boardCode);
-    expect(this.backlog).toEqual(state.backlog);
+    expect(this.showBacklog).toEqual(state.showBacklog);
     if (!this.swimlane) {
       expect(state.swimlane).toBeFalsy();
     } else {

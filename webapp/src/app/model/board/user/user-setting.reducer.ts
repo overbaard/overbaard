@@ -131,7 +131,7 @@ export function userSettingReducer(state: UserSettingState = initialUserSettingS
       return UserSettingUtil.toStateRecord(state).withMutations( mutable => {
         const initAction: InitialiseFromQueryStringAction = <InitialiseFromQueryStringAction>action;
         mutable.boardCode = initAction.payload['board'];
-        mutable.backlog = initAction.payload['bl'] ? initAction.payload['bl'] === 'true' : false;
+        mutable.showBacklog = initAction.payload['bl'] ? initAction.payload['bl'] === 'true' : false;
         mutable.swimlane = initAction.payload['swimlane'];
         mutable.filters = boardFilterMetaReducer(state.filters, action);
         mutable.defaultColumnVisibility = initAction.getVisibleColumnDefault();
@@ -145,7 +145,7 @@ export function userSettingReducer(state: UserSettingState = initialUserSettingS
     }
     case TOGGLE_BACKLOG: {
       return UserSettingUtil.toStateRecord(state).withMutations(mutable => {
-        mutable.backlog = !mutable.backlog;
+        mutable.showBacklog = !mutable.showBacklog;
       });
     }
     case TOGGLE_COLUMN_VISIBILITY: {

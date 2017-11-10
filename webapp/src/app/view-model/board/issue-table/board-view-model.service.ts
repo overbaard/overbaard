@@ -166,8 +166,8 @@ export class IssueTableViewModelHandler {
             changeType = ChangeType.CHANGE_SWIMLANE;
           } else if (userSettingState.columnVisibilities !== this._lastUserSettingState.columnVisibilities) {
             changeType = ChangeType.CHANGE_COLUMN_VISIBILITY;
-          } else if (userSettingState.backlog !== this._lastUserSettingState.backlog) {
-            changeType = userSettingState.backlog ? ChangeType.ENABLE_BACKLOG : ChangeType.DISABLE_BACKLOG;
+          } else if (userSettingState.showBacklog !== this._lastUserSettingState.showBacklog) {
+            changeType = userSettingState.showBacklog ? ChangeType.ENABLE_BACKLOG : ChangeType.DISABLE_BACKLOG;
           }
         }
 
@@ -215,16 +215,21 @@ class IssueTableBuilder {
     const visibleIssueCounts: List<number> = this.calculateVisibleIssueCounts(issues, table);
     const swimlaneInfo: SwimlaneInfo = this.calculateSwimlane(issues, table);
     const visibleColumns: List<boolean> = this.calculateVisibleColumns(table.size);
-    const showBacklog: boolean = this._currentUserSettingState.backlog;
-    const backlogStates: List<number> = initialIssueTable.backlogStates;
-    const normalStates: List<number> = initialIssueTable.normalStates;
+    const showBacklog: boolean = this._currentUserSettingState.showBacklog;
+    const backlogStates: List<number> = this.splitStates(true);
+    const normalStates: List<number> = this.splitStates(false);
     if (issues === this._oldIssueTableState.issues &&
         table === this._oldIssueTableState.table &&
         swimlaneInfo === this._oldIssueTableState.swimlaneInfo &&
         visibleIssueCounts === this._oldIssueTableState.visibleIssueCounts &&
-        visibleColumns === this._oldIssueTableState.visibleColumns) {
+        visibleColumns === this._oldIssueTableState.visibleColumns &&
+        showBacklog === this._oldIssueTableState.showBacklog &&
+        backlogStates === this._oldIssueTableState.backlogStates &&
+        normalStates === this._oldIssueTableState.normalStates) {
       return this._oldIssueTableState;
     }
+
+
     return IssueTableUtil.createIssueTable(showBacklog,
       normalStates, backlogStates, issues, table, swimlaneInfo, visibleIssueCounts, visibleColumns);
   }
@@ -412,21 +417,29 @@ class IssueTableBuilder {
     return swimlaneBuilder;
   }
 
-  /*private populateStates(forBacklog: boolean) : List<number> {
+  private splitStates(forBacklog: boolean): List<number> {
     if (this._changeType !== ChangeType.LOAD_BOARD && this._changeType !== ChangeType.ENABLE_BACKLOG &&
       this._changeType !== ChangeType.DISABLE_BACKLOG) {
       return forBacklog ? this._oldIssueTableState.backlogStates : this._oldIssueTableState.normalStates;
     }
+    const headerState: HeaderState = this._currentBoardState.headers;
     if (forBacklog) {
-      if (this._currentUserSettingState.backlog) {
+      if (headerState.backlog === 0) {
+        return this._oldIssueTableState.backlogStates;
+      }
+      if (this._currentUserSettingState.showBacklog) {
+
+      } else {
 
       }
     } else {
       return List<number>().withMutations(mutable => {
-        for (let i = this._currentBoardState.headers.headers.)
+        for (let i = headerState.backlog ; i < headerState.states.size ; i++) {
+          mutable.push(i);
+        }
       });
     }
-  }*/
+  }
 }
 
 class SwimlaneInfoBuilder {
