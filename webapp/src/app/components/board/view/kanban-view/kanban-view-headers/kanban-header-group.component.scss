@@ -1,0 +1,21 @@
+.header-group {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.header-category {
+  height: 100%;
+  width: 100%;
+}
+.header-line {
+  display: flex;
+  flex-grow: 1;
+  width: 100%;
+}
+.backlog {
+  background-color: #CCCCCC;
+}
+.hidden-backlog {
+  min-width: 50px;
+  max-width: 50px;
+}

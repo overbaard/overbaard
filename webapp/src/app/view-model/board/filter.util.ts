@@ -8,13 +8,13 @@ import {
   NONE_FILTER, PARALLEL_TASK_ATTRIBUTES,
   PRIORITY_ATTRIBUTES,
   PROJECT_ATTRIBUTES
-} from '../../../model/board/user/board-filter/board-filter.constants';
-import {BoardFilterState} from '../../../model/board/user/board-filter/board-filter.model';
+} from '../../model/board/user/board-filter/board-filter.constants';
+import {BoardFilterState} from '../../model/board/user/board-filter/board-filter.model';
 import {BoardIssueView} from './board-issue-view';
 import {List, Map, Set} from 'immutable';
-import {NO_ASSIGNEE} from '../../../model/board/data/assignee/assignee.model';
-import {CustomField} from '../../../model/board/data/custom-field/custom-field.model';
-import {ParallelTask, ProjectState} from '../../../model/board/data/project/project.model';
+import {NO_ASSIGNEE} from '../../model/board/data/assignee/assignee.model';
+import {CustomField} from '../../model/board/data/custom-field/custom-field.model';
+import {ParallelTask, ProjectState} from '../../model/board/data/project/project.model';
 
 export class AllFilters {
   private _project: SimpleFilter;

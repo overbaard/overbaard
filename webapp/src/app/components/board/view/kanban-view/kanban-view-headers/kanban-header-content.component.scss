@@ -1,0 +1,27 @@
+:host {
+  display: flex;
+  flex-grow: 1;
+}
+.header-content {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  justify-content: center;
+  border: solid 1px black;
+  text-align: center;
+}
+.header-content:hover {
+  background-color: #F0F0F0;
+}
+
+.state {
+  display: flex;
+}
+.visible {
+  min-width: 200px;
+  max-width: 200px;
+}
+.invisible {
+  min-width: 40px;
+  max-width: 40px;
+}

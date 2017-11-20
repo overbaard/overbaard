@@ -116,5 +116,4 @@ export class ProjectUtil {
 
     return ownToBoard;
   }
-
 }

@@ -1,5 +1,7 @@
-import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
-import {IssueTable} from '../../../../../view-model/board/issue-table/issue-table';
+import {ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, OnInit, Output} from '@angular/core';
+import {BoardHeader} from '../../../../../view-model/board/board-header';
+import {List} from 'immutable';
+import {BoardViewModel} from '../../../../../view-model/board/board-view';
 
 @Component({
   selector: 'app-kanban-normal-view',
@@ -10,7 +12,12 @@ import {IssueTable} from '../../../../../view-model/board/issue-table/issue-tabl
 export class KanbanNormalViewComponent implements OnInit {
 
   @Input()
-  issueTable: IssueTable;
+  board: BoardViewModel;
+
+  @Output()
+  scrollTableBodyX: EventEmitter<number> = new EventEmitter<number>();
+
+  private _lastLeftOffset = 0;
 
   constructor() {
   }

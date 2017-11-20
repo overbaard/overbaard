@@ -1,15 +1,15 @@
-import {boardFilterMetaReducer} from '../../../model/board/user/board-filter/board-filter.reducer';
-import {BoardFilterState, initialBoardFilterState} from '../../../model/board/user/board-filter/board-filter.model';
-import {UserSettingActions} from '../../../model/board/user/user-setting.reducer';
-import {Dictionary} from '../../../common/dictionary';
+import {boardFilterMetaReducer} from '../../model/board/user/board-filter/board-filter.reducer';
+import {BoardFilterState, initialBoardFilterState} from '../../model/board/user/board-filter/board-filter.model';
+import {UserSettingActions} from '../../model/board/user/user-setting.reducer';
+import {Dictionary} from '../../common/dictionary';
 import {BoardIssueView} from './board-issue-view';
-import {Assignee, NO_ASSIGNEE} from '../../../model/board/data/assignee/assignee.model';
+import {Assignee, NO_ASSIGNEE} from '../../model/board/data/assignee/assignee.model';
 import {List, Map, OrderedSet} from 'immutable';
-import {CustomField} from '../../../model/board/data/custom-field/custom-field.model';
-import {Issue} from '../../../model/board/data/issue/issue';
+import {CustomField} from '../../model/board/data/custom-field/custom-field.model';
+import {Issue} from '../../model/board/data/issue/issue';
 import {AllFilters} from './filter.util';
-import {NONE_FILTER} from '../../../model/board/user/board-filter/board-filter.constants';
-import {ParallelTask, ProjectState} from '../../../model/board/data/project/project.model';
+import {NONE_FILTER} from '../../model/board/user/board-filter/board-filter.constants';
+import {ParallelTask, ProjectState} from '../../model/board/data/project/project.model';
 
 describe('Apply filter tests', () => {
 

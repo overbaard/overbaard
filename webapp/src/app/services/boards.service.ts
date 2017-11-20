@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/timeout';
+import 'rxjs/add/operator/catch';
 import 'rxjs/add/observable/throw';
 import {RestUrlService} from './rest-url.service';
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
@@ -47,7 +48,7 @@ export class BoardsService {
     console.log('Saving board ' + path);
     const ret: Observable<any> =
       this._httpClient.post(path, json, {
-        headers : this.createHeaders()
+        _headers : this.createHeaders()
       })
         .timeout(this.timeout);
     return ret;
@@ -58,7 +59,7 @@ export class BoardsService {
     console.log('Saving board ' + path);
     const ret: Observable<any> =
       this._httpClient.put(path, json, {
-        headers : this.createHeaders()
+        _headers : this.createHeaders()
       })
         .timeout(this.timeout);
     return ret;
@@ -69,7 +70,7 @@ export class BoardsService {
     console.log('Deleting board ' + path);
     const ret: Observable<any> =
       this._httpClient.delete(path, {
-        headers : this.createHeaders()
+        _headers : this.createHeaders()
       })
         .timeout(this.timeout);
     return ret;
@@ -81,7 +82,7 @@ export class BoardsService {
     const payload: string = JSON.stringify({id: id});
     const ret: Observable<any> =
       this._httpClient.put(path, payload, {
-        headers : this.createHeaders()
+        _headers : this.createHeaders()
       })
         .timeout(this.timeout);
     return ret;

@@ -1,10 +1,10 @@
 import {List, Map} from 'immutable';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
-import {BoardIssue} from '../../../model/board/data/issue/board-issue';
+import {BoardIssue} from '../../model/board/data/issue/board-issue';
 import {BoardIssueView} from './board-issue-view';
-import {NO_ASSIGNEE} from '../../../model/board/data/assignee/assignee.model';
-import {CustomField} from '../../../model/board/data/custom-field/custom-field.model';
-import {Issue} from '../../../model/board/data/issue/issue';
+import {NO_ASSIGNEE} from '../../model/board/data/assignee/assignee.model';
+import {CustomField} from '../../model/board/data/custom-field/custom-field.model';
+import {Issue} from '../../model/board/data/issue/issue';
 
 const DEFAULT_STATE: BoardIssueView = {
   // Fields from core issue

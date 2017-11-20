@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
-import {IssueTable, SwimlaneData, SwimlaneInfo} from '../../../../../view-model/board/issue-table/issue-table';
-import {BoardIssueView} from '../../../../../view-model/board/issue-table/board-issue-view';
+import {SwimlaneData} from '../../../../../view-model/board/swimlane-data';
+import {BoardViewModel} from '../../../../../view-model/board/board-view';
 
 @Component({
   selector: 'app-kanban-swimlane-entry',
@@ -11,10 +11,11 @@ import {BoardIssueView} from '../../../../../view-model/board/issue-table/board-
 export class KanbanSwimlaneEntryComponent implements OnInit {
 
   @Input()
-  swimlane: SwimlaneData;
+  board: BoardViewModel
 
   @Input()
-  issues: Map<string, BoardIssueView>;
+  swimlane: SwimlaneData;
+
 
   constructor() {
   }

@@ -1,13 +1,9 @@
-<table *ngIf="swimlane.filterVisible" id="body-table" class="board">
-  <tr>
-    <td [attr.colspan]="swimlane.table.size">{{swimlane.display}}</td>
-  </tr>
-  <tr>
-    <td app-kanban-view-column
-        class="cell visible"
-        *ngFor="let issuesForState of swimlane.table ; trackBy: columnTrackByFn "
-        [issues]="issues"
-        [issueKeys]="issuesForState">
-    </td>
-  </tr>
-</table>
+<div class="swimlane-header">{{swimlane.key}}</div>
+<div class="swimlane-content">
+  <app-kanban-view-column-group
+    *ngFor="let header of board.headers.headersList ; trackBy: columnTrackByFn"
+    [header]="header"
+    [issues]="board.issueTable.issues"
+    [table]="swimlane.table"
+  ></app-kanban-view-column-group>
+</div>

@@ -1,26 +1,44 @@
-import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChange, SimpleChanges} from '@angular/core';
 import {List, Map} from 'immutable';
-import {BoardIssueView} from '../../../../../view-model/board/issue-table/board-issue-view';
+import {BoardIssueView} from '../../../../../view-model/board/board-issue-view';
+import {IssueTable} from '../../../../../view-model/board/issue-table';
+import {BoardHeader} from '../../../../../view-model/board/board-header';
 
-/* tslint:disable:component-selector */
 @Component({
-  selector: '[app-kanban-view-column]',
+  selector: 'app-kanban-view-column',
   templateUrl: './kanban-view-column.component.html',
   styleUrls: ['./kanban-view-column.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class KanbanViewColumnComponent implements OnInit {
+export class KanbanViewColumnComponent implements OnInit, OnChanges {
+
+  @Input()
+  header: BoardHeader;
 
   @Input()
   issues: Map<string, BoardIssueView>;
+
   @Input()
   issueKeys: List<string>;
-  @Input()
-  visible: boolean;
+
+  classList: string[];
 
   constructor() { }
 
   ngOnInit() {
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['header']) {
+      const change: SimpleChange = changes['header'];
+      if (change.isFirstChange() || change.previousValue.visible !== change.currentValue.visible) {
+        if (this.header.visible) {
+          this.classList = ['column', 'visible'];
+        } else {
+          this.classList = ['column', 'invisible'];
+        }
+      }
+    }
   }
 
   // trackBy is a hint to angular to be able to keep (i.e. don't destroy and recreate) as many components as possible

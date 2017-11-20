@@ -1,4 +1,4 @@
-import {BoardIssue} from '../../../model/board/data/issue/board-issue';
+import {BoardIssue} from '../../model/board/data/issue/board-issue';
 
 /**
  * Board issue with extra state calculated in the view model

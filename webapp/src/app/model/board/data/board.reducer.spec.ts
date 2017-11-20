@@ -14,13 +14,13 @@ import {CustomField} from './custom-field/custom-field.model';
 import {BoardProject, ProjectState} from './project/project.model';
 import {BoardIssue} from './issue/board-issue';
 import {BlacklistState} from './blacklist/blacklist.model';
-import {Header} from './header/header';
 import {RankState} from './rank/rank.model';
 import {getTestAssigneesInput} from './assignee/assignee.reducer.spec';
 import {getTestFixVersionsInput} from './fix-version/fix-version.reducer.spec';
 import {IssueChecker} from './issue/issue.model.spec';
 import {BoardState} from './board';
 import {BoardUtil, initialBoardState} from './board.model';
+import {HeaderState} from './header/header.state';
 
 export function getTestBoardsInput(): any {
   return cloneObject(
@@ -30,9 +30,10 @@ export function getTestBoardsInput(): any {
       states: [
         {name: 'S1'},
         {name: 'S2', header: 0},
-        {name: 'S3', header: 1},
+        {name: 'S3', header: 1, wip: 10},
         {name: 'S4'},
-        {name: 'S5'}
+        {name: 'S5'},
+        {name: 'S6'}
       ],
       headers: ['H1', 'H2'],
       backlog: 1,
@@ -114,10 +115,11 @@ describe('Board reducer tests', () => {
 
       // Do some sanity checking of the contents. The individual reducer tests do in-depth checking
 
-      const headers: List<List<Header>> = boardState.headers.headers;
-      expect(headers.size).toEqual(2);
-      expect(headers.get(0).size).toEqual(4);
-      expect(headers.get(0).get(0).name).toEqual('Backlog');
+      const headerState: HeaderState = boardState.headers;
+      expect(headerState.states.toArray()).toEqual(['S1', 'S2', 'S3', 'S4', 'S5']);
+      expect(headerState.categories.toArray()).toEqual(['H1', 'H2']);
+      expect(headerState.wip.toArray()).toEqual([0, 10, 0, 0]);
+      expect(headerState.backlog).toBe(1);
 
       const assignees: OrderedMap<string, Assignee> = boardState.assignees.assignees;
       expect(assignees.size).toBe(2);
@@ -206,8 +208,7 @@ describe('Board reducer tests', () => {
       // Do some sanity checking of the contents. The individual reducer tests do in-depth checking
 
       // We've checked these properly in the 'Deserialize Full' test above
-      const headers: List<List<Header>> = boardState.headers.headers;
-      expect(headers.size).toEqual(2);
+      expect(boardState.headers.states.size).toEqual(5);
 
       const assignees: OrderedMap<string, Assignee> = boardState.assignees.assignees;
       expect(assignees.size).toBe(2);
@@ -337,7 +338,7 @@ describe('Board reducer tests', () => {
       const newState: BoardState = boardReducer(boardState, BoardActions.createChanges(changes));
       expect(newState.viewId).toBe(11);
       // These will never change via changes
-      checkSameStateEntries(boardState, newState, 'rankCustomField', 'headers', 'priorities', 'issueTypes', 'projects');
+      checkSameStateEntries(boardState, newState, 'rankCustomField', '_headers', 'headers', 'priorities', 'issueTypes', 'projects');
 
       // Do some sanity checking of the contents. The individual reducer tests do in-depth checking
 
@@ -400,7 +401,7 @@ describe('Board reducer tests', () => {
       const newState: BoardState = boardReducer(boardState, BoardActions.createChanges(changes));
       expect(newState.viewId).toBe(11);
 
-      checkSameStateEntries(boardState, newState, 'headers', 'assignees', 'issueTypes', 'priorities', 'components',
+      checkSameStateEntries(boardState, newState, '_headers', 'headers', 'assignees', 'issueTypes', 'priorities', 'components',
         'labels', 'fixVersions', 'customFields', 'projects', 'issues');
 
       const rankState: RankState = newState.ranks;
@@ -428,7 +429,7 @@ describe('Board reducer tests', () => {
       const newState: BoardState = boardReducer(boardState, BoardActions.createChanges(changes));
       expect(newState.viewId).toBe(11);
 
-      checkSameStateEntries(boardState, newState, 'headers', 'assignees', 'issueTypes', 'priorities', 'components',
+      checkSameStateEntries(boardState, newState, '_headers', 'headers', 'assignees', 'issueTypes', 'priorities', 'components',
         'labels', 'fixVersions', 'customFields', 'projects', 'issues');
 
       const rankState: RankState = newState.ranks;
@@ -456,9 +457,9 @@ describe('Board reducer tests', () => {
           expect(currentState[key]).toBe(originalState[key]);
         } else {
           if (!currentState[key]) {
-            expect(originalState).not.toEqual(jasmine.anything());
+            expect(originalState).not.toEqual(jasmine.anything(), key);
           } else {
-            expect(currentState[key]).not.toBe(originalState[key]);
+            expect(currentState[key]).not.toBe(originalState[key], key);
           }
         }
       }

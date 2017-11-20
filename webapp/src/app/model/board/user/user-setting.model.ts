@@ -7,10 +7,14 @@ export interface UserSettingState {
   showBacklog: boolean;
   swimlane: string;
   filters: BoardFilterState;
+  /**
+   * Only used on initialisation of the board
+   */
   defaultColumnVisibility: boolean;
-  /*
-    This will only contain values for column visibilities explicitly set. It is the callers responsibility to account for misses.
-    A non-existent entry should count as {defaultColumnVisibility}
+  /**
+    Until the board data is got, this will only contain values for column visibilities explicitly set.
+    A non-existent entry should count as {defaultColumnVisibility}.
+   Once the board data is got, all values are initialised
    */
   columnVisibilities: Map<number, boolean>;
 }

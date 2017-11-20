@@ -1,6 +1,6 @@
-import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
-import {IssueTable, SwimlaneInfo} from '../../../../../view-model/board/issue-table/issue-table';
-import {BoardIssueView} from '../../../../../view-model/board/issue-table/board-issue-view';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {SwimlaneData} from '../../../../../view-model/board/swimlane-data';
+import {BoardViewModel} from '../../../../../view-model/board/board-view';
 
 @Component({
   selector: 'app-kanban-swimlane-view',
@@ -11,10 +11,12 @@ import {BoardIssueView} from '../../../../../view-model/board/issue-table/board-
 export class KanbanSwimlaneViewComponent implements OnInit {
 
   @Input()
-  swimlaneInfo: SwimlaneInfo;
+  board: BoardViewModel;
 
-  @Input()
-  issues: Map<string, BoardIssueView>;
+  @Output()
+  scrollTableBodyX: EventEmitter<number> = new EventEmitter<number>();
+
+  private _lastLeftOffset = 0;
 
   constructor() {
   }
@@ -23,7 +25,7 @@ export class KanbanSwimlaneViewComponent implements OnInit {
   }
 
   // trackBy is a hint to angular to be able to keep (i.e. don't destroy and recreate) as many components as possible
-  columnTrackByFn(index: number, key: string) {
-    return index;
+  columnTrackByFn(index: number, swimlaneData: SwimlaneData) {
+    return swimlaneData.key;
   }
 }

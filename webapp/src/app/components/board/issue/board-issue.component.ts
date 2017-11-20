@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
 import {BoardIssue} from '../../../model/board/data/issue/board-issue';
-import {BoardIssueView} from '../../../view-model/board/issue-table/board-issue-view';
+import {BoardIssueView} from '../../../view-model/board/board-issue-view';
 import {Assignee, NO_ASSIGNEE} from '../../../model/board/data/assignee/assignee.model';
 
 @Component({

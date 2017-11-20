@@ -1,205 +1,413 @@
 import {Injectable} from '@angular/core';
 import {Store} from '@ngrx/store';
-import {AppState} from '../../../app-store';
-import {Observable} from 'rxjs/Observable';
-import {initialIssueTable, IssueTableUtil} from './issue-table.model';
-import {BoardState} from '../../../model/board/data/board';
-import 'rxjs/add/observable/combineLatest';
-import {List, Map, OrderedMap, OrderedSet, Set} from 'immutable';
-import {BoardIssue} from '../../../model/board/data/issue/board-issue';
-import {BoardProject, ProjectUtil} from '../../../model/board/data/project/project.model';
-import {IssueTable, SwimlaneData, SwimlaneInfo} from './issue-table';
-import {initialUserSettingState, UserSettingState} from '../../../model/board/user/user-setting.model';
-import {initialBoardState} from '../../../model/board/data/board.model';
-import {BoardIssueView} from './board-issue-view';
-import {BoardIssueViewUtil} from './board-issue-view.model';
-import {IssueChange} from '../../../model/board/data/issue/issue.model';
-import {AllFilters} from './filter.util';
+import {AppState} from '../../app-store';
 import {
-  ASSIGNEE_ATTRIBUTES,
-  COMPONENT_ATTRIBUTES,
-  FIX_VERSION_ATTRIBUTES,
-  ISSUE_TYPE_ATTRIBUTES,
-  LABEL_ATTRIBUTES,
-  NONE_FILTER,
-  PRIORITY_ATTRIBUTES,
+  BoardViewModelUtil, initialBoardViewModel} from './board-view.model';
+import {Observable} from 'rxjs/Observable';
+import {BoardState} from '../../model/board/data/board';
+import {initialUserSettingState, UserSettingState} from '../../model/board/user/user-setting.model';
+import {initialBoardState} from '../../model/board/data/board.model';
+import {List, Map, OrderedMap, OrderedSet, Set} from 'immutable';
+import {HeaderState} from '../../model/board/data/header/header.state';
+import {BoardIssueView} from './board-issue-view';
+import {
+  ASSIGNEE_ATTRIBUTES, COMPONENT_ATTRIBUTES, FIX_VERSION_ATTRIBUTES,
+  ISSUE_TYPE_ATTRIBUTES, LABEL_ATTRIBUTES, NONE_FILTER, PRIORITY_ATTRIBUTES,
   PROJECT_ATTRIBUTES
-} from '../../../model/board/user/board-filter/board-filter.constants';
-import {CustomField} from '../../../model/board/data/custom-field/custom-field.model';
-import {NO_ASSIGNEE} from '../../../model/board/data/assignee/assignee.model';
-import {HeaderState} from '../../../model/board/data/header/header.state';
-import {HeadersView, HeaderView} from './headers-view';
-import {initialHeaderState} from '../../../model/board/data/header/header.model';
-import {getHeadersState} from '../../../model/board/data/header/header.reducer';
-import {HeaderViewUtil, initialHeadersView} from './headers-view.model';
-import {Header} from '../../../model/board/data/header/header';
+} from '../../model/board/user/board-filter/board-filter.constants';
+import {CustomField} from '../../model/board/data/custom-field/custom-field.model';
+import {NO_ASSIGNEE} from '../../model/board/data/assignee/assignee.model';
+import {BoardProject, ProjectUtil} from '../../model/board/data/project/project.model';
+import {BoardIssue} from '../../model/board/data/issue/board-issue';
+import {BoardIssueViewUtil} from './board-issue-view.model';
+import {IssueChange} from '../../model/board/data/issue/issue.model';
+import {AllFilters} from './filter.util';
+import {BoardViewModel} from './board-view';
+import {SwimlaneData} from './swimlane-data';
+import {BoardHeader} from './board-header';
+import {IssueTable} from './issue-table';
+import {BoardHeaders} from './board-headers';
+import {SwimlaneInfo} from './swimlane-info';
+import 'rxjs/add/observable/combineLatest';
 
 @Injectable()
 export class BoardViewModelService {
-
-  private _issueTableHandler: IssueTableViewModelHandler = new IssueTableViewModelHandler();
-  private _headersHandler: HeadersViewModelHandler = new HeadersViewModelHandler()
+  private _boardViewModelHandler: BoardViewModelHandler = new BoardViewModelHandler();
 
   constructor(private _store: Store<AppState>) {
   }
 
-  getIssueTable(): Observable<IssueTable> {
-    return this._issueTableHandler.getIssueTable(
+  getBoardViewModel(): Observable<BoardViewModel> {
+    return this._boardViewModelHandler.getBoardViewModel(
       this._store.select('board'),
-      this._store.select('userSettings')
-    );
-  }
-
-  getHeaders(issueTable$: Observable<IssueTable>): Observable<HeadersView> {
-    const headerState: Observable<HeaderState> = this._store.select(getHeadersState);
-    return this._headersHandler.getHeaders(
-      headerState,
-      issueTable$
-    )
+      this._store.select('userSettings'));
   }
 }
 
-export class HeadersViewModelHandler {
-  private _lastHeaderState: HeaderState = initialHeaderState;
-  private _lastIssueTable: IssueTable = initialIssueTable;
-  private _lastHeadersView: HeadersView = initialHeadersView;
-
-  getHeaders(
-    headerState$: Observable<HeaderState>,
-    issueTable$: Observable<IssueTable>): Observable<HeadersView>  {
-    return Observable.combineLatest(headerState$, issueTable$, (headerState, issueTable) => {
-      let headersView: HeadersView = this._lastHeadersView;
-      if (issueTable !== initialIssueTable && headerState !== initialHeaderState) {
-        if (headerState !== this._lastHeaderState) {
-          headersView = this.populateHeaders(headerState, issueTable);
-        } else if (issueTable !== this._lastIssueTable) {
-          if (issueTable.visibleIssueCounts !== this._lastIssueTable.visibleIssueCounts ||
-            issueTable.table !== this._lastIssueTable.table ||
-            issueTable.visibleColumns !== this._lastIssueTable.visibleColumns) {
-
-            headersView = this.populateHeaders(headerState, issueTable);
-          }
-        }
-      }
-      this._lastHeaderState = headerState;
-      this._lastIssueTable = issueTable;
-      this._lastHeadersView = headersView;
-      return this._lastHeadersView;
-    });
-  }
-
-  private populateHeaders(headerState: HeaderState, issueTable: IssueTable): HeadersView {
-    const headerList: List<List<HeaderView>> = List<List<HeaderView>>().asMutable();
-
-    let changed = false;
-    for (let i = 0 ; i < headerState.headers.size ; i++) {
-      const headerRow: List<Header> = headerState.headers.get(i);
-      const row: List<HeaderView> = List<HeaderView>().asMutable();
-
-      let changedRow = false;
-      for (let j = 0 ; j < headerRow.size ; j++) {
-        let oldHeader: Header = null;
-        let oldHeaderView: HeaderView = null;
-
-        if (this._lastHeadersView.headers.size > i && this._lastHeadersView.headers.get(i).size > j) {
-          oldHeader = this._lastHeaderState.headers.get(i).get(j);
-          oldHeaderView = this._lastHeadersView.headers.get(i).get(j);
-        }
-
-        const headerView: HeaderView = this.createHeaderView(issueTable, headerRow.get(j), oldHeader, oldHeaderView);
-        if (headerView !== oldHeaderView) {
-          changedRow = true;
-        }
-        row.push(headerView);
-      }
-      headerList.push(changedRow ? row.asImmutable() : this._lastHeadersView.headers.get(i));
-      changed = changedRow || changed;
-    }
-
-    return changed ? HeaderViewUtil.creaateHeadersView(headerList.asImmutable(), headerState.states) : this._lastHeadersView;
-  }
-
-  private createHeaderView(issueTable: IssueTable, header: Header, oldHeader: Header, oldHeaderView: HeaderView): HeaderView {
-    let visibleColumn = false;
-    let totalIssues = 0;
-    let visibleIssues = 0;
-    header.states.forEach(stateIndex => {
-      if (issueTable.visibleColumns.get(stateIndex)) {
-        visibleColumn = true;
-      }
-      totalIssues += issueTable.table.get(stateIndex).size;
-      visibleIssues += issueTable.visibleIssueCounts.get(stateIndex);
-    });
-    if (oldHeader === header &&
-      oldHeaderView.visible === visibleColumn &&
-      oldHeaderView.visibleIssues === visibleIssues &&
-      oldHeaderView.totalIssues === totalIssues) {
-      return oldHeaderView;
-    }
-    const headerView: HeaderView = HeaderViewUtil.createHeaderView(header, visibleColumn, totalIssues, visibleIssues);
-    return headerView;
-  }
-}
 /**
- * This class is mainly internal for BoardViewModelService, and a hook for testing. When used by BoardViewModelService,
+ * This class is mainly internal for _BoardViewModelService, and a hook for testing. When used by BoardViewModelService,
  * its lifecycle follows that of the service
  */
-export class IssueTableViewModelHandler {
-  // Last inputs
+export class BoardViewModelHandler {
   private _lastBoardState: BoardState = initialBoardState;
   private _lastUserSettingState: UserSettingState = initialUserSettingState;
-  // Last result
-  private _lastIssueTable: IssueTable = initialIssueTable;
 
-  getIssueTable(
-    boardState$: Observable<BoardState>,
-    userSettingState$: Observable<UserSettingState>):  Observable<IssueTable> {
-    return Observable
-      .combineLatest(boardState$, userSettingState$, (boardState, userSettingState) => {
-        let changeType: ChangeType = null;
-        if (boardState !== this._lastBoardState) {
-          changeType = this._lastBoardState === initialBoardState ? ChangeType.LOAD_BOARD : ChangeType.UPDATE_BOARD;
-        } else if (boardState.viewId >= 0) {
-          if (userSettingState.filters !== this._lastUserSettingState.filters) {
-            changeType = ChangeType.APPLY_FILTERS;
-          } else if (userSettingState.swimlane !== this._lastUserSettingState.swimlane) {
-            changeType = ChangeType.CHANGE_SWIMLANE;
-          } else if (userSettingState.columnVisibilities !== this._lastUserSettingState.columnVisibilities) {
-            changeType = ChangeType.CHANGE_COLUMN_VISIBILITY;
-          } else if (userSettingState.showBacklog !== this._lastUserSettingState.showBacklog) {
-            changeType = userSettingState.showBacklog ? ChangeType.ENABLE_BACKLOG : ChangeType.DISABLE_BACKLOG;
-          }
+  private _lastBoardView: BoardViewModel = initialBoardViewModel;
+
+  getBoardViewModel(boardState$: Observable<BoardState>,
+                    userSettingState$: Observable<UserSettingState>): Observable<BoardViewModel> {
+    return Observable.combineLatest(boardState$, userSettingState$, (boardState, userSettingState) => {
+      if (boardState === initialBoardState || userSettingState === initialUserSettingState) {
+        return this._lastBoardView;
+      }
+
+      let changeType: ChangeType = null;
+      if (boardState !== this._lastBoardState) {
+        changeType = this._lastBoardState === initialBoardState ? ChangeType.LOAD_BOARD : ChangeType.UPDATE_BOARD;
+      } else if (boardState.viewId >= 0) {
+        if (userSettingState.filters !== this._lastUserSettingState.filters) {
+          changeType = ChangeType.APPLY_FILTERS;
+        } else if (userSettingState.swimlane !== this._lastUserSettingState.swimlane) {
+          changeType = ChangeType.CHANGE_SWIMLANE;
+        } else if (userSettingState.showBacklog !== this._lastUserSettingState.showBacklog) {
+          changeType = ChangeType.TOGGLE_BACKLOG;
+        } else if (userSettingState.columnVisibilities !== this._lastUserSettingState.columnVisibilities) {
+          changeType = ChangeType.CHANGE_COLUMN_VISIBILITY;
         }
+      }
 
-        if (changeType === null) {
-          return this._lastIssueTable;
-        }
+      if (changeType === null) {
+        return this._lastBoardView;
+      }
 
-        const issueTableBuilder: IssueTableBuilder = new IssueTableBuilder(
-          changeType,
-          this._lastIssueTable,
-          boardState,
-          userSettingState);
-        const issueTable: IssueTable = issueTableBuilder.updateIssueTable();
-        this._lastIssueTable = issueTable;
-        this._lastBoardState = boardState;
-        this._lastUserSettingState = userSettingState;
-        return issueTable;
-      });
+      const boardView: BoardViewModel =
+        new BoardViewBuilder(changeType, this._lastBoardView,
+            this._lastBoardState, boardState, this._lastUserSettingState, userSettingState)
+          .build();
+
+      this._lastBoardState = boardState;
+      this._lastUserSettingState = userSettingState;
+      this._lastBoardView = boardView;
+      return this._lastBoardView;
+    });
   }
 }
 
-enum ChangeType {
-  LOAD_BOARD,
-  UPDATE_BOARD,
-  APPLY_FILTERS,
-  CHANGE_SWIMLANE,
-  CHANGE_COLUMN_VISIBILITY,
-  ENABLE_BACKLOG,
-  DISABLE_BACKLOG
+class BoardViewBuilder {
+  constructor(
+    private readonly _changeType: ChangeType,
+    private readonly _oldBoardView: BoardViewModel,
+    private readonly _oldBoardState: BoardState,
+    private readonly _currentBoardState: BoardState,
+    private readonly _lastUserSettingState: UserSettingState,
+    private readonly _currentUserSettingState: UserSettingState) {
+  }
+
+  build(): BoardViewModel {
+    const headersBuilder: HeadersBuilder =
+      new HeadersBuilder(this._changeType, this._oldBoardView, this._oldBoardState.headers,
+      this._currentBoardState.headers, this._lastUserSettingState, this._currentUserSettingState);
+
+    headersBuilder.initialiseHeaders();
+
+    const issueTableBuilder: IssueTableBuilder =
+      new IssueTableBuilder(this._changeType, this._oldBoardView.issueTable, this._currentBoardState, this._currentUserSettingState);
+    const issueTable: IssueTable = issueTableBuilder.build();
+
+    headersBuilder.updateIssueHeaderCounts(issueTable, issueTableBuilder.visibleIssueCounts);
+
+    const newHeaders: BoardHeaders = headersBuilder.build();
+    if (newHeaders !== this._oldBoardView.headers || issueTable !== this._oldBoardView.issueTable) {
+      return BoardViewModelUtil.updateBoardViewModel(this._oldBoardView, model => {
+        model.headers = newHeaders,
+        model.issueTable = issueTable
+      });
+    } else {
+      return this._oldBoardView;
+    }
+  }
+}
+
+class HeadersBuilder {
+  private _headers: BoardHeaders;
+
+  constructor(
+    private readonly _changeType: ChangeType,
+    private readonly _oldBoardView: BoardViewModel,
+    private readonly _oldHeaderState: HeaderState,
+    private readonly _currentHeaderState: HeaderState,
+    private readonly _lastUserSettingState: UserSettingState,
+    private readonly _currentUserSettingState: UserSettingState) {
+  }
+
+  initialiseHeaders(): HeadersBuilder {
+    this._headers = this._oldBoardView.headers;
+
+    if (this._oldHeaderState !== this._currentHeaderState) {
+      this.populateHeaders();
+    }
+
+    switch (this._changeType) {
+      case ChangeType.TOGGLE_BACKLOG:
+        this.toggleBacklog();
+        break;
+      case ChangeType.CHANGE_COLUMN_VISIBILITY:
+        this.updateStateVisibility();
+        break;
+    }
+
+    return this;
+  }
+
+  private populateHeaders() {
+    const headerList: List<BoardHeader> = List<BoardHeader>().asMutable();
+    const headerState: HeaderState = this._currentHeaderState;
+    // Create the backlog group
+    if (headerState.backlog > 0) {
+      headerList.push(this.createBacklogHeader());
+    }
+
+    // Create the other groups
+    for (let i = headerState.backlog ; i < headerState.states.size ; i++) {
+      const nonBlIndex = i - headerState.backlog;
+      const categoryIndex: number = headerState.stateToCategoryMappings.get(nonBlIndex);
+      if (categoryIndex < 0) {
+        const visible: boolean = this._currentUserSettingState.columnVisibilities.get(Number(i));
+        headerList.push(StateHeader(headerState.states.get(i), false, i, headerState.wip.get(nonBlIndex), visible));
+      } else {
+        let visibleCategory = false;
+        const stateList: List<BoardHeader> = List<BoardHeader>().asMutable();
+        for (let j = i ; j < headerState.states.size ; j++) {
+          if (headerState.stateToCategoryMappings.get(j - headerState.backlog) !== categoryIndex) {
+            break;
+          }
+          const visible: boolean = this._currentUserSettingState.columnVisibilities.get(Number(j));
+          visibleCategory = visibleCategory || visible;
+          stateList.push(StateHeader(headerState.states.get(j), false, j, headerState.wip.get(j - headerState.backlog), visible));
+        }
+        i += stateList.size - 1;
+        headerList.push(CategoryHeader(headerState.categories.get(categoryIndex), false, visibleCategory, stateList.asImmutable()));
+      }
+    }
+    this._headers = BoardViewModelUtil.createBoardHeaders(headerList.asImmutable());
+  }
+
+  private toggleBacklog() {
+    const backlog = this.createBacklogHeader();
+    this._headers = BoardViewModelUtil.updateBoardHeaders(this._headers, boardHeaders => {
+      boardHeaders.headersList = boardHeaders.headersList.set(0, backlog);
+    });
+  }
+
+  private updateStateVisibility() {
+    const statesList: List<BoardHeader> = this.flattenHeaders();
+
+    const updatedStateValues: Map<number, boolean> =
+      this._currentUserSettingState.columnVisibilities
+        .filter((v, k) => {return this._lastUserSettingState.columnVisibilities.get(k) !== v}).toMap();
+    const updatedStates: Map<number, BoardHeader> = Map<number, BoardHeader>().asMutable();
+    updatedStateValues.forEach((v, k) => {
+      const header: BoardHeader = BoardViewModelUtil.updateBoardHeader(statesList.get(k), mutable => {
+        mutable.visible = v;
+      });
+      updatedStates.set(k, header);
+    });
+
+    let allFalse = true;
+    const headersList: List<BoardHeader> =
+      this.updateHeaders(
+        updatedStates,
+        // Reset the counter for a new category header
+        h => allFalse = true,
+        // Called for each state in the category
+        s => allFalse = allFalse && !s.visible,
+        // Update the category
+        mutable => mutable.visible = !allFalse);
+
+    this._headers = BoardViewModelUtil.updateBoardHeaders(this._headers, boardHeaders => {
+      boardHeaders.headersList = headersList;
+    });
+  }
+
+  updateIssueHeaderCounts(issueTable: IssueTable, visibleIssueCounts: List<number>): HeadersBuilder {
+    switch (this._changeType) {
+      case ChangeType.UPDATE_BOARD:
+      case ChangeType.LOAD_BOARD:
+      case ChangeType.APPLY_FILTERS:
+        break;
+      default:
+        return this;
+    }
+
+    const statesList: List<BoardHeader> = this.flattenHeaders();
+    const updatedStates: Map<number, BoardHeader> = Map<number, BoardHeader>().asMutable();
+    statesList.forEach((h, i) => {
+      const newTotal = issueTable.table.get(i).size;
+      const newVisible = visibleIssueCounts.get(i);
+
+      if (newTotal !== h.totalIssues || newVisible !== h.visibleIssues) {
+        const header: BoardHeader = BoardViewModelUtil.updateBoardHeader(h, mutable => {
+          mutable.visibleIssues = newVisible;
+          mutable.totalIssues = newTotal;
+        });
+        updatedStates.set(Number(i), header);
+      }
+    });
+
+    let totalIssues = 0;
+    let visibleIssues = 0;
+    const headersList: List<BoardHeader> =
+      this.updateHeaders(
+        updatedStates,
+        // Reset the counter for a new category header
+        h => {
+          totalIssues = 0;
+          visibleIssues = 0;
+        },
+        // Called for each state in the category
+        s => {
+          totalIssues += s.totalIssues;
+          visibleIssues += s.visibleIssues;
+        },
+        // Update the category
+        mutable => {
+          mutable.totalIssues = totalIssues;
+          mutable.visibleIssues = visibleIssues;
+        });
+
+    this._headers = BoardViewModelUtil.updateBoardHeaders(this._headers, boardHeaders => {
+      boardHeaders.headersList = headersList;
+    });
+    return this;
+  }
+
+  private updateHeaders(updatedStates: Map<number, BoardHeader>,
+                        startCategory: (h: BoardHeader) => void,
+                        categoryState: (updated: BoardHeader) => void,
+                        finaliseCategory: (mutable: BoardHeader) => void): List<BoardHeader> {
+    let headersList: List<BoardHeader> = this._headers.headersList;
+    this._headers.headersList.forEach((h, i) => {
+      if (!h.category) {
+        const updated: BoardHeader = updatedStates.get(h.stateIndices.get(0));
+        if (updated) {
+          headersList = headersList.asMutable().set(i, updated);
+        }
+      } else {
+        startCategory(h);
+        let stateHeaderList: List<BoardHeader> = h.states;
+        h.states.forEach((stateHeader, index) => {
+          const updated: BoardHeader = updatedStates.get(stateHeader.stateIndices.get(0));
+          if (updated) {
+            stateHeaderList = stateHeaderList.asMutable().set(index, updated);
+          }
+          categoryState(updated ? updated : stateHeader);
+        });
+        if (stateHeaderList !== h.states) {
+          const updated: BoardHeader = BoardViewModelUtil.updateBoardHeader(h, mutable => {
+            mutable.states = stateHeaderList.asImmutable();
+            finaliseCategory(mutable);
+          });
+          headersList = headersList.asMutable().set(i, updated);
+        }
+      }
+    });
+    return headersList.asImmutable();
+  }
+
+  private createBacklogHeader(): BoardHeader {
+    const headerState: HeaderState = this._currentHeaderState;
+    const list: List<BoardHeader> = List<BoardHeader>().asMutable();
+    for (let i = 0 ; i < headerState.backlog ; i++) {
+      const name: string = headerState.states.get(i);
+      const visible: boolean = this._currentUserSettingState.columnVisibilities.get(Number(i));
+      list.push(StateHeader(name, true, i, 0, visible));
+    }
+    const showBacklog = this._currentUserSettingState.showBacklog;
+    return CategoryHeader('Backlog', true, showBacklog, list.asImmutable());
+  }
+
+  private flattenHeaders(): List<BoardHeader> {
+    const statesList: List<BoardHeader> = List<BoardHeader>().asMutable();
+    this._headers.headersList.forEach(h => {
+      if (!h.category) {
+        statesList.push(h);
+        // headersList.push(null);
+      } else {
+        h.states.forEach(s => {
+          statesList.push(s);
+          // headersList.push(h);
+        });
+      }
+    });
+
+    return statesList.asImmutable();
+  }
+
+
+  build(): BoardHeaders {
+    return this._headers;
+  }
+}
+
+
+function StateHeader(name: string, backlog: boolean, stateIndex: number, wip: number, visible: boolean): BoardHeader {
+  return BoardViewModelUtil.createBoardHeaderRecord({
+    name: name,
+    abbreviation: abbreviate(name),
+    backlog: backlog,
+    category: false,
+    stateIndices: List<number>([stateIndex]),
+    wip: wip,
+    totalIssues: 0,
+    visibleIssues: 0,
+    visible: visible});
+}
+
+function CategoryHeader(name: string, backlog: boolean, visible: boolean, states: List<BoardHeader>): BoardHeader {
+  let wip = 0;
+  let stateIndices: List<number> = List<number>().asMutable();
+  states.forEach(state => {
+    stateIndices.push(state.stateIndices.get(0));
+    wip += state.wip;
+  });
+
+  stateIndices = stateIndices.asImmutable();
+
+  return BoardViewModelUtil.createBoardHeaderRecord({
+    name: name,
+    abbreviation: abbreviate(name),
+    backlog: backlog,
+    category: true,
+    stateIndices: stateIndices,
+    states: states,
+    wip: wip,
+    totalIssues: 0,
+    visibleIssues: 0,
+    visible: visible});
+}
+
+function abbreviate(str: string): string {
+  let words: string[] = str.split(' ');
+  if (!words) {
+    words = [str];
+  }
+  let abbreviated = '';
+  let length: number = words.length;
+  if (length > 3) {
+    length = 3;
+  }
+  for (let i = 0; i < length; i++) {
+    const s = words[i].trim();
+    if (s.length > 0) {
+      abbreviated += s.charAt(0).toUpperCase();
+    }
+  }
+  return abbreviated;
 }
 
 class IssueTableBuilder {
+
+  private _visibleIssueCounts: List<number>;
 
   constructor(
     private readonly _changeType: ChangeType,
@@ -208,30 +416,24 @@ class IssueTableBuilder {
     private readonly _currentUserSettingState: UserSettingState) {
   }
 
-  updateIssueTable (): IssueTable {
+  get visibleIssueCounts(): List<number> {
+    return this._visibleIssueCounts;
+  }
+
+  build (): IssueTable {
     let issues: Map<string, BoardIssueView> = this.populateIssues();
     issues = this.filterIssues(issues);
     const table: List<List<string>> = this.createTable(issues);
-    const visibleIssueCounts: List<number> = this.calculateVisibleIssueCounts(issues, table);
+    this._visibleIssueCounts = this.calculateVisibleIssueCounts(issues, table);
     const swimlaneInfo: SwimlaneInfo = this.calculateSwimlane(issues, table);
-    const visibleColumns: List<boolean> = this.calculateVisibleColumns(table.size);
-    const showBacklog: boolean = this._currentUserSettingState.showBacklog;
-    const backlogStates: List<number> = this.splitStates(true);
-    const normalStates: List<number> = this.splitStates(false);
     if (issues === this._oldIssueTableState.issues &&
-        table === this._oldIssueTableState.table &&
-        swimlaneInfo === this._oldIssueTableState.swimlaneInfo &&
-        visibleIssueCounts === this._oldIssueTableState.visibleIssueCounts &&
-        visibleColumns === this._oldIssueTableState.visibleColumns &&
-        showBacklog === this._oldIssueTableState.showBacklog &&
-        backlogStates === this._oldIssueTableState.backlogStates &&
-        normalStates === this._oldIssueTableState.normalStates) {
+      table === this._oldIssueTableState.table &&
+      swimlaneInfo === this._oldIssueTableState.swimlaneInfo) {
       return this._oldIssueTableState;
     }
 
 
-    return IssueTableUtil.createIssueTable(showBacklog,
-      backlogStates, normalStates, issues, table, swimlaneInfo, visibleIssueCounts, visibleColumns);
+    return BoardViewModelUtil.createIssueTable(issues, table, swimlaneInfo);
   }
 
   private populateIssues(): Map<string, BoardIssueView> {
@@ -320,17 +522,17 @@ class IssueTableBuilder {
     const oldTable: List<List<string>> = this._changeType === ChangeType.LOAD_BOARD ? null : this._oldIssueTableState.table;
     const tableBuilder: TableBuilder = new TableBuilder(this._currentBoardState.headers.states.size, oldTable);
 
-    this.addProjectIssues(issues, tableBuilder, this._currentBoardState.projects.boardProjects.get(this._currentBoardState.projects.owner));
+    this.addProjectIssues(tableBuilder, this._currentBoardState.projects.boardProjects.get(this._currentBoardState.projects.owner));
     this._currentBoardState.projects.boardProjects.forEach((project, key) => {
       if (key !== this._currentBoardState.projects.owner) {
-        this.addProjectIssues(issues, tableBuilder, project);
+        this.addProjectIssues(tableBuilder, project);
       }
     });
 
     return tableBuilder.getTable();
   }
 
-  private addProjectIssues(issues: Map<string, BoardIssueView>, tableBuilder: TableBuilder, project: BoardProject) {
+  private addProjectIssues(tableBuilder: TableBuilder, project: BoardProject) {
     const rankedKeysForProject: List<string> = this._currentBoardState.ranks.rankedIssueKeys.get(project.key);
     if (!rankedKeysForProject) {
       return;
@@ -356,26 +558,7 @@ class IssueTableBuilder {
         mutable.push(visible);
       });
     });
-    return visibilities.equals(this._oldIssueTableState.visibleIssueCounts) ? this._oldIssueTableState.visibleIssueCounts : visibilities;
-  }
-
-  private calculateVisibleColumns(numColumns: number): List<boolean> {
-    if (this._changeType === ChangeType.LOAD_BOARD || this._changeType === ChangeType.CHANGE_COLUMN_VISIBILITY) {
-      const visibleMap: Map<number, boolean> = this._currentUserSettingState.columnVisibilities;
-      const visibilities: List<boolean> = List<boolean>().withMutations(mutable => {
-        for (let i = 0 ; i < numColumns ; i++) {
-          if (!visibleMap.has(i)) {
-            mutable.push(this._currentUserSettingState.defaultColumnVisibility);
-          } else {
-            mutable.push(visibleMap.get(i));
-          }
-        }
-      });
-      if (!visibilities.equals(this._oldIssueTableState.visibleColumns)) {
-        return visibilities;
-      }
-    }
-    return this._oldIssueTableState.visibleColumns;
+    return visibilities;
   }
 
   private calculateSwimlane(issues: Map<string, BoardIssueView>, table: List<List<string>>): SwimlaneInfo {
@@ -385,12 +568,13 @@ class IssueTableBuilder {
     let swimlaneBuilder: SwimlaneInfoBuilder;
     switch (this._changeType) {
       case ChangeType.CHANGE_COLUMN_VISIBILITY:
+      case ChangeType.TOGGLE_BACKLOG:
         return this._oldIssueTableState.swimlaneInfo;
       case ChangeType.LOAD_BOARD:
       case ChangeType.CHANGE_SWIMLANE: {
         swimlaneBuilder = SwimlaneInfoBuilder.create(this._currentBoardState, this._currentUserSettingState, null);
       }
-      break;
+        break;
       case ChangeType.APPLY_FILTERS:
       case ChangeType.UPDATE_BOARD: {
         const oldSwimlane = this._oldIssueTableState.swimlaneInfo;
@@ -417,26 +601,6 @@ class IssueTableBuilder {
     return swimlaneBuilder;
   }
 
-  private splitStates(forBacklog: boolean): List<number> {
-    if (this._changeType !== ChangeType.LOAD_BOARD && this._changeType !== ChangeType.ENABLE_BACKLOG &&
-      this._changeType !== ChangeType.DISABLE_BACKLOG) {
-      return forBacklog ? this._oldIssueTableState.backlogStates : this._oldIssueTableState.normalStates;
-    }
-    const headerState: HeaderState = this._currentBoardState.headers;
-    if (forBacklog) {
-      if (headerState.backlog === 0) {
-        return this._oldIssueTableState.backlogStates;
-      }
-      // TODO some stuff here
-      return this._oldIssueTableState.backlogStates;
-    } else {
-      return List<number>().withMutations(mutable => {
-        for (let i = headerState.backlog ; i < headerState.states.size ; i++) {
-          mutable.push(i);
-        }
-      });
-    }
-  }
 }
 
 class SwimlaneInfoBuilder {
@@ -606,7 +770,7 @@ class SwimlaneInfoBuilder {
     if (!changed) {
       return this._existing;
     }
-    return IssueTableUtil.createSwimlaneInfoView(swimlanes.asImmutable());
+    return BoardViewModelUtil.createSwimlaneInfoView(swimlanes.asImmutable());
   }
 }
 
@@ -669,7 +833,7 @@ class SwimlaneDataBuilder {
         return this._existing;
       }
     }
-    return IssueTableUtil.createSwimlaneDataView(
+    return BoardViewModelUtil.createSwimlaneDataView(
       this._key, this._display, this._tableBuilder.getTable(), this._visibleIssuesCount, this.filterVisible);
   }
 }
@@ -681,7 +845,7 @@ class TableBuilder {
     this._current = new Array<ColumnBuilder>(states);
     for (let i = 0 ; i < this._current.length ; i++) {
       if (_existing) {
-        this._current[i] = new ExistingColumnBuilder(this._existing.get(i));
+        this._current[i] = new ExistingColumnBuilder(i, this._existing.get(i));
       } else {
         this._current[i] = new NewColumnBuilder();
       }
@@ -704,8 +868,8 @@ class TableBuilder {
       let changed = false;
       const table: List<List<string>> = List<List<string>>().withMutations(mutable => {
         for (const column of this._current) {
-            changed = changed || column.isChanged();
-            mutable.push(column.getList());
+          changed = changed || column.isChanged();
+          mutable.push(column.getList());
         }
       });
       if (!changed) {
@@ -727,7 +891,7 @@ class ExistingColumnBuilder implements ColumnBuilder {
   private _index = 0;
   private _changed = false;
 
-  constructor(private _existing: List<string>) {
+  constructor(private _column: number, private _existing: List<string>) {
   }
 
   push(value: string) {
@@ -748,7 +912,7 @@ class ExistingColumnBuilder implements ColumnBuilder {
   }
 
   isChanged(): boolean {
-      return this._changed || this.safeSize(this._existing) !== this.safeSize(this._current);
+    return this._changed || this.safeSize(this._existing) !== this.safeSize(this._current);
   }
 
   private safeSize(list: List<string>): number {
@@ -770,6 +934,7 @@ class NewColumnBuilder implements ColumnBuilder {
   private _current: List<string> = List<string>().asMutable();
   private _changed = true;
 
+
   push(value: string) {
     this._current.push(value);
   }
@@ -783,5 +948,11 @@ class NewColumnBuilder implements ColumnBuilder {
   }
 }
 
-
-
+enum ChangeType {
+  LOAD_BOARD,
+  UPDATE_BOARD,
+  APPLY_FILTERS,
+  CHANGE_SWIMLANE,
+  CHANGE_COLUMN_VISIBILITY,
+  TOGGLE_BACKLOG
+}

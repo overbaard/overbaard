@@ -1,0 +1,9 @@
+<div class="headers-container" [ngStyle]="{'margin-left':boardLeftOffset+'px'}">
+  <app-kanban-header-group
+    *ngFor="let header of headers.headersList"
+    [header]="header"
+    (toggleColumnVisibility)="onToggleVisibility($event)"
+    (toggleBacklog)="onToggleBacklog($event)"
+  >
+  </app-kanban-header-group>
+</div>

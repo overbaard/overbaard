@@ -110,15 +110,15 @@ describe('User setting reducer tests', () => {
         checker.boardCode = 'TEST';
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(List<number>([1])));
+        state = userSettingReducer(state, UserSettingActions.toggleVisibility(false, List<number>([1])));
         checker.visibleColumns = {1: false};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(List<number>([1])));
+        state = userSettingReducer(state, UserSettingActions.toggleVisibility(true, List<number>([1])));
         checker.visibleColumns = {1: true};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(List<number>([2])));
+        state = userSettingReducer(state, UserSettingActions.toggleVisibility(false, List<number>([2])));
         checker.visibleColumns = {1: true, 2: false};
         checker.check(state);
       });
@@ -137,15 +137,15 @@ describe('User setting reducer tests', () => {
         checker.visibleColumns = {1: false};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(List<number>([1])));
+        state = userSettingReducer(state, UserSettingActions.toggleVisibility(true, List<number>([1])));
         checker.visibleColumns = {1: true};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(List<number>([1])));
+        state = userSettingReducer(state, UserSettingActions.toggleVisibility(false, List<number>([1])));
         checker.visibleColumns = {1: false};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(List<number>([2])));
+        state = userSettingReducer(state, UserSettingActions.toggleVisibility(false, List<number>([2])));
         checker.visibleColumns = {1: false, 2: false};
         checker.check(state);
       });
@@ -165,15 +165,15 @@ describe('User setting reducer tests', () => {
         checker.visibleColumns = {1: true};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(List<number>([1])));
+        state = userSettingReducer(state, UserSettingActions.toggleVisibility(false, List<number>([1])));
         checker.visibleColumns = {1: false};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(List<number>([1])));
+        state = userSettingReducer(state, UserSettingActions.toggleVisibility(true, List<number>([1])));
         checker.visibleColumns = {1: true};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(List<number>([2])));
+        state = userSettingReducer(state, UserSettingActions.toggleVisibility(true, List<number>([2])));
         checker.visibleColumns = {1: true, 2: true};
         checker.check(state);
       });
@@ -196,20 +196,20 @@ describe('User setting reducer tests', () => {
         checker.check(state);
 
         // Toggle all of them
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(categoryStates));
+        state = userSettingReducer(state, UserSettingActions.toggleVisibility(false, categoryStates));
         checker.visibleColumns = {1: false, 2: false, 3: false};
         checker.check(state);
 
         // Set one to true, and then when toggling the header all should be false again
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(List<number>([1])));
+        state = userSettingReducer(state, UserSettingActions.toggleVisibility(true, List<number>([1])));
         checker.visibleColumns = {1: true, 2: false, 3: false};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(categoryStates));
+        state = userSettingReducer(state, UserSettingActions.toggleVisibility(false, categoryStates));
         checker.visibleColumns = {1: false, 2: false, 3: false};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(categoryStates));
+        state = userSettingReducer(state, UserSettingActions.toggleVisibility(true, categoryStates));
         checker.visibleColumns = {1: true, 2: true, 3: true};
         checker.check(state);
       });
@@ -228,23 +228,23 @@ describe('User setting reducer tests', () => {
         checker.visibleColumns = {1: false};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(List<number>([3])));
+        state = userSettingReducer(state, UserSettingActions.toggleVisibility(false, List<number>([3])));
         checker.visibleColumns = {1: false, 3: false};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(categoryStates));
+        state = userSettingReducer(state, UserSettingActions.toggleVisibility(false, categoryStates));
         checker.visibleColumns = {1: false, 2: false, 3: false};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(List<number>([3])));
+        state = userSettingReducer(state, UserSettingActions.toggleVisibility(true, List<number>([3])));
         checker.visibleColumns = {1: false, 2: false, 3: true};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(categoryStates));
+        state = userSettingReducer(state, UserSettingActions.toggleVisibility(false, categoryStates));
         checker.visibleColumns = {1: false, 2: false, 3: false};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(categoryStates));
+        state = userSettingReducer(state, UserSettingActions.toggleVisibility(true, categoryStates));
         checker.visibleColumns = {1: true, 2: true, 3: true};
         checker.check(state);
       });
@@ -265,23 +265,23 @@ describe('User setting reducer tests', () => {
         checker.defaultColumnVisibility = false;
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(List<number>([3])));
+        state = userSettingReducer(state, UserSettingActions.toggleVisibility(true, List<number>([3])));
         checker.visibleColumns = {1: true, 3: true};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(categoryStates));
+        state = userSettingReducer(state, UserSettingActions.toggleVisibility(false, categoryStates));
         checker.visibleColumns = {1: false, 2: false, 3: false};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(List<number>([3])));
+        state = userSettingReducer(state, UserSettingActions.toggleVisibility(true, List<number>([3])));
         checker.visibleColumns = {1: false, 2: false, 3: true};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(categoryStates));
+        state = userSettingReducer(state, UserSettingActions.toggleVisibility(false, categoryStates));
         checker.visibleColumns = {1: false, 2: false, 3: false};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(categoryStates));
+        state = userSettingReducer(state, UserSettingActions.toggleVisibility(true, categoryStates));
         checker.visibleColumns = {1: true, 2: true, 3: true};
         checker.check(state);
       })

@@ -1,9 +1,21 @@
-@import "../kanban-view.component";
+:host  {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-left: 1px black solid;
+  border-right: 1px black solid;
+}
+.column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
-ul.issues-list {
-  margin: 0px;
-  padding: 0px;
-  list-style: none;
-  display: block;
-  width: 192px;
+}
+.visible {
+  min-width: 200px;
+  max-width: 200px;
+}
+.invisible {
+  min-width: 40px;
+  max-width: 40px;
 }

@@ -1,3 +1,19 @@
-@import "../../../../../../styles";
-@import "kanban-swimlane-view.component";
-
+:host {
+}
+.swimlane-header-container {
+  width: 100%;
+}
+.swimlane-header {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 25px;
+  max-height: 25px;
+  border: 1px black solid;
+}
+.swimlane-header:hover {
+  background-color: #F0F0F0;
+}
+.swimlane-content {
+  display: flex;
+}

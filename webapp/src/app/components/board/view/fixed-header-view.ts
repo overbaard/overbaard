@@ -2,14 +2,12 @@
  * Abstract base class for a board containing a fixed header.
  */
 import {Input} from '@angular/core';
-import {List} from 'immutable';
-import {Header} from '../../../model/board/data/header/header';
-import {HeadersView} from '../../../view-model/board/issue-table/headers-view';
+import {BoardViewModel} from '../../../view-model/board/board-view';
 
 export class FixedHeaderView {
 
   @Input()
-  headers: HeadersView;
+  board: BoardViewModel;
 
   @Input()
   windowHeight: number;
@@ -17,10 +15,12 @@ export class FixedHeaderView {
   @Input()
   windowWidth: number;
 
-  @Input()
-  boardLeftOffset: number;
+  boardLeftOffset = 0;
 
-  scrollTableBodyX($event: Event) {
-    this.boardLeftOffset = event.target['scrollLeft'] * -1
+  onScrollBoardX(event: Event) {
+    const boardLeftOffset: number = event.target['scrollLeft'] * -1
+    if (this.boardLeftOffset !== boardLeftOffset) {
+      this.boardLeftOffset = boardLeftOffset;
+    }
   }
 }

@@ -1,5 +1,9 @@
-<app-kanban-swimlane-entry *ngFor="let swimlane of swimlaneInfo.swimlanes.values()"
+<!-- trackBy is a hint to angular to be able to keep (i.e. don't destroy and recreate) as many components as possible -->
+<div>
+<app-kanban-swimlane-entry
+  *ngFor="let swimlane of board.issueTable.swimlaneInfo.swimlanes.values()"
+  [board]="board"
   [swimlane]="swimlane"
-  [issues]="issues">
 
-</app-kanban-swimlane-entry>
+></app-kanban-swimlane-entry>
+</div>

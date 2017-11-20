@@ -1,7 +1,6 @@
 import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {FixedHeaderView} from '../fixed-header-view';
-import {IssueTable} from '../../../../view-model/board/issue-table/issue-table';
-import {HeaderView} from '../../../../view-model/board/issue-table/headers-view';
+import {BoardHeader} from '../../../../view-model/board/board-header';
 
 @Component({
   selector: 'app-kanban-view',
@@ -11,11 +10,11 @@ import {HeaderView} from '../../../../view-model/board/issue-table/headers-view'
 })
 export class KanbanViewComponent extends FixedHeaderView implements OnInit {
 
-  @Input()
-  issueTable: IssueTable;
+  @Output()
+  toggleColumnVisibility: EventEmitter<BoardHeader> = new EventEmitter<BoardHeader>();
 
   @Output()
-  toggleColumnVisibility: EventEmitter<HeaderView> = new EventEmitter<HeaderView>();
+  toggleBacklog: EventEmitter<BoardHeader> = new EventEmitter<BoardHeader>();
 
   constructor() {
     super();
@@ -29,7 +28,11 @@ export class KanbanViewComponent extends FixedHeaderView implements OnInit {
     return this.windowHeight - 150;
   }
 
-  onToggleVisibility(header: HeaderView) {
+  onToggleVisibility(header: BoardHeader) {
     this.toggleColumnVisibility.emit(header);
+  }
+
+  onToggleBacklog(header: BoardHeader) {
+    this.toggleBacklog.next(header);
   }
 }

@@ -15,13 +15,14 @@ import {HttpClientModule} from '@angular/common/http';
 import {AppHeaderService} from './services/app-header.service';
 import {KanbanViewComponent} from './components/board/view/kanban-view/kanban-view.component';
 import {RankViewComponent} from './components/board/view/rank-view/rank-view.component';
-import {KanbanViewHeadersComponent} from './components/board/view/kanban-view/kanban-view-headers/kanban-view-headers.component';
-import {KanbanViewHeaderRowComponent} from './components/board/view/kanban-view/kanban-view-headers/kanban-view-header-row.component';
-import {KanbanViewHeaderComponent} from './components/board/view/kanban-view/kanban-view-headers/kanban-view-header.component';
+import {ControlPanelComponent} from './components/board/control-panel/control-panel.component';
+import {KanbanHeadersContainerComponent} from './components/board/view/kanban-view/kanban-view-headers/kanban-headers-container.component';
+import {KanbanHeaderGroupComponent} from './components/board/view/kanban-view/kanban-view-headers/kanban-header-group.component';
+import {KanbanHeaderContentComponent} from './components/board/view/kanban-view/kanban-view-headers/kanban-header-content.component';
+import {KanbanNormalViewComponent} from './components/board/view/kanban-view/kanban-normal-view/kanban-normal-view.component';
+import {KanbanViewColumnGroupComponent} from './components/board/view/kanban-view/kanban-view-column/kanban-view-column-group.component';
 import {KanbanViewColumnComponent} from './components/board/view/kanban-view/kanban-view-column/kanban-view-column.component';
 import {BoardIssueComponent} from './components/board/issue/board-issue.component';
-import {ControlPanelComponent} from './components/board/control-panel/control-panel.component';
-import {KanbanNormalViewComponent} from './components/board/view/kanban-view/kanban-normal-view/kanban-normal-view.component';
 import {KanbanSwimlaneViewComponent} from './components/board/view/kanban-view/kanban-view-swimlane/kanban-swimlane-view.component';
 import {KanbanSwimlaneEntryComponent} from './components/board/view/kanban-view/kanban-view-swimlane/kanban-swimlane-entry.component';
 
@@ -32,13 +33,14 @@ import {KanbanSwimlaneEntryComponent} from './components/board/view/kanban-view/
     BoardComponent,
     KanbanViewComponent,
     KanbanNormalViewComponent,
+    KanbanViewColumnGroupComponent,
+    KanbanViewColumnComponent,
     KanbanSwimlaneViewComponent,
     KanbanSwimlaneEntryComponent,
     RankViewComponent,
-    KanbanViewHeadersComponent,
-    KanbanViewHeaderRowComponent,
-    KanbanViewHeaderComponent,
-    KanbanViewColumnComponent,
+    KanbanHeaderContentComponent,
+    KanbanHeaderGroupComponent,
+    KanbanHeadersContainerComponent,
     BoardIssueComponent,
     ControlPanelComponent
   ],

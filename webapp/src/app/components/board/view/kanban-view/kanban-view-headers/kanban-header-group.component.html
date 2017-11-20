@@ -1,0 +1,18 @@
+<div class="header-group" [ngClass]="classList">
+  <div class="header-line">
+    <app-kanban-header-content
+      [header]="header"
+      (click)="onToggleVisibility(header)"
+    ></app-kanban-header-content>
+  </div>
+  <div
+    *ngIf="showStates"
+    class="header-line">
+    <app-kanban-header-content
+      *ngFor="let stateHeader of header.states"
+      [header]="stateHeader"
+      (click)="onToggleVisibility(stateHeader)"
+    ></app-kanban-header-content>
+  </div>
+
+</div>

@@ -1,4 +1,4 @@
-<li *ngIf="issue.visible" class="issue">
+<div *ngIf="issue.visible" class="issue">
   <div>{{issue.visible}}</div>
   <div>{{issue.key}}</div>
   <div>{{issue.summary}}</div>
@@ -9,4 +9,4 @@
     <span *ngIf="issue.assignee !== noAssignee; else emptyAssignee">{{issue.assignee.name}}</span>
     <ng-template #emptyAssignee>-</ng-template>
   </div>
-</li>
+</div>

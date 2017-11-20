@@ -1,234 +1,64 @@
 import {List} from 'immutable';
 import {HeaderUtil, initialHeaderState} from './header.model';
 import {Action} from '@ngrx/store';
-import {Dictionary} from '../../../../common/dictionary';
 import {HeaderState} from './header.state';
-import {Header} from './header';
-import {AppState} from '../../../../app-store';
-import {createSelector} from 'reselect';
+
 
 const DESERIALIZE_HEADERS = 'DESERIALIZE_HEADERS';
 
 class DeserializeHeadersAction implements Action {
   readonly type = DESERIALIZE_HEADERS;
-  constructor(readonly payload: HeaderTableCreator) {
+  constructor(readonly payload: DeserializeHeadersPayload) {
   }
 }
 
 export class HeaderActions {
   static createDeserializeHeaders(states: any[], headers: string[], backlog: number, done: number): Action {
-    return new DeserializeHeadersAction(new HeaderTableCreator(states, headers, backlog, done));
+    return new DeserializeHeadersAction({states: states, headers: headers, backlog: backlog, done: done});
   }
 }
 
-class HeaderTableCreator {
-  // The raw input
-  private _states: any[];
-  private headers: string[];
-  private _backlog: number;
-  private done: number;
-
-  // The states contained in the backlog
-  private backlogStates: number[];
-  // The states contained in each header
-  private headerStates: Dictionary<number[]>;
-
-
-  constructor(states: any[], headers: string[], backlog: number, done: number) {
-    // Only use the visible states
-    this._states = states.slice(0, states.length - done);
-    this.headers = headers;
-    this._backlog = backlog;
-    this.done = done;
-
-    this.backlogStates = backlog && backlog > 0 ? [] : null;
-    this.headerStates = this.backlogStates || headers.length > 0 ? {} : null;
-    if (this.headerStates) {
-      headers.forEach(v => this.headerStates[v] = [] );
-    }
-  }
-
-  get states(): any[] {
-    return this._states;
-  }
-
-  get backlog(): number {
-    return this._backlog;
-  }
-
-  private hasHeaders(): boolean {
-    return !!this.backlogStates || !!this.headerStates;
-  }
-
-  createHeaderTable(): List<List<Header>> {
-    const stateHeaders: TempHeader[] = this.createStateHeaders();
-    if (!this.hasHeaders()) {
-      // Simple case - just return the states
-      return List<List<Header>>().push(this.makeImmutable(stateHeaders));
-    }
-
-    return this.createCategoriesTable(stateHeaders);
-  }
-
-  private createStateHeaders(): TempHeader[] {
-    const stateHeaders: TempHeader[] = new Array<TempHeader>(this._states.length);
-
-    for (let i = 0; i < this._states.length ; i++) {
-      const state: any = this._states[i];
-      const header: number = state['header'];
-      const rows = this.calculateRows(i, header);
-      const stateHeader = new TempHeader(state['name'], i < this._backlog, rows, state['wip']);
-      stateHeader.addState(i);
-      stateHeaders[i] = stateHeader;
-
-      // Add this state to the relevant headers
-      if (this.backlogStates && i < this._backlog) {
-        this.backlogStates.push(i);
-      } else if (this.hasHeaders() && !isNaN(header)) {
-        this.headerStates[this.headers[header]].push(i);
-      }
-    }
-    return stateHeaders;
-  }
-
-  private calculateRows(index: number, header: number) {
-    if (index < this._backlog) {
-      return 1;
-    }
-    return (this.hasHeaders() && isNaN(header)) ? 2 : 1;
-  }
-
-  private createCategoriesTable(stateHeaders: TempHeader[]): List<List<Header>> {
-    // Now create the headers
-    const categoriesByFirstState: TempHeader[] = new Array<TempHeader>(stateHeaders.length);
-    if (this.backlogStates) {
-      const header: TempHeader =
-        new TempHeader('Backlog', true, 1, 0);
-      this.backlogStates.forEach((v) => {
-        header.addState(v);
-      });
-      categoriesByFirstState[header.states.get(0)] = header;
-      header.wip = this.calculateCategoryWip(stateHeaders, this.backlogStates);
-    }
-    for (const name of this.headers) {
-      const states: number[] = this.headerStates[name];
-      const header: TempHeader =
-        new TempHeader(name, false, 1, 0);
-      states.forEach((v) => {
-        header.addState(v);
-      });
-      categoriesByFirstState[header.states.get(0)] = header;
-      header.wip = this.calculateCategoryWip(stateHeaders, states);
-    }
-
-    const topRow: TempHeader[] = [];
-    const bottomRow: TempHeader[] = [];
-    for (let i = 0 ; i < stateHeaders.length ; i++) {
-      const header = stateHeaders[i];
-      if (isNaN(this._states[i]['header']) && !header.backlog) {
-        topRow.push(header);
-      } else {
-        bottomRow.push(header);
-        const category = categoriesByFirstState[i];
-        if (category) {
-          topRow.push(category);
-        }
-      }
-    }
-
-    return List<List<Header>>()
-      .push(this.makeImmutable(topRow))
-      .push(this.makeImmutable(bottomRow));
-  }
-
-  calculateCategoryWip(stateHeaders: TempHeader[], states: number[]): number {
-    let wip = 0;
-    states.forEach(s => {
-      wip += stateHeaders[s].wip;
-    });
-    return wip;
-  }
-
-
-  private makeImmutable(headers: TempHeader[]): List<Header> {
-    return List<Header>().withMutations(list => {
-      headers.forEach(header => {
-        list.push(HeaderUtil.fromObject(header));
-      });
-    });
-  }
-}
-
-// 'meta-reducer here means it is not called directly by the store, rather from the boardReducer
 export function headerMetaReducer(state: HeaderState = initialHeaderState, action: Action): HeaderState {
   switch (action.type) {
     case DESERIALIZE_HEADERS: {
-      const payload: HeaderTableCreator = (<DeserializeHeadersAction>action).payload;
-
-      const exisitingHeaders = state.headers;
-      const headers: List<List<Header>> = payload.createHeaderTable();
-
-      if (exisitingHeaders.equals(headers)) {
-        return state;
-      }
-      const newState: HeaderState = HeaderUtil.toStateRecord(state).withMutations( mutable => {
-        mutable.states = List<string>(payload.states.map(value => value['name']));
-        mutable.headers = headers;
+      const payload: DeserializeHeadersPayload = (<DeserializeHeadersAction>action).payload;
+      const newState = HeaderUtil.toStateRecord(state).withMutations(mutable => {
+        mutable.categories = List<string>(payload.headers);
         mutable.backlog = payload.backlog;
+
+        const sizeNotIncludingDone = payload.states.length - payload.done;
+        const states: List<string> = List<string>().setSize(sizeNotIncludingDone).asMutable();
+        const wip: List<number> = List<number>().setSize(sizeNotIncludingDone - payload.backlog).asMutable();
+        const stateToCategoryMappings: List<number> = List<number>().setSize(sizeNotIncludingDone - payload.backlog).asMutable();
+
+        payload.states.forEach((stateInput, i) => {
+          if (i >= sizeNotIncludingDone) {
+            return false;
+          }
+          states.set(i, stateInput['name']);
+          if (i >= payload.backlog) {
+            wip.set(i - payload.backlog, stateInput['wip'] ? stateInput['wip'] : 0);
+            stateToCategoryMappings.set(i - payload.backlog, isNaN(stateInput['header']) ? -1 : stateInput['header']);
+          }
+        });
+
+        mutable.states = states.asImmutable();
+        mutable.wip = wip.asImmutable();
+        mutable.stateToCategoryMappings = stateToCategoryMappings.asImmutable();
       });
       if (HeaderUtil.toStateRecord(newState).equals(HeaderUtil.toStateRecord(state))) {
         return state;
       }
       return newState;
     }
-    default:
-      return state;
   }
+  return state;
 }
 
-class TempHeader implements Header {
-  name: string;
-  abbreviated: string;
-  rows: number;
-  cols = 0;
-  wip: number;
-  backlog: boolean;
-  states: List<number> = List<number>();
-
-  constructor(name: string, backlog: boolean, rows: number, wip: number) {
-    this.backlog = backlog;
-    this.rows = rows;
-    this.name = name;
-    this.abbreviated = this.abbreviate(name);
-    this.wip = isNaN(wip) ? 0 : wip;
-  }
-
-  addState(index: number) {
-    this.states = this.states.push(index);
-    this.cols++;
-  }
-
-  private abbreviate(str: string): string {
-    let words: string[] = str.split(' ');
-    if (!words) {
-      words = [str];
-    }
-    let abbreviated = '';
-    let length: number = words.length;
-    if (length > 3) {
-      length = 3;
-    }
-    for (let i = 0; i < length; i++) {
-      const s = words[i].trim();
-      if (s.length > 0) {
-        abbreviated += s.charAt(0).toUpperCase();
-      }
-    }
-    return abbreviated;
-  }
+interface DeserializeHeadersPayload {
+  states: any[];
+  headers: string[];
+  backlog: number;
+  done: number;
 }
-
-export const getHeadersState = (state: AppState) => state.board.headers;
-const getHeaders = (state: HeaderState) => state.headers;
-export const headersSelector = createSelector(getHeadersState, getHeaders);
 

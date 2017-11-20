@@ -1,10 +1,4 @@
-@import "../../../../../../styles";
-@import "../kanban-view.component";
-
-/* table */
-#body-table table, td{
-  font-weight: normal;
-  table-layout: fixed;
-  vertical-align: top;
-  text-align: left;
+:host{
+  display: flex;
+  overflow: auto;
 }

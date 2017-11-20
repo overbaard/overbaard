@@ -46,4 +46,3 @@ export class BoardUtil {
     return <BoardStateRecord>s;
   }
 }
-

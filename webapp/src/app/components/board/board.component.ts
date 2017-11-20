@@ -13,14 +13,10 @@ import 'rxjs/add/operator/takeUntil';
 import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/observable/of';
 import {Subject} from 'rxjs/Subject';
-import {List} from 'immutable';
-import {headersSelector} from '../../model/board/data/header/header.reducer';
-import {Header} from '../../model/board/data/header/header';
-import {BoardViewModelService} from '../../view-model/board/issue-table/board-view-model.service';
-import {IssueTable} from '../../view-model/board/issue-table/issue-table';
 import {UserSettingActions} from '../../model/board/user/user-setting.reducer';
-import {initialHeadersView} from '../../view-model/board/issue-table/headers-view.model';
-import {HeadersView, HeaderView} from '../../view-model/board/issue-table/headers-view';
+import {BoardViewModelService} from '../../view-model/board/board-view.service';
+import {BoardHeader} from '../../view-model/board/board-header';
+import {BoardViewModel} from '../../view-model/board/board-view';
 
 
 const VIEW_KANBAN = 'kbv';
@@ -40,8 +36,7 @@ export class BoardComponent implements OnInit, OnDestroy {
   view: string = VIEW_KANBAN;
   private _wasBacklogForced = false;
 
-  headers$: Observable<HeadersView>;
-  issueTable$: Observable<IssueTable>;
+  board$: Observable<BoardViewModel>;
   windowHeight: number;
   windowWidth: number;
 
@@ -53,7 +48,7 @@ export class BoardComponent implements OnInit, OnDestroy {
     private _boardService: BoardService,
     private _appHeaderService: AppHeaderService,
     private _store: Store<AppState>,
-    private _issueTableVmService: BoardViewModelService) {
+    private boardViewService: BoardViewModelService) {
 
     this.setWindowSize();
 
@@ -83,7 +78,6 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    // TODO use backlog from querystring (store in the state)
     // TODO turn on/off progress indicator and log errors
 
     // Parse the user settings from the query string first
@@ -95,6 +89,10 @@ export class BoardComponent implements OnInit, OnDestroy {
       .takeUntil(gotAllData$)
       .subscribe(
         value => {
+          // Initialise the states in the user settings
+          const states: any[] = value['states'];
+          const backlog: number = value['backlog'] ? value['backlog'] : 0;
+          this._store.dispatch(UserSettingActions.createInitialiseStates(states.length, backlog))
           // Deserialize the board
           this._store.dispatch(BoardActions.createDeserializeBoard(value));
         }
@@ -105,13 +103,12 @@ export class BoardComponent implements OnInit, OnDestroy {
       .takeUntil(gotAllData$)
       .subscribe(
         board => {
-          // Parse the filters once we have the board
+          // Turn
           gotAllData$.next(true);
         }
       );
 
-    this.issueTable$ = this._issueTableVmService.getIssueTable();
-    this.headers$ = this._issueTableVmService.getHeaders(this.issueTable$);
+    this.board$ = this.boardViewService.getBoardViewModel();
   }
 
 
@@ -141,7 +138,26 @@ export class BoardComponent implements OnInit, OnDestroy {
     this.showControlPanel = !this.showControlPanel;
   }
 
-  onToggleVisibility(header: HeaderView) {
-    this._store.dispatch(UserSettingActions.toggleVisibility(header.states));
+  onToggleBacklog(backlogHeader: BoardHeader) {
+    this._store.dispatch(UserSettingActions.toggleBacklog(backlogHeader));
+  }
+
+  onToggleVisibility(header: BoardHeader) {
+    // A decision about whether to pass up toggleVisibility or toggleBacklog is made in KanbanHeaderGroupComponent
+    let newValue = true;
+    if (header.category) {
+      // For a category, if all its states are false, make them all true. Otherwise make them all false.
+      header.states.forEach(s => {
+        const currentVisibility: boolean = s.visible;
+        if (currentVisibility) {
+          newValue = false;
+          return false;
+        }
+      });
+    } else {
+      newValue = !header.visible;
+    }
+    this._store.dispatch(UserSettingActions.toggleVisibility(newValue, header.stateIndices));
   }
 }
+

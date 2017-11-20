@@ -8,22 +8,10 @@
     {"name": "Analysis Dev", "header":0},
     {"name": "Analysis Handoff", "header":0},
     {"name": "Analysis QA", "header":0},
-    {"name": "Dev TODO"},
-    {"name": "Design/POC", "header":1},
-    {"name": "Dev In Progres", "header":1},
-    {"name": "Awaiting Merge", "header":1},
-    {"name": "Stalled"},
-    {"name": "Awaiting Build"},
-    {"name": "Verification TODO"},
-    {"name": "QA In Progress", "header":2},
-    {"name": "Awaiting Docs", "header":2},
-    {"name": "Docs Verification", "header":2},
-    {"name": "Verified"},
-    {"name": "Done"}
+    {"name": "Dev TODO"}
   ],
   "backlog": 3,
-  "done": 1,
-  "headers": ["Analysis", "Development", "QA"],
+  "headers": ["Analysis"],
   "assignees" : [
     {
       "key" : "kabir.khan",
@@ -112,18 +100,7 @@
           "Analysis Dev" : "Analysis Dev",
           "Analysis Handoff" : "Analysis Handoff",
           "Analysis QA" : "Analysis QA",
-          "Dev TODO" : "Dev TODO",
-          "Design/POC" : "Design/POC",
-          "Dev In Progres" : "Dev In Progres",
-          "Awaiting Merge" : "Awaiting Merge",
-          "Stalled" : "Stalled",
-          "Awaiting Build" : "Awaiting Build",
-          "Verification TODO" : "Verification TODO",
-          "QA In Progress" : "QA In Progress",
-          "Awaiting Build" : "Awaiting Build",
-          "Docs Verification" : "Docs Verification",
-          "verified" : "Verified",
-          "Done" : "Done"
+          "Dev TODO" : "Dev TODO"
         },
         "parallel-tasks" : [
           {
@@ -143,22 +120,7 @@
               "Merged"]
           }
         ],
-        "ranked": ["FEAT-1", "FEAT-2", "FEAT-3", "FEAT-4", "FEAT-5"]
-      },
-      "BUG" : {
-        "colour" : "#CA6746",
-        "rank" : true,
-        "state-links" : {
-          "Backlog P1" : "Backlog",
-          "Dev In Progres" : "Under Development",
-          "Awaiting Merge" : "To Be Merged",
-          "Awaiting Build" : "Next Build",
-          "Verification TODO" : "Ready For QA",
-          "QA In Progress" : "QA In Progress",
-          "verified" : "Verified",
-          "Done" : "Done"
-        },
-        "ranked" : []
+        "ranked": ["FEAT-1", "FEAT-2", "FEAT-3"]
       }
     }
   },
@@ -191,20 +153,6 @@
     "FEAT-3" : {
       "key": "FEAT-3",
       "state": 3,
-      "summary": "Issue number 3",
-      "priority": 2,
-      "type": 0
-    },
-    "FEAT-4" : {
-      "key": "FEAT-4",
-      "state": 6,
-      "summary": "Issue number 3",
-      "priority": 2,
-      "type": 0
-    },
-    "FEAT-5" : {
-      "key": "FEAT-5",
-      "state": 4,
       "summary": "Issue number 3",
       "priority": 2,
       "type": 0

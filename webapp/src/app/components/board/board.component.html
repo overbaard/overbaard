@@ -1,17 +1,19 @@
 <div (window:focus)="onFocus($event)" (window:blur)="onBlur($event)" (window:resize)="onResize($event)">
   <app-kanban-view
     *ngIf="view === 'kbv'"
-    [headers]="headers$ | async"
-    [issueTable]="issueTable$ | async"
+    [board]="board$ | async"
     [windowWidth]="windowWidth"
     [windowHeight]="windowHeight"
-    (toggleColumnVisibility)="onToggleVisibility($event)">
+    (toggleColumnVisibility)="onToggleVisibility($event)"
+    (toggleBacklog)="onToggleBacklog($event)"
+  >
   </app-kanban-view>
   <app-rank-view
     *ngIf="view === 'rv'"
-    [headers]="headers$ | async"
+    [board]="board$ | async"
     [windowWidth]="windowWidth"
-    [windowHeight]="windowHeight">
+    [windowHeight]="windowHeight"
+    (toggleColumnVisibility)="onToggleVisibility($event)">
   </app-rank-view>
 </div>
 <button id="temp-control-button" (click)="onToggleControlPanel($event)">*</button>

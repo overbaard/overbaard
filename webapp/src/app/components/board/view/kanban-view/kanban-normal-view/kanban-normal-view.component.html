@@ -1,12 +1,9 @@
-<table id="body-table" class="board">
-  <tr>
-    <!-- trackBy is a hint to angular to be able to keep (i.e. don't destroy and recreate) as many components as possible -->
-    <td app-kanban-view-column
-        class="cell visible"
-        *ngFor="let issuesForState of issueTable.table ; trackBy: columnTrackByFn ; let i = index"
-        [issues]="issueTable.issues"
-        [issueKeys]="issuesForState"
-        [visible]="issueTable.visibleColumns.get(i)">
-    </td>
-  </tr>
-</table>
+<!-- trackBy is a hint to angular to be able to keep (i.e. don't destroy and recreate) as many components as possible -->
+<app-kanban-view-column-group
+  *ngFor="let header of board.headers.headersList ; trackBy: columnTrackByFn"
+  [header]="header"
+  [issues]="board.issueTable.issues"
+  [table]="board.issueTable.table"
+></app-kanban-view-column-group>
+
+

@@ -1,105 +1,47 @@
 import {Action} from '@ngrx/store';
 import {Dictionary} from '../../../common/dictionary';
-import {List, Map, Set} from 'immutable';
+import {List} from 'immutable';
 import {initialUserSettingState, UserSettingState, UserSettingUtil} from './user-setting.model';
 import {boardFilterMetaReducer} from './board-filter/board-filter.reducer';
+import {BoardHeader} from '../../../view-model/board/board-header';
+import {
+  INITIALISE_SETTINGS_FROM_QUERYSTRING,
+  InitialiseFromQueryStringAction
+} from './initialise-from-querystring.action';
 
 const CLEAR_SETTINGS = 'CLEAR_SETTINGS';
-export const INITIALISE_SETTINGS_FROM_QUERYSTRING = 'INITIALISE_SETTINGS_FROM_QUERYSTRING';
+
+const INITIALIZE_STATE_VISIBILITIES = 'INITIALIZE_STATE_VISIBILITIES';
 const UPDATE_SWIMLANE = 'UPDATE_SWIMLANE';
 const TOGGLE_COLUMN_VISIBILITY = 'TOGGLE_COLUMN_VISIBILITY';
 const TOGGLE_BACKLOG = 'TOGGLE_BACKLOG';
 
-export class ClearSettingsAction implements Action {
+class ClearSettingsAction implements Action {
   readonly type = CLEAR_SETTINGS;
 }
 
-export class UpdateSwimlaneAction implements Action {
+
+class UpdateSwimlaneAction implements Action {
   readonly type = UPDATE_SWIMLANE;
   constructor(readonly payload: string) {
   }
 }
 
-export class InitialiseFromQueryStringAction implements Action {
-  readonly type = INITIALISE_SETTINGS_FROM_QUERYSTRING;
-
-  constructor(readonly payload: Dictionary<string>) {
-  }
-
-  parseCustomFieldFilters(): Map<string, Set<string>> {
-    return this.parsePrefixedMapFilters('cf.');
-  }
-
-  parseParallelTaskFilters(): Map<string, Set<string>> {
-    return this.parsePrefixedMapFilters('pt.');
-  }
-
-  private parsePrefixedMapFilters(prefix: string): Map<string, Set<string>> {
-    return Map<string, Set<string>>().withMutations(mutable => {
-      for (const key of Object.keys(this.payload)) {
-        if (key.startsWith(prefix)) {
-          const name: string = decodeURIComponent(key.substr(prefix.length));
-          mutable.set(name, this.parseBooleanFilter(key));
-        }
-      }
-    });
-  }
-
-  parseBooleanFilter(name: string): Set<string> {
-    const valueString: string = this.payload[name];
-    const set: Set<string> = Set<string>();
-    if (valueString) {
-      return set.withMutations(mutable => {
-        const values: string[] = valueString.split(',');
-        for (const value of values) {
-          const decoded = decodeURIComponent(value);
-          mutable.add(decoded);
-        }
-      });
-    }
-    return set;
-  }
-
-  getVisibleColumnDefault(): boolean {
-    if (this.payload['visible']) {
-      return false;
-    } else if (this.payload['hidden']) {
-      return true;
-    } else {
-      return true;
-    }
-  }
-
-  parseVisibleColumns(): Map<number, boolean> {
-    let visible: boolean;
-    let valueString: string;
-    if (this.payload['visible']) {
-      valueString = this.payload['visible'];
-      visible = true;
-    } else if (this.payload['hidden']) {
-      valueString = this.payload['hidden'];
-      visible = false;
-    }
-    return Map<number, boolean>().withMutations(mutable => {
-      if (valueString) {
-        const values: string[] = valueString.split(',');
-        for (const value of values) {
-          mutable.set(Number(value), visible);
-        }
-      }
-    });
-  }
-}
-
 class ToggleVisibilityAction implements Action {
   readonly type = TOGGLE_COLUMN_VISIBILITY;
-  constructor(readonly payload: List<number>) {
+  constructor(readonly payload: ToggleVisibilityPayload) {
   }
 }
 
 class ToggleBacklogAction implements Action {
   readonly type = TOGGLE_BACKLOG;
-  constructor() {
+  constructor(readonly payload: BoardHeader) {
+  }
+}
+
+class InitialiseStateVisibilitiesAction implements Action {
+  readonly type = INITIALIZE_STATE_VISIBILITIES;
+  constructor(readonly payload: InitialiseStatesPayload) {
   }
 }
 
@@ -112,16 +54,20 @@ export class UserSettingActions {
     return new InitialiseFromQueryStringAction(queryParams);
   }
 
+  static createInitialiseStates(numStates: number, backlog: number): Action {
+    return new InitialiseStateVisibilitiesAction({numStates: numStates, backlog: backlog});
+  }
+
   static createUpdateSwimlane(swimlane: string): Action {
     return new UpdateSwimlaneAction(swimlane);
   }
 
-  static toggleVisibility(states: List<number>): Action {
-    return new ToggleVisibilityAction(states);
+  static toggleBacklog(backlogHeader: BoardHeader): Action {
+    return new ToggleBacklogAction(backlogHeader);
   }
 
-  static toggleBacklog(): Action {
-    return new ToggleBacklogAction();
+  static toggleVisibility(newValue: boolean, states: List<number>): Action {
+    return new ToggleVisibilityAction({newValue: newValue, states: states});
   }
 }
 
@@ -138,40 +84,53 @@ export function userSettingReducer(state: UserSettingState = initialUserSettingS
         mutable.columnVisibilities = initAction.parseVisibleColumns();
       });
     }
+    case INITIALIZE_STATE_VISIBILITIES: {
+      const initAction: InitialiseStateVisibilitiesAction = <InitialiseStateVisibilitiesAction>action;
+      return UserSettingUtil.toStateRecord(state).withMutations(settingState => {
+        settingState.columnVisibilities = settingState.columnVisibilities.withMutations(visibilities => {
+          for (let i = 0 ; i < initAction.payload.numStates ; i++) {
+            const index: number = Number(i);
+            if (!visibilities.has(index)) {
+              visibilities.set(index, settingState.defaultColumnVisibility);
+            }
+          }
+          for (let i = 0 ; i < initAction.payload.backlog ; i++) {
+            if (!settingState.showBacklog) {
+              visibilities.set(i, settingState.showBacklog);
+            } else {
+              if (!visibilities.has(i)) {
+                visibilities.set(i, settingState.defaultColumnVisibility);
+              }
+            }
+          }
+        });
+      });
+
+    }
     case UPDATE_SWIMLANE: {
       return UserSettingUtil.toStateRecord(state).withMutations(mutable => {
         mutable.swimlane = (<UpdateSwimlaneAction>action).payload;
       });
     }
     case TOGGLE_BACKLOG: {
-      return UserSettingUtil.toStateRecord(state).withMutations(mutable => {
-        mutable.showBacklog = !mutable.showBacklog;
+      const backlogHeader: BoardHeader = (<ToggleBacklogAction>action).payload;
+      return UserSettingUtil.toStateRecord(state).withMutations(settingState => {
+        const newValue: boolean = !settingState.showBacklog;
+        settingState.showBacklog = newValue;
+        settingState.columnVisibilities = settingState.columnVisibilities.withMutations(visibilities => {
+          backlogHeader.stateIndices.forEach(stateIndex => {
+            visibilities.set(stateIndex, newValue);
+          });
+        });
       });
     }
-    case TOGGLE_COLUMN_VISIBILITY: {
-      const toggleAction: ToggleVisibilityAction = <ToggleVisibilityAction>action;
-      const states: List<number> = toggleAction.payload;
-      return UserSettingUtil.toStateRecord(state).withMutations(settingsState => {
-        settingsState.columnVisibilities = settingsState.columnVisibilities.withMutations(visibilities => {
-          if (states.size === 1) {
-            // With just one state is is a state header
-            const s = states.get(0);
-            const currentVisibility = !visibilities.has(s) ? settingsState.defaultColumnVisibility : visibilities.get(s);
-            visibilities.set(s, !currentVisibility);
-          } else {
-            // If it has several states it is a category header. If all are false, make them all true. Otherwise make them all false.
-            let allFalse = true;
-            states.forEach(s => {
-              const currentVisibility: boolean = !visibilities.has(s) ? settingsState.defaultColumnVisibility : visibilities.get(s);
-              if (currentVisibility) {
-                allFalse = false;
-                return false;
-              }
-            });
-            states.forEach(s => {
-              visibilities.set(s, allFalse);
-            });
-          }
+    case TOGGLE_COLUMN_VISIBILITY : {
+      const payload: ToggleVisibilityPayload = (<ToggleVisibilityAction>action).payload;
+      return UserSettingUtil.toStateRecord(state).withMutations(settingState => {
+        settingState.columnVisibilities = settingState.columnVisibilities.withMutations(visibilities => {
+          payload.states.forEach(stateIndex => {
+            visibilities.set(stateIndex, payload.newValue);
+          });
         });
       });
     }
@@ -182,4 +141,12 @@ export function userSettingReducer(state: UserSettingState = initialUserSettingS
   });
 }
 
+interface ToggleVisibilityPayload {
+  newValue: boolean;
+  states: List<number>;
+}
 
+interface InitialiseStatesPayload {
+  numStates: number;
+  backlog: number;
+}

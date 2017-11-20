@@ -1,6 +1,7 @@
 import {List} from 'immutable';
 
-export interface Header {
+/* tslint:disable:class-name */
+export interface _Header {
   name: string;
   abbreviated: string;
   rows: number;

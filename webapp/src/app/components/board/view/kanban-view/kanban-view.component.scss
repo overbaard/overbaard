@@ -14,8 +14,8 @@
   overflow: hidden;
 }
 /* Board body */
-#table-body {
+#board-body {
   overflow: auto;
-  height: 100px; /** This will get calculated and set by the component code */
+  height: 200px; /** This will get calculated and set by the component code */
 }
 
