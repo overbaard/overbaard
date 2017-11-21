@@ -1,10 +1,11 @@
 import {Dictionary} from '../../../common/dictionary';
-import {initialUserSettingState, UserSettingState} from './user-setting.model';
+import {initialUserSettingState} from './user-setting.model';
 import {UserSettingActions, userSettingReducer} from './user-setting.reducer';
 import {FilterChecker} from './board-filter/board-filter.reducer.spec';
 import {BoardFilterActions} from './board-filter/board-filter.reducer';
 import {PROJECT_ATTRIBUTES} from './board-filter/board-filter.constants';
 import {List} from 'immutable';
+import {UserSettingState} from './user-setting';
 
 describe('User setting reducer tests', () => {
   describe('Querystring tests', () => {
@@ -31,6 +32,7 @@ describe('User setting reducer tests', () => {
         bl: 'false',
         project: 'P1',
         swimlane: 'project',
+        showEmptySl: 'true',
         visible: '1,5,7'
       };
       const state: UserSettingState = userSettingReducer(
@@ -39,6 +41,7 @@ describe('User setting reducer tests', () => {
       const settingChecker: SettingChecker = new SettingChecker();
       settingChecker.boardCode = 'TEST';
       settingChecker.swimlane = 'project';
+      settingChecker.showEmptySwimlane = true;
       settingChecker.filterChecker.project = ['P1'];
       settingChecker.visibleColumns = {1: true, 5: true, 7: true}
       settingChecker.defaultColumnVisibility = false;
@@ -51,6 +54,7 @@ describe('User setting reducer tests', () => {
         bl: 'true',
         project: 'P1',
         swimlane: 'project',
+        showEmptySl: 'false',
         hidden: '2,6,8'
       };
       const state: UserSettingState = userSettingReducer(
@@ -92,6 +96,40 @@ describe('User setting reducer tests', () => {
       const checker: SettingChecker = new SettingChecker();
       checker.boardCode = 'TEST';
       checker.swimlane = 'project';
+      checker.check(state);
+    });
+
+    it ('Update show empty swimlanes', () => {
+      // showEmpty is ignored until happen until we have set a swimlane
+      state = userSettingReducer(state, UserSettingActions.createToggleShowEmptySwimlanes());
+      const checker: SettingChecker = new SettingChecker();
+      checker.boardCode = 'TEST';
+      checker.check(state);
+
+      state = userSettingReducer(state, UserSettingActions.createUpdateSwimlane('project'));
+      checker.swimlane = 'project';
+      checker.check(state);
+
+      state = userSettingReducer(state, UserSettingActions.createToggleShowEmptySwimlanes());
+      checker.showEmptySwimlane = true;
+      checker.check(state);
+
+      // Noop re showEmpty
+      state = userSettingReducer(state, UserSettingActions.createUpdateSwimlane('project'));
+
+      // Changing a swimlane should reset showEmpty to false
+      state = userSettingReducer(state, UserSettingActions.createUpdateSwimlane('assignee'));
+      checker.swimlane = 'assignee';
+      checker.showEmptySwimlane = false;
+      checker.check(state);
+
+      state = userSettingReducer(state, UserSettingActions.createToggleShowEmptySwimlanes());
+      checker.showEmptySwimlane = true;
+      checker.check(state);
+
+      state = userSettingReducer(state, UserSettingActions.createUpdateSwimlane(null));
+      checker.swimlane = null;
+      checker.showEmptySwimlane = false;
       checker.check(state);
     });
   });
@@ -296,6 +334,7 @@ class SettingChecker {
   filterChecker: FilterChecker = new FilterChecker();
   defaultColumnVisibility = true;
   visibleColumns: any;
+  showEmptySwimlane = false;
 
   constructor() {
     for (const key of Object.keys(this.filterChecker)) {
@@ -309,13 +348,14 @@ class SettingChecker {
   }
 
   check(state: UserSettingState) {
-    expect(this.boardCode).toEqual(state.boardCode);
-    expect(this.showBacklog).toEqual(state.showBacklog);
+    expect(state.boardCode).toEqual(this.boardCode);
+    expect(state.showBacklog).toEqual(this.showBacklog);
     if (!this.swimlane) {
       expect(state.swimlane).toBeFalsy();
     } else {
       expect(state.swimlane).toEqual(this.swimlane);
     }
+    expect(state.swimlaneShowEmpty).toEqual(this.showEmptySwimlane);
     this.filterChecker.check(state.filters);
     expect(state.defaultColumnVisibility).toBe(this.defaultColumnVisibility);
     if (!this.visibleColumns) {

@@ -2,7 +2,7 @@ import {List, Map} from 'immutable';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/take';
 import {BoardViewModelHandler} from './board-view.service';
-import {initialUserSettingState, UserSettingState} from '../../model/board/user/user-setting.model';
+import {initialUserSettingState} from '../../model/board/user/user-setting.model';
 import {BoardUtil, initialBoardState} from '../../model/board/data/board.model';
 import {BoardState} from '../../model/board/data/board';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
@@ -37,6 +37,8 @@ import {
 import {BoardFilterActions} from '../../model/board/user/board-filter/board-filter.reducer';
 import {BoardViewModel} from './board-view';
 import {BoardHeader} from './board-header';
+import {UserSettingState} from '../../model/board/user/user-setting';
+import {Action} from '@ngrx/store';
 
 export class BoardViewObservableUtil {
   private _service: BoardViewModelHandler = new BoardViewModelHandler();
@@ -259,9 +261,7 @@ export class UserSettingUpdater {
   }
 
   updateSwimlane(swimlane: string): BoardViewObservableUtil {
-    const userSettingState: UserSettingState  =
-      userSettingReducer(this._mainUtil.userSettingState, UserSettingActions.createUpdateSwimlane(swimlane));
-    return this._mainUtil.emitUserSettingState(userSettingState);
+    return this.emitState(UserSettingActions.createUpdateSwimlane(swimlane));
   }
 
   updateFilters(name: string, ...keys: string[]): BoardViewObservableUtil {
@@ -310,10 +310,7 @@ export class UserSettingUpdater {
     }
 
     expect(values).toBeTruthy();
-
-    const userSettingState: UserSettingState =
-      userSettingReducer(this._mainUtil.userSettingState, BoardFilterActions.createUpdateFilter(atributes, values));
-    return this._mainUtil.emitUserSettingState(userSettingState);
+    return this.emitState(BoardFilterActions.createUpdateFilter(atributes, values));
   }
 
   toggleBacklog(): BoardViewObservableUtil {
@@ -321,24 +318,24 @@ export class UserSettingUpdater {
       const backlogHeader: BoardHeader = boardView.headers.headersList.get(0);
           expect(backlogHeader.backlog).toBe(true);
 
-          const userSettingState: UserSettingState =
-            userSettingReducer(
-              this._mainUtil.userSettingState,
-              UserSettingActions.toggleBacklog(backlogHeader));
-          return this._mainUtil.emitUserSettingState(userSettingState);
+      return this.emitState(UserSettingActions.toggleBacklog(backlogHeader));
     });
 
     return this._mainUtil;
   }
 
   updateVisibility(newValue: boolean, ...stateIndices: number[]): BoardViewObservableUtil {
-    const userSettingState: UserSettingState =
-      userSettingReducer(
-        this._mainUtil.userSettingState,
-        UserSettingActions.toggleVisibility(newValue, List<number>(stateIndices)));
-    return this._mainUtil.emitUserSettingState(userSettingState);
+    return this.emitState(UserSettingActions.toggleVisibility(newValue, List<number>(stateIndices)));
   }
 
+  toggleShowEmptySwimlanes(): BoardViewObservableUtil {
+    return this.emitState(UserSettingActions.createToggleShowEmptySwimlanes());
+  }
+
+  private emitState(action: Action): BoardViewObservableUtil {
+    const userSettingState: UserSettingState = userSettingReducer(this._mainUtil.userSettingState, action);
+    return this._mainUtil.emitUserSettingState(userSettingState);
+  }
 }
 
 function getDeserializeIssueLookupParams(headerState: HeaderState, projectState: ProjectState): DeserializeIssueLookupParams {

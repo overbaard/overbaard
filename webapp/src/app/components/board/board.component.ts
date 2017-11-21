@@ -17,6 +17,7 @@ import {UserSettingActions} from '../../model/board/user/user-setting.reducer';
 import {BoardViewModelService} from '../../view-model/board/board-view.service';
 import {BoardHeader} from '../../view-model/board/board-header';
 import {BoardViewModel} from '../../view-model/board/board-view';
+import {UserSettingState} from '../../model/board/user/user-setting';
 
 
 const VIEW_KANBAN = 'kbv';
@@ -40,6 +41,7 @@ export class BoardComponent implements OnInit, OnDestroy {
   windowHeight: number;
   windowWidth: number;
 
+  userSettings$: Observable<UserSettingState>;
   showControlPanel = false;
 
 
@@ -109,6 +111,7 @@ export class BoardComponent implements OnInit, OnDestroy {
       );
 
     this.board$ = this.boardViewService.getBoardViewModel();
+    this.userSettings$ = this._store.select<UserSettingState>('userSettings');
   }
 
 

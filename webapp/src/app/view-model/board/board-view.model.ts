@@ -39,6 +39,7 @@ const DEFAULT_ISSUE_TABLE: IssueTable = {
 };
 
 const DEFAULT_SWIMLANE_INFO: SwimlaneInfo = {
+  showEmpty: false,
   swimlanes: OrderedMap<string, SwimlaneData>()
 };
 
@@ -139,8 +140,9 @@ export class BoardViewModelUtil {
     return SWIMLANE_DATA_STATE_FACTORY(state);
   }
 
-  static createSwimlaneInfoView(swimlanes: OrderedMap<string, SwimlaneData>) {
+  static createSwimlaneInfoView(showEmpty: boolean, swimlanes: OrderedMap<string, SwimlaneData>) {
     const state: SwimlaneInfo = {
+      showEmpty: showEmpty,
       swimlanes: swimlanes
     }
     return SWIMLANE_INFO_STATE_FACTORY(state);

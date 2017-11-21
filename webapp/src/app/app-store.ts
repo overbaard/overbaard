@@ -5,7 +5,7 @@ import {storeFreeze} from 'ngrx-store-freeze';
 import {BoardState} from './model/board/data/board';
 import {boardReducer} from './model/board/data/board.reducer';
 import {userSettingReducer} from './model/board/user/user-setting.reducer';
-import {UserSettingState} from './model/board/user/user-setting.model';
+import {UserSettingState} from './model/board/user/user-setting';
 
 export interface AppState {
   board: BoardState;

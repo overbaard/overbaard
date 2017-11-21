@@ -1,9 +1,11 @@
-<div class="swimlane-header">{{swimlane.key}}</div>
-<div class="swimlane-content">
-  <app-kanban-view-column-group
-    *ngFor="let header of board.headers.headersList ; trackBy: columnTrackByFn"
-    [header]="header"
-    [issues]="board.issueTable.issues"
-    [table]="swimlane.table"
-  ></app-kanban-view-column-group>
+<div *ngIf="visible">
+  <div class="swimlane-header">{{swimlane.key}}</div>
+  <div class="swimlane-content">
+    <app-kanban-view-column-group
+      *ngFor="let header of board.headers.headersList ; trackBy: columnTrackByFn"
+      [header]="header"
+      [issues]="board.issueTable.issues"
+      [table]="swimlane.table"
+    ></app-kanban-view-column-group>
+  </div>
 </div>

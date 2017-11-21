@@ -5,7 +5,7 @@ import {
   BoardViewModelUtil, initialBoardViewModel} from './board-view.model';
 import {Observable} from 'rxjs/Observable';
 import {BoardState} from '../../model/board/data/board';
-import {initialUserSettingState, UserSettingState} from '../../model/board/user/user-setting.model';
+import {initialUserSettingState} from '../../model/board/user/user-setting.model';
 import {initialBoardState} from '../../model/board/data/board.model';
 import {List, Map, OrderedMap, OrderedSet, Set} from 'immutable';
 import {HeaderState} from '../../model/board/data/header/header.state';
@@ -29,6 +29,7 @@ import {IssueTable} from './issue-table';
 import {BoardHeaders} from './board-headers';
 import {SwimlaneInfo} from './swimlane-info';
 import 'rxjs/add/observable/combineLatest';
+import {UserSettingState} from '../../model/board/user/user-setting';
 
 @Injectable()
 export class BoardViewModelService {
@@ -73,6 +74,8 @@ export class BoardViewModelHandler {
           changeType = ChangeType.TOGGLE_BACKLOG;
         } else if (userSettingState.columnVisibilities !== this._lastUserSettingState.columnVisibilities) {
           changeType = ChangeType.CHANGE_COLUMN_VISIBILITY;
+        } else if (userSettingState.swimlaneShowEmpty !== this._lastUserSettingState.swimlaneShowEmpty) {
+          changeType = ChangeType.TOGGLE_SWIMLANE_SHOW_EMPTY;
         }
       }
 
@@ -571,14 +574,18 @@ class IssueTableBuilder {
       case ChangeType.TOGGLE_BACKLOG:
         return this._oldIssueTableState.swimlaneInfo;
       case ChangeType.LOAD_BOARD:
-      case ChangeType.CHANGE_SWIMLANE: {
+      case ChangeType.CHANGE_SWIMLANE:
         swimlaneBuilder = SwimlaneInfoBuilder.create(this._currentBoardState, this._currentUserSettingState, null);
-      }
         break;
       case ChangeType.APPLY_FILTERS:
       case ChangeType.UPDATE_BOARD: {
         const oldSwimlane = this._oldIssueTableState.swimlaneInfo;
         swimlaneBuilder = SwimlaneInfoBuilder.create(this._currentBoardState, this._currentUserSettingState, oldSwimlane);
+        break;
+      }
+      case ChangeType.TOGGLE_SWIMLANE_SHOW_EMPTY: {
+        const oldSwimlane = this._oldIssueTableState.swimlaneInfo;
+        return BoardViewModelUtil.createSwimlaneInfoView(this._currentUserSettingState.swimlaneShowEmpty, oldSwimlane.swimlanes);
       }
     }
 
@@ -754,6 +761,8 @@ class SwimlaneInfoBuilder {
     let changed = false;
     if (!this._existing) {
       changed = true;
+    } else if (this._existing.showEmpty !== this._userSettingState.swimlaneShowEmpty) {
+      changed = true;
     } else {
       changed = keys.length !== this._existing.swimlanes.size;
     }
@@ -770,7 +779,7 @@ class SwimlaneInfoBuilder {
     if (!changed) {
       return this._existing;
     }
-    return BoardViewModelUtil.createSwimlaneInfoView(swimlanes.asImmutable());
+    return BoardViewModelUtil.createSwimlaneInfoView(this._userSettingState.swimlaneShowEmpty, swimlanes.asImmutable());
   }
 }
 
@@ -954,5 +963,6 @@ enum ChangeType {
   APPLY_FILTERS,
   CHANGE_SWIMLANE,
   CHANGE_COLUMN_VISIBILITY,
-  TOGGLE_BACKLOG
+  TOGGLE_BACKLOG,
+  TOGGLE_SWIMLANE_SHOW_EMPTY
 }

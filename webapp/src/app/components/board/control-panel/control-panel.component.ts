@@ -1,9 +1,10 @@
-import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {AppState} from '../../../app-store';
 import {Store} from '@ngrx/store';
 import {Dictionary} from '../../../common/dictionary';
 import {FormControl, FormGroup} from '@angular/forms';
-import 'rxjs/add/operator/takeWhile';
+import 'rxjs/add/operator/take';
+import 'rxjs/add/operator/takeUntil';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/observable/of';
@@ -34,8 +35,9 @@ import {BoardFilterActions} from '../../../model/board/user/board-filter/board-f
 import {customFieldsSelector} from '../../../model/board/data/custom-field/custom-field.reducer';
 import {CustomField} from '../../../model/board/data/custom-field/custom-field.model';
 import {ParallelTask} from '../../../model/board/data/project/project.model';
-import {UserSettingState} from '../../../model/board/user/user-setting.model';
 import {UserSettingActions} from '../../../model/board/user/user-setting.reducer';
+import {Subject} from 'rxjs/Subject';
+import {UserSettingState} from '../../../model/board/user/user-setting';
 
 @Component({
   selector: 'app-control-panel',
@@ -47,6 +49,10 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
 
   readonly none = NONE_FILTER;
 
+  // Have this come in via an input to be able to decide the state of showing/hiding empty swimlanes
+  @Input()
+  userSettings: UserSettingState;
+
   swimlaneForm: FormGroup;
   filterForm: FormGroup;
 
@@ -57,10 +63,14 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
   filtersToDisplay: FilterAttributes = null;
   currentFilterEntries: FilterFormEntry[];
 
+  private _destroy$: Subject<null> = new Subject<null>();
+
   constructor(private _store: Store<AppState>) {
   }
 
   ngOnInit() {
+    // As the control panel is recreated each time we display it, don't try to follow the live data by listening to changes
+    // (Apart from whether to show/hide empty swimlanes which is handled by this.userSetting)
     const filterList: FilterAttributes[] =
       [PROJECT_ATTRIBUTES, ISSUE_TYPE_ATTRIBUTES, PRIORITY_ATTRIBUTES, ASSIGNEE_ATTRIBUTES, COMPONENT_ATTRIBUTES,
         LABEL_ATTRIBUTES, FIX_VERSION_ATTRIBUTES];
@@ -70,42 +80,39 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
     this.swimlaneForm = new FormGroup({});
     this.filterForm = new FormGroup({});
 
-    this._store.select<UserSettingState>('userSettings')
-      .takeWhile((userSetting, i) => (i === 0))
-      .subscribe(
-    userSetting => {
-          this.swimlaneForm.addControl('swimlane', new FormControl(userSetting.swimlane));
+    this.swimlaneForm.addControl('swimlane', new FormControl(this.userSettings.swimlane));
 
-          this.createGroupFromObservable(this._store.select(boardProjectsSelector), PROJECT_ATTRIBUTES,
-            project => project.map(p => FilterFormEntry(p.key, p.key)).toArray(),
-            () => userSetting.filters.project);
-          this.createGroupFromObservable(this._store.select(issuesTypesSelector), ISSUE_TYPE_ATTRIBUTES,
-            types => types.map(t => FilterFormEntry(t.name, t.name)).toArray(),
-            () => userSetting.filters.issueType);
-          this.createGroupFromObservable(this._store.select(prioritiesSelector), PRIORITY_ATTRIBUTES,
-            priorities => priorities.map(p => FilterFormEntry(p.name, p.name)).toArray(),
-            () => userSetting.filters.priority);
-          this.createGroupFromObservable(this._store.select(assigneesSelector), ASSIGNEE_ATTRIBUTES,
-            assignees => assignees.map(a => FilterFormEntry(a.key, a.name)).toArray(),
-            () => userSetting.filters.assignee);
-          this.createGroupFromObservable(this._store.select(componentsSelector), COMPONENT_ATTRIBUTES,
-            components => components.map(c => FilterFormEntry(c, c)).toArray(),
-            () => userSetting.filters.component);
-          this.createGroupFromObservable(this._store.select(labelsSelector), LABEL_ATTRIBUTES,
-            labels => labels.map(l => FilterFormEntry(l, l)).toArray(),
-            () => userSetting.filters.label);
-          this.createGroupFromObservable(this._store.select(fixVersionsSelector), FIX_VERSION_ATTRIBUTES,
-            fixVersions => fixVersions.map(f => FilterFormEntry(f, f)).toArray(),
-            () => userSetting.filters.fixVersion);
-          this.createCustomFieldGroups(userSetting.filters, this._store.select(customFieldsSelector));
-          this.createParallelTaskGroup(userSetting.filters, this._store.select(parallelTasksSelector));
-        }
-      );
+    this.createGroupFromObservable(this._store.select(boardProjectsSelector), PROJECT_ATTRIBUTES,
+      project => project.map(p => FilterFormEntry(p.key, p.key)).toArray(),
+      () => this.userSettings.filters.project);
+    this.createGroupFromObservable(this._store.select(issuesTypesSelector), ISSUE_TYPE_ATTRIBUTES,
+      types => types.map(t => FilterFormEntry(t.name, t.name)).toArray(),
+      () => this.userSettings.filters.issueType);
+    this.createGroupFromObservable(this._store.select(prioritiesSelector), PRIORITY_ATTRIBUTES,
+      priorities => priorities.map(p => FilterFormEntry(p.name, p.name)).toArray(),
+      () => this.userSettings.filters.priority);
+    this.createGroupFromObservable(this._store.select(assigneesSelector), ASSIGNEE_ATTRIBUTES,
+      assignees => assignees.map(a => FilterFormEntry(a.key, a.name)).toArray(),
+      () => this.userSettings.filters.assignee);
+    this.createGroupFromObservable(this._store.select(componentsSelector), COMPONENT_ATTRIBUTES,
+      components => components.map(c => FilterFormEntry(c, c)).toArray(),
+      () => this.userSettings.filters.component);
+    this.createGroupFromObservable(this._store.select(labelsSelector), LABEL_ATTRIBUTES,
+      labels => labels.map(l => FilterFormEntry(l, l)).toArray(),
+      () => this.userSettings.filters.label);
+    this.createGroupFromObservable(this._store.select(fixVersionsSelector), FIX_VERSION_ATTRIBUTES,
+      fixVersions => fixVersions.map(f => FilterFormEntry(f, f)).toArray(),
+      () => this.userSettings.filters.fixVersion);
+    this.createCustomFieldGroups(this.userSettings.filters, this._store.select(customFieldsSelector));
+    this.createParallelTaskGroup(this.userSettings.filters, this._store.select(parallelTasksSelector));
+
 
     this.filterForm.valueChanges
+      .takeUntil(this._destroy$)
       .debounceTime(150)  // Timeout here for when we clear form to avoid costly recalculation of everything
       .subscribe(value => this.processFormValueChanges(value));
     this.swimlaneForm.valueChanges
+      .takeUntil(this._destroy$)
       .subscribe(value => this.processSwimlaneChange(value));
 
     this.swimlaneList = this.filterList
@@ -114,6 +121,7 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this._destroy$.next(null);
   }
 
   private createGroupFromObservable<T>(observable: Observable<T>,
@@ -121,7 +129,7 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
                                        mapper: (t: T) => FilterFormEntry[],
                                        setFilterGetter: () => Set<string>) {
     observable
-      .takeWhile((v, i) => (i === 0))
+      .take(1)
       .map(v => mapper(v))
       .subscribe(
         filterFormEntries => {
@@ -134,7 +142,7 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
                                   observable: Observable<OrderedMap<string,
                                     OrderedMap<string, CustomField>>>) {
     observable
-      .takeWhile((v, i) => (i === 0))
+      .take(1)
       .subscribe(
         customFields => {
           customFields.forEach((fields, key) => {
@@ -149,7 +157,7 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
 
   private createParallelTaskGroup(filterState: BoardFilterState, observable: Observable<OrderedMap<string, List<ParallelTask>>>) {
     observable
-      .takeWhile((v, i) => (i === 0))
+      .take(1)
       .subscribe(
         parallelTasks => {
           if (parallelTasks.size === 0) {
@@ -223,8 +231,12 @@ export class ControlPanelComponent implements OnInit, OnDestroy {
 
   processSwimlaneChange(value: any) {
     const sl: string = value['swimlane'];
-
     this._store.dispatch(UserSettingActions.createUpdateSwimlane(sl));
+  }
+
+  onShowEmptySwimlanes(event: MouseEvent) {
+    event.preventDefault();
+    this._store.dispatch(UserSettingActions.createToggleShowEmptySwimlanes());
   }
 }
 

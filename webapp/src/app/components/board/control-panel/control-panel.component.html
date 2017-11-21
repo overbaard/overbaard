@@ -9,7 +9,10 @@
             <option></option>
             <option *ngFor="let sl of swimlaneList" value="{{sl.key}}">{{sl.display}}</option>
           </select>
-
+          <div *ngIf="userSettings.swimlane">
+            <span *ngIf="userSettings.swimlaneShowEmpty"><a href="hide" (click)="onShowEmptySwimlanes($event)">Hide Empty</a></span>
+            <span *ngIf="!userSettings.swimlaneShowEmpty"><a href="hide" (click)="onShowEmptySwimlanes($event)">Show Empty</a></span>
+          </div>
         </div>
       </td>
       <td></td>

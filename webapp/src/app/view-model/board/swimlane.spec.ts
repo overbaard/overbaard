@@ -17,8 +17,6 @@ import {IssueTable} from './issue-table';
 
 describe('Swimlane observer tests', () => {
 
-  // TODO Some tests of filtering on other than swimlane (does not need to be extensive)
-
   describe('No Filters', () => {
     describe('Create swimlane', () => {
       it('Project', () => {
@@ -1253,141 +1251,141 @@ describe('Swimlane observer tests', () => {
               .addIssue('TWO-2', 1)
               .addIssue('TWO-3', 1));
           util.observer().take(1).subscribe(
-            issueTable => {
+            board => {
               new BoardChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']])
                 .invisibleIssues(['TWO-1', 'TWO-2', 'TWO-3'])
                 .swimlanes([
                   {key: 'ONE', name: 'ONE', issues: ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4'], visibleFilter: true},
                   {key: 'TWO', name: 'TWO', issues: ['TWO-1', 'TWO-2', 'TWO-3'], visibleFilter: false}])
-                .checkBoard(issueTable);
-              originalView = issueTable;
+                .checkBoard(board);
+              originalView = board;
             });
           util.getUserSettingUpdater().updateFilters('project')
             .observer().take(1).subscribe(
-            issueTable => {
+            board => {
               new BoardChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']])
                 .swimlanes([
                   {key: 'ONE', name: 'ONE', issues: ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4'], visibleFilter: true},
                   {key: 'TWO', name: 'TWO', issues: ['TWO-1', 'TWO-2', 'TWO-3'], visibleFilter: true}])
-                .checkBoard(issueTable);
+                .checkBoard(board);
               new EqualityChecker()
                 .cleanSwimlanes('ONE')
                 .cleanSwimlaneTables('TWO')
-                .check(originalView, issueTable);
-              originalView = issueTable;
+                .check(originalView, board);
+              originalView = board;
             });
 
           util.getUserSettingUpdater().updateFilters('project', 'TWO')
             .observer().take(1).subscribe(
-            issueTable => {
+            board => {
               new BoardChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']])
                 .invisibleIssues(['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4'])
                 .swimlanes([
                   {key: 'ONE', name: 'ONE', issues: ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4'], visibleFilter: false},
                   {key: 'TWO', name: 'TWO', issues: ['TWO-1', 'TWO-2', 'TWO-3'], visibleFilter: true}])
-                .checkBoard(issueTable);
+                .checkBoard(board);
               new EqualityChecker()
                 .cleanSwimlanes('TWO')
                 .cleanSwimlaneTables('ONE')
-                .check(originalView, issueTable);
-              originalView = issueTable;
+                .check(originalView, board);
+              originalView = board;
             });
           util.getUserSettingUpdater().updateFilters('project', 'ONE', 'TWO')
             .observer().take(1).subscribe(
-            issueTable => {
+            board => {
               new BoardChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']])
                 .swimlanes([
                   {key: 'ONE', name: 'ONE', issues: ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4'], visibleFilter: true},
                   {key: 'TWO', name: 'TWO', issues: ['TWO-1', 'TWO-2', 'TWO-3'], visibleFilter: true}])
-                .checkBoard(issueTable);
+                .checkBoard(board);
               new EqualityChecker()
                 .cleanSwimlanes('TWO')
                 .cleanSwimlaneTables('ONE')
-                .check(originalView, issueTable);
+                .check(originalView, board);
             });
         });
         it('Issue Type', () => {
           util = createUtilWithStandardIssues({swimlane: 'issue-type', 'issue-type': 'bug'});
           util.observer().take(1).subscribe(
-            issueTable => {
+            board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .invisibleIssues(['ONE-2', 'ONE-4'])
                 .swimlanes([
                   {key: 'task', name: 'task', issues: ['ONE-2', 'ONE-4'], visibleFilter: false},
                   {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3', 'ONE-5'], visibleFilter: true}])
-                .checkBoard(issueTable);
-              originalView = issueTable;
+                .checkBoard(board);
+              originalView = board;
             });
           util.getUserSettingUpdater().updateFilters('issue-type', 'task')
-            .observer().take(1).subscribe(issueTable => {
+            .observer().take(1).subscribe(board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .invisibleIssues(['ONE-1', 'ONE-3', 'ONE-5'])
               .swimlanes([
                 {key: 'task', name: 'task', issues: ['ONE-2', 'ONE-4'], visibleFilter: true},
                 {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3', 'ONE-5'], visibleFilter: false}])
-              .checkBoard(issueTable);
+              .checkBoard(board);
             new EqualityChecker()
               .cleanSwimlaneTables('task', 'bug')
-              .check(originalView, issueTable);
+              .check(originalView, board);
           });
         });
         it('Priority', () => {
           util = createUtilWithStandardIssues({swimlane: 'priority', 'priority': 'Blocker'});
           util.observer().take(1).subscribe(
-            issueTable => {
+            board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .invisibleIssues(['ONE-2', 'ONE-4'])
                 .swimlanes([
                   {key: 'Blocker', name: 'Blocker', issues: ['ONE-1', 'ONE-3', 'ONE-5'], visibleFilter: true},
                   {key: 'Major', name: 'Major', issues: ['ONE-2', 'ONE-4'], visibleFilter: false}])
-                .checkBoard(issueTable);
-              originalView = issueTable;
+                .checkBoard(board);
+              originalView = board;
             });
           util.getUserSettingUpdater().updateFilters('priority', 'Major')
-            .observer().take(1).subscribe(issueTable => {
+            .observer().take(1).subscribe(board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .invisibleIssues(['ONE-1', 'ONE-3', 'ONE-5'])
               .swimlanes([
                 {key: 'Blocker', name: 'Blocker', issues: ['ONE-1', 'ONE-3', 'ONE-5'], visibleFilter: false},
                 {key: 'Major', name: 'Major', issues: ['ONE-2', 'ONE-4'], visibleFilter: true}])
-              .checkBoard(issueTable);
+              .checkBoard(board);
             new EqualityChecker()
               .cleanSwimlaneTables('Blocker', 'Major')
-              .check(originalView, issueTable);
+              .check(originalView, board);
           });
         });
         it('Assignee', () => {
           util = createUtilWithStandardIssues({swimlane: 'assignee', 'assignee': 'kabir'});
           util.observer().take(1).subscribe(
-            issueTable => {
+            board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .invisibleIssues(['ONE-3', 'ONE-2', 'ONE-5'])
                 .swimlanes([
                   {key: 'bob', name: 'Bob Brent Barlow', issues: ['ONE-3'], visibleFilter: false},
                   {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4'], visibleFilter: true},
                   {key: NONE_FILTER, name: 'None', issues: ['ONE-2', 'ONE-5'], visibleFilter: false}])
-                .checkBoard(issueTable);
-              originalView = issueTable;
+                .checkBoard(board);
+              originalView = board;
             });
           util.getUserSettingUpdater().updateFilters('assignee', 'kabir', NONE_FILTER)
-            .observer().take(1).subscribe(issueTable => {
+            .observer().take(1).subscribe(board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .invisibleIssues(['ONE-3'])
               .swimlanes([
                 {key: 'bob', name: 'Bob Brent Barlow', issues: ['ONE-3'], visibleFilter: false},
                 {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4'], visibleFilter: true},
                 {key: NONE_FILTER, name: 'None', issues: ['ONE-2', 'ONE-5'], visibleFilter: true}])
-              .checkBoard(issueTable);
+              .checkBoard(board);
             new EqualityChecker()
               .cleanSwimlanes('bob', 'kabir')
               .cleanSwimlaneTables(NONE_FILTER)
-              .check(originalView, issueTable);
+              .check(originalView, board);
           });
         });
         it('Components', () => {
           util = createUtilWithStandardIssues({swimlane: 'component', 'component': NONE_FILTER});
           util.observer().take(1).subscribe(
-            issueTable => {
+            board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .invisibleIssues(['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4'])
                 .swimlanes([
@@ -1395,11 +1393,11 @@ describe('Swimlane observer tests', () => {
                   {key: 'C-20', name: 'C-20', issues: ['ONE-2', 'ONE-4'], visibleFilter: false},
                   {key: 'C-30', name: 'C-30', issues: ['ONE-3', 'ONE-4'], visibleFilter: false},
                   {key: NONE_FILTER, name: 'None', issues: ['ONE-5'], visibleFilter: true}])
-                .checkBoard(issueTable);
-              originalView = issueTable;
+                .checkBoard(board);
+              originalView = board;
             });
           util.getUserSettingUpdater().updateFilters('component', 'C-10', 'C-20')
-            .observer().take(1).subscribe(issueTable => {
+            .observer().take(1).subscribe(board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .invisibleIssues(['ONE-3', 'ONE-5'])
               .swimlanes([
@@ -1407,16 +1405,16 @@ describe('Swimlane observer tests', () => {
                 {key: 'C-20', name: 'C-20', issues: ['ONE-2', 'ONE-4'], visibleFilter: true},
                 {key: 'C-30', name: 'C-30', issues: ['ONE-3', 'ONE-4'], visibleFilter: false},
                 {key: NONE_FILTER, name: 'None', issues: ['ONE-5'], visibleFilter: false}])
-              .checkBoard(issueTable);
+              .checkBoard(board);
             new EqualityChecker()
               .cleanSwimlaneTables('C-10', 'C-20', 'C-30', NONE_FILTER)
-              .check(originalView, issueTable);
+              .check(originalView, board);
           });
         });
         it('Fix Versions', () => {
           util = createUtilWithStandardIssues({swimlane: 'fix-version', 'fix-version': NONE_FILTER});
           util.observer().take(1).subscribe(
-            issueTable => {
+            board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .invisibleIssues(['ONE-1', 'ONE-2', 'ONE-3', 'ONE-5'])
                 .swimlanes([
@@ -1424,11 +1422,11 @@ describe('Swimlane observer tests', () => {
                   {key: 'F-20', name: 'F-20', issues: ['ONE-1', 'ONE-3'], visibleFilter: false},
                   {key: 'F-30', name: 'F-30', issues: ['ONE-1', 'ONE-5'], visibleFilter: false},
                   {key: NONE_FILTER, name: 'None', issues: ['ONE-4'], visibleFilter: true}])
-                .checkBoard(issueTable);
-              originalView = issueTable;
+                .checkBoard(board);
+              originalView = board;
             });
           util.getUserSettingUpdater().updateFilters('fix-version', 'F-10')
-            .observer().take(1).subscribe(issueTable => {
+            .observer().take(1).subscribe(board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .invisibleIssues(['ONE-3', 'ONE-4', 'ONE-5'])
               .swimlanes([
@@ -1436,16 +1434,16 @@ describe('Swimlane observer tests', () => {
                 {key: 'F-20', name: 'F-20', issues: ['ONE-1', 'ONE-3'], visibleFilter: false},
                 {key: 'F-30', name: 'F-30', issues: ['ONE-1', 'ONE-5'], visibleFilter: false},
                 {key: NONE_FILTER, name: 'None', issues: ['ONE-4'], visibleFilter: false}])
-              .checkBoard(issueTable);
+              .checkBoard(board);
             new EqualityChecker()
               .cleanSwimlaneTables('F-10', 'F-20', 'F-30', NONE_FILTER)
-              .check(originalView, issueTable);
+              .check(originalView, board);
           });
         });
         it('Labels', () => {
           util = createUtilWithStandardIssues({swimlane: 'label', 'label': NONE_FILTER});
           util.observer().take(1).subscribe(
-            issueTable => {
+            board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .invisibleIssues(['ONE-2', 'ONE-3', 'ONE-4', 'ONE-5'])
                 .swimlanes([
@@ -1453,50 +1451,50 @@ describe('Swimlane observer tests', () => {
                   {key: 'L-20', name: 'L-20', issues: ['ONE-2', 'ONE-4'], visibleFilter: false},
                   {key: 'L-30', name: 'L-30', issues: ['ONE-2', 'ONE-5'], visibleFilter: false},
                   {key: NONE_FILTER, name: 'None', issues: ['ONE-1'], visibleFilter: true}])
-                .checkBoard(issueTable);
-              originalView = issueTable;
+                .checkBoard(board);
+              originalView = board;
             });
           util.getUserSettingUpdater().updateFilters('label')
-            .observer().take(1).subscribe(issueTable => {
+            .observer().take(1).subscribe(board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .swimlanes([
                 {key: 'L-10', name: 'L-10', issues: ['ONE-2', 'ONE-3'], visibleFilter: true},
                 {key: 'L-20', name: 'L-20', issues: ['ONE-2', 'ONE-4'], visibleFilter: true},
                 {key: 'L-30', name: 'L-30', issues: ['ONE-2', 'ONE-5'], visibleFilter: true},
                 {key: NONE_FILTER, name: 'None', issues: ['ONE-1'], visibleFilter: true}])
-              .checkBoard(issueTable);
+              .checkBoard(board);
             new EqualityChecker()
               .cleanSwimlanes(NONE_FILTER)
               .cleanSwimlaneTables('L-10', 'L-20', 'L-30')
-              .check(originalView, issueTable);
+              .check(originalView, board);
           });
         });
         it('Custom Field', () => {
           util = createUtilWithStandardIssues({swimlane: 'Custom-2', 'cf.Custom-2': 'c2-A'});
           util.observer().take(1).subscribe(
-            issueTable => {
+            board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .invisibleIssues(['ONE-4', 'ONE-5'])
                 .swimlanes([
                   {key: 'c2-A', name: 'First C2', issues: ['ONE-1', 'ONE-2', 'ONE-3'], visibleFilter: true},
                   {key: 'c2-B', name: 'Second C2', issues: ['ONE-4'], visibleFilter: false},
                   {key: NONE_FILTER, name: 'None', issues: ['ONE-5'], visibleFilter: false}])
-                .checkBoard(issueTable);
-              originalView = issueTable;
+                .checkBoard(board);
+              originalView = board;
             });
           util.getUserSettingUpdater().updateFilters('Custom-2', 'c2-B')
-            .observer().take(1).subscribe(issueTable => {
+            .observer().take(1).subscribe(board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .invisibleIssues(['ONE-1', 'ONE-2', 'ONE-3', 'ONE-5'])
               .swimlanes([
                 {key: 'c2-A', name: 'First C2', issues: ['ONE-1', 'ONE-2', 'ONE-3'], visibleFilter: false},
                 {key: 'c2-B', name: 'Second C2', issues: ['ONE-4'], visibleFilter: true},
                 {key: NONE_FILTER, name: 'None', issues: ['ONE-5'], visibleFilter: false}])
-              .checkBoard(issueTable);
+              .checkBoard(board);
             new EqualityChecker()
               .cleanSwimlanes(NONE_FILTER)
               .cleanSwimlaneTables('c2-A', 'c2-B')
-              .check(originalView, issueTable);
+              .check(originalView, board);
           });
         });
       });
@@ -1509,15 +1507,15 @@ describe('Swimlane observer tests', () => {
           util =
             createUtilWithStandardIssues({swimlane: 'assignee', 'assignee': 'kabir', 'issue-type': 'task'});
           util.observer().take(1).subscribe(
-            issueTable => {
+            board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .invisibleIssues(['ONE-1', 'ONE-2', 'ONE-3', 'ONE-5'])
                 .swimlanes([
                   {key: 'bob', name: 'Bob Brent Barlow', issues: ['ONE-3'], visibleFilter: false},
                   {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4'], visibleFilter: true},
                   {key: NONE_FILTER, name: 'None', issues: ['ONE-2', 'ONE-5'], visibleFilter: false}])
-                .checkBoard(issueTable);
-              originalView = issueTable;
+                .checkBoard(board);
+              originalView = board;
             });
           util.getUserSettingUpdater().updateFilters('issue-type');
           util.getUserSettingUpdater().updateFilters('priority', 'Blocker')
@@ -1535,6 +1533,64 @@ describe('Swimlane observer tests', () => {
                 .cleanSwimlanes('bob', NONE_FILTER, 'kabir')
                 .check(originalView, board);
             });
+        });
+      });
+
+      describe('Check toggle show empty swimlanes', () => {
+        it ('Initially false', () => {
+          // What we create here does not really matter, the main check is that the swimlane info 'showEmpty' field gets set
+          util =
+            createUtilWithStandardIssues({swimlane: 'assignee', 'assignee': 'kabir', 'issue-type': 'task'});
+          util.observer().take(1).subscribe(
+            board => {
+              // We do tests elsewhere for the content of the board/swimlanes - let's just check the SwimlaneInfo showEmpty field
+              expect(board.issueTable.swimlaneInfo).toBeTruthy();
+              expect(board.issueTable.swimlaneInfo.showEmpty).toBe(false);
+            });
+          util.getUserSettingUpdater().toggleShowEmptySwimlanes()
+            .observer().take(1).subscribe(
+              board => {
+                expect(board.issueTable.swimlaneInfo).toBeTruthy();
+                expect(board.issueTable.swimlaneInfo.showEmpty).toBe(true);
+              });
+
+          // Do some extra checks here which are not needed in the other similar tests
+          util.getUserSettingUpdater().updateSwimlane('project')
+            .observer().take(1).subscribe(
+            board => {
+              expect(board.issueTable.swimlaneInfo).toBeTruthy();
+              expect(board.issueTable.swimlaneInfo.showEmpty).toBe(false);
+            });
+          util.getUserSettingUpdater().toggleShowEmptySwimlanes()
+            .observer().take(1).subscribe(
+            board => {
+              expect(board.issueTable.swimlaneInfo).toBeTruthy();
+              expect(board.issueTable.swimlaneInfo.showEmpty).toBe(true);
+            });
+          util.getUserSettingUpdater().updateSwimlane(null)
+            .observer().take(1).subscribe(
+            board => {
+              expect(board.issueTable.swimlaneInfo).toBeFalsy();
+            });
+        });
+
+        it ('Initially true', () => {
+          // What we create here does not really matter, the main check is that the swimlane info 'showEmpty' field gets set
+          util =
+            createUtilWithStandardIssues({showEmptySl: 'true', swimlane: 'assignee', 'assignee': 'kabir', 'issue-type': 'task'});
+          util.observer().take(1).subscribe(
+            board => {
+              // We do tests elsewhere for the content of the board/swimlanes - let's just check the SwimlaneInfo showEmpty field
+              expect(board.issueTable.swimlaneInfo).toBeTruthy();
+              expect(board.issueTable.swimlaneInfo.showEmpty).toBe(true);
+            });
+          util.getUserSettingUpdater().toggleShowEmptySwimlanes()
+            .observer().take(1).subscribe(
+            board => {
+              expect(board.issueTable.swimlaneInfo).toBeTruthy();
+              expect(board.issueTable.swimlaneInfo.showEmpty).toBe(false);
+            });
+
         });
       });
     });
@@ -1579,6 +1635,7 @@ describe('Swimlane observer tests', () => {
 class BoardChecker {
   private _expectedInvisible: string[] = [];
   private _expectedSwimlanes: SwimlaneCheck[];
+  private _expectedShowEmptySwimlanes: boolean;
 
   constructor(private _expectedTable: string[][]) {
   }
@@ -1588,8 +1645,9 @@ class BoardChecker {
     return this;
   }
 
-  swimlanes(swimlanes: SwimlaneCheck[]): BoardChecker {
+  swimlanes(swimlanes: SwimlaneCheck[], showEmpty: boolean = false): BoardChecker {
     this._expectedSwimlanes = swimlanes;
+    this._expectedShowEmptySwimlanes = showEmpty;
     return this;
   }
 
@@ -1635,6 +1693,8 @@ class BoardChecker {
 
   private checkSwimlanes(issueTable: IssueTable) {
     const slInfo: SwimlaneInfo = issueTable.swimlaneInfo;
+    expect(slInfo.showEmpty).toBe(this._expectedShowEmptySwimlanes);
+
     // Check the names and keys are as expected
     expect(slInfo.swimlanes.size).toBe(this._expectedSwimlanes.length);
     expect(slInfo.swimlanes.keySeq().toArray()).toEqual(this._expectedSwimlanes.map(sl => sl.key));

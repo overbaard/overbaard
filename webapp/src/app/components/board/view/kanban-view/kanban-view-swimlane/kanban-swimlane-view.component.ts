@@ -1,6 +1,7 @@
 import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {SwimlaneData} from '../../../../../view-model/board/swimlane-data';
 import {BoardViewModel} from '../../../../../view-model/board/board-view';
+import {SwimlaneInfo} from '../../../../../view-model/board/swimlane-info';
 
 @Component({
   selector: 'app-kanban-swimlane-view',
@@ -27,5 +28,9 @@ export class KanbanSwimlaneViewComponent implements OnInit {
   // trackBy is a hint to angular to be able to keep (i.e. don't destroy and recreate) as many components as possible
   columnTrackByFn(index: number, swimlaneData: SwimlaneData) {
     return swimlaneData.key;
+  }
+
+  get swimlaneInfo(): SwimlaneInfo {
+    return this.board.issueTable.swimlaneInfo;
   }
 }

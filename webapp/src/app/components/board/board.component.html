@@ -17,4 +17,7 @@
   </app-rank-view>
 </div>
 <button id="temp-control-button" (click)="onToggleControlPanel($event)">*</button>
-<app-control-panel *ngIf="showControlPanel"></app-control-panel>
+<app-control-panel
+  *ngIf="showControlPanel"
+  [userSettings]="userSettings$ | async"
+></app-control-panel>
