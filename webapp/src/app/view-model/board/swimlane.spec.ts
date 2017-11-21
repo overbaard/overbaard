@@ -1536,61 +1536,150 @@ describe('Swimlane observer tests', () => {
         });
       });
 
-      describe('Check toggle show empty swimlanes', () => {
-        it ('Initially false', () => {
-          // What we create here does not really matter, the main check is that the swimlane info 'showEmpty' field gets set
-          util =
-            createUtilWithStandardIssues({swimlane: 'assignee', 'assignee': 'kabir', 'issue-type': 'task'});
-          util.observer().take(1).subscribe(
-            board => {
-              // We do tests elsewhere for the content of the board/swimlanes - let's just check the SwimlaneInfo showEmpty field
-              expect(board.issueTable.swimlaneInfo).toBeTruthy();
-              expect(board.issueTable.swimlaneInfo.showEmpty).toBe(false);
-            });
-          util.getUserSettingUpdater().toggleShowEmptySwimlanes()
-            .observer().take(1).subscribe(
-              board => {
-                expect(board.issueTable.swimlaneInfo).toBeTruthy();
-                expect(board.issueTable.swimlaneInfo.showEmpty).toBe(true);
-              });
+    });
 
-          // Do some extra checks here which are not needed in the other similar tests
-          util.getUserSettingUpdater().updateSwimlane('project')
-            .observer().take(1).subscribe(
-            board => {
-              expect(board.issueTable.swimlaneInfo).toBeTruthy();
-              expect(board.issueTable.swimlaneInfo.showEmpty).toBe(false);
-            });
-          util.getUserSettingUpdater().toggleShowEmptySwimlanes()
-            .observer().take(1).subscribe(
-            board => {
-              expect(board.issueTable.swimlaneInfo).toBeTruthy();
-              expect(board.issueTable.swimlaneInfo.showEmpty).toBe(true);
-            });
-          util.getUserSettingUpdater().updateSwimlane(null)
-            .observer().take(1).subscribe(
-            board => {
-              expect(board.issueTable.swimlaneInfo).toBeFalsy();
-            });
+    describe('Check toggle show empty swimlanes', () => {
+      it ('Initially false', () => {
+        // What we create here does not really matter, the main check is that the swimlane info 'showEmpty' field gets set
+        const util: BoardViewObservableUtil =
+          createUtilWithStandardIssues({swimlane: 'assignee', 'assignee': 'kabir', 'issue-type': 'task'});
+        util.observer().take(1).subscribe(
+          board => {
+            // We do tests elsewhere for the content of the board/swimlanes - let's just check the SwimlaneInfo showEmpty field
+            expect(board.issueTable.swimlaneInfo).toBeTruthy();
+            expect(board.issueTable.swimlaneInfo.showEmpty).toBe(false);
+          });
+        util.getUserSettingUpdater().toggleShowEmptySwimlanes()
+          .observer().take(1).subscribe(
+          board => {
+            expect(board.issueTable.swimlaneInfo).toBeTruthy();
+            expect(board.issueTable.swimlaneInfo.showEmpty).toBe(true);
+          });
+
+        // Do some extra checks here which are not needed in the other similar tests
+        util.getUserSettingUpdater().updateSwimlane('project')
+          .observer().take(1).subscribe(
+          board => {
+            expect(board.issueTable.swimlaneInfo).toBeTruthy();
+            expect(board.issueTable.swimlaneInfo.showEmpty).toBe(false);
+          });
+        util.getUserSettingUpdater().toggleShowEmptySwimlanes()
+          .observer().take(1).subscribe(
+          board => {
+            expect(board.issueTable.swimlaneInfo).toBeTruthy();
+            expect(board.issueTable.swimlaneInfo.showEmpty).toBe(true);
+          });
+        util.getUserSettingUpdater().updateSwimlane(null)
+          .observer().take(1).subscribe(
+          board => {
+            expect(board.issueTable.swimlaneInfo).toBeFalsy();
+          });
+      });
+
+      it ('Initially true', () => {
+        // What we create here does not really matter, the main check is that the swimlane info 'showEmpty' field gets set
+        const util: BoardViewObservableUtil =
+          createUtilWithStandardIssues({showEmptySl: 'true', swimlane: 'assignee', 'assignee': 'kabir', 'issue-type': 'task'});
+        util.observer().take(1).subscribe(
+          board => {
+            // We do tests elsewhere for the content of the board/swimlanes - let's just check the SwimlaneInfo showEmpty field
+            expect(board.issueTable.swimlaneInfo).toBeTruthy();
+            expect(board.issueTable.swimlaneInfo.showEmpty).toBe(true);
+          });
+        util.getUserSettingUpdater().toggleShowEmptySwimlanes()
+          .observer().take(1).subscribe(
+          board => {
+            expect(board.issueTable.swimlaneInfo).toBeTruthy();
+            expect(board.issueTable.swimlaneInfo.showEmpty).toBe(false);
+          });
+
+      });
+    });
+
+    describe('Toggle collapsed swimlane', () => {
+      let util: BoardViewObservableUtil;
+      let originalView: BoardViewModel;
+      let checker: BoardChecker;
+
+      beforeEach(() => {
+        checker = new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+          .invisibleIssues(['ONE-2', 'ONE-4'])
+          .swimlanes([
+            {key: 'Blocker', name: 'Blocker', issues: ['ONE-1', 'ONE-3', 'ONE-5'], visibleFilter: true},
+            {key: 'Major', name: 'Major', issues: ['ONE-2', 'ONE-4'], visibleFilter: false}]);
+      });
+
+      it('Default settings', () => {
+        util = createUtilWithStandardIssues({swimlane: 'priority', 'priority': 'Blocker'});
+        util.observer().take(1).subscribe(
+          board => {
+            checker.checkBoard(board);
+          });
+        util.getUserSettingUpdater().toggleCollapsedSwimlane('Blocker')
+          .observer().take(1).subscribe(board => {
+            checker
+              .collapsedSwimlanes('Blocker')
+              .checkBoard(board);
         });
-
-        it ('Initially true', () => {
-          // What we create here does not really matter, the main check is that the swimlane info 'showEmpty' field gets set
-          util =
-            createUtilWithStandardIssues({showEmptySl: 'true', swimlane: 'assignee', 'assignee': 'kabir', 'issue-type': 'task'});
-          util.observer().take(1).subscribe(
-            board => {
-              // We do tests elsewhere for the content of the board/swimlanes - let's just check the SwimlaneInfo showEmpty field
-              expect(board.issueTable.swimlaneInfo).toBeTruthy();
-              expect(board.issueTable.swimlaneInfo.showEmpty).toBe(true);
-            });
-          util.getUserSettingUpdater().toggleShowEmptySwimlanes()
-            .observer().take(1).subscribe(
-            board => {
-              expect(board.issueTable.swimlaneInfo).toBeTruthy();
-              expect(board.issueTable.swimlaneInfo.showEmpty).toBe(false);
-            });
-
+        util.getUserSettingUpdater().toggleCollapsedSwimlane('Major')
+          .observer().take(1).subscribe(board => {
+          checker
+            .collapsedSwimlanes('Blocker', 'Major')
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().toggleCollapsedSwimlane('Major')
+          .observer().take(1).subscribe(board => {
+          checker
+            .collapsedSwimlanes('Blocker')
+            .checkBoard(board);
+        });
+      });
+      it('Initially Collapsed/hidden', () => {
+        util = createUtilWithStandardIssues({swimlane: 'priority', 'priority': 'Blocker', 'hidden-sl': 'Blocker'});
+        util.observer().take(1).subscribe(
+          board => {
+            checker
+              .collapsedSwimlanes('Blocker')
+              .checkBoard(board);
+          });
+        util.getUserSettingUpdater().toggleCollapsedSwimlane('Blocker')
+          .observer().take(1).subscribe(board => {
+          checker
+            .collapsedSwimlanes()
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().toggleCollapsedSwimlane('Major')
+          .observer().take(1).subscribe(board => {
+          checker
+            .collapsedSwimlanes('Major')
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().toggleCollapsedSwimlane('Major')
+          .observer().take(1).subscribe(board => {
+          checker
+            .collapsedSwimlanes()
+            .checkBoard(board);
+        });
+      });
+      it('Initially visible', () => {
+        util = createUtilWithStandardIssues({swimlane: 'priority', 'priority': 'Blocker', 'visible-sl': 'Blocker'});
+        util.observer().take(1).subscribe(
+          board => {
+            checker
+              .collapsedSwimlanes('Major')
+              .checkBoard(board);
+          });
+        util.getUserSettingUpdater().toggleCollapsedSwimlane('Blocker')
+          .observer().take(1).subscribe(board => {
+          checker
+            .collapsedSwimlanes('Major', 'Blocker')
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().toggleCollapsedSwimlane('Major')
+          .observer().take(1).subscribe(board => {
+          checker
+            .collapsedSwimlanes('Blocker')
+            .checkBoard(board);
         });
       });
     });
@@ -1636,6 +1725,7 @@ class BoardChecker {
   private _expectedInvisible: string[] = [];
   private _expectedSwimlanes: SwimlaneCheck[];
   private _expectedShowEmptySwimlanes: boolean;
+  private _expectedCollapsedSwimlanes: Set<string>;
 
   constructor(private _expectedTable: string[][]) {
   }
@@ -1648,6 +1738,11 @@ class BoardChecker {
   swimlanes(swimlanes: SwimlaneCheck[], showEmpty: boolean = false): BoardChecker {
     this._expectedSwimlanes = swimlanes;
     this._expectedShowEmptySwimlanes = showEmpty;
+    return this;
+  }
+
+  collapsedSwimlanes(...keys: string[]): BoardChecker {
+    this._expectedCollapsedSwimlanes = Set<string>(keys);
     return this;
   }
 
@@ -1689,6 +1784,7 @@ class BoardChecker {
       expect(issueTable.swimlaneInfo).toBeTruthy();
       this.checkSwimlanes(issueTable);
     }
+
   }
 
   private checkSwimlanes(issueTable: IssueTable) {
@@ -1718,6 +1814,12 @@ class BoardChecker {
       // Undefined means true
       const expectedVisible: boolean = !(check.visibleFilter === false);
       expect(sl.filterVisible).toBe(expectedVisible);
+
+      if (this._expectedCollapsedSwimlanes && this._expectedCollapsedSwimlanes.contains(sl.key)) {
+        expect(sl.collapsed).toBe(true);
+      } else {
+        expect(sl.collapsed).toBe(false);
+      }
     }
   }
 

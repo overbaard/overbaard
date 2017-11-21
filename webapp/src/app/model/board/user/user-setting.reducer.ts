@@ -1,6 +1,6 @@
 import {Action} from '@ngrx/store';
 import {Dictionary} from '../../../common/dictionary';
-import {List} from 'immutable';
+import {List, Map} from 'immutable';
 import {initialUserSettingState, UserSettingUtil} from './user-setting.model';
 import {boardFilterMetaReducer} from './board-filter/board-filter.reducer';
 import {BoardHeader} from '../../../view-model/board/board-header';
@@ -16,6 +16,7 @@ const UPDATE_SWIMLANE = 'UPDATE_SWIMLANE';
 const TOGGLE_COLUMN_VISIBILITY = 'TOGGLE_COLUMN_VISIBILITY';
 const TOGGLE_BACKLOG = 'TOGGLE_BACKLOG';
 const TOGGLE_SHOW_EMPTY_SWIMLANES = 'TOGGLE_SHOW_EMPTY_SWIMLANES';
+const TOGGLE_COLLAPSED_SWIMLANE = 'TOGGLE_COLLAPSED_SWIMLANE';
 
 class ClearSettingsAction implements Action {
   readonly type = CLEAR_SETTINGS;
@@ -45,6 +46,14 @@ class ToggleShowEmptySwimlanesAction implements Action {
 
 }
 
+class ToggleCollapsedSwimlaneAction {
+
+  readonly type = TOGGLE_COLLAPSED_SWIMLANE;
+  constructor(readonly payload: string) {
+  }
+
+}
+
 export class UserSettingActions {
   static createClearSettings() {
     return new ClearSettingsAction();
@@ -58,16 +67,20 @@ export class UserSettingActions {
     return new UpdateSwimlaneAction(swimlane);
   }
 
-  static toggleBacklog(backlogHeader: BoardHeader): Action {
+  static createToggleBacklog(backlogHeader: BoardHeader): Action {
     return new ToggleBacklogAction(backlogHeader);
   }
 
-  static toggleVisibility(newValue: boolean, states: List<number>): Action {
+  static createToggleVisibility(newValue: boolean, states: List<number>): Action {
     return new ToggleVisibilityAction({newValue: newValue, states: states});
   }
 
   static createToggleShowEmptySwimlanes() {
     return new ToggleShowEmptySwimlanesAction();
+  }
+
+  static createToggleCollapsedSwimlane(key: string) {
+    return new ToggleCollapsedSwimlaneAction(key);
   }
 }
 
@@ -78,13 +91,15 @@ export function userSettingReducer(state: UserSettingState = initialUserSettingS
         const initAction: InitialiseFromQueryStringAction = <InitialiseFromQueryStringAction>action;
         mutable.boardCode = initAction.payload['board'];
         mutable.showBacklog = initAction.payload['bl'] ? initAction.payload['bl'] === 'true' : false;
-        mutable.swimlane = initAction.payload['swimlane'];
-        if (mutable.swimlane) {
-          mutable.swimlaneShowEmpty = initAction.payload['showEmptySl'] ? initAction.payload['showEmptySl'] === 'true' : false;
-        }
         mutable.filters = boardFilterMetaReducer(state.filters, action);
         mutable.defaultColumnVisibility = initAction.getVisibleColumnDefault();
         mutable.columnVisibilities = initAction.parseVisibleColumns();
+        mutable.swimlane = initAction.payload['swimlane'];
+        if (mutable.swimlane) {
+          mutable.swimlaneShowEmpty = initAction.payload['showEmptySl'] ? initAction.payload['showEmptySl'] === 'true' : false;
+          mutable.defaultCollapsedSwimlane = initAction.getSwimlaneCollapsedDefault();
+          mutable.collapsedSwimlanes = initAction.parseCollapsedSwimlanes();
+        }
       });
     }
     case UPDATE_SWIMLANE: {
@@ -93,6 +108,8 @@ export function userSettingReducer(state: UserSettingState = initialUserSettingS
         if (mutable.swimlane !== usa.payload) {
           mutable.swimlane = usa.payload;
           mutable.swimlaneShowEmpty = false;
+          mutable.defaultCollapsedSwimlane = false;
+          mutable.collapsedSwimlanes = Map<string, boolean>();
         }
       });
     }
@@ -124,6 +141,17 @@ export function userSettingReducer(state: UserSettingState = initialUserSettingS
           settingState.swimlaneShowEmpty = !settingState.swimlaneShowEmpty;
         });
       }
+      return state;
+    }
+    case TOGGLE_COLLAPSED_SWIMLANE: {
+      if (state.swimlane) {
+        return UserSettingUtil.updateUserSettingState(state, settingState => {
+          const key: string = (<ToggleCollapsedSwimlaneAction>action).payload;
+          const existingValue = settingState.collapsedSwimlanes.get(key, settingState.defaultCollapsedSwimlane);
+          settingState.collapsedSwimlanes = settingState.collapsedSwimlanes.set(key, !existingValue);
+        });
+      }
+      return state;
     }
   }
   // Delegate other actions like updating the filters

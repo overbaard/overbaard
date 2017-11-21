@@ -6,4 +6,5 @@ export interface SwimlaneData {
   table: List<List<string>>;
   visibleIssues: number;
   filterVisible: boolean;
+  collapsed: boolean;
 }

@@ -16,6 +16,10 @@ export class KanbanViewComponent extends FixedHeaderView implements OnInit {
   @Output()
   toggleBacklog: EventEmitter<BoardHeader> = new EventEmitter<BoardHeader>();
 
+  @Output()
+  toggleCollapsedSwimlane: EventEmitter<string> = new EventEmitter<string>();
+
+
   constructor() {
     super();
   }
@@ -35,4 +39,9 @@ export class KanbanViewComponent extends FixedHeaderView implements OnInit {
   onToggleBacklog(header: BoardHeader) {
     this.toggleBacklog.next(header);
   }
+
+  onToggleCollapsedSwimlane(key: string) {
+    this.toggleCollapsedSwimlane.emit(key);
+  }
+
 }

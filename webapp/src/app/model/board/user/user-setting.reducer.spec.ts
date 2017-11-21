@@ -9,20 +9,32 @@ import {UserSettingState} from './user-setting';
 
 describe('User setting reducer tests', () => {
   describe('Querystring tests', () => {
-    it ('With Querystring, no backlog or column visibilties', () => {
+    it ('Simple', () => {
       // Just test a few filter fields, the board filter reducer tests test this properly
       const qs: Dictionary<string> = {
-        board: 'TEST',
-        project: 'P1',
-        swimlane: 'project'
+        board: 'TEST'
       };
       const state: UserSettingState = userSettingReducer(
         initialUserSettingState,
         UserSettingActions.createInitialiseFromQueryString(qs));
       const settingChecker: SettingChecker = new SettingChecker();
       settingChecker.boardCode = 'TEST';
-      settingChecker.swimlane = 'project';
+      settingChecker.check(state)
+    });
+    it ('Swimlane and project filter', () => {
+      // Just test a few filter fields, the board filter reducer tests test this properly
+      const qs: Dictionary<string> = {
+        board: 'TEST',
+        project: 'P1',
+        swimlane: 'assignee'
+      };
+      const state: UserSettingState = userSettingReducer(
+        initialUserSettingState,
+        UserSettingActions.createInitialiseFromQueryString(qs));
+      const settingChecker: SettingChecker = new SettingChecker();
+      settingChecker.boardCode = 'TEST';
       settingChecker.filterChecker.project = ['P1'];
+      settingChecker.swimlane = 'assignee';
       settingChecker.check(state)
     });
     it ('With Querystring, bl=false and visible columns', () => {
@@ -33,7 +45,8 @@ describe('User setting reducer tests', () => {
         project: 'P1',
         swimlane: 'project',
         showEmptySl: 'true',
-        visible: '1,5,7'
+        visible: '1,5,7',
+        'visible-sl': 'a,b,c'
       };
       const state: UserSettingState = userSettingReducer(
         initialUserSettingState,
@@ -43,8 +56,10 @@ describe('User setting reducer tests', () => {
       settingChecker.swimlane = 'project';
       settingChecker.showEmptySwimlane = true;
       settingChecker.filterChecker.project = ['P1'];
-      settingChecker.visibleColumns = {1: true, 5: true, 7: true}
+      settingChecker.visibleColumns = {1: true, 5: true, 7: true};
       settingChecker.defaultColumnVisibility = false;
+      settingChecker.collapsedSwimlanes = {a: false, b: false, c: false};
+      settingChecker.defaultSwimlaneCollapsed = true;
       settingChecker.check(state)
     });
     it ('With Querystring, bl=true and hidden columns', () => {
@@ -55,7 +70,8 @@ describe('User setting reducer tests', () => {
         project: 'P1',
         swimlane: 'project',
         showEmptySl: 'false',
-        hidden: '2,6,8'
+        hidden: '2,6,8',
+        'hidden-sl': 'd,e,f'
       };
       const state: UserSettingState = userSettingReducer(
         initialUserSettingState,
@@ -66,6 +82,9 @@ describe('User setting reducer tests', () => {
       settingChecker.swimlane = 'project';
       settingChecker.filterChecker.project = ['P1'];
       settingChecker.visibleColumns = {2: false, 6: false, 8: false}
+      settingChecker.collapsedSwimlanes = {d: true, e: true, f: true};
+      settingChecker.defaultSwimlaneCollapsed = false;
+
       settingChecker.check(state)
     });
   });
@@ -74,8 +93,7 @@ describe('User setting reducer tests', () => {
     let state: UserSettingState
     beforeEach(() => {
       const qs: Dictionary<string> = {
-        board: 'TEST',
-        project: 'P1'
+        board: 'TEST'
       };
       state = userSettingReducer(
         initialUserSettingState,
@@ -136,10 +154,9 @@ describe('User setting reducer tests', () => {
 
   describe('Toggle column visibility', () => {
     describe('Single state', () => {
-      it ('No visibilities columns', () => {
+      it ('Default visibilities', () => {
         const qs: Dictionary<string> = {
-          board: 'TEST',
-          project: 'P1'
+          board: 'TEST'
         };
         let state: UserSettingState = userSettingReducer(
           initialUserSettingState,
@@ -148,15 +165,15 @@ describe('User setting reducer tests', () => {
         checker.boardCode = 'TEST';
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(false, List<number>([1])));
+        state = userSettingReducer(state, UserSettingActions.createToggleVisibility(false, List<number>([1])));
         checker.visibleColumns = {1: false};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(true, List<number>([1])));
+        state = userSettingReducer(state, UserSettingActions.createToggleVisibility(true, List<number>([1])));
         checker.visibleColumns = {1: true};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(false, List<number>([2])));
+        state = userSettingReducer(state, UserSettingActions.createToggleVisibility(false, List<number>([2])));
         checker.visibleColumns = {1: true, 2: false};
         checker.check(state);
       });
@@ -164,7 +181,6 @@ describe('User setting reducer tests', () => {
       it ('Hidden columns', () => {
         const qs: Dictionary<string> = {
           board: 'TEST',
-          project: 'P1',
           hidden: '1'
         };
         let state: UserSettingState = userSettingReducer(
@@ -175,15 +191,15 @@ describe('User setting reducer tests', () => {
         checker.visibleColumns = {1: false};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(true, List<number>([1])));
+        state = userSettingReducer(state, UserSettingActions.createToggleVisibility(true, List<number>([1])));
         checker.visibleColumns = {1: true};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(false, List<number>([1])));
+        state = userSettingReducer(state, UserSettingActions.createToggleVisibility(false, List<number>([1])));
         checker.visibleColumns = {1: false};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(false, List<number>([2])));
+        state = userSettingReducer(state, UserSettingActions.createToggleVisibility(false, List<number>([2])));
         checker.visibleColumns = {1: false, 2: false};
         checker.check(state);
       });
@@ -191,7 +207,6 @@ describe('User setting reducer tests', () => {
       it ('Visible columns', () => {
         const qs: Dictionary<string> = {
           board: 'TEST',
-          project: 'P1',
           visible: '1'
         };
         let state: UserSettingState = userSettingReducer(
@@ -203,15 +218,15 @@ describe('User setting reducer tests', () => {
         checker.visibleColumns = {1: true};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(false, List<number>([1])));
+        state = userSettingReducer(state, UserSettingActions.createToggleVisibility(false, List<number>([1])));
         checker.visibleColumns = {1: false};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(true, List<number>([1])));
+        state = userSettingReducer(state, UserSettingActions.createToggleVisibility(true, List<number>([1])));
         checker.visibleColumns = {1: true};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(true, List<number>([2])));
+        state = userSettingReducer(state, UserSettingActions.createToggleVisibility(true, List<number>([2])));
         checker.visibleColumns = {1: true, 2: true};
         checker.check(state);
       });
@@ -223,8 +238,7 @@ describe('User setting reducer tests', () => {
       const categoryStates: List<number> = List<number>([1, 2, 3]);
       it ('No visiblities', () => {
         const qs: Dictionary<string> = {
-          board: 'TEST',
-          project: 'P1'
+          board: 'TEST'
         };
         let state: UserSettingState = userSettingReducer(
           initialUserSettingState,
@@ -234,20 +248,20 @@ describe('User setting reducer tests', () => {
         checker.check(state);
 
         // Toggle all of them
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(false, categoryStates));
+        state = userSettingReducer(state, UserSettingActions.createToggleVisibility(false, categoryStates));
         checker.visibleColumns = {1: false, 2: false, 3: false};
         checker.check(state);
 
         // Set one to true, and then when toggling the header all should be false again
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(true, List<number>([1])));
+        state = userSettingReducer(state, UserSettingActions.createToggleVisibility(true, List<number>([1])));
         checker.visibleColumns = {1: true, 2: false, 3: false};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(false, categoryStates));
+        state = userSettingReducer(state, UserSettingActions.createToggleVisibility(false, categoryStates));
         checker.visibleColumns = {1: false, 2: false, 3: false};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(true, categoryStates));
+        state = userSettingReducer(state, UserSettingActions.createToggleVisibility(true, categoryStates));
         checker.visibleColumns = {1: true, 2: true, 3: true};
         checker.check(state);
       });
@@ -255,7 +269,6 @@ describe('User setting reducer tests', () => {
       it ('Hidden', () => {
         const qs: Dictionary<string> = {
           board: 'TEST',
-          project: 'P1',
           hidden: '1'
         };
         let state: UserSettingState = userSettingReducer(
@@ -266,23 +279,23 @@ describe('User setting reducer tests', () => {
         checker.visibleColumns = {1: false};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(false, List<number>([3])));
+        state = userSettingReducer(state, UserSettingActions.createToggleVisibility(false, List<number>([3])));
         checker.visibleColumns = {1: false, 3: false};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(false, categoryStates));
+        state = userSettingReducer(state, UserSettingActions.createToggleVisibility(false, categoryStates));
         checker.visibleColumns = {1: false, 2: false, 3: false};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(true, List<number>([3])));
+        state = userSettingReducer(state, UserSettingActions.createToggleVisibility(true, List<number>([3])));
         checker.visibleColumns = {1: false, 2: false, 3: true};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(false, categoryStates));
+        state = userSettingReducer(state, UserSettingActions.createToggleVisibility(false, categoryStates));
         checker.visibleColumns = {1: false, 2: false, 3: false};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(true, categoryStates));
+        state = userSettingReducer(state, UserSettingActions.createToggleVisibility(true, categoryStates));
         checker.visibleColumns = {1: true, 2: true, 3: true};
         checker.check(state);
       });
@@ -291,7 +304,6 @@ describe('User setting reducer tests', () => {
       it ('Visible', () => {
         const qs: Dictionary<string> = {
           board: 'TEST',
-          project: 'P1',
           visible: '1'
         };
         let state: UserSettingState = userSettingReducer(
@@ -303,28 +315,132 @@ describe('User setting reducer tests', () => {
         checker.defaultColumnVisibility = false;
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(true, List<number>([3])));
+        state = userSettingReducer(state, UserSettingActions.createToggleVisibility(true, List<number>([3])));
         checker.visibleColumns = {1: true, 3: true};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(false, categoryStates));
+        state = userSettingReducer(state, UserSettingActions.createToggleVisibility(false, categoryStates));
         checker.visibleColumns = {1: false, 2: false, 3: false};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(true, List<number>([3])));
+        state = userSettingReducer(state, UserSettingActions.createToggleVisibility(true, List<number>([3])));
         checker.visibleColumns = {1: false, 2: false, 3: true};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(false, categoryStates));
+        state = userSettingReducer(state, UserSettingActions.createToggleVisibility(false, categoryStates));
         checker.visibleColumns = {1: false, 2: false, 3: false};
         checker.check(state);
 
-        state = userSettingReducer(state, UserSettingActions.toggleVisibility(true, categoryStates));
+        state = userSettingReducer(state, UserSettingActions.createToggleVisibility(true, categoryStates));
         checker.visibleColumns = {1: true, 2: true, 3: true};
         checker.check(state);
-      })
+      });
     });
   });
+
+  describe('Toggle collapsed swimlane', () => {
+    it('Default visibilities', () => {
+      const qs: Dictionary<string> = {
+        board: 'TEST',
+        swimlane: 'project'
+      };
+      let state: UserSettingState = userSettingReducer(
+        initialUserSettingState,
+        UserSettingActions.createInitialiseFromQueryString(qs));
+      const checker: SettingChecker = new SettingChecker();
+      checker.boardCode = 'TEST';
+      checker.swimlane = 'project';
+      checker.check(state);
+
+      state = userSettingReducer(state, UserSettingActions.createToggleCollapsedSwimlane('a'));
+      checker.collapsedSwimlanes = {a: true};
+      checker.check(state);
+
+      state = userSettingReducer(state, UserSettingActions.createToggleCollapsedSwimlane('a'));
+      checker.collapsedSwimlanes = {a: false};
+      checker.check(state);
+
+      state = userSettingReducer(state, UserSettingActions.createToggleCollapsedSwimlane('b'));
+      checker.collapsedSwimlanes = {a: false, b: true};
+      checker.check(state);
+
+      // Check that the collapsed info is reset to its defaults when we change the swimlane
+      state = userSettingReducer(state, UserSettingActions.createUpdateSwimlane(null));
+      checker.swimlane = null;
+      checker.collapsedSwimlanes = {};
+      checker.check(state);
+    });
+
+    it('Hidden swimlanes', () => {
+      const qs: Dictionary<string> = {
+        board: 'TEST',
+        swimlane: 'project',
+        'hidden-sl': 'a'
+      };
+      let state: UserSettingState = userSettingReducer(
+        initialUserSettingState,
+        UserSettingActions.createInitialiseFromQueryString(qs));
+      const checker: SettingChecker = new SettingChecker();
+      checker.boardCode = 'TEST';
+      checker.swimlane = 'project';
+      checker.collapsedSwimlanes = {a: true};
+      checker.check(state);
+
+      state = userSettingReducer(state, UserSettingActions.createToggleCollapsedSwimlane('a'));
+      checker.collapsedSwimlanes = {a: false};
+      checker.check(state);
+
+      state = userSettingReducer(state, UserSettingActions.createToggleCollapsedSwimlane('a'));
+      checker.collapsedSwimlanes = {a: true};
+      checker.check(state);
+
+      state = userSettingReducer(state, UserSettingActions.createToggleCollapsedSwimlane('b'));
+      checker.collapsedSwimlanes = {a: true, b: true};
+      checker.check(state);
+
+      // Check that the collapsed info is reset to its defaults when we change the swimlane
+      state = userSettingReducer(state, UserSettingActions.createUpdateSwimlane('assignee'));
+      checker.swimlane = 'assignee';
+      checker.collapsedSwimlanes = {};
+      checker.check(state);
+    });
+    it('Visible swimlanes', () => {
+      const qs: Dictionary<string> = {
+        board: 'TEST',
+        swimlane: 'project',
+        'visible-sl': 'a'
+      };
+      let state: UserSettingState = userSettingReducer(
+        initialUserSettingState,
+        UserSettingActions.createInitialiseFromQueryString(qs));
+      const checker: SettingChecker = new SettingChecker();
+      checker.boardCode = 'TEST';
+      checker.swimlane = 'project';
+      checker.defaultSwimlaneCollapsed = true;
+      checker.collapsedSwimlanes = {a: false};
+      checker.check(state);
+
+      state = userSettingReducer(state, UserSettingActions.createToggleCollapsedSwimlane('a'));
+      checker.collapsedSwimlanes = {a: true};
+      checker.check(state);
+
+      state = userSettingReducer(state, UserSettingActions.createToggleCollapsedSwimlane('a'));
+      checker.collapsedSwimlanes = {a: false};
+      checker.check(state);
+
+      state = userSettingReducer(state, UserSettingActions.createToggleCollapsedSwimlane('b'));
+      checker.collapsedSwimlanes = {a: false, b: false};
+      checker.check(state);
+
+      // Check that the collapsed info is reset to its defaults when we change the swimlane
+      state = userSettingReducer(state, UserSettingActions.createUpdateSwimlane(null));
+      checker.swimlane = null;
+      checker.collapsedSwimlanes = {};
+      checker.defaultSwimlaneCollapsed = false;
+      checker.check(state);
+    });
+  });
+
 });
 
 class SettingChecker {
@@ -335,6 +451,8 @@ class SettingChecker {
   defaultColumnVisibility = true;
   visibleColumns: any;
   showEmptySwimlane = false;
+  defaultSwimlaneCollapsed = false;
+  collapsedSwimlanes: any;
 
   constructor() {
     for (const key of Object.keys(this.filterChecker)) {
@@ -344,7 +462,6 @@ class SettingChecker {
         this.filterChecker[key] = [];
       }
     }
-    this.filterChecker.project = ['P1'];
   }
 
   check(state: UserSettingState) {
@@ -362,6 +479,12 @@ class SettingChecker {
       expect(state.columnVisibilities.size).toBe(0);
     } else {
       expect(state.columnVisibilities.toObject()).toEqual(this.visibleColumns);
+    }
+    expect(state.defaultCollapsedSwimlane).toBe(this.defaultSwimlaneCollapsed);
+    if (!this.collapsedSwimlanes) {
+      expect(state.collapsedSwimlanes.size).toBe(0);
+    } else {
+      expect(state.collapsedSwimlanes.toObject()).toEqual(this.collapsedSwimlanes);
     }
   }
 }

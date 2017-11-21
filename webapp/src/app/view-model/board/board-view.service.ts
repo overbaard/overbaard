@@ -76,6 +76,8 @@ export class BoardViewModelHandler {
           changeType = ChangeType.CHANGE_COLUMN_VISIBILITY;
         } else if (userSettingState.swimlaneShowEmpty !== this._lastUserSettingState.swimlaneShowEmpty) {
           changeType = ChangeType.TOGGLE_SWIMLANE_SHOW_EMPTY;
+        } else if (userSettingState.collapsedSwimlanes !== this._lastUserSettingState.collapsedSwimlanes) {
+          changeType = ChangeType.TOGGLE_SWIMLANE_COLLAPSED;
         }
       }
 
@@ -593,6 +595,12 @@ class IssueTableBuilder {
         const oldSwimlane = this._oldIssueTableState.swimlaneInfo;
         return BoardViewModelUtil.createSwimlaneInfoView(this._currentUserSettingState.swimlaneShowEmpty, oldSwimlane.swimlanes);
       }
+      case ChangeType.TOGGLE_SWIMLANE_COLLAPSED: {
+        const oldSwimlane = this._oldIssueTableState.swimlaneInfo;
+        swimlaneBuilder = SwimlaneInfoBuilder.create(this._currentBoardState, this._currentUserSettingState, oldSwimlane);
+        // The builder does the updating for us
+        return swimlaneBuilder.updateCollapsed();
+      }
     }
 
     this.populateSwimlanes(swimlaneBuilder, issues, table);
@@ -621,54 +629,77 @@ class SwimlaneInfoBuilder {
                 userSettingState: UserSettingState, existingInfo: SwimlaneInfo): SwimlaneInfoBuilder {
     const states: number = boardState.headers.states.size;
     let builderMap: OrderedMap<string, SwimlaneDataBuilder> = OrderedMap<string, SwimlaneDataBuilder>().asMutable();
-    let builderNone: SwimlaneDataBuilder = new SwimlaneDataBuilder(NONE_FILTER, 'None', states, existingInfo);
+    let builderNone: SwimlaneDataBuilder =
+      new SwimlaneDataBuilder(NONE_FILTER, 'None', states, collapsed(userSettingState, NONE_FILTER),  existingInfo);
     let issueMatcher:
       (issue: BoardIssueView, dataBuilders: Map<string, SwimlaneDataBuilder>) => SwimlaneDataBuilder[];
     switch (userSettingState.swimlane) {
       case PROJECT_ATTRIBUTES.key:
         boardState.projects.boardProjects.forEach(
-          p => builderMap.set(p.key, new SwimlaneDataBuilder(p.key, p.key, states, existingInfo)));
+          p => {
+            builderMap.set(p.key,
+              new SwimlaneDataBuilder(p.key, p.key, states, collapsed(userSettingState, p.key), existingInfo))});
         issueMatcher = ((issue, dataBuilders) => [dataBuilders.get(issue.projectCode)]);
         builderNone = null;
         break;
       case ISSUE_TYPE_ATTRIBUTES.key:
         boardState.issueTypes.types.forEach(
-          t => builderMap.set(t.name, new SwimlaneDataBuilder(t.name, t.name, states, existingInfo)));
+          t => {
+            builderMap.set(
+              t.name, new SwimlaneDataBuilder(t.name, t.name, states, collapsed(userSettingState, t.name), existingInfo))
+          });
         issueMatcher = ((issue, dataBuilders) => [dataBuilders.get(issue.type.name)]);
         builderNone = null;
         break;
       case PRIORITY_ATTRIBUTES.key:
         boardState.priorities.priorities.forEach(
-          p => builderMap.set(p.name, new SwimlaneDataBuilder(p.name, p.name, states, existingInfo)));
+          p => {
+            builderMap.set(p.name,
+              new SwimlaneDataBuilder(p.name, p.name, states, collapsed(userSettingState, p.name), existingInfo))
+          });
         issueMatcher = ((issue, dataBuilders) => [dataBuilders.get(issue.priority.name)]);
         builderNone = null;
         break;
       case ASSIGNEE_ATTRIBUTES.key:
         boardState.assignees.assignees.forEach(
-          a => builderMap.set(a.key, new SwimlaneDataBuilder(a.key, a.name, states, existingInfo)));
+          a => {
+            builderMap.set(a.key,
+              new SwimlaneDataBuilder(a.key, a.name, states, collapsed(userSettingState, a.key), existingInfo))
+          });
         issueMatcher = ((issue, dataBuilders) =>
           [dataBuilders.get(issue.assignee === NO_ASSIGNEE ? NONE_FILTER : issue.assignee.key)]);
         break;
       case COMPONENT_ATTRIBUTES.key:
         boardState.components.components.forEach(
-          c => builderMap.set(c, new SwimlaneDataBuilder(c, c, states, existingInfo)));
+          c => {
+            builderMap.set(c, new SwimlaneDataBuilder(c, c, states, collapsed(userSettingState, c), existingInfo))
+          });
         issueMatcher = ((issue, dataBuilders) => this.multiStringMatcher(issue.components, dataBuilders));
         break;
       case LABEL_ATTRIBUTES.key:
         boardState.labels.labels.forEach(
-          l => builderMap.set(l, new SwimlaneDataBuilder(l, l, states, existingInfo)));
+          l => {
+            builderMap.set(l,
+              new SwimlaneDataBuilder(l, l, states, collapsed(userSettingState, l), existingInfo))
+          });
         issueMatcher = ((issue, dataBuilders) => this.multiStringMatcher(issue.labels, dataBuilders));
         break;
       case FIX_VERSION_ATTRIBUTES.key:
         boardState.fixVersions.versions.forEach(
-          f => builderMap.set(f, new SwimlaneDataBuilder(f, f, states, existingInfo)));
+          f => {
+            builderMap.set(f,
+              new SwimlaneDataBuilder(f, f, states, collapsed(userSettingState, f), existingInfo))
+          });
         issueMatcher = ((issue, dataBuilders) => this.multiStringMatcher(issue.fixVersions, dataBuilders));
         break;
       default: {
         const customFields: OrderedMap<string, CustomField> = boardState.customFields.fields.get(userSettingState.swimlane);
         if (customFields) {
           customFields.forEach(
-            f => builderMap.set(f.key, new SwimlaneDataBuilder(f.key, f.value, states, existingInfo)));
+            f => {
+              builderMap.set(f.key,
+                new SwimlaneDataBuilder(f.key, f.value, states, collapsed(userSettingState, f.key), existingInfo))
+            });
           issueMatcher = ((issue, dataBuilders) => {
             const issueField: CustomField = issue.customFields.get(userSettingState.swimlane);
             return [dataBuilders.get(issueField ? issueField.key : NONE_FILTER)];
@@ -787,6 +818,21 @@ class SwimlaneInfoBuilder {
     }
     return BoardViewModelUtil.createSwimlaneInfoView(this._userSettingState.swimlaneShowEmpty, swimlanes.asImmutable());
   }
+
+  updateCollapsed(): SwimlaneInfo {
+    const updatedSwimlanes: Map<string, SwimlaneData> = this._existing.swimlanes.withMutations(mutable => {
+      this._dataBuilders.forEach((sdb, k) => {
+        const existing = mutable.get(k);
+        const data: SwimlaneData = sdb.updateCollapsed();
+        if (existing !== data) {
+          mutable.set(k, data);
+        }
+      });
+    });
+    return BoardViewModelUtil.updateSwimlaneInfo(this._existing, mutable => {
+      mutable.swimlanes = updatedSwimlanes;
+    });
+  }
 }
 
 class SwimlaneDataBuilder {
@@ -796,7 +842,8 @@ class SwimlaneDataBuilder {
   filterVisible = true;
 
 
-  constructor(private readonly _key: string, private readonly _display: string, states: number, exisitingInfo: SwimlaneInfo) {
+  constructor(private readonly _key: string, private readonly _display: string,
+              states: number, private _collapsed: boolean, exisitingInfo: SwimlaneInfo) {
     this._existing = exisitingInfo ? exisitingInfo.swimlanes.get(_key) : null;
     this._tableBuilder = new TableBuilder(states, this._existing ? this._existing.table : null);
   }
@@ -810,10 +857,6 @@ class SwimlaneDataBuilder {
 
   get table() {
     return this._tableBuilder.getTable();
-  }
-
-  get visibleIssuesCount(): number {
-    return this._visibleIssuesCount;
   }
 
   get key(): string {
@@ -837,8 +880,15 @@ class SwimlaneDataBuilder {
       this._visibleIssuesCount !== this._existing.visibleIssues;
   }
 
+  private isChangedCollapsed(): boolean {
+    if (!this._existing) {
+      return true;
+    }
+    return this._existing.collapsed !== this._collapsed;
+  }
+
   isChanged(): boolean {
-    return this.isChangedTable() || this.isChangedFilterVisibility();
+    return this.isChangedTable() || this.isChangedFilterVisibility() || this.isChangedCollapsed();
   }
 
   build(): SwimlaneData {
@@ -849,7 +899,19 @@ class SwimlaneDataBuilder {
       }
     }
     return BoardViewModelUtil.createSwimlaneDataView(
-      this._key, this._display, this._tableBuilder.getTable(), this._visibleIssuesCount, this.filterVisible);
+      this._key, this._display, this._tableBuilder.getTable(), this._visibleIssuesCount, this.filterVisible, this._collapsed);
+  }
+
+  updateCollapsed() {
+    // This code path is only used when the swimlanes have been populated already. So if the visibility was changed we need
+    // to basically update the old one
+    if (!this.isChangedCollapsed()) {
+      return this._existing;
+    }
+    // _existing can't be null here
+    return BoardViewModelUtil.updateSwimlaneData(this._existing, mutable => {
+      mutable.collapsed = this._collapsed;
+    });
   }
 }
 
@@ -970,5 +1032,12 @@ enum ChangeType {
   CHANGE_SWIMLANE,
   CHANGE_COLUMN_VISIBILITY,
   TOGGLE_BACKLOG,
-  TOGGLE_SWIMLANE_SHOW_EMPTY
+  TOGGLE_SWIMLANE_SHOW_EMPTY,
+  TOGGLE_SWIMLANE_COLLAPSED
 }
+
+function collapsed(userSettingState: UserSettingState, key: string): boolean {
+  return userSettingState.collapsedSwimlanes.get(key, userSettingState.defaultCollapsedSwimlane);
+}
+
+

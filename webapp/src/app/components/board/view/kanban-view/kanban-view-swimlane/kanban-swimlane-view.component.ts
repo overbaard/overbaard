@@ -17,6 +17,9 @@ export class KanbanSwimlaneViewComponent implements OnInit {
   @Output()
   scrollTableBodyX: EventEmitter<number> = new EventEmitter<number>();
 
+  @Output()
+  toggleCollapsedSwimlane: EventEmitter<string> = new EventEmitter<string>();
+
   private _lastLeftOffset = 0;
 
   constructor() {
@@ -32,5 +35,9 @@ export class KanbanSwimlaneViewComponent implements OnInit {
 
   get swimlaneInfo(): SwimlaneInfo {
     return this.board.issueTable.swimlaneInfo;
+  }
+
+  onToggleCollapsedSwimlane(key: string) {
+    this.toggleCollapsedSwimlane.emit(key);
   }
 }

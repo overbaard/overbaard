@@ -1,4 +1,7 @@
-import {ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
+import {
+  ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output,
+  SimpleChanges
+} from '@angular/core';
 import {SwimlaneData} from '../../../../../view-model/board/swimlane-data';
 import {BoardViewModel} from '../../../../../view-model/board/board-view';
 
@@ -19,8 +22,10 @@ export class KanbanSwimlaneEntryComponent implements OnInit, OnChanges {
   @Input()
   swimlane: SwimlaneData;
 
-  visible: boolean;
+  @Output()
+  toggleCollapsedSwimlane: EventEmitter<string> = new EventEmitter<string>();
 
+  visible: boolean;
 
   constructor() {
   }
@@ -40,5 +45,9 @@ export class KanbanSwimlaneEntryComponent implements OnInit, OnChanges {
 // trackBy is a hint to angular to be able to keep (i.e. don't destroy and recreate) as many components as possible
   columnTrackByFn(index: number, key: string) {
     return index;
+  }
+
+  onToggleCollapsedSwimlane(event: MouseEvent, key: string) {
+    this.toggleCollapsedSwimlane.emit(key);
   }
 }

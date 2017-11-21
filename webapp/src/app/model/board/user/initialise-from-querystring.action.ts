@@ -73,4 +73,34 @@ export class InitialiseFromQueryStringAction implements Action {
       }
     });
   }
+
+  getSwimlaneCollapsedDefault(): boolean {
+    if (this.payload['visible-sl']) {
+      return true;
+    } else if (this.payload['hidden-sl']) {
+      return false;
+    } else {
+      return false;
+    }
+  }
+
+  parseCollapsedSwimlanes(): Map<string, boolean> {
+    let collapsed: boolean;
+    let valueString: string;
+    if (this.payload['visible-sl']) {
+        valueString = this.payload['visible-sl'];
+        collapsed = false;
+    } else if (this.payload['hidden-sl']) {
+      valueString = this.payload['hidden-sl'];
+      collapsed = true;
+    }
+    return Map<string, boolean>().withMutations(mutable => {
+      if (valueString) {
+        const values: string[] = valueString.split(',');
+        for (const value of values) {
+          mutable.set(value, collapsed);
+        }
+      }
+    });
+  }
 }

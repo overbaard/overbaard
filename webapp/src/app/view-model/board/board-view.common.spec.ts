@@ -311,18 +311,22 @@ export class UserSettingUpdater {
       const backlogHeader: BoardHeader = boardView.headers.headersList.get(0);
           expect(backlogHeader.backlog).toBe(true);
 
-      return this.emitState(UserSettingActions.toggleBacklog(backlogHeader));
+      return this.emitState(UserSettingActions.createToggleBacklog(backlogHeader));
     });
 
     return this._mainUtil;
   }
 
   updateVisibility(newValue: boolean, ...stateIndices: number[]): BoardViewObservableUtil {
-    return this.emitState(UserSettingActions.toggleVisibility(newValue, List<number>(stateIndices)));
+    return this.emitState(UserSettingActions.createToggleVisibility(newValue, List<number>(stateIndices)));
   }
 
   toggleShowEmptySwimlanes(): BoardViewObservableUtil {
     return this.emitState(UserSettingActions.createToggleShowEmptySwimlanes());
+  }
+
+  toggleCollapsedSwimlane(key: string): BoardViewObservableUtil {
+    return this.emitState(UserSettingActions.createToggleCollapsedSwimlane(key));
   }
 
   private emitState(action: Action): BoardViewObservableUtil {

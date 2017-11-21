@@ -138,7 +138,7 @@ export class BoardComponent implements OnInit, OnDestroy {
   }
 
   onToggleBacklog(backlogHeader: BoardHeader) {
-    this._store.dispatch(UserSettingActions.toggleBacklog(backlogHeader));
+    this._store.dispatch(UserSettingActions.createToggleBacklog(backlogHeader));
   }
 
   onToggleVisibility(header: BoardHeader) {
@@ -156,7 +156,12 @@ export class BoardComponent implements OnInit, OnDestroy {
     } else {
       newValue = !header.visible;
     }
-    this._store.dispatch(UserSettingActions.toggleVisibility(newValue, header.stateIndices));
+    this._store.dispatch(UserSettingActions.createToggleVisibility(newValue, header.stateIndices));
   }
+
+  onToggleCollapsedSwimlane(key: string) {
+    this._store.dispatch(UserSettingActions.createToggleCollapsedSwimlane(key));
+  }
+
 }
 

@@ -10,8 +10,10 @@ const DEFAULT_STATE: UserSettingState = {
   swimlaneShowEmpty: false,
   filters: initialBoardFilterState,
   defaultColumnVisibility: true,
-  columnVisibilities: Map<number, boolean>()
-}
+  columnVisibilities: Map<number, boolean>(),
+  defaultCollapsedSwimlane: false,
+  collapsedSwimlanes: Map<string, boolean>()
+};
 
 interface UserSettingStateRecord extends TypedRecord<UserSettingStateRecord>, UserSettingState {
 }

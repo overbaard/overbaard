@@ -1,6 +1,12 @@
 <div *ngIf="visible">
-  <div class="swimlane-header">{{swimlane.key}}</div>
-  <div class="swimlane-content">
+  <div
+    class="swimlane-header"
+    (click)="onToggleCollapsedSwimlane($event, swimlane.key)"
+  >{{swimlane.display}}</div>
+  <div
+    class="swimlane-content"
+    *ngIf="!swimlane.collapsed"
+  >
     <app-kanban-view-column-group
       *ngFor="let header of board.headers.headersList ; trackBy: columnTrackByFn"
       [header]="header"

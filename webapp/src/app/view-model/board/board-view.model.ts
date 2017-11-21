@@ -48,7 +48,8 @@ const DEFAULT_SWIMLANE_DATA: SwimlaneData = {
   display: null,
   table: List<List<string>>(),
   visibleIssues: 0,
-  filterVisible: true
+  filterVisible: true,
+  collapsed: false
 };
 
 interface BoardViewModelRecord extends TypedRecord<BoardViewModelRecord>, BoardViewModel {
@@ -100,6 +101,18 @@ export class BoardViewModelUtil {
     });
   }
 
+  static updateSwimlaneInfo(swimlaneInfo: SwimlaneInfo, mutate: (swimlaneInfo: SwimlaneInfo) => any): SwimlaneInfo {
+    return (<SwimlaneInfoRecord>swimlaneInfo).withMutations(mutable => {
+      return mutate(mutable);
+    })
+  }
+
+  static updateSwimlaneData(swimlaneData: SwimlaneData, mutate: (swimlaneData: SwimlaneData) => any): SwimlaneData {
+    return (<SwimlaneDataRecord>swimlaneData).withMutations(mutable => {
+      return mutate(mutable);
+    })
+  }
+
   static createBoardHeaders(headers: List<BoardHeader>) {
     return BOARD_HEADERS_FACTORY({
       headersList: headers
@@ -129,13 +142,15 @@ export class BoardViewModelUtil {
     display: string,
     table: List<List<string>>,
     visibleIssues: number,
-    filterVisible: boolean): SwimlaneData {
+    filterVisible: boolean,
+    collapsed: boolean): SwimlaneData {
     const state: SwimlaneData = {
       key: key,
       display: display,
       table: table,
       visibleIssues: visibleIssues,
-      filterVisible: filterVisible
+      filterVisible: filterVisible,
+      collapsed: collapsed
     }
     return SWIMLANE_DATA_STATE_FACTORY(state);
   }
