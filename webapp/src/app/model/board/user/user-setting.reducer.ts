@@ -12,7 +12,6 @@ import {UserSettingState} from './user-setting';
 
 const CLEAR_SETTINGS = 'CLEAR_SETTINGS';
 
-const INITIALIZE_STATE_VISIBILITIES = 'INITIALIZE_STATE_VISIBILITIES';
 const UPDATE_SWIMLANE = 'UPDATE_SWIMLANE';
 const TOGGLE_COLUMN_VISIBILITY = 'TOGGLE_COLUMN_VISIBILITY';
 const TOGGLE_BACKLOG = 'TOGGLE_BACKLOG';
@@ -41,12 +40,6 @@ class ToggleBacklogAction implements Action {
   }
 }
 
-class InitialiseStateVisibilitiesAction implements Action {
-  readonly type = INITIALIZE_STATE_VISIBILITIES;
-  constructor(readonly payload: InitialiseStatesPayload) {
-  }
-}
-
 class ToggleShowEmptySwimlanesAction implements Action {
   readonly type = TOGGLE_SHOW_EMPTY_SWIMLANES;
 
@@ -59,10 +52,6 @@ export class UserSettingActions {
 
   static createInitialiseFromQueryString(queryParams: Dictionary<string>): Action {
     return new InitialiseFromQueryStringAction(queryParams);
-  }
-
-  static createInitialiseStates(numStates: number, backlog: number): Action {
-    return new InitialiseStateVisibilitiesAction({numStates: numStates, backlog: backlog});
   }
 
   static createUpdateSwimlane(swimlane: string): Action {
@@ -97,29 +86,6 @@ export function userSettingReducer(state: UserSettingState = initialUserSettingS
         mutable.defaultColumnVisibility = initAction.getVisibleColumnDefault();
         mutable.columnVisibilities = initAction.parseVisibleColumns();
       });
-    }
-    case INITIALIZE_STATE_VISIBILITIES: {
-      const initAction: InitialiseStateVisibilitiesAction = <InitialiseStateVisibilitiesAction>action;
-      return UserSettingUtil.updateUserSettingState(state, settingState => {
-        settingState.columnVisibilities = settingState.columnVisibilities.withMutations(visibilities => {
-          for (let i = 0 ; i < initAction.payload.numStates ; i++) {
-            const index: number = Number(i);
-            if (!visibilities.has(index)) {
-              visibilities.set(index, settingState.defaultColumnVisibility);
-            }
-          }
-          for (let i = 0 ; i < initAction.payload.backlog ; i++) {
-            if (!settingState.showBacklog) {
-              visibilities.set(i, settingState.showBacklog);
-            } else {
-              if (!visibilities.has(i)) {
-                visibilities.set(i, settingState.defaultColumnVisibility);
-              }
-            }
-          }
-        });
-      });
-
     }
     case UPDATE_SWIMLANE: {
       return UserSettingUtil.updateUserSettingState(state, mutable => {

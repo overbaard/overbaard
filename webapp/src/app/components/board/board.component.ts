@@ -91,10 +91,6 @@ export class BoardComponent implements OnInit, OnDestroy {
       .takeUntil(gotAllData$)
       .subscribe(
         value => {
-          // Initialise the states in the user settings
-          const states: any[] = value['states'];
-          const backlog: number = value['backlog'] ? value['backlog'] : 0;
-          this._store.dispatch(UserSettingActions.createInitialiseStates(states.length, backlog))
           // Deserialize the board
           this._store.dispatch(BoardActions.createDeserializeBoard(value));
         }

@@ -175,7 +175,7 @@ class HeadersBuilder {
       const nonBlIndex = i - headerState.backlog;
       const categoryIndex: number = headerState.stateToCategoryMappings.get(nonBlIndex);
       if (categoryIndex < 0) {
-        const visible: boolean = this._currentUserSettingState.columnVisibilities.get(Number(i));
+        const visible: boolean = this.calculateVisibility(this._currentUserSettingState, i);
         headerList.push(StateHeader(headerState.states.get(i), false, i, headerState.wip.get(nonBlIndex), visible));
       } else {
         let visibleCategory = false;
@@ -184,7 +184,7 @@ class HeadersBuilder {
           if (headerState.stateToCategoryMappings.get(j - headerState.backlog) !== categoryIndex) {
             break;
           }
-          const visible: boolean = this._currentUserSettingState.columnVisibilities.get(Number(j));
+          const visible: boolean = this.calculateVisibility(this._currentUserSettingState, j);
           visibleCategory = visibleCategory || visible;
           stateList.push(StateHeader(headerState.states.get(j), false, j, headerState.wip.get(j - headerState.backlog), visible));
         }
@@ -207,7 +207,7 @@ class HeadersBuilder {
 
     const updatedStateValues: Map<number, boolean> =
       this._currentUserSettingState.columnVisibilities
-        .filter((v, k) => {return this._lastUserSettingState.columnVisibilities.get(k) !== v}).toMap();
+        .filter((v, k) => {return this.calculateVisibility(this._lastUserSettingState, k) !== v}).toMap();
     const updatedStates: Map<number, BoardHeader> = Map<number, BoardHeader>().asMutable();
     updatedStateValues.forEach((v, k) => {
       const header: BoardHeader = BoardViewModelUtil.updateBoardHeader(statesList.get(k), mutable => {
@@ -318,14 +318,17 @@ class HeadersBuilder {
   }
 
   private createBacklogHeader(): BoardHeader {
+    const showBacklog: boolean = this._currentUserSettingState.showBacklog;
     const headerState: HeaderState = this._currentHeaderState;
     const list: List<BoardHeader> = List<BoardHeader>().asMutable();
     for (let i = 0 ; i < headerState.backlog ; i++) {
       const name: string = headerState.states.get(i);
-      const visible: boolean = this._currentUserSettingState.columnVisibilities.get(Number(i));
+      // If showBacklog is false, the state is not shown
+      const defaultVisibility = showBacklog ? this._currentUserSettingState.defaultColumnVisibility : false;
+      const visible: boolean =
+        this._currentUserSettingState.columnVisibilities.get(i, defaultVisibility);
       list.push(StateHeader(name, true, i, 0, visible));
     }
-    const showBacklog = this._currentUserSettingState.showBacklog;
     return CategoryHeader('Backlog', true, showBacklog, list.asImmutable());
   }
 
@@ -346,6 +349,9 @@ class HeadersBuilder {
     return statesList.asImmutable();
   }
 
+  private calculateVisibility(userSettingState: UserSettingState, index: number): boolean {
+    return userSettingState.columnVisibilities.get(index, userSettingState.defaultColumnVisibility);
+  }
 
   build(): BoardHeaders {
     return this._headers;

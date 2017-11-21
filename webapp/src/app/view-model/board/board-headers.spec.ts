@@ -873,7 +873,7 @@ describe('Board headers tests', () => {
           });
       });
 
-      it('Backlog', () => {
+      it('Toggle backlog', () => {
         // DON'T TOGGLE all of them and assume that the backlog will be toggled
         // - that is handled by the header group component
         util.getUserSettingUpdater().updateVisibility(true, 1)
@@ -1083,7 +1083,7 @@ describe('Board headers tests', () => {
           });
       });
 
-      it('Backlog', () => {
+      it('Toggle backlog', () => {
         // Toggle the invisible state back to true
         // DON'T TOGGLE all of them and assume that the backlog will be toggled
         // - that is handled by the header group component

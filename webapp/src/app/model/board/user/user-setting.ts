@@ -8,13 +8,11 @@ export interface UserSettingState {
   swimlaneShowEmpty: boolean;
   filters: BoardFilterState;
   /**
-   * Only used on initialisation of the board
+   * The visibility value to use for column, if its index does not show up in columnVisibilities
    */
   defaultColumnVisibility: boolean;
   /**
-   Until the board data is got, this will only contain values for column visibilities explicitly set.
-   A non-existent entry should count as {defaultColumnVisibility}.
-   Once the board data is got, all values are initialised
+   * The column visibilities if any, initially set up by the query parameters
    */
   columnVisibilities: Map<number, boolean>;
 }

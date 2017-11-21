@@ -86,14 +86,7 @@ export class BoardViewObservableUtil {
     return new UserSettingUpdater(this);
   }
 
-  emitBoardState(boardState: BoardState, first?: boolean): BoardViewObservableUtil {
-    if (first) {
-      const headers: HeaderState = boardState.headers;
-      this._userSettingState =
-        userSettingReducer(this._userSettingState,
-          UserSettingActions.createInitialiseStates(headers.states.size, headers.backlog));
-      this._userSettingSubject$.next(this._userSettingState);
-    }
+  emitBoardState(boardState: BoardState): BoardViewObservableUtil {
     this._boardState = boardState;
     this._boardStateSubject$.next(this._boardState);
     return this;
@@ -167,7 +160,7 @@ export class BoardStateInitializer {
       mutable.ranks = this.createRankState();
       mutable.issues = this.createIssueState(getDeserializeIssueLookupParams(headerState, projectState));
     });
-    mainUtil.emitBoardState(this._boardState, true);
+    mainUtil.emitBoardState(this._boardState);
   }
 
   private createProjectState(): ProjectState {
