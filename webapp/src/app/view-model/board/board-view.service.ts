@@ -32,6 +32,7 @@ import 'rxjs/add/observable/combineLatest';
 import {UserSettingState} from '../../model/board/user/user-setting';
 import {boardSelector} from '../../model/board/data/board.reducer';
 import {userSettingSelector} from '../../model/board/user/user-setting.reducer';
+import {RankViewEntry} from './rank-view-entry';
 
 @Injectable()
 export class BoardViewModelService {
@@ -422,6 +423,10 @@ class IssueTableBuilder {
 
   private _visibleIssueCounts: List<number>;
 
+  // Initialised in createTableAndRankView
+  private _rankView: List<RankViewEntry>;
+  private _table: List<List<string>>;
+
   constructor(
     private readonly _changeType: ChangeType,
     private readonly _oldIssueTableState: IssueTable,
@@ -436,17 +441,19 @@ class IssueTableBuilder {
   build (): IssueTable {
     let issues: Map<string, BoardIssueView> = this.populateIssues();
     issues = this.filterIssues(issues);
-    const table: List<List<string>> = this.createTable(issues);
-    this._visibleIssueCounts = this.calculateVisibleIssueCounts(issues, table);
-    const swimlaneInfo: SwimlaneInfo = this.calculateSwimlane(issues, table);
+
+    this.createTableAndRankView(issues);
+
+    this._visibleIssueCounts = this.calculateVisibleIssueCounts(issues, this._table);
+    const swimlaneInfo: SwimlaneInfo = this.calculateSwimlane(issues, this._table);
     if (issues === this._oldIssueTableState.issues &&
-      table === this._oldIssueTableState.table &&
+      this._table === this._oldIssueTableState.table &&
+      this._rankView === this._oldIssueTableState.rankView &&
       swimlaneInfo === this._oldIssueTableState.swimlaneInfo) {
       return this._oldIssueTableState;
     }
 
-
-    return BoardViewModelUtil.createIssueTable(issues, table, swimlaneInfo);
+    return BoardViewModelUtil.createIssueTable(issues, this._rankView, this._table, swimlaneInfo);
   }
 
   private populateIssues(): Map<string, BoardIssueView> {
@@ -524,28 +531,35 @@ class IssueTableBuilder {
     return issues;
   }
 
-  private createTable(issues: Map<string, BoardIssueView>): List<List<string>> {
+  private createTableAndRankView(issues: Map<string, BoardIssueView>) {
     switch (this._changeType) {
       case ChangeType.APPLY_FILTERS:
       case ChangeType.CHANGE_SWIMLANE:
       case ChangeType.CHANGE_COLUMN_VISIBILITY:
-        return this._oldIssueTableState.table;
+        this._table = this._oldIssueTableState.table;
+        this._rankView = this._oldIssueTableState.rankView;
+        return;
     }
 
     const oldTable: List<List<string>> = this._changeType === ChangeType.LOAD_BOARD ? null : this._oldIssueTableState.table;
+    const oldRank: List<RankViewEntry> = this._changeType === ChangeType.LOAD_BOARD ? null : this._oldIssueTableState.rankView;
     const tableBuilder: TableBuilder = new TableBuilder(this._currentBoardState.headers.states.size, oldTable);
+    const rankViewBuilder: RankViewBuilder = new RankViewBuilder(oldRank);
 
-    this.addProjectIssues(tableBuilder, this._currentBoardState.projects.boardProjects.get(this._currentBoardState.projects.owner));
+    this.addProjectIssues(
+      tableBuilder,
+      rankViewBuilder,
+      this._currentBoardState.projects.boardProjects.get(this._currentBoardState.projects.owner));
     this._currentBoardState.projects.boardProjects.forEach((project, key) => {
       if (key !== this._currentBoardState.projects.owner) {
-        this.addProjectIssues(tableBuilder, project);
+        this.addProjectIssues(tableBuilder, rankViewBuilder, project);
       }
     });
 
-    return tableBuilder.getTable();
+    this._table = tableBuilder.getTable();
   }
 
-  private addProjectIssues(tableBuilder: TableBuilder, project: BoardProject) {
+  private addProjectIssues(tableBuilder: TableBuilder, rankViewBuilder: RankViewBuilder, project: BoardProject) {
     const rankedKeysForProject: List<string> = this._currentBoardState.ranks.rankedIssueKeys.get(project.key);
     if (!rankedKeysForProject) {
       return;
@@ -556,6 +570,7 @@ class IssueTableBuilder {
       // find the index and add the issue
       const boardIndex: number = ownToBoardIndex[issue.ownState];
       tableBuilder.push(boardIndex, key);
+      rankViewBuilder.push(boardIndex, key);
     });
   }
 
@@ -1026,6 +1041,55 @@ class NewColumnBuilder implements ColumnBuilder {
     return this._current.asImmutable();
   }
 }
+
+class RankViewBuilder {
+  private readonly _current: List<RankViewEntry> = List<RankViewEntry>().asMutable();
+  private readonly _currentMap: Map<string, RankViewEntry>;
+  private _currentIndex = 0;
+  private _changed = false;
+
+  constructor(private readonly _existing: List<RankViewEntry>) {
+    if (!_existing) {
+      this._changed = true;
+      this._currentMap = Map<string, RankViewEntry>();
+    } else {
+      this._currentMap =
+        this._existing.reduce(
+          (map, entry) => map.set(entry.issueKey, entry), Map<string, RankViewEntry>());
+    }
+  }
+
+  push(boardIndex: number, key: string): RankViewBuilder {
+    let entry: RankViewEntry = null;
+    if (!this._changed) {
+      const existing: RankViewEntry = this._current.get(this._currentIndex);
+      if (existing && existing.issueKey === key && existing.boardIndex === boardIndex) {
+        entry = existing;
+        this._currentIndex++;
+      } else {
+        this._changed = true;
+      }
+    }
+    if (!entry) {
+      entry = this._currentMap.get(key);
+      if (!entry || entry.boardIndex !== boardIndex) {
+        entry = BoardViewModelUtil.createRankViewEntry(key, boardIndex);
+      }
+    }
+    this._current.push(entry);
+    return this;
+  }
+
+  getRankView(): List<RankViewEntry> {
+    if (!this._changed) {
+      if (this._current.size === this._existing.size) {
+        return this._existing;
+      }
+    }
+    return this._current.asImmutable();
+  }
+}
+
 
 enum ChangeType {
   LOAD_BOARD,

@@ -2,9 +2,11 @@ import {initialBoardFilterState} from './board-filter/board-filter.model';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {Map} from 'immutable';
 import {UserSettingState} from './user-setting';
+import {BoardViewMode} from './board-view-mode';
 
 const DEFAULT_STATE: UserSettingState = {
   boardCode: '',
+  viewMode: BoardViewMode.KANBAN,
   showBacklog: false,
   swimlane: undefined,
   swimlaneShowEmpty: false,

@@ -1,6 +1,6 @@
 <div (window:focus)="onFocus($event)" (window:blur)="onBlur($event)" (window:resize)="onResize($event)">
   <app-kanban-view
-    *ngIf="view === 'kbv'"
+    *ngIf="viewMode === 0"
     [board]="board$ | async"
     [windowWidth]="windowWidth"
     [windowHeight]="windowHeight"
@@ -10,7 +10,7 @@
   >
   </app-kanban-view>
   <app-rank-view
-    *ngIf="view === 'rv'"
+    *ngIf="viewMode === 1"
     [board]="board$ | async"
     [windowWidth]="windowWidth"
     [windowHeight]="windowHeight"

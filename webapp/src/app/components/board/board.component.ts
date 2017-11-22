@@ -18,6 +18,7 @@ import {BoardViewModelService} from '../../view-model/board/board-view.service';
 import {BoardHeader} from '../../view-model/board/board-header';
 import {BoardViewModel} from '../../view-model/board/board-view';
 import {UserSettingState} from '../../model/board/user/user-setting';
+import {BoardViewMode} from '../../model/board/user/board-view-mode';
 
 
 const VIEW_KANBAN = 'kbv';
@@ -34,7 +35,7 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   // TODO move these into the store?
   private boardCode: string;
-  view: string = VIEW_KANBAN;
+  viewMode: BoardViewMode = BoardViewMode.KANBAN;
   private _wasBacklogForced = false;
 
   board$: Observable<BoardViewModel>;
@@ -63,7 +64,7 @@ export class BoardComponent implements OnInit, OnDestroy {
 
     const view = queryParams['view'];
     if (view) {
-      this.view = view;
+      this.viewMode = BoardViewMode.RANK;
       if (view === VIEW_RANK) {
         this._wasBacklogForced = true;
       }

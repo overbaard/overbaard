@@ -7,6 +7,7 @@ import {BoardHeader} from './board-header';
 import {IssueTable} from './issue-table';
 import {BoardHeaders} from './board-headers';
 import {SwimlaneInfo} from './swimlane-info';
+import {RankViewEntry} from './rank-view-entry';
 
 
 const DEFAULT_BOARD_HEADERS: BoardHeaders = {
@@ -34,6 +35,7 @@ const DEFAULT_BOARD_HEADER: BoardHeader = {
 
 const DEFAULT_ISSUE_TABLE: IssueTable = {
   issues: Map<string, BoardIssueView>(),
+  rankView: List<RankViewEntry>(),
   table: List<List<string>>(),
   swimlaneInfo: null
 };
@@ -51,6 +53,11 @@ const DEFAULT_SWIMLANE_DATA: SwimlaneData = {
   filterVisible: true,
   collapsed: false
 };
+
+const DEFAULT_RANK_VIEW_ENTRY: RankViewEntry = {
+  issueKey: null,
+  boardIndex: 0
+}
 
 interface BoardViewModelRecord extends TypedRecord<BoardViewModelRecord>, BoardViewModel {
 }
@@ -70,12 +77,17 @@ interface SwimlaneInfoRecord extends TypedRecord<SwimlaneInfoRecord>, SwimlaneIn
 interface SwimlaneDataRecord extends TypedRecord<SwimlaneDataRecord>, SwimlaneData {
 }
 
+interface RankViewEntryRecord extends TypedRecord<RankViewEntryRecord>, RankViewEntry {
+}
+
 const BOARD_VIEW_MODEL_FACTORY = makeTypedFactory<BoardViewModel, BoardViewModelRecord>(DEFAULT_BOARD_VIEW);
 const BOARD_HEADER_FACTORY = makeTypedFactory<BoardHeader, BoardHeaderRecord>(DEFAULT_BOARD_HEADER);
 const BOARD_HEADERS_FACTORY = makeTypedFactory<BoardHeaders, BoardHeadersRecord>(DEFAULT_BOARD_HEADERS);
 const ISSUE_TABLE_STATE_FACTORY = makeTypedFactory<IssueTable, IssueTableRecord>(DEFAULT_ISSUE_TABLE);
 const SWIMLANE_INFO_STATE_FACTORY = makeTypedFactory<SwimlaneInfo, SwimlaneInfoRecord>(DEFAULT_SWIMLANE_INFO);
 const SWIMLANE_DATA_STATE_FACTORY = makeTypedFactory<SwimlaneData, SwimlaneDataRecord>(DEFAULT_SWIMLANE_DATA);
+const RANK_VIEW_ENTRY_RECORD = makeTypedFactory<RankViewEntry, RankViewEntryRecord>(DEFAULT_RANK_VIEW_ENTRY);
+
 const initialBoardHeaders: BoardHeaders = BOARD_HEADERS_FACTORY(DEFAULT_BOARD_HEADERS);
 const initialIssueTable: IssueTable = ISSUE_TABLE_STATE_FACTORY(DEFAULT_ISSUE_TABLE);
 export const initialBoardViewModel: BoardViewModel = BOARD_VIEW_MODEL_FACTORY({
@@ -126,11 +138,13 @@ export class BoardViewModelUtil {
 
   static createIssueTable(
     issues: Map<string, BoardIssueView>,
+    rankView: List<RankViewEntry>,
     tableList: List<List<string>>,
     swimlaneInfo: SwimlaneInfo): IssueTable {
 
     const state: IssueTable = {
       issues: issues,
+      rankView: rankView,
       table: tableList,
       swimlaneInfo: swimlaneInfo
     };
@@ -161,5 +175,9 @@ export class BoardViewModelUtil {
       swimlanes: swimlanes
     }
     return SWIMLANE_INFO_STATE_FACTORY(state);
+  }
+
+  static createRankViewEntry(key: string, boardIndex: number) {
+    return RANK_VIEW_ENTRY_RECORD({issueKey: key, boardIndex: boardIndex});
   }
 }
