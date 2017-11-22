@@ -97,11 +97,10 @@ export class BoardComponent implements OnInit, OnDestroy {
       );
 
     this._store.select<BoardState>(boardSelector)
-      .skipWhile(board => { console.log('skipping'); return !board || board.viewId < 0;})
+      .skipWhile(board => board.viewId < 0)
       .takeUntil(gotAllData$)
       .subscribe(
         board => {
-          // Turn
           gotAllData$.next(true);
         }
       );

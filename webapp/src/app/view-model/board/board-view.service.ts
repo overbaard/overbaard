@@ -30,6 +30,8 @@ import {BoardHeaders} from './board-headers';
 import {SwimlaneInfo} from './swimlane-info';
 import 'rxjs/add/observable/combineLatest';
 import {UserSettingState} from '../../model/board/user/user-setting';
+import {boardSelector} from '../../model/board/data/board.reducer';
+import {userSettingSelector} from '../../model/board/user/user-setting.reducer';
 
 @Injectable()
 export class BoardViewModelService {
@@ -40,8 +42,8 @@ export class BoardViewModelService {
 
   getBoardViewModel(): Observable<BoardViewModel> {
     return this._boardViewModelHandler.getBoardViewModel(
-      this._store.select('board'),
-      this._store.select('userSettings'));
+      this._store.select(boardSelector),
+      this._store.select(userSettingSelector));
   }
 }
 
