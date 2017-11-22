@@ -50,8 +50,8 @@ import {KanbanSwimlaneEntryComponent} from './components/board/view/kanban-view/
     HttpClientModule,
     ReactiveFormsModule,
     AppRoutingModule,
-    StoreModule.provideStore(reducer),
-    !environment.production ? StoreDevtoolsModule.instrumentOnlyWithExtension() : []
+    StoreModule.forRoot(reducer),
+    !environment.production ? StoreDevtoolsModule.instrument({ maxAge: 50 }) : []
   ],
   providers: [
     {provide: APP_BASE_HREF, useValue: '/'},

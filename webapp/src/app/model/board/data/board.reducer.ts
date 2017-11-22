@@ -93,7 +93,7 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
       return initialBoardState;
     }
     case DESERIALIZE_BOARD: {
-      const input = action.payload;
+      const input = (<DeserializeBoardAction>action).payload;
       const viewId: number = input['view'];
       if (viewId === state.viewId) {
         return state;
@@ -173,7 +173,7 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
       return BoardUtil.recordFromObject(newState);
     }
     case PROCESS_BOARD_CHANGES: {
-      const input: any = action.payload;
+      const input: any = (<ProcessBoardChangesAction>action).payload;
       const viewId: number = input['view'];
 
       const assigneeState: AssigneeState = input['assignees'] ?
@@ -263,4 +263,4 @@ function addAll(result: string[], input: any, ...keys: string[]) {
   (<string[]>current).forEach(v => result.push(v));
 }
 
-const getBoardState = (state: AppState) => state.board;
+export const boardSelector = (state: AppState) => state.board;

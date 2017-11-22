@@ -9,6 +9,7 @@ import {
   InitialiseFromQueryStringAction
 } from './initialise-from-querystring.action';
 import {UserSettingState} from './user-setting';
+import {AppState} from '../../../app-store';
 
 const CLEAR_SETTINGS = 'CLEAR_SETTINGS';
 
@@ -169,3 +170,5 @@ interface InitialiseStatesPayload {
   numStates: number;
   backlog: number;
 }
+
+export const userSettingSelector = (state: AppState) => state.userSettings;

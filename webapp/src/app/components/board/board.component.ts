@@ -5,7 +5,7 @@ import {AppHeaderService} from '../../services/app-header.service';
 import {BoardService} from '../../services/board.service';
 import {Store} from '@ngrx/store';
 import {AppState} from '../../app-store';
-import {BoardActions} from '../../model/board/data/board.reducer';
+import {BoardActions, boardSelector} from '../../model/board/data/board.reducer';
 import {Observable} from 'rxjs/Observable';
 import {BoardState} from '../../model/board/data/board';
 import 'rxjs/add/operator/skipWhile';
@@ -13,7 +13,7 @@ import 'rxjs/add/operator/takeUntil';
 import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/observable/of';
 import {Subject} from 'rxjs/Subject';
-import {UserSettingActions} from '../../model/board/user/user-setting.reducer';
+import {UserSettingActions, userSettingSelector} from '../../model/board/user/user-setting.reducer';
 import {BoardViewModelService} from '../../view-model/board/board-view.service';
 import {BoardHeader} from '../../view-model/board/board-header';
 import {BoardViewModel} from '../../view-model/board/board-view';
@@ -96,8 +96,8 @@ export class BoardComponent implements OnInit, OnDestroy {
         }
       );
 
-    this._store.select<BoardState>('board')
-      .skipWhile(board => board.viewId < 0)
+    this._store.select<BoardState>(boardSelector)
+      .skipWhile(board => { console.log('skipping'); return !board || board.viewId < 0;})
       .takeUntil(gotAllData$)
       .subscribe(
         board => {
@@ -107,7 +107,7 @@ export class BoardComponent implements OnInit, OnDestroy {
       );
 
     this.board$ = this.boardViewService.getBoardViewModel();
-    this.userSettings$ = this._store.select<UserSettingState>('userSettings');
+    this.userSettings$ = this._store.select<UserSettingState>(userSettingSelector);
   }
 
 
