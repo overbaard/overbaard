@@ -25,12 +25,16 @@ import {BoardIssueComponent} from './components/board/issue/board-issue.componen
 import {KanbanSwimlaneViewComponent} from './components/board/view/kanban-view/kanban-view-swimlane/kanban-swimlane-view.component';
 import {KanbanSwimlaneEntryComponent} from './components/board/view/kanban-view/kanban-view-swimlane/kanban-swimlane-entry.component';
 import {HttpClientModule} from '@angular/common/http';
+import {ConfigurationComponent} from './components/config/configuration.component';
+import {BoardConfigurationComponent} from './components/config/board-configuration-component';
 
 @NgModule({
   declarations: [
     AppComponent,
     BoardsComponent,
     BoardComponent,
+    ConfigurationComponent,
+    BoardConfigurationComponent,
     KanbanViewComponent,
     KanbanNormalViewComponent,
     KanbanViewColumnGroupComponent,

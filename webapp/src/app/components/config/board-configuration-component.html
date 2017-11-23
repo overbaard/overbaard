@@ -1,0 +1,26 @@
+<!-- board.edit is whether the user has the edit permission -->
+<div *ngIf="mode === enumMode.VIEW">
+  <div *ngIf="canEdit">
+    <a href="edit" (click)="onToggleEdit($event)">Edit</a>
+    <a href="delete" (click)="onToggleDelete($event)">Delete</a>
+  </div>
+  <pre>{{configJson}}</pre>
+</div>
+<div *ngIf="mode === enumMode.DELETE">
+  <form (ngSubmit)="onDeleteBoard()" [formGroup]="deleteForm" #f="ngForm">
+    <label>Type in the 'name' field of the board to delete it <b>permanently</b>:</label>
+    <input type="text" formControlName="boardName"/>
+    <a href="delete" (click)="onToggleDelete($event)">Cancel</a>
+    <button type="submit" [disabled]="!f.form.valid">Delete</button>
+  </form>
+</div>
+<div *ngIf="mode === enumMode.EDIT">
+  <form (ngSubmit)="onSaveBoard()" [formGroup]="editForm" #f="ngForm">
+    <textarea cols="100" rows="15" name="editJson" formControlName="editJson" (keyup)="clearJsonErrors()"></textarea>
+    <div *ngIf="jsonError">{{jsonError}}</div>
+    <div>
+      <a href="cancel" (click)="onToggleEdit($event)">Cancel</a>
+      <button type="submit" [disabled]="!f.form.valid">Save</button>
+    </div>
+  </form>
+</div>

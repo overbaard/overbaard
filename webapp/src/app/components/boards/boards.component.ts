@@ -14,7 +14,7 @@ import {VIEW_RANK} from '../board/board.component';
 })
 export class BoardsComponent implements OnInit, OnDestroy {
 
-  boards: Observable<any[]>;
+  boards$: Observable<any[]>;
 
   rankViewParameter = VIEW_RANK;
 
@@ -22,7 +22,7 @@ export class BoardsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     // TODO turn on/off progress indicator and log errors
-    this.boards = this._boardsService.loadBoardsList(true);
+    this.boards$ = this._boardsService.loadBoardsList(true);
     this._appHeaderService.setTitle('Boards List');
   }
 

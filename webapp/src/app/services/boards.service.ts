@@ -9,7 +9,7 @@ import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 
 @Injectable()
 export class BoardsService {
-  private timeout = 30000;
+  private _timeout = 30000;
 
   constructor(private _restUrlService: RestUrlService, private _httpClient: HttpClient) {
   }
@@ -17,79 +17,101 @@ export class BoardsService {
   loadBoardsList(summaryOnly: boolean): Observable<any[]> {
     const path: string = this._restUrlService.caclulateRestUrl(
       summaryOnly ? RestUrlService.OVERBAARD_REST_PREFIX + '/boards' : RestUrlService.OVERBAARD_REST_PREFIX + '/boards?full=true');
-    const ret: Observable<any> =
-      this._httpClient.get(path)
-        .timeout(this.timeout)
-        .map(r => r['configs'])
-        .catch(response => {
-          if (response instanceof HttpErrorResponse) {
-          }
-          // TODO log error
-          return Observable.throw(response);
-        });
-
-    return ret;
+    return this._httpClient.get(path)
+      .timeout(this._timeout)
+      .map(r => summaryOnly ? r['configs'] : r)
+      .catch(response => {
+        // TODO log error properly
+        console.log(response);
+        if (response instanceof HttpErrorResponse) {
+        }
+        return Observable.throw(response);
+      });
   }
 
-  /*
-    loadBoardConfigJson(boardId: number): Observable<Response> {
-      const path: string = this._restUrlService.caclulateRestUrl(OVERBAARD_REST_PREFIX + '/boards/' + boardId);
-      console.log('Loading board configuration' + path);
-      const ret: Observable<any> =
-        this._httpClient.get(path)
-          .timeout(this.timeout);
+  loadBoardConfigJson(boardId: number): Observable<any> {
+    const path: string = this._restUrlService.caclulateRestUrl(RestUrlService.OVERBAARD_REST_PREFIX + '/boards/' + boardId);
+    return this._httpClient.get(path)
+      .timeout(this._timeout)
+      .catch(response => {
+        if (response instanceof HttpErrorResponse) {
+        }
+        // TODO log error
+        return Observable.throw(response);
+      });
+  }
 
-      return ret;
-    }
-
-    createBoard(json: string): Observable<Response> {
-      const path: string = this._restUrlService.caclulateRestUrl(OVERBAARD_REST_PREFIX + '/boards');
-      console.log('Saving board ' + path);
-      const ret: Observable<any> =
-        this._httpClient.post(path, json, {
-          _headers : this.createHeaders()
+  createBoard(json: string): Observable<Object> {
+    const path: string = this._restUrlService.caclulateRestUrl(RestUrlService.OVERBAARD_REST_PREFIX + '/boards');
+    console.log('Saving new board ' + path);
+    return this._httpClient
+      .post(path, json, {
+          headers : this.createHeaders()
         })
-          .timeout(this.timeout);
-      return ret;
-    }
+      .timeout(this._timeout)
+      .catch(response => {
+        // TODO log error properly
+        console.log(response);
+        if (response instanceof HttpErrorResponse) {
+        }
+        return Observable.throw(response);
+      });
+  }
 
-    saveBoard(id: number, json: string): Observable<Response> {
-      const path: string = this._restUrlService.caclulateRestUrl(OVERBAARD_REST_PREFIX + '/boards/' + id);
-      console.log('Saving board ' + path);
-      const ret: Observable<any> =
-        this._httpClient.put(path, json, {
-          _headers : this.createHeaders()
-        })
-          .timeout(this.timeout);
-      return ret;
-    }
+  saveBoard(id: number, json: string): Observable<Object> {
+    const path: string = this._restUrlService.caclulateRestUrl(RestUrlService.OVERBAARD_REST_PREFIX + '/boards/' + id);
+    console.log('Saving board ' + path);
+    return this._httpClient
+      .put(path, json, {
+        headers : this.createHeaders()
+      })
+      .timeout(this._timeout)
+      .catch(response => {
+        // TODO log error properly
+        console.log(response);
+        if (response instanceof HttpErrorResponse) {
+        }
+        return Observable.throw(response);
+      });
+  }
 
-    deleteBoard(id: number): Observable<Response> {
-      const path: string = this._restUrlService.caclulateRestUrl(OVERBAARD_REST_PREFIX + '/boards/' + id);
-      console.log('Deleting board ' + path);
-      const ret: Observable<any> =
-        this._httpClient.delete(path, {
-          _headers : this.createHeaders()
-        })
-          .timeout(this.timeout);
-      return ret;
-    }
+  deleteBoard(id: number): Observable<Object> {
+    const path: string = this._restUrlService.caclulateRestUrl(RestUrlService.OVERBAARD_REST_PREFIX + '/boards/' + id);
+    console.log('Deleting board ' + path);
+    return this._httpClient
+      .delete(path, {
+        headers: this.createHeaders()
+      })
+      .timeout(this._timeout)
+      .catch(response => {
+        // TODO log error properly
+        console.log(response);
+        if (response instanceof HttpErrorResponse) {
+        }
+        return Observable.throw(response);
+      });
+  }
 
-    saveRankCustomFieldId(id: number): Observable<Response> {
-      const path: string = this._restUrlService.caclulateRestUrl(OVERBAARD_REST_PREFIX + 'rankCustomFieldId');
-      console.log('Saving custom field id ' + path);
-      const payload: string = JSON.stringify({id: id});
-      const ret: Observable<any> =
-        this._httpClient.put(path, payload, {
-          _headers : this.createHeaders()
-        })
-          .timeout(this.timeout);
-      return ret;
-    }*/
+  saveRankCustomFieldId(id: number): Observable<Object> {
+    const path: string = this._restUrlService.caclulateRestUrl(RestUrlService.OVERBAARD_REST_PREFIX + '/rankCustomFieldId');
+    console.log('Saving custom field id ' + path);
+    const payload: string = JSON.stringify({id: id});
+    return this._httpClient
+      .put(path, payload, {
+        headers: this.createHeaders()
+      })
+      .timeout(this._timeout)
+      .catch(response => {
+        // TODO log error properly
+        console.log(response);
+        if (response instanceof HttpErrorResponse) {
+        }
+        return Observable.throw(response);
+      });
+  }
 
   private createHeaders(): HttpHeaders {
-    const headers = new HttpHeaders();
-    headers.append('Content-Type', 'application/json');
-    return headers;
+    return new HttpHeaders()
+      .append('Content-Type', 'application/json');
   }
 }

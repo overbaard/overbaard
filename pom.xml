@@ -355,7 +355,7 @@
                                     <goal>yarn</goal>
                                 </goals>
                                 <configuration>
-                                    <arguments>run build</arguments>
+                                    <arguments>run build --output-hashing=all</arguments>
                                 </configuration>
                             </execution>
                         </executions>
