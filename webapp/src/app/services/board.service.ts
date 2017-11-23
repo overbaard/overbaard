@@ -5,8 +5,6 @@ import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/timeout';
 import 'rxjs/add/observable/throw';
 
-const OVERBAARD_REST_PREFIX = 'rest/overbaard/1.0';
-
 @Injectable()
 export class BoardService {
   private static readonly _bigTimeout: number = 60000;
@@ -15,7 +13,7 @@ export class BoardService {
   }
 
   loadBoardData(board: string, backlog: boolean): Observable<any> {
-    let url = OVERBAARD_REST_PREFIX + '/issues/' + board;
+    let url = RestUrlService.OVERBAARD_REST_PREFIX + '/issues/' + board;
     if (backlog) {
       url += '?backlog=' + true;
     }

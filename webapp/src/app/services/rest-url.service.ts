@@ -2,6 +2,10 @@ import {Injectable} from '@angular/core';
 
 @Injectable()
 export class RestUrlService {
+
+  private static OVERBAARD_FRAGMENT = 'jirban';
+  static readonly OVERBAARD_REST_PREFIX = 'rest/' + RestUrlService.OVERBAARD_FRAGMENT + '/1.0';
+
   private _overbaardPrefix: string;
   private _localDebug: boolean;
   private _testRunner: boolean;
@@ -10,13 +14,13 @@ export class RestUrlService {
   constructor() {
     const location: Location = window.location;
 
-    let index: number = location.href.indexOf('/overbaard/');
+    let index: number = location.href.indexOf('/' + RestUrlService.OVERBAARD_FRAGMENT + '/');
     this._overbaardPrefix = index >= 0 ? location.href.substr(0, index) + '/' : null;
     this._localDebug = location.hostname === 'localhost' && location.port === '4200';
     // In our current test setup the url http://localhost:9876/context.html is used by the runner
     this._testRunner = location.hostname === 'localhost' && location.port === '9876';
     if (this._overbaardPrefix) {
-      index = this._overbaardPrefix.indexOf('/overbaard/');
+      index = this._overbaardPrefix.indexOf('/' + RestUrlService.OVERBAARD_FRAGMENT + '/');
       this._jiraUrl = this._overbaardPrefix.substr(0, index);
     }
   }
