@@ -1716,7 +1716,7 @@ describe('Swimlane observer tests', () => {
       init.setRank(key, ...ranks[key]);
     }
     const util: BoardViewObservableUtil = new BoardViewObservableUtil(params)
-      .initializeBoardState(init);
+      .updateBoardState(init);
     return util;
   }
 });
@@ -1934,7 +1934,7 @@ class NumberedHeaderStateFactory implements HeaderStateFactory {
   constructor(private _numStates: number) {
   }
 
-  createHeaderState(): HeaderState {
+  createHeaderState(currentState: HeaderState): HeaderState {
     const input: any = [];
     for (let i = 1 ; i <= this._numStates ; i++) {
       input.push({name: 'S-' + i});

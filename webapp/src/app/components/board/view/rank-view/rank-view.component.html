@@ -1,3 +1,14 @@
-<p>
-  rank-view works!
-</p>
+<app-board-headers-container
+  [headers]="board.headers"
+  [viewMode]="viewMode"
+  [boardLeftOffset]="boardLeftOffset"
+>
+</app-board-headers-container>
+<div id="board-body">
+  <app-rank-view-container
+    [board]="board"
+    [statesDummyArray]="statesDummyArray"
+    (scroll)="onScrollBoardX($event)"
+  >
+  </app-rank-view-container>
+</div>

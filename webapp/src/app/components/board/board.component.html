@@ -1,23 +1,27 @@
 <div (window:focus)="onFocus($event)" (window:blur)="onBlur($event)" (window:resize)="onResize($event)">
-  <app-kanban-view
-    *ngIf="viewMode === 0"
-    [board]="board$ | async"
-    [windowWidth]="windowWidth"
-    [windowHeight]="windowHeight"
-    (toggleColumnVisibility)="onToggleVisibility($event)"
-    (toggleBacklog)="onToggleBacklog($event)"
-    (toggleCollapsedSwimlane)="onToggleCollapsedSwimlane($event)"
-  >
-  </app-kanban-view>
-  <app-rank-view
-    *ngIf="viewMode === 1"
-    [board]="board$ | async"
-    [windowWidth]="windowWidth"
-    [windowHeight]="windowHeight"
-    (toggleColumnVisibility)="onToggleVisibility($event)">
-  </app-rank-view>
+  <div id="board-outer">
+    <div id="board-inner">
+      <app-kanban-view
+        *ngIf="(userSettings$ | async).viewMode === enumViewMode.KANBAN"
+        [board]="board$ | async"
+        [windowWidth]="windowWidth"
+        [windowHeight]="windowHeight"
+        (toggleColumnVisibility)="onToggleVisibility($event)"
+        (toggleBacklog)="onToggleBacklog($event)"
+        (toggleCollapsedSwimlane)="onToggleCollapsedSwimlane($event)"
+      >
+      </app-kanban-view>
+      <app-rank-view
+        *ngIf="(userSettings$ | async).viewMode === enumViewMode.RANK"
+        [board]="board$ | async"
+        [windowWidth]="windowWidth"
+        [windowHeight]="windowHeight">
+      </app-rank-view>
+    </div>
+  </div>
 </div>
 <button id="temp-control-button" (click)="onToggleControlPanel($event)">*</button>
+<button id="temp-switch-view-button" (click)="onSwitchViewMode($event)">~</button>
 <app-control-panel
   *ngIf="showControlPanel"
   [userSettings]="userSettings$ | async"

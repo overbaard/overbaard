@@ -34,7 +34,7 @@ describe('Board headers tests', () => {
       describe('No wip', () => {
         it('Simple', () => {
           util
-            .initializeBoardState(initializer.headerStateFactory(createHeaderStateFactory(states, 0, 0)))
+            .updateBoardState(initializer.headerStateFactory(createHeaderStateFactory(states, 0, 0)))
             .observer().take(1).map(board => board.headers)
             .subscribe(headers => {
               check(headers.headersList,
@@ -47,7 +47,7 @@ describe('Board headers tests', () => {
         });
         it('Backlog and done', () => {
           util
-            .initializeBoardState(initializer.headerStateFactory(createHeaderStateFactory(states, 2, 1)))
+            .updateBoardState(initializer.headerStateFactory(createHeaderStateFactory(states, 2, 1)))
             .observer().take(1).map(board => board.headers)
             .subscribe(headers => {
               check(headers.headersList,
@@ -69,7 +69,7 @@ describe('Board headers tests', () => {
             .issuesFactory(new EmptyIssuesFactory())
             .headerStateFactory(createHeaderStateFactory(states, 1, 0));
           util
-            .initializeBoardState(initializer)
+            .updateBoardState(initializer)
             .observer().take(1).map(board => board.headers)
             .subscribe(headers => {
               check(headers.headersList,
@@ -92,7 +92,7 @@ describe('Board headers tests', () => {
             .issuesFactory(new EmptyIssuesFactory())
             .headerStateFactory(createHeaderStateFactory(states, 1, 0));
           util
-            .initializeBoardState(initializer)
+            .updateBoardState(initializer)
             .observer().take(1).map(board => board.headers)
             .subscribe(headers => {
               check(headers.headersList,
@@ -133,7 +133,7 @@ describe('Board headers tests', () => {
             .issuesFactory(new EmptyIssuesFactory())
             .headerStateFactory(new TestHeaderStateFactory(states, ['H1'], 0, 0));
           util
-            .initializeBoardState(initializer)
+            .updateBoardState(initializer)
             .observer().take(1).map(board => board.headers)
             .subscribe(headers => {
               check(headers.headersList,
@@ -154,7 +154,7 @@ describe('Board headers tests', () => {
             .issuesFactory(new EmptyIssuesFactory())
             .headerStateFactory(new TestHeaderStateFactory(states, ['H1'], 0, 0));
           util
-            .initializeBoardState(initializer)
+            .updateBoardState(initializer)
             .observer().take(1).map(board => board.headers)
             .subscribe(headers => {
               check(headers.headersList,
@@ -174,7 +174,7 @@ describe('Board headers tests', () => {
             .issuesFactory(new EmptyIssuesFactory())
             .headerStateFactory(new TestHeaderStateFactory(states, ['H1'], 0, 0));
           util
-            .initializeBoardState(initializer)
+            .updateBoardState(initializer)
             .observer().take(1).map(board => board.headers)
             .subscribe(headers => {
               check(headers.headersList,
@@ -195,7 +195,7 @@ describe('Board headers tests', () => {
             .issuesFactory(new EmptyIssuesFactory())
             .headerStateFactory(new TestHeaderStateFactory(states, ['H1'], 0, 0));
           util
-            .initializeBoardState(initializer)
+            .updateBoardState(initializer)
             .observer().take(1).map(board => board.headers)
             .subscribe(headers => {
               check(headers.headersList,
@@ -215,7 +215,7 @@ describe('Board headers tests', () => {
             .issuesFactory(new EmptyIssuesFactory())
             .headerStateFactory(new TestHeaderStateFactory(states, ['H1'], 0, 0));
           util
-            .initializeBoardState(initializer)
+            .updateBoardState(initializer)
             .observer().take(1).map(board => board.headers)
             .subscribe(headers => {
               check(headers.headersList,
@@ -237,7 +237,7 @@ describe('Board headers tests', () => {
             .issuesFactory(new EmptyIssuesFactory())
             .headerStateFactory(new TestHeaderStateFactory(states, ['H1'], 0, 0));
           util
-            .initializeBoardState(initializer)
+            .updateBoardState(initializer)
             .observer().take(1).map(board => board.headers)
             .subscribe(headers => {
               check(headers.headersList,
@@ -267,7 +267,7 @@ describe('Board headers tests', () => {
             .issuesFactory(new EmptyIssuesFactory())
             .headerStateFactory(new TestHeaderStateFactory(states, ['H1', 'H2'], 0, 0));
           util
-            .initializeBoardState(initializer)
+            .updateBoardState(initializer)
             .observer().take(1).map(board => board.headers)
             .subscribe(headers => {
               check(headers.headersList,
@@ -299,7 +299,7 @@ describe('Board headers tests', () => {
             .issuesFactory(new EmptyIssuesFactory())
             .headerStateFactory(new TestHeaderStateFactory(states, ['H1', 'H2'], 0, 0));
           util
-            .initializeBoardState(initializer)
+            .updateBoardState(initializer)
             .observer().take(1).map(board => board.headers)
             .subscribe(headers => {
               check(headers.headersList,
@@ -335,7 +335,7 @@ describe('Board headers tests', () => {
             .issuesFactory(new EmptyIssuesFactory())
             .headerStateFactory(new TestHeaderStateFactory(states, ['H1', 'H2'], 2, 0));
           util
-            .initializeBoardState(initializer)
+            .updateBoardState(initializer)
             .observer().take(1).map(board => board.headers)
             .subscribe(headers => {
               check(headers.headersList,
@@ -361,13 +361,13 @@ describe('Board headers tests', () => {
             .headerStateFactory(new TestHeaderStateFactory(states, ['H1', 'H2'], 2, 0));
           let original: BoardHeaders;
           util
-            .initializeBoardState(initializer)
+            .updateBoardState(initializer)
             .observer().take(1).map(board => board.headers)
             .subscribe(headers => {
               original = headers;
             });
           util
-            .initializeBoardState(initializer)
+            .updateBoardState(initializer)
             .observer().take(1).map(board => board.headers)
             .subscribe(headers => {
               expect(headers).toBe(headers);
@@ -389,7 +389,7 @@ describe('Board headers tests', () => {
         .issuesFactory(new EmptyIssuesFactory())
         .headerStateFactory(new TestHeaderStateFactory(states, ['Short Header', 'A much longer header'], 1, 0));
       util
-        .initializeBoardState(initializer)
+        .updateBoardState(initializer)
         .observer().take(1).map(board => board.headers)
         .subscribe(headers => {
           check(headers.headersList,
@@ -528,55 +528,37 @@ describe('Board headers tests', () => {
     });
 
     function setUpBoard(headerStateFactory: HeaderStateFactory, params?: Dictionary<string>): BoardViewObservableUtil {
-      const init =
-        new BoardStateInitializer('ONE')
-          .headerStateFactory(headerStateFactory)
-          .setRank('ONE', 1, 2, 3, 4, 5, 6, 7, 8, 9)
-          .mapState('ONE', 'S1', '1-1')
-          .mapState('ONE', 'S2', '1-2')
-          .mapState('ONE', 'S3', '1-3')
-          .mapState('ONE', 'S4', '1-4')
-          .issuesFactory(
-            new SimpleIssueFactory()
-              .addIssue('ONE-1', 0)
-              .addIssue('ONE-2', 0)
-              .addIssue('ONE-3', 1)
-              .addIssue('ONE-4', 1)
-              .addIssue('ONE-5', 1)
-              .addIssue('ONE-6', 2)
-              .addIssue('ONE-7', 2)
-              .addIssue('ONE-8', 2)
-              .addIssue('ONE-9', 2)
-          );
       return new BoardViewObservableUtil(params)
-        .initializeBoardState(init);
+        .updateBoardState(
+          new BoardStateInitializer('ONE')
+            .headerStateFactory(headerStateFactory)
+            .setRank('ONE', 1, 2, 3, 4, 5, 6, 7, 8, 9)
+            .mapState('ONE', 'S1', '1-1')
+            .mapState('ONE', 'S2', '1-2')
+            .mapState('ONE', 'S3', '1-3')
+            .mapState('ONE', 'S4', '1-4')
+            .issuesFactory(
+              new SimpleIssueFactory()
+                .addIssue('ONE-1', 0)
+                .addIssue('ONE-2', 0)
+                .addIssue('ONE-3', 1)
+                .addIssue('ONE-4', 1)
+                .addIssue('ONE-5', 1)
+                .addIssue('ONE-6', 2)
+                .addIssue('ONE-7', 2)
+                .addIssue('ONE-8', 2)
+                .addIssue('ONE-9', 2)
+            ));
     }
   });
 
 
   describe('State visibility', () => {
-    let states: any[];
-    let init: BoardStateInitializer;
     let original: BoardHeaders;
-    beforeEach(() => {
-      states = [
-        // No wip or headers for the backlog states
-        {name: 'B1'},
-        {name: 'B2'},
-        {name: 'S1', header: 0},
-        {name: 'S2', header: 0},
-        {name: 'S3'},
-        {name: 'S4', header: 1},
-        {name: 'S5', header: 1},
-        {name: 'S6'}];
-      init = new BoardStateInitializer('TEST')
-        .issuesFactory(new EmptyIssuesFactory())
-        .headerStateFactory(new TestHeaderStateFactory(states, ['H1', 'H2'], 2, 0));
-    });
     describe('No visibilities set on load', () => {
       beforeEach(() => {
         util = new BoardViewObservableUtil()
-          .initializeBoardState(init);
+          .updateBoardState(createInitialiser());
         util
           .observer().take(1).map(board => board.headers)
           .subscribe(headers => {
@@ -600,9 +582,17 @@ describe('Board headers tests', () => {
       });
 
       it('Toggle backlog', () => {
+        // The toggle itself is a noop
         util.getUserSettingUpdater().toggleBacklog()
           .observer().take(1).map(board => board.headers)
           .subscribe(headers => {
+            expect(headers).toBe(original);
+          });
+        // The caller (BoardComponent) does a full refresh to load the board again
+        util.updateBoardState(createInitialiser())
+          .observer().take(1).map(board => board.headers)
+          .subscribe(headers => {
+            expect(headers).not.toBe(original);
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog()
                 .states(
@@ -850,7 +840,7 @@ describe('Board headers tests', () => {
     describe('Show backlog, initial visible', () => {
       beforeEach(() => {
         util = new BoardViewObservableUtil({bl: 'true', visible: '0,2,4'})
-          .initializeBoardState(init);
+          .updateBoardState(createInitialiser());
         util
           .observer().take(1).map(board => board.headers)
           .subscribe(headers => {
@@ -898,9 +888,17 @@ describe('Board headers tests', () => {
           });
 
         // Toggle the backlog to invisible
+        // The toggle itself is a noop
         util.getUserSettingUpdater().toggleBacklog()
           .observer().take(1).map(board => board.headers)
           .subscribe(headers => {
+            expect(headers).toBe(original);
+          });
+        // The caller (BoardComponent) does a full refresh to load the board again which rebuilds it
+        util.updateBoardState(createInitialiser())
+          .observer().take(1).map(board => board.headers)
+          .subscribe(headers => {
+            expect(headers).not.toBe(original);
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog().invisible()
                 .states(
@@ -921,9 +919,18 @@ describe('Board headers tests', () => {
           });
 
         // Toggle the backlog to visible
+        // Toggle the backlog to invisible
+        // The toggle itself is a noop
         util.getUserSettingUpdater().toggleBacklog()
           .observer().take(1).map(board => board.headers)
           .subscribe(headers => {
+            expect(headers).toBe(original);
+          });
+        // The caller (BoardComponent) does a full refresh to load the board again which rebuilds it
+        util.updateBoardState(createInitialiser())
+          .observer().take(1).map(board => board.headers)
+          .subscribe(headers => {
+            expect(headers).not.toBe(original);
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog()
                 .states(
@@ -1060,7 +1067,7 @@ describe('Board headers tests', () => {
     describe('Show backlog, initial hidden', () => {
       beforeEach(() => {
         util = new BoardViewObservableUtil({bl: 'true', hidden: '0,2,3,4'})
-          .initializeBoardState(init);
+          .updateBoardState(createInitialiser());
         util
           .observer().take(1).map(board => board.headers)
           .subscribe(headers => {
@@ -1113,6 +1120,13 @@ describe('Board headers tests', () => {
         util.getUserSettingUpdater().toggleBacklog()
           .observer().take(1).map(board => board.headers)
           .subscribe(headers => {
+            expect(headers).toBe(original);
+          });
+        // The caller (BoardComponent) does a full refresh to load the board again which rebuilds it
+        util.updateBoardState(createInitialiser())
+          .observer().take(1).map(board => board.headers)
+          .subscribe(headers => {
+            expect(headers).not.toBe(original);
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog().invisible()
                 .states(
@@ -1136,6 +1150,13 @@ describe('Board headers tests', () => {
         util.getUserSettingUpdater().toggleBacklog()
           .observer().take(1).map(board => board.headers)
           .subscribe(headers => {
+            expect(headers).toBe(original);
+          });
+        // The caller (BoardComponent) does a full refresh to load the board again which rebuilds it
+        util.updateBoardState(createInitialiser())
+          .observer().take(1).map(board => board.headers)
+          .subscribe(headers => {
+            expect(headers).not.toBe(original);
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog()
                 .states(
@@ -1271,6 +1292,23 @@ describe('Board headers tests', () => {
           });
       });
     });
+
+    function createInitialiser() {
+      const states = [
+        // No wip or headers for the backlog states
+        {name: 'B1'},
+        {name: 'B2'},
+        {name: 'S1', header: 0},
+        {name: 'S2', header: 0},
+        {name: 'S3'},
+        {name: 'S4', header: 1},
+        {name: 'S5', header: 1},
+        {name: 'S6'}];
+      return new BoardStateInitializer('TEST')
+        .issuesFactory(new EmptyIssuesFactory())
+        .headerStateFactory(new TestHeaderStateFactory(states, ['H1', 'H2'], 2, 0));
+
+    }
   });
 });
 
@@ -1433,8 +1471,8 @@ class TestHeaderStateFactory implements HeaderStateFactory {
   constructor(private _states: any[], private _headers: string[], private _backlog?: number, private _done?: number) {
   }
 
-  createHeaderState(): HeaderState {
-    return headerMetaReducer(initialHeaderState,
+  createHeaderState(currentState: HeaderState): HeaderState {
+    return headerMetaReducer(currentState,
       HeaderActions.createDeserializeHeaders(this._states, this._headers, this._backlog ? this._backlog : 0, this._done ? this._done : 0));
   }
 }

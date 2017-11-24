@@ -98,6 +98,7 @@ describe('Boards Query Parameters Service Tests', () => {
         mutable.boardCode = 'TEST&=123';
         mutable.showBacklog = true;
         mutable.viewMode = BoardViewMode.RANK;
+        mutable.forceBacklog = true;
         mutable.swimlane = 'project'; // Not really valid when we use rank but still
         mutable.filters = BoardFilterUtil.updateBoardFilterState(initialBoardFilterState, mutable2 => {
           mutable2.project = Set<string>(['PROJ&=1', 'PROJ&=2']);

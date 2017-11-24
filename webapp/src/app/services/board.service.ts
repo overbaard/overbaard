@@ -4,6 +4,7 @@ import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/timeout';
 import 'rxjs/add/observable/throw';
+import {BoardViewMode} from '../model/board/user/board-view-mode';
 
 @Injectable()
 export class BoardService {

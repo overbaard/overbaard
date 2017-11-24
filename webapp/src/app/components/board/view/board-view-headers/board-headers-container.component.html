@@ -1,9 +1,11 @@
 <div class="headers-container" [ngStyle]="{'margin-left':boardLeftOffset+'px'}">
-  <app-kanban-header-group
+  <div *ngIf="viewMode === enumViewMode.RANK" class="rank-issues-header"></div>
+  <app-board-header-group
     *ngFor="let header of headers.headersList"
     [header]="header"
+    [viewMode]="viewMode"
     (toggleColumnVisibility)="onToggleVisibility($event)"
     (toggleBacklog)="onToggleBacklog($event)"
   >
-  </app-kanban-header-group>
+  </app-board-header-group>
 </div>

@@ -1,0 +1,9 @@
+<div class="header-content" *ngIf="viewMode === enumViewMode.KANBAN" [ngClass]="classList">
+  <div *ngIf="header.visible">{{header.name}}</div>
+  <div *ngIf="!header.visible">{{header.abbreviation}}</div>
+  <div>{{header.visibleIssues}}/{{header.totalIssues}} ({{header.wip}}) <i>{{header.visible ? 't' : 'f'}}</i></div>
+</div>
+<div class="header-content" *ngIf="viewMode === enumViewMode.RANK" [ngClass]="classList">
+  <div >{{header.abbreviation}}</div>
+  <div>{{header.visibleIssues}}</div>
+</div>

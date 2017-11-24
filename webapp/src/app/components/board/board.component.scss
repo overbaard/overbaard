@@ -1,3 +1,5 @@
+@import "../../../styles";
+
 table.board {
   border-collapse: collapse;
   border: 1px black solid;
@@ -19,4 +21,28 @@ td.visible {
   left: 10px;
   font-size: 25px;
   padding: 3px;
+}
+#temp-switch-view-button {
+  width: 30px;
+  height: 30px;
+  z-index: 10;
+  position: fixed;
+  bottom: 10px;
+  left: 50px;
+  font-size: 25px;
+  padding: 3px;
+}
+
+
+#board-outer {
+  background-color: #fff;
+  position: absolute;
+  top: $toolbar-height;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+}
+#board-inner {
+  height: 100%;
+  overflow: hidden;
 }

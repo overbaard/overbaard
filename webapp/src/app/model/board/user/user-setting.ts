@@ -5,6 +5,7 @@ import {BoardViewMode} from './board-view-mode';
 export interface UserSettingState {
   boardCode: string;
   viewMode: BoardViewMode;
+  forceBacklog: boolean;
   showBacklog: boolean;
   filters: BoardFilterState;
   /** The visibility value to use for column, if its index does not show up in columnVisibilities */

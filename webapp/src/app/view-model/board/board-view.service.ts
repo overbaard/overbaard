@@ -2,7 +2,8 @@ import {Injectable} from '@angular/core';
 import {Store} from '@ngrx/store';
 import {AppState} from '../../app-store';
 import {
-  BoardViewModelUtil, initialBoardViewModel} from './board-view.model';
+  BoardViewModelUtil, initialBoardViewModel, initialIssueTable
+} from './board-view.model';
 import {Observable} from 'rxjs/Observable';
 import {BoardState} from '../../model/board/data/board';
 import {initialUserSettingState} from '../../model/board/user/user-setting.model';
@@ -33,6 +34,7 @@ import {UserSettingState} from '../../model/board/user/user-setting';
 import {boardSelector} from '../../model/board/data/board.reducer';
 import {userSettingSelector} from '../../model/board/user/user-setting.reducer';
 import {RankViewEntry} from './rank-view-entry';
+import {BoardViewMode} from '../../model/board/user/board-view-mode';
 
 @Injectable()
 export class BoardViewModelService {
@@ -57,6 +59,7 @@ export class BoardViewModelHandler {
   private _lastUserSettingState: UserSettingState = initialUserSettingState;
 
   private _lastBoardView: BoardViewModel = initialBoardViewModel;
+  private _forcedRefresh = false;
 
   getBoardViewModel(boardState$: Observable<BoardState>,
                     userSettingState$: Observable<UserSettingState>): Observable<BoardViewModel> {
@@ -67,14 +70,27 @@ export class BoardViewModelHandler {
 
       let changeType: ChangeType = null;
       if (boardState !== this._lastBoardState) {
-        changeType = this._lastBoardState === initialBoardState ? ChangeType.LOAD_BOARD : ChangeType.UPDATE_BOARD;
+        if (this._forcedRefresh) {
+          changeType = ChangeType.UPDATE_BOARD_AFTER_BACKLOG_TOGGLE;
+          this._forcedRefresh = false;
+        } else {
+          changeType = this._lastBoardState === initialBoardState ? ChangeType.LOAD_BOARD : ChangeType.UPDATE_BOARD;
+        }
       } else if (boardState.viewId >= 0) {
         if (userSettingState.filters !== this._lastUserSettingState.filters) {
           changeType = ChangeType.APPLY_FILTERS;
         } else if (userSettingState.swimlane !== this._lastUserSettingState.swimlane) {
           changeType = ChangeType.CHANGE_SWIMLANE;
+        } else if (userSettingState.viewMode !== this._lastUserSettingState.viewMode) {
+          if (this._lastUserSettingState.showBacklog !== userSettingState.showBacklog) {
+            // Don't do anything for this update. The caller needs to do a full refresh (see comment in BoardComponent).
+            this._forcedRefresh = true;
+          } else {
+            changeType = ChangeType.SWITCH_VIEW_MODE;
+          }
         } else if (userSettingState.showBacklog !== this._lastUserSettingState.showBacklog) {
-          changeType = ChangeType.TOGGLE_BACKLOG;
+          // Don't do anything. The caller needs to do a full refresh (see comment in BoardComponent).
+          this._forcedRefresh = true;
         } else if (userSettingState.columnVisibilities !== this._lastUserSettingState.columnVisibilities) {
           changeType = ChangeType.CHANGE_COLUMN_VISIBILITY;
         } else if (userSettingState.swimlaneShowEmpty !== this._lastUserSettingState.swimlaneShowEmpty) {
@@ -84,14 +100,12 @@ export class BoardViewModelHandler {
         }
       }
 
-      if (changeType === null) {
-        return this._lastBoardView;
-      }
-
-      const boardView: BoardViewModel =
-        new BoardViewBuilder(changeType, this._lastBoardView,
-            this._lastBoardState, boardState, this._lastUserSettingState, userSettingState)
+      let boardView: BoardViewModel = this._lastBoardView;
+      if (changeType != null) {
+        boardView = new BoardViewBuilder(changeType, this._lastBoardView,
+          this._lastBoardState, boardState, this._lastUserSettingState, userSettingState)
           .build();
+      }
 
       this._lastBoardState = boardState;
       this._lastUserSettingState = userSettingState;
@@ -119,7 +133,9 @@ class BoardViewBuilder {
     headersBuilder.initialiseHeaders();
 
     const issueTableBuilder: IssueTableBuilder =
-      new IssueTableBuilder(this._changeType, this._oldBoardView.issueTable, this._currentBoardState, this._currentUserSettingState);
+      new IssueTableBuilder(
+        this._changeType, this._oldBoardView.issueTable, this._currentBoardState,
+        this._lastUserSettingState, this._currentUserSettingState);
     const issueTable: IssueTable = issueTableBuilder.build();
 
     headersBuilder.updateIssueHeaderCounts(issueTable, issueTableBuilder.visibleIssueCounts);
@@ -144,7 +160,7 @@ class HeadersBuilder {
     private readonly _oldBoardView: BoardViewModel,
     private readonly _oldHeaderState: HeaderState,
     private readonly _currentHeaderState: HeaderState,
-    private readonly _lastUserSettingState: UserSettingState,
+    private readonly _oldUserSettingState: UserSettingState,
     private readonly _currentUserSettingState: UserSettingState) {
   }
 
@@ -156,14 +172,13 @@ class HeadersBuilder {
     }
 
     switch (this._changeType) {
-      case ChangeType.TOGGLE_BACKLOG:
-        this.toggleBacklog();
-        break;
       case ChangeType.CHANGE_COLUMN_VISIBILITY:
         this.updateStateVisibility();
         break;
+      case ChangeType.UPDATE_BOARD_AFTER_BACKLOG_TOGGLE:
+        this.toggleBacklog();
+        break;
     }
-
     return this;
   }
 
@@ -212,7 +227,7 @@ class HeadersBuilder {
 
     const updatedStateValues: Map<number, boolean> =
       this._currentUserSettingState.columnVisibilities
-        .filter((v, k) => {return this.calculateVisibility(this._lastUserSettingState, k) !== v}).toMap();
+        .filter((v, k) => {return this.calculateVisibility(this._oldUserSettingState, k) !== v}).toMap();
     const updatedStates: Map<number, BoardHeader> = Map<number, BoardHeader>().asMutable();
     updatedStateValues.forEach((v, k) => {
       const header: BoardHeader = BoardViewModelUtil.updateBoardHeader(statesList.get(k), mutable => {
@@ -240,6 +255,7 @@ class HeadersBuilder {
   updateIssueHeaderCounts(issueTable: IssueTable, visibleIssueCounts: List<number>): HeadersBuilder {
     switch (this._changeType) {
       case ChangeType.UPDATE_BOARD:
+      case ChangeType.UPDATE_BOARD_AFTER_BACKLOG_TOGGLE:
       case ChangeType.LOAD_BOARD:
       case ChangeType.APPLY_FILTERS:
         break;
@@ -431,7 +447,10 @@ class IssueTableBuilder {
     private readonly _changeType: ChangeType,
     private readonly _oldIssueTableState: IssueTable,
     private readonly _currentBoardState: BoardState,
+    private readonly _oldUserSettingState: UserSettingState,
     private readonly _currentUserSettingState: UserSettingState) {
+    this._table = _oldIssueTableState.table;
+    this._rankView = _oldIssueTableState.rankView;
   }
 
   get visibleIssueCounts(): List<number> {
@@ -466,6 +485,7 @@ class IssueTableBuilder {
         });
         return issues.asImmutable();
       }
+      case ChangeType.UPDATE_BOARD_AFTER_BACKLOG_TOGGLE:
       case ChangeType.UPDATE_BOARD: {
         const issueChanges = this._currentBoardState.issues.lastChanged.size > 0;
         let issues: Map<string, BoardIssueView> = this._oldIssueTableState.issues;
@@ -506,6 +526,7 @@ class IssueTableBuilder {
         });
         return issues.asImmutable();
       }
+      case ChangeType.UPDATE_BOARD_AFTER_BACKLOG_TOGGLE:
       case ChangeType.UPDATE_BOARD: {
         const filters: AllFilters = new AllFilters(this._currentUserSettingState.filters, this._currentBoardState.projects);
         this._currentBoardState.issues.lastChanged.forEach((change, key) => {
@@ -531,20 +552,22 @@ class IssueTableBuilder {
     return issues;
   }
 
-  private createTableAndRankView(issues: Map<string, BoardIssueView>) {
+  private createTableAndRankView(issues: Map<string, BoardIssueView>): Map<string, BoardIssueView> {
     switch (this._changeType) {
       case ChangeType.APPLY_FILTERS:
       case ChangeType.CHANGE_SWIMLANE:
       case ChangeType.CHANGE_COLUMN_VISIBILITY:
-        this._table = this._oldIssueTableState.table;
-        this._rankView = this._oldIssueTableState.rankView;
         return;
     }
 
+    const viewMode: BoardViewMode = this._currentUserSettingState.viewMode;
     const oldTable: List<List<string>> = this._changeType === ChangeType.LOAD_BOARD ? null : this._oldIssueTableState.table;
     const oldRank: List<RankViewEntry> = this._changeType === ChangeType.LOAD_BOARD ? null : this._oldIssueTableState.rankView;
+
+    // We always need this since the issue table is used to calculate the total issues
     const tableBuilder: TableBuilder = new TableBuilder(this._currentBoardState.headers.states.size, oldTable);
-    const rankViewBuilder: RankViewBuilder = new RankViewBuilder(oldRank);
+    // Only calculate the rank view if we have that viewMode
+    const rankViewBuilder: RankViewBuilder = viewMode === BoardViewMode.RANK ? new RankViewBuilder(oldRank) : null;
 
     this.addProjectIssues(
       tableBuilder,
@@ -557,9 +580,12 @@ class IssueTableBuilder {
     });
 
     this._table = tableBuilder.getTable();
+    this._rankView = rankViewBuilder ? rankViewBuilder.getRankView() : initialIssueTable.rankView;
+    return issues;
   }
 
-  private addProjectIssues(tableBuilder: TableBuilder, rankViewBuilder: RankViewBuilder, project: BoardProject) {
+  private addProjectIssues(tableBuilder: TableBuilder, rankViewBuilder: RankViewBuilder,
+                           project: BoardProject) {
     const rankedKeysForProject: List<string> = this._currentBoardState.ranks.rankedIssueKeys.get(project.key);
     if (!rankedKeysForProject) {
       return;
@@ -570,9 +596,13 @@ class IssueTableBuilder {
       // find the index and add the issue
       const boardIndex: number = ownToBoardIndex[issue.ownState];
       tableBuilder.push(boardIndex, key);
-      rankViewBuilder.push(boardIndex, key);
+      if (rankViewBuilder) {
+        rankViewBuilder.push(boardIndex, key);
+      }
     });
   }
+
+
 
   private calculateVisibleIssueCounts(issues: Map<string, BoardIssueView>, table: List<List<string>>): List<number> {
     const visibilities: List<number> = List<number>().withMutations(mutable => {
@@ -596,13 +626,12 @@ class IssueTableBuilder {
     let swimlaneBuilder: SwimlaneInfoBuilder;
     switch (this._changeType) {
       case ChangeType.CHANGE_COLUMN_VISIBILITY:
-      case ChangeType.TOGGLE_BACKLOG:
-        return this._oldIssueTableState.swimlaneInfo;
       case ChangeType.LOAD_BOARD:
       case ChangeType.CHANGE_SWIMLANE:
         swimlaneBuilder = SwimlaneInfoBuilder.create(this._currentBoardState, this._currentUserSettingState, null);
         break;
       case ChangeType.APPLY_FILTERS:
+      case ChangeType.UPDATE_BOARD_AFTER_BACKLOG_TOGGLE:
       case ChangeType.UPDATE_BOARD: {
         const oldSwimlane = this._oldIssueTableState.swimlaneInfo;
         swimlaneBuilder = SwimlaneInfoBuilder.create(this._currentBoardState, this._currentUserSettingState, oldSwimlane);
@@ -1062,7 +1091,7 @@ class RankViewBuilder {
   push(boardIndex: number, key: string): RankViewBuilder {
     let entry: RankViewEntry = null;
     if (!this._changed) {
-      const existing: RankViewEntry = this._current.get(this._currentIndex);
+      const existing: RankViewEntry = this._existing.get(this._currentIndex);
       if (existing && existing.issueKey === key && existing.boardIndex === boardIndex) {
         entry = existing;
         this._currentIndex++;
@@ -1094,12 +1123,13 @@ class RankViewBuilder {
 enum ChangeType {
   LOAD_BOARD,
   UPDATE_BOARD,
+  UPDATE_BOARD_AFTER_BACKLOG_TOGGLE,
   APPLY_FILTERS,
   CHANGE_SWIMLANE,
   CHANGE_COLUMN_VISIBILITY,
-  TOGGLE_BACKLOG,
   TOGGLE_SWIMLANE_SHOW_EMPTY,
-  TOGGLE_SWIMLANE_COLLAPSED
+  TOGGLE_SWIMLANE_COLLAPSED,
+  SWITCH_VIEW_MODE
 }
 
 function collapsed(userSettingState: UserSettingState, key: string): boolean {

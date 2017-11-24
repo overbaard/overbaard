@@ -7,6 +7,7 @@ import {BoardViewMode} from './board-view-mode';
 const DEFAULT_STATE: UserSettingState = {
   boardCode: '',
   viewMode: BoardViewMode.KANBAN,
+  forceBacklog: false,
   showBacklog: false,
   swimlane: undefined,
   swimlaneShowEmpty: false,

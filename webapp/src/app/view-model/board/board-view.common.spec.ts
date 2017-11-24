@@ -39,6 +39,7 @@ import {BoardViewModel} from './board-view';
 import {BoardHeader} from './board-header';
 import {UserSettingState} from '../../model/board/user/user-setting';
 import {Action} from '@ngrx/store';
+import {main} from '@angular/compiler-cli/src/main';
 
 export class BoardViewObservableUtil {
   private _service: BoardViewModelHandler = new BoardViewModelHandler();
@@ -73,7 +74,7 @@ export class BoardViewObservableUtil {
     return this._userSettingState;
   }
 
-  initializeBoardState(boardStateInitializer: BoardStateInitializer): BoardViewObservableUtil {
+  updateBoardState(boardStateInitializer: BoardStateInitializer): BoardViewObservableUtil {
     boardStateInitializer.emitBoardChange(this);
     return this;
   }
@@ -104,8 +105,6 @@ export class BoardViewObservableUtil {
 }
 
 export class BoardStateInitializer {
-  private _boardState: BoardState = initialBoardState;
-
   private _issuesFactory: IssuesFactory;
   private _headerStateFactory: HeaderStateFactory;
 
@@ -144,9 +143,9 @@ export class BoardStateInitializer {
 
   // Internal use only
   emitBoardChange(mainUtil: BoardViewObservableUtil): void {
-    const headerState: HeaderState = this._headerStateFactory.createHeaderState();
+    const headerState: HeaderState = this._headerStateFactory.createHeaderState(mainUtil.boardState.headers);
     const projectState: ProjectState = this.createProjectState();
-    this._boardState = BoardUtil.toStateRecord(this._boardState).withMutations(mutable => {
+    const boardState: BoardState = BoardUtil.toStateRecord(mainUtil.boardState).withMutations(mutable => {
       mutable.viewId = 1;
       mutable.headers = headerState;
       mutable.projects = projectState;
@@ -158,9 +157,9 @@ export class BoardStateInitializer {
       mutable.labels = getTestLabelState();
       mutable.customFields = getTestCustomFieldState();
       mutable.ranks = this.createRankState();
-      mutable.issues = this.createIssueState(getDeserializeIssueLookupParams(headerState, projectState));
+      mutable.issues = this.createIssueState(mainUtil.boardState, getDeserializeIssueLookupParams(headerState, projectState));
     });
-    mainUtil.emitBoardState(this._boardState);
+    mainUtil.emitBoardState(boardState);
   }
 
   private createProjectState(): ProjectState {
@@ -197,11 +196,11 @@ export class BoardStateInitializer {
     return rankMetaReducer(initialRankState, RankActions.createDeserializeRanks(this._rankedIssueKeys));
   }
 
-  private createIssueState(params: DeserializeIssueLookupParams): IssueState {
+  private createIssueState(boardState: BoardState, params: DeserializeIssueLookupParams): IssueState {
     const input: any = this._issuesFactory.createIssueStateInput(params);
     this._issuesFactory.clear();
     return issueMetaReducer(
-      initialIssueState,
+      boardState.issues,
       IssueActions.createDeserializeIssuesAction(input, params));
   }
 }
@@ -317,6 +316,10 @@ export class UserSettingUpdater {
     return this._mainUtil;
   }
 
+  switchViewMode(): BoardViewObservableUtil {
+    return this.emitState(UserSettingActions.createSwitchBoardViewAction());
+  }
+
   updateVisibility(newValue: boolean, ...stateIndices: number[]): BoardViewObservableUtil {
     return this.emitState(UserSettingActions.createToggleVisibility(newValue, List<number>(stateIndices)));
   }
@@ -359,5 +362,5 @@ export interface IssuesFactory {
 }
 
 export interface HeaderStateFactory {
-  createHeaderState(): HeaderState;
+  createHeaderState(currentState: HeaderState): HeaderState;
 }

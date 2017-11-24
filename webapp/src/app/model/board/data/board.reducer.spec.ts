@@ -260,14 +260,6 @@ describe('Board reducer tests', () => {
       expect(blacklist.issueTypes.size).toBe(0);
       expect(blacklist.issues.size).toBe(0);
     });
-
-    it('Deserialize same', () => {
-      const boardStateA: BoardState = boardReducer(
-        initialBoardState, BoardActions.createDeserializeBoard(getTestBoardsInput()));
-      const boardStateB: BoardState = boardReducer(
-        boardStateA, BoardActions.createDeserializeBoard(getTestBoardsInput()));
-      expect(boardStateB).toBe(boardStateA);
-    });
   });
 
   describe('Changes', () => {

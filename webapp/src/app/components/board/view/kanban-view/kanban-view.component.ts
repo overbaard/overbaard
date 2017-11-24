@@ -1,6 +1,7 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {FixedHeaderView} from '../fixed-header-view';
 import {BoardHeader} from '../../../../view-model/board/board-header';
+import {BoardViewMode} from '../../../../model/board/user/board-view-mode';
 
 @Component({
   selector: 'app-kanban-view',
@@ -19,17 +20,14 @@ export class KanbanViewComponent extends FixedHeaderView implements OnInit {
   @Output()
   toggleCollapsedSwimlane: EventEmitter<string> = new EventEmitter<string>();
 
+  readonly viewMode =  BoardViewMode.KANBAN;
+
 
   constructor() {
     super();
   }
 
   ngOnInit() {
-  }
-
-  get boardBodyHeight() {
-    // TODO calculate properly taking into account the sizes of the toolbar and the headers, which may be one or two rows
-    return this.windowHeight - 150;
   }
 
   onToggleVisibility(header: BoardHeader) {

@@ -15,9 +15,9 @@ import {AppHeaderService} from './services/app-header.service';
 import {KanbanViewComponent} from './components/board/view/kanban-view/kanban-view.component';
 import {RankViewComponent} from './components/board/view/rank-view/rank-view.component';
 import {ControlPanelComponent} from './components/board/control-panel/control-panel.component';
-import {KanbanHeadersContainerComponent} from './components/board/view/kanban-view/kanban-view-headers/kanban-headers-container.component';
-import {KanbanHeaderGroupComponent} from './components/board/view/kanban-view/kanban-view-headers/kanban-header-group.component';
-import {KanbanHeaderContentComponent} from './components/board/view/kanban-view/kanban-view-headers/kanban-header-content.component';
+import {BoardHeadersContainerComponent} from './components/board/view/board-view-headers/board-headers-container.component';
+import {BoardHeaderGroupComponent} from './components/board/view/board-view-headers/board-header-group.component';
+import {BoardHeaderContentComponent} from './components/board/view/board-view-headers/board-header-content.component';
 import {KanbanNormalViewComponent} from './components/board/view/kanban-view/kanban-normal-view/kanban-normal-view.component';
 import {KanbanViewColumnGroupComponent} from './components/board/view/kanban-view/kanban-view-column/kanban-view-column-group.component';
 import {KanbanViewColumnComponent} from './components/board/view/kanban-view/kanban-view-column/kanban-view-column.component';
@@ -27,6 +27,8 @@ import {KanbanSwimlaneEntryComponent} from './components/board/view/kanban-view/
 import {HttpClientModule} from '@angular/common/http';
 import {ConfigurationComponent} from './components/config/configuration.component';
 import {BoardConfigurationComponent} from './components/config/board-configuration-component';
+import {RankViewEntryComponent} from './components/board/view/rank-view/rank-view-entry.component';
+import {RankViewContainerComponent} from './components/board/view/rank-view/rank-view-container.component';
 
 @NgModule({
   declarations: [
@@ -42,9 +44,11 @@ import {BoardConfigurationComponent} from './components/config/board-configurati
     KanbanSwimlaneViewComponent,
     KanbanSwimlaneEntryComponent,
     RankViewComponent,
-    KanbanHeaderContentComponent,
-    KanbanHeaderGroupComponent,
-    KanbanHeadersContainerComponent,
+    RankViewContainerComponent,
+    RankViewEntryComponent,
+    BoardHeaderContentComponent,
+    BoardHeaderGroupComponent,
+    BoardHeadersContainerComponent,
     BoardIssueComponent,
     ControlPanelComponent
   ],

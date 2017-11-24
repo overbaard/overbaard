@@ -1,0 +1,20 @@
+:host {
+  display: flex;
+  width: 100%;
+}
+.rank-line {
+  display: flex;
+}
+.cell {
+  display: flex;
+  flex-direction: column;
+  min-width: 40px;
+  max-width: 40px;
+  border: 1px black solid;
+  text-align: center;
+}
+.rank-issue {
+  min-width: 250px;
+  max-width: 250px;
+  border: 1px black solid;
+}

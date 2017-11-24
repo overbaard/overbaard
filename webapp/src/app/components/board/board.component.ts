@@ -1,5 +1,4 @@
 import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
-import {Dictionary} from '../../common/dictionary';
 import {ActivatedRoute} from '@angular/router';
 import {AppHeaderService} from '../../services/app-header.service';
 import {BoardService} from '../../services/board.service';
@@ -20,10 +19,8 @@ import {BoardViewModel} from '../../view-model/board/board-view';
 import {UserSettingState} from '../../model/board/user/user-setting';
 import {BoardViewMode} from '../../model/board/user/board-view-mode';
 import {BoardQueryParamsService} from '../../services/board-query-params.service';
+import {flatMap} from 'tslint/lib/utils';
 
-
-const VIEW_KANBAN = 'kbv';
-export const VIEW_RANK = 'rv';
 
 @Component({
   selector: 'app-board',
@@ -37,7 +34,6 @@ export class BoardComponent implements OnInit, OnDestroy {
   // TODO move these into the store?
   private boardCode: string;
   viewMode: BoardViewMode = BoardViewMode.KANBAN;
-  private _wasBacklogForced = false;
 
   board$: Observable<BoardViewModel>;
   windowHeight: number;
@@ -46,7 +42,10 @@ export class BoardComponent implements OnInit, OnDestroy {
   userSettings$: Observable<UserSettingState>;
   showControlPanel = false;
 
-  private _destroy: Subject<boolean> = new Subject<boolean>();
+  private _destroy$: Subject<boolean> = new Subject<boolean>();
+
+  // Expose the enum to the template
+  enumViewMode = BoardViewMode;
 
   constructor(
     private _route: ActivatedRoute,
@@ -58,28 +57,6 @@ export class BoardComponent implements OnInit, OnDestroy {
 
     this.setWindowSize();
 
-    const queryParams: Dictionary<string> = _route.snapshot.queryParams;
-    const code: string = queryParams['board'];
-    if (!code) {
-      return;
-    }
-    this.boardCode = code;
-
-    const view = queryParams['view'];
-    if (view) {
-      this.viewMode = BoardViewMode.RANK;
-      if (view === VIEW_RANK) {
-        this._wasBacklogForced = true;
-      }
-    }
-
-    let title = `Board ${code}`;
-    if (view === VIEW_RANK) {
-      title += ' (rank)';
-    }
-    this._appHeaderService.setTitle(title);
-
-    // TODO push more querystring values into the store
   }
 
   ngOnInit() {
@@ -87,21 +64,36 @@ export class BoardComponent implements OnInit, OnDestroy {
     // TODO turn on/off progress indicator and log errors
 
     // Parse the user settings from the query string first
-    this._store.dispatch(UserSettingActions.createInitialiseFromQueryString(this._route.snapshot.queryParams));
 
     const gotAllData$: Subject<boolean> = new Subject<boolean>();
 
-    this._boardService.loadBoardData(this.boardCode, true)
-      .takeUntil(gotAllData$)
+    let userSettings: UserSettingState = null;
+    this._store.dispatch(UserSettingActions.createInitialiseFromQueryString(this._route.snapshot.queryParams))
+    this._store.select(userSettingSelector)
+      .take(1)
       .subscribe(
-        value => {
-          // Deserialize the board
-          this._store.dispatch(BoardActions.createDeserializeBoard(value));
-        }
-      );
+        userSettingsValue => {
+          let title = `Board ${userSettingsValue.boardCode}`;
+          if (userSettingsValue.viewMode === BoardViewMode.RANK) {
+            title += ' (rank)';
+          }
+          this._appHeaderService.setTitle(title);
+          this.viewMode = userSettingsValue.viewMode;
+          userSettings = userSettingsValue;
+          // TODO progress and error handling
+          this._boardService.loadBoardData(userSettingsValue.boardCode, userSettings.showBacklog)
+            .takeUntil(gotAllData$)
+            .subscribe(
+              boardValue => {
+                // Deserialize the board
+                this._store.dispatch(BoardActions.createDeserializeBoard(boardValue));
+              }
+            );
+        });
+
 
     this._store.select<BoardState>(boardSelector)
-      .skipWhile(board => board.viewId < 0)
+      .skipWhile(board => !board || board.viewId < 0)
       .takeUntil(gotAllData$)
       .subscribe(
         board => {
@@ -113,7 +105,7 @@ export class BoardComponent implements OnInit, OnDestroy {
     this.userSettings$ = this._store.select<UserSettingState>(userSettingSelector);
 
     this._queryParamsService.getQueryParams()
-      .takeUntil(this._destroy)
+      .takeUntil(this._destroy$)
       .subscribe(queryString => {
         this.updateLink(queryString);
       });
@@ -123,7 +115,7 @@ export class BoardComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this._store.dispatch(BoardActions.createClearBoard());
     this._store.dispatch(UserSettingActions.createClearSettings());
-    this._destroy.next(true);
+    this._destroy$.next(true);
   }
 
   onFocus($event: Event) {
@@ -148,11 +140,15 @@ export class BoardComponent implements OnInit, OnDestroy {
   }
 
   onToggleBacklog(backlogHeader: BoardHeader) {
+    // A decision about whether to pass up toggleVisibility or toggleBacklog is made in BoardHeaderGroupComponent
     this._store.dispatch(UserSettingActions.createToggleBacklog(backlogHeader));
+    this.userSettings$.take(1).subscribe(us => {
+      this.refreshBoardForBacklogToggle(us);
+    });
   }
 
   onToggleVisibility(header: BoardHeader) {
-    // A decision about whether to pass up toggleVisibility or toggleBacklog is made in KanbanHeaderGroupComponent
+    // A decision about whether to pass up toggleVisibility or toggleBacklog is made in BoardHeaderGroupComponent
     let newValue = true;
     if (header.category) {
       // For a category, if all its states are false, make them all true. Otherwise make them all false.
@@ -169,6 +165,35 @@ export class BoardComponent implements OnInit, OnDestroy {
     this._store.dispatch(UserSettingActions.createToggleVisibility(newValue, header.stateIndices));
   }
 
+  onSwitchViewMode(event: Event) {
+    // Update the view
+    this.userSettings$.take(1).subscribe(originalUs => {
+      this._store.dispatch(UserSettingActions.createSwitchBoardViewAction());
+      this.userSettings$.take(1).subscribe(us => {
+        if (us.showBacklog !== originalUs.showBacklog) {
+          this.refreshBoardForBacklogToggle(us);
+        }
+      });
+    });
+  }
+
+  private refreshBoardForBacklogToggle(userSetting: UserSettingState) {
+    // We need to do a full refresh when toggling the backlog to keep the ranks in order. This is needed whether
+    // we show it or hide it.
+    // The main reason for this is the list of issue ranks in the board state. This is even needed when hiding it, as
+    // if we have the list with the backlog shown and then simply hide locally without doing a full reload, the rank changes we
+    // get from the server will be based off the 'no backlog' indices, while we would have the list including the backlog
+    // issues
+    this._boardService.loadBoardData(userSetting.boardCode, userSetting.showBacklog)
+      .take(1)
+      .subscribe(
+        boardValue => {
+          // Deserialize the board
+          this._store.dispatch(BoardActions.createDeserializeBoard(boardValue));
+        });
+  }
+
+
   onToggleCollapsedSwimlane(key: string) {
     this._store.dispatch(UserSettingActions.createToggleCollapsedSwimlane(key));
   }
@@ -184,5 +209,6 @@ export class BoardComponent implements OnInit, OnDestroy {
       history.replaceState(null, null, url);
     }
   }
+
 }
 

@@ -1,18 +1,3 @@
-@import "../../../../../styles";
-@import "../../board.component";
-
-#board-outer {
-  background-color: #fff;
-  position: absolute;
-  top: $toolbar-height;
-  left: 0px;
-  right: 0px;
-  bottom: 0px;
-}
-#board-inner {
-  height: 100%;
-  overflow: hidden;
-}
 /* Board body */
 #board-body {
   overflow: auto;

@@ -1,24 +1,21 @@
-<div id="board-outer">
-  <div id="board-inner">
-    <app-kanban-headers-container
-      [board]="board"
-      [boardLeftOffset]="boardLeftOffset"
-      (toggleColumnVisibility)="onToggleVisibility($event)"
-      (toggleBacklog)="onToggleBacklog($event)"
-    >
-    </app-kanban-headers-container>
-    <div id="board-body">
-      <app-kanban-normal-view
-        *ngIf="!board.issueTable.swimlaneInfo"
-        [board]="board"
-        (scroll)="onScrollBoardX($event)"
-      ></app-kanban-normal-view>
-      <app-kanban-swimlane-view
-        *ngIf="board.issueTable.swimlaneInfo"
-        [board]="board"
-        (scroll)="onScrollBoardX($event)"
-        (toggleCollapsedSwimlane)="onToggleCollapsedSwimlane($event)"
-      ></app-kanban-swimlane-view>
-    </div>
-  </div>
+<app-board-headers-container
+  [headers]="board.headers"
+  [boardLeftOffset]="boardLeftOffset"
+  [viewMode]="viewMode"
+  (toggleColumnVisibility)="onToggleVisibility($event)"
+  (toggleBacklog)="onToggleBacklog($event)"
+>
+</app-board-headers-container>
+<div id="board-body">
+  <app-kanban-normal-view
+    *ngIf="!board.issueTable.swimlaneInfo"
+    [board]="board"
+    (scroll)="onScrollBoardX($event)"
+  ></app-kanban-normal-view>
+  <app-kanban-swimlane-view
+    *ngIf="board.issueTable.swimlaneInfo"
+    [board]="board"
+    (scroll)="onScrollBoardX($event)"
+    (toggleCollapsedSwimlane)="onToggleCollapsedSwimlane($event)"
+  ></app-kanban-swimlane-view>
 </div>

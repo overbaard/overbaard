@@ -89,7 +89,7 @@ const SWIMLANE_DATA_STATE_FACTORY = makeTypedFactory<SwimlaneData, SwimlaneDataR
 const RANK_VIEW_ENTRY_RECORD = makeTypedFactory<RankViewEntry, RankViewEntryRecord>(DEFAULT_RANK_VIEW_ENTRY);
 
 const initialBoardHeaders: BoardHeaders = BOARD_HEADERS_FACTORY(DEFAULT_BOARD_HEADERS);
-const initialIssueTable: IssueTable = ISSUE_TABLE_STATE_FACTORY(DEFAULT_ISSUE_TABLE);
+export const initialIssueTable: IssueTable = ISSUE_TABLE_STATE_FACTORY(DEFAULT_ISSUE_TABLE);
 export const initialBoardViewModel: BoardViewModel = BOARD_VIEW_MODEL_FACTORY({
   headers: initialBoardHeaders,
   issueTable: initialIssueTable});

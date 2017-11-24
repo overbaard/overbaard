@@ -1,16 +1,20 @@
 import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {BoardHeader} from '../../../../../view-model/board/board-header';
+import {BoardHeader} from '../../../../view-model/board/board-header';
+import {BoardViewMode} from '../../../../model/board/user/board-view-mode';
 
 @Component({
-  selector: 'app-kanban-header-group',
-  templateUrl: './kanban-header-group.component.html',
-  styleUrls: ['./kanban-header-group.component.scss'],
+  selector: 'app-board-header-group',
+  templateUrl: './board-header-group.component.html',
+  styleUrls: ['./board-header-group.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class KanbanHeaderGroupComponent implements OnInit {
+export class BoardHeaderGroupComponent implements OnInit {
 
   @Input()
   header: BoardHeader;
+
+  @Input()
+  viewMode: BoardViewMode;
 
   @Output()
   toggleColumnVisibility: EventEmitter<BoardHeader> = new EventEmitter<BoardHeader>();
@@ -24,18 +28,33 @@ export class KanbanHeaderGroupComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    if (this.header.backlog) {
-      if (this.header.visible) {
-        this.classList = ['backlog']
+    if (!this.header.category) {
+      this.showStates = false;
+    } else if (this.header.backlog) {
+      if (this.viewMode === BoardViewMode.KANBAN) {
+        this.showStates = this.header.visible;
       } else {
-        this.classList = ['backlog', 'hidden-backlog']
+        this.showStates = this.header.stateIndices.size > 1;
       }
     }
 
-    if (!this.header.category) {
-      this.showStates = false;
-    } else if (this.header.backlog && !this.header.visible) {
-      this.showStates = false;
+    if (this.viewMode === BoardViewMode.KANBAN) {
+      if (this.header.backlog) {
+        if (this.header.visible) {
+          this.classList = ['backlog']
+        } else {
+          this.classList = ['backlog', 'hidden-backlog']
+        }
+      }
+    } else if (this.viewMode === BoardViewMode.RANK) {
+      if (this.header.backlog) {
+        if (this.header.category && this.showStates) {
+          this.classList = ['backlog'];
+        } else {
+          this.classList = this.classList = ['backlog', 'rank-backlog'];
+
+        }
+      }
     }
   }
 

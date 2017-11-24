@@ -3,7 +3,6 @@ import {BoardsService} from '../../services/boards.service';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/catch';
 import {AppHeaderService} from '../../services/app-header.service';
-import {VIEW_RANK} from '../board/board.component';
 
 @Component({
   selector: 'app-boards',
@@ -16,7 +15,7 @@ export class BoardsComponent implements OnInit, OnDestroy {
 
   boards$: Observable<any[]>;
 
-  rankViewParameter = VIEW_RANK;
+  readonly rankViewParameter = 'rv';
 
   constructor(private _boardsService: BoardsService, private _appHeaderService: AppHeaderService) { }
 

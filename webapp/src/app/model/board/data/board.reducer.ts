@@ -95,9 +95,6 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
     case DESERIALIZE_BOARD: {
       const input = (<DeserializeBoardAction>action).payload;
       const viewId: number = input['view'];
-      if (viewId === state.viewId) {
-        return state;
-      }
       const rankCustomFieldId = input['rank-custom-field-id'];
       const headerState: HeaderState =
         metaReducers.headers(state.headers, HeaderActions.createDeserializeHeaders(
@@ -152,25 +149,22 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
       const blacklistState: BlacklistState =
         metaReducers.blacklist(state.blacklist, BlacklistActions.createDeserializeBlacklist(input['blacklist']));
 
-      const newState: BoardState = {
-        viewId: viewId,
-        rankCustomFieldId: rankCustomFieldId,
-        headers: headerState,
-        assignees: assigneeState,
-        issueTypes: issueTypeState,
-        priorities: priorityState,
-        components: componentState,
-        fixVersions: fixVersionState,
-        labels: labelState,
-        customFields: customFieldState,
-        projects: projectState,
-        issues: issueState,
-        ranks: rankState,
-        blacklist: blacklistState
-
-      };
-
-      return BoardUtil.recordFromObject(newState);
+      return BoardUtil.withMutatons(state, mutable => {
+        mutable.viewId = viewId;
+        mutable.rankCustomFieldId = rankCustomFieldId;
+        mutable.headers =  headerState;
+        mutable.assignees = assigneeState;
+        mutable.issueTypes = issueTypeState;
+        mutable.priorities = priorityState;
+        mutable.components = componentState;
+        mutable.fixVersions = fixVersionState;
+        mutable.labels = labelState;
+        mutable.customFields = customFieldState;
+        mutable.projects = projectState;
+        mutable.issues = issueState;
+        mutable.ranks = rankState;
+        mutable.blacklist = blacklistState;
+      });
     }
     case PROCESS_BOARD_CHANGES: {
       const input: any = (<ProcessBoardChangesAction>action).payload;

@@ -1,4 +1,4 @@
-import {Action} from '@ngrx/store';
+import {Action, createSelector} from '@ngrx/store';
 import {Dictionary} from '../../../common/dictionary';
 import {List, Map} from 'immutable';
 import {initialUserSettingState, UserSettingUtil} from './user-setting.model';
@@ -16,9 +16,10 @@ const CLEAR_SETTINGS = 'CLEAR_SETTINGS';
 
 const UPDATE_SWIMLANE = 'UPDATE_SWIMLANE';
 const TOGGLE_COLUMN_VISIBILITY = 'TOGGLE_COLUMN_VISIBILITY';
-const TOGGLE_BACKLOG = 'TOGGLE_BACKLOG';
+const TOGGLE_BACKLOG = 'TOGGLE_HIDE_BACKLOG';
 const TOGGLE_SHOW_EMPTY_SWIMLANES = 'TOGGLE_SHOW_EMPTY_SWIMLANES';
 const TOGGLE_COLLAPSED_SWIMLANE = 'TOGGLE_COLLAPSED_SWIMLANE';
+const SWITCH_BOARD_VIEW = 'SWITCH_BOARD_VIEW';
 
 class ClearSettingsAction implements Action {
   readonly type = CLEAR_SETTINGS;
@@ -49,11 +50,15 @@ class ToggleShowEmptySwimlanesAction implements Action {
 }
 
 class ToggleCollapsedSwimlaneAction {
-
   readonly type = TOGGLE_COLLAPSED_SWIMLANE;
   constructor(readonly payload: string) {
   }
+}
 
+class SwitchBoardViewAction {
+  readonly type = SWITCH_BOARD_VIEW;
+  constructor() {
+  }
 }
 
 export class UserSettingActions {
@@ -77,35 +82,45 @@ export class UserSettingActions {
     return new ToggleVisibilityAction({newValue: newValue, states: states});
   }
 
-  static createToggleShowEmptySwimlanes() {
+  static createToggleShowEmptySwimlanes(): Action {
     return new ToggleShowEmptySwimlanesAction();
   }
 
-  static createToggleCollapsedSwimlane(key: string) {
+  static createToggleCollapsedSwimlane(key: string): Action {
     return new ToggleCollapsedSwimlaneAction(key);
+  }
+
+  static createSwitchBoardViewAction(): Action {
+    return new SwitchBoardViewAction();
   }
 }
 
 export function userSettingReducer(state: UserSettingState = initialUserSettingState, action: Action): UserSettingState {
   switch (action.type) {
     case INITIALISE_SETTINGS_FROM_QUERYSTRING: {
+      const initAction: InitialiseFromQueryStringAction = <InitialiseFromQueryStringAction>action;
+      const params: Dictionary<string> = initAction.payload;
       return UserSettingUtil.updateUserSettingState(state, mutable => {
-        const initAction: InitialiseFromQueryStringAction = <InitialiseFromQueryStringAction>action;
-        mutable.boardCode = decodeURIComponent(initAction.payload['board']);
-        if (initAction.payload['view'] === 'rv') {
+        mutable.boardCode = decodeURIComponent(params['board']);
+        if (params['view'] === 'rv') {
           mutable.viewMode = BoardViewMode.RANK;
+          mutable.forceBacklog = true;
+          mutable.showBacklog = true;
         }
-        mutable.showBacklog = initAction.payload['bl'] ? initAction.payload['bl'] === 'true' : false;
+        mutable.showBacklog = params['bl'] === 'true' || mutable.viewMode === BoardViewMode.RANK;
         mutable.filters = boardFilterMetaReducer(state.filters, action);
         mutable.defaultColumnVisibility = initAction.getVisibleColumnDefault();
         mutable.columnVisibilities = initAction.parseVisibleColumns();
-        mutable.swimlane = initAction.payload['swimlane'];
+        mutable.swimlane = params['swimlane'];
         if (mutable.swimlane) {
-          mutable.swimlaneShowEmpty = initAction.payload['showEmptySl'] ? initAction.payload['showEmptySl'] === 'true' : false;
+          mutable.swimlaneShowEmpty = params['showEmptySl'] === 'true';
           mutable.defaultCollapsedSwimlane = initAction.getSwimlaneCollapsedDefault();
           mutable.collapsedSwimlanes = initAction.parseCollapsedSwimlanes();
         }
       });
+    }
+    case CLEAR_SETTINGS: {
+      return initialUserSettingState;
     }
     case UPDATE_SWIMLANE: {
       return UserSettingUtil.updateUserSettingState(state, mutable => {
@@ -157,6 +172,23 @@ export function userSettingReducer(state: UserSettingState = initialUserSettingS
         });
       }
       return state;
+    }
+    case SWITCH_BOARD_VIEW: {
+      return UserSettingUtil.updateUserSettingState(state, settingState => {
+        if (settingState.viewMode === BoardViewMode.KANBAN) {
+          settingState.viewMode = BoardViewMode.RANK;
+          if (!settingState.showBacklog) {
+            settingState.showBacklog = true;
+            settingState.forceBacklog = true;
+          }
+        } else if (settingState.viewMode === BoardViewMode.RANK) {
+          settingState.viewMode = BoardViewMode.KANBAN;
+          if (settingState.forceBacklog) {
+            settingState.showBacklog = false;
+            settingState.forceBacklog = false;
+          }
+        }
+      });
     }
   }
   // Delegate other actions like updating the filters

@@ -6,6 +6,8 @@ import {BoardFilterActions} from './board-filter/board-filter.reducer';
 import {PROJECT_ATTRIBUTES} from './board-filter/board-filter.constants';
 import {List} from 'immutable';
 import {UserSettingState} from './user-setting';
+import {BoardViewMode} from './board-view-mode';
+import {BoardHeader} from '../../../view-model/board/board-header';
 
 describe('User setting reducer tests', () => {
   describe('Querystring tests', () => {
@@ -441,11 +443,150 @@ describe('User setting reducer tests', () => {
     });
   });
 
+  describe('Backlog and view mode tests', () => {
+    it ('Initial rank view', () => {
+      const qs: Dictionary<string> = {
+        board: 'TEST',
+        view: 'rv'
+      };
+      let state: UserSettingState = userSettingReducer(
+        initialUserSettingState,
+        UserSettingActions.createInitialiseFromQueryString(qs));
+      const checker: SettingChecker = new SettingChecker();
+      checker.boardCode = 'TEST';
+      checker.viewMode = BoardViewMode.RANK;
+      checker.showBacklog = true;
+      checker.forceBacklog = true;
+      checker.check(state);
+
+      state = userSettingReducer(state, UserSettingActions.createSwitchBoardViewAction());
+      checker.viewMode = BoardViewMode.KANBAN;
+      checker.showBacklog = false;
+      checker.forceBacklog = false;
+      checker.check(state);
+    });
+
+    describe('Initial Kanban view', () => {
+      describe('Backlog initially hidden', () => {
+        it ('Switch view', () => {
+          const qs: Dictionary<string> = {
+            board: 'TEST'
+          };
+          let state: UserSettingState = userSettingReducer(
+            initialUserSettingState,
+            UserSettingActions.createInitialiseFromQueryString(qs));
+          const checker: SettingChecker = new SettingChecker();
+          checker.boardCode = 'TEST';
+          checker.check(state);
+
+          state = userSettingReducer(state, UserSettingActions.createSwitchBoardViewAction());
+          checker.viewMode = BoardViewMode.RANK;
+          checker.showBacklog = true;
+          checker.forceBacklog = true;
+          checker.check(state);
+
+          state = userSettingReducer(state, UserSettingActions.createSwitchBoardViewAction());
+          checker.viewMode = BoardViewMode.KANBAN;
+          checker.showBacklog = false;
+          checker.forceBacklog = false;
+          checker.check(state);
+        });
+
+        it ('Toggle backlog', () => {
+          const qs: Dictionary<string> = {
+            board: 'TEST'
+          };
+          let state: UserSettingState = userSettingReducer(
+            initialUserSettingState,
+            UserSettingActions.createInitialiseFromQueryString(qs));
+          const checker: SettingChecker = new SettingChecker();
+          checker.boardCode = 'TEST';
+          checker.check(state);
+
+          state = userSettingReducer(state, UserSettingActions.createToggleBacklog(getBacklogHeaderForToggle()));
+          checker.showBacklog = true;
+          checker.visibleColumns = {0: true};
+          checker.check(state);
+
+          state = userSettingReducer(state, UserSettingActions.createToggleBacklog(getBacklogHeaderForToggle()));
+          checker.showBacklog = false;
+          checker.visibleColumns = {0: false};
+          checker.check(state);
+        });
+      });
+
+      describe('Backlog initially visible', () => {
+        it ('Switch view', () => {
+          const qs: Dictionary<string> = {
+            board: 'TEST',
+            bl: 'true'
+          };
+          let state: UserSettingState = userSettingReducer(
+            initialUserSettingState,
+            UserSettingActions.createInitialiseFromQueryString(qs));
+          const checker: SettingChecker = new SettingChecker();
+          checker.boardCode = 'TEST';
+          checker.showBacklog = true;
+          checker.check(state);
+
+          state = userSettingReducer(state, UserSettingActions.createSwitchBoardViewAction());
+          checker.viewMode = BoardViewMode.RANK;
+          checker.check(state);
+
+          state = userSettingReducer(state, UserSettingActions.createSwitchBoardViewAction());
+          checker.viewMode = BoardViewMode.KANBAN;
+          checker.check(state);
+        });
+
+        it ('Toggle backlog', () => {
+          const qs: Dictionary<string> = {
+            board: 'TEST',
+            bl: 'true'
+          };
+          let state: UserSettingState = userSettingReducer(
+            initialUserSettingState,
+            UserSettingActions.createInitialiseFromQueryString(qs));
+          const checker: SettingChecker = new SettingChecker();
+          checker.boardCode = 'TEST';
+          checker.showBacklog = true;
+          checker.check(state);
+
+          state = userSettingReducer(state, UserSettingActions.createToggleBacklog(getBacklogHeaderForToggle()));
+          checker.showBacklog = false;
+          checker.visibleColumns = {0: false};
+          checker.check(state);
+
+          state = userSettingReducer(state, UserSettingActions.createToggleBacklog(getBacklogHeaderForToggle()));
+          checker.showBacklog = true;
+          checker.visibleColumns = {0: true
+          };
+          checker.check(state);
+        });
+      });
+      function getBacklogHeaderForToggle(): BoardHeader {
+        // Only the stateIndices are used for what we are testing here
+        return {
+          name: 'Backlog',
+          abbreviation: 'BL',
+          category: true,
+          backlog: true,
+          wip: 0,
+          totalIssues: 0,
+          visibleIssues: 0,
+          visible: true,
+          states: List<BoardHeader>(),
+          stateIndices: List<number>([0])
+        };
+      }
+    })
+  });
 });
 
 class SettingChecker {
   boardCode: string = null;
+  viewMode: BoardViewMode = BoardViewMode.KANBAN;
   showBacklog = false;
+  forceBacklog = false;
   swimlane: string = null;
   filterChecker: FilterChecker = new FilterChecker();
   defaultColumnVisibility = true;
@@ -467,6 +608,7 @@ class SettingChecker {
   check(state: UserSettingState) {
     expect(state.boardCode).toEqual(this.boardCode);
     expect(state.showBacklog).toEqual(this.showBacklog);
+    expect(state.forceBacklog).toEqual(this.forceBacklog)
     if (!this.swimlane) {
       expect(state.swimlane).toBeFalsy();
     } else {

@@ -1,19 +1,21 @@
 import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {BoardHeaders} from '../../../../../view-model/board/board-headers';
-import {List} from 'immutable';
-import {BoardViewModel} from '../../../../../view-model/board/board-view';
-import {BoardHeader} from '../../../../../view-model/board/board-header';
+import {BoardHeaders} from '../../../../view-model/board/board-headers';
+import {BoardHeader} from '../../../../view-model/board/board-header';
+import {BoardViewMode} from '../../../../model/board/user/board-view-mode';
 
 @Component({
-  selector: 'app-kanban-headers-container',
-  templateUrl: './kanban-headers-container.component.html',
-  styleUrls: ['./kanban-headers-container.component.scss'],
+  selector: 'app-board-headers-container',
+  templateUrl: './board-headers-container.component.html',
+  styleUrls: ['./board-headers-container.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class KanbanHeadersContainerComponent implements OnInit {
+export class BoardHeadersContainerComponent implements OnInit {
 
   @Input()
-  board: BoardViewModel;
+  headers: BoardHeaders;
+
+  @Input()
+  viewMode: BoardViewMode;
 
   @Input()
   boardLeftOffset = 0;
@@ -24,13 +26,13 @@ export class KanbanHeadersContainerComponent implements OnInit {
   @Output()
   toggleBacklog: EventEmitter<BoardHeader> = new EventEmitter<BoardHeader>();
 
+  // Expose the enum to the component
+  readonly enumViewMode = BoardViewMode;
+
+
   constructor() { }
 
   ngOnInit() {
-  }
-
-  get headers(): BoardHeaders {
-    return this.board.headers;
   }
 
   onToggleVisibility(header: BoardHeader) {
