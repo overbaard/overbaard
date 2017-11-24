@@ -34,7 +34,6 @@ export class ConfigurationComponent implements OnInit {
 
   // For saving the rank id
   rankCustomFieldIdForm: FormGroup
-  initialRankCustomFieldId: number;
 
   constructor(private _boardsService: BoardsService,
               appHeaderService: AppHeaderService) {
