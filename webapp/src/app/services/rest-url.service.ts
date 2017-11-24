@@ -3,7 +3,7 @@ import {Injectable} from '@angular/core';
 @Injectable()
 export class RestUrlService {
 
-  private static OVERBAARD_FRAGMENT = 'jirban';
+  private static OVERBAARD_FRAGMENT = 'overbaard';
   static readonly OVERBAARD_REST_PREFIX = 'rest/' + RestUrlService.OVERBAARD_FRAGMENT + '/1.0';
 
   private _overbaardPrefix: string;

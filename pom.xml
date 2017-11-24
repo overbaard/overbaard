@@ -18,14 +18,14 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.jirban</groupId>
-    <artifactId>jirban-jira</artifactId>
-    <version>2.0.5-SNAPSHOT</version>
+    <groupId>org.overbaard</groupId>
+    <artifactId>overbaard</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
     <organization>
         <name>Red Hat Inc.</name>
-        <url>https://github.com/kabir/jirban-jira</url>
+        <url>https://github.com/overbaard/overbaard</url>
     </organization>
-    <name>JirBan</name>
+    <name>Overbård</name>
     <description>Nicer views on the Jira Agile boards</description>
     <packaging>atlassian-plugin</packaging>
 
@@ -232,7 +232,7 @@
                     <instructions>
                         <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
                         <!-- Add package to export here -->
-                        <Export-Package>org.jirban.jira.api,</Export-Package>
+                        <Export-Package>org.overbaard.jira.api,</Export-Package>
                         <!-- Add package import here -->
                         <Import-Package>org.springframework.osgi.*;resolution:="optional", org.eclipse.gemini.blueprint.*;resolution:="optional", *</Import-Package>
                         <!-- Ensure plugin is spring powered - see https://extranet.atlassian.com/x/xBS9hQ  -->
@@ -283,14 +283,14 @@
         <profile>
             <!--
                 Installs node and yarn in the webapp/node and webapp/node_modules folders respectively.
-                Run 'atlas-package -Djirban.ui.deps':
+                Run 'atlas-package -Dob.ui.deps':
                     * the first time you have checked out the source.
                     * whenever the dependencies have been changed in package.json (delete the webapp/node_modules
                       folder first!)
             -->
             <id>Install node and yarn</id>
             <activation>
-                <property><name>jirban.ui.deps</name></property>
+                <property><name>ob.ui.deps</name></property>
             </activation>
             <build>
                 <plugins>
@@ -332,12 +332,12 @@
         <profile>
             <!--
                 Since building the ui is slightly time-consuming, and not all changes necessarily affect the ui, turn on
-                building the ui explicitly by running 'atlas-package -Djirban.ui'
+                building the ui explicitly by running 'atlas-package -Dob.ui'
             -->
             <id>Build the UI</id>
             <activation>
                 <property>
-                    <name>jirban.ui</name>
+                    <name>ob.ui</name>
                 </property>
             </activation>
             <build>

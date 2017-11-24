@@ -10,7 +10,7 @@ import {environment} from './environments/environment';
 
 
 function calculatePublicPath(): string {
-  const searchElement = '/download/resources/org.jirban.jirban-jira/webapp/';
+  const searchElement = '/download/resources/org.overbaard.overbaard/webapp/';
   const location: Location = window.location;
   const href: string = location.href;
   const index: number = href.indexOf(searchElement);

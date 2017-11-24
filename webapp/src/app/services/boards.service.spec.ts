@@ -34,7 +34,7 @@ describe('Boards Service', () => {
         expect(data).toEqual(getBordsListSummary());
       });
 
-    httpMock.expectOne({url: 'rest/jirban/1.0/boards$.json', method: 'GET'})
+    httpMock.expectOne({url: 'rest/overbaard/1.0/boards$.json', method: 'GET'})
       .flush({
       'configs': getBordsListSummary()});
     httpMock.verify();
@@ -49,7 +49,7 @@ describe('Boards Service', () => {
           }
         );
 
-    httpMock.expectOne('rest/jirban/1.0/boards$.json')
+    httpMock.expectOne('rest/overbaard/1.0/boards$.json')
       .flush(null, {status: 401, statusText: 'Unauthorized'});
   })
 });
