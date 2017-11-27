@@ -62,7 +62,7 @@ export function boardFilterMetaReducer(state: BoardFilterState = initialBoardFil
     }
     case UPDATE_FILTER: {
       const payload: UpdateFilterPayload = (<UpdateFilterAction>action).payload;
-      return BoardFilterUtil.toStateRecord(state).withMutations(mutable => {
+      return BoardFilterUtil.updateBoardFilterState(state, mutable => {
         if (payload.filter.customField) {
           mutable.customField = mutable.customField.set(payload.filter.key, createSelectedFieldsSet(payload.data));
           return;

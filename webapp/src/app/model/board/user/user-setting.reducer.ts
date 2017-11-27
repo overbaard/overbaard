@@ -10,6 +10,7 @@ import {
 } from './initialise-from-querystring.action';
 import {UserSettingState} from './user-setting';
 import {AppState} from '../../../app-store';
+import {BoardViewMode} from './board-view-mode';
 
 const CLEAR_SETTINGS = 'CLEAR_SETTINGS';
 
@@ -90,7 +91,10 @@ export function userSettingReducer(state: UserSettingState = initialUserSettingS
     case INITIALISE_SETTINGS_FROM_QUERYSTRING: {
       return UserSettingUtil.updateUserSettingState(state, mutable => {
         const initAction: InitialiseFromQueryStringAction = <InitialiseFromQueryStringAction>action;
-        mutable.boardCode = initAction.payload['board'];
+        mutable.boardCode = decodeURIComponent(initAction.payload['board']);
+        if (initAction.payload['view'] === 'rv') {
+          mutable.viewMode = BoardViewMode.RANK;
+        }
         mutable.showBacklog = initAction.payload['bl'] ? initAction.payload['bl'] === 'true' : false;
         mutable.filters = boardFilterMetaReducer(state.filters, action);
         mutable.defaultColumnVisibility = initAction.getVisibleColumnDefault();

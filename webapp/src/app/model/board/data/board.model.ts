@@ -45,4 +45,10 @@ export class BoardUtil {
     // TODO do some checks. TS does not allow use of instanceof when the type is an interface (since they are compiled away)
     return <BoardStateRecord>s;
   }
+
+  static withMutatons(s: BoardState, mutate: (mutable: BoardState) => any): BoardState {
+    return (<BoardStateRecord>s).withMutations(mutable => {
+      mutate(mutable);
+    });
+  }
 }

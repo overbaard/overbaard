@@ -98,7 +98,7 @@ export class InitialiseFromQueryStringAction implements Action {
       if (valueString) {
         const values: string[] = valueString.split(',');
         for (const value of values) {
-          mutable.set(value, collapsed);
+          mutable.set(decodeURIComponent(value), collapsed);
         }
       }
     });

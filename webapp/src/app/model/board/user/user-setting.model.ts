@@ -1,6 +1,6 @@
 import {initialBoardFilterState} from './board-filter/board-filter.model';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
-import {Map} from 'immutable';
+import {List, Map} from 'immutable';
 import {UserSettingState} from './user-setting';
 import {BoardViewMode} from './board-view-mode';
 
@@ -34,4 +34,5 @@ export class UserSettingUtil {
   static fromObject(object: UserSettingState) {
     return STATE_FACTORY(object);
   }
+
 }

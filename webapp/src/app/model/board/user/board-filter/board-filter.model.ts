@@ -33,10 +33,12 @@ const STATE_FACTORY = makeTypedFactory<BoardFilterState, BoardFilterStateRecord>
 export const initialBoardFilterState: BoardFilterState = STATE_FACTORY(DEFAULT_STATE);
 
 export class BoardFilterUtil {
-  static toStateRecord(s: BoardFilterState): BoardFilterStateRecord {
-    // TODO do some checks. TS does not allow use of instanceof when the type is an interface (since they are compiled away)
-    return <BoardFilterStateRecord>s;
+  static updateBoardFilterState(boardFilterState: BoardFilterState, mutate: (mutable: BoardFilterState) => any): BoardFilterState {
+    return (<BoardFilterStateRecord>boardFilterState).withMutations(mutable => {
+      return mutate(mutable);
+    });
   }
+
 
   static fromObject(object: BoardFilterState) {
     return STATE_FACTORY(object);

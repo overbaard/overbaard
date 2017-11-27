@@ -22,7 +22,7 @@ export function headerMetaReducer(state: HeaderState = initialHeaderState, actio
   switch (action.type) {
     case DESERIALIZE_HEADERS: {
       const payload: DeserializeHeadersPayload = (<DeserializeHeadersAction>action).payload;
-      const newState = HeaderUtil.toStateRecord(state).withMutations(mutable => {
+      const newState = HeaderUtil.withMutatons(state, mutable => {
         mutable.categories = List<string>(payload.headers);
         mutable.backlog = payload.backlog;
 

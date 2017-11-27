@@ -22,4 +22,11 @@ export class HeaderUtil {
     // TODO do some checks. TS does not allow use of instanceof when the type is an interface (since they are compiled away)
     return <HeaderStateRecord>s;
   }
+
+  static withMutatons(s: HeaderState, mutate: (mutable: HeaderState) => any): HeaderState {
+    return (<HeaderStateRecord>s).withMutations(mutable => {
+      mutate(mutable);
+    });
+  }
+
 }
