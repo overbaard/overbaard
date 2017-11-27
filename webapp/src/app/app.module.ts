@@ -5,7 +5,7 @@ import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {APP_BASE_HREF, HashLocationStrategy, LocationStrategy} from '@angular/common';
 import {StoreModule} from '@ngrx/store';
-import {metaReducers, reducers} from './app-store';
+import {initialAppState, metaReducers, reducers} from './app-store';
 import {StoreDevtoolsModule} from '@ngrx/store-devtools';
 import {environment} from '../environments/environment';
 import {BoardsComponent} from './components/boards/boards.component';
@@ -54,7 +54,7 @@ import {BoardConfigurationComponent} from './components/config/board-configurati
     HttpClientModule,
     ReactiveFormsModule,
     AppRoutingModule,
-    StoreModule.forRoot(reducers, { metaReducers }),
+    StoreModule.forRoot(reducers, {initialState: initialAppState, metaReducers: metaReducers}),
     !environment.production ? StoreDevtoolsModule.instrument({ maxAge: 50 }) : []
   ],
   providers: [
