@@ -51,7 +51,9 @@ describe('Boards Service', () => {
 
     httpMock.expectOne('rest/overbaard/1.0/boards.json')
       .flush(null, {status: 401, statusText: 'Unauthorized'});
-  })
+  });
+
+  // TODO More tests of the other methods - perhaps it makes more sense to do that along with the component?
 });
 
 function  getBordsListSummary(): any {
