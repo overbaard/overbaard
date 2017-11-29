@@ -55,6 +55,8 @@
         <version.frontend-maven-plugin>1.6</version.frontend-maven-plugin>
 
         <version.resources-plugin>3.0.2</version.resources-plugin>
+        <version.clean-plugin>3.0.0</version.clean-plugin>
+
 
         <!-- This key is used to keep the consistency between the key in atlassian-plugin.xml and the key to generate bundle. -->
         <atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
@@ -280,6 +282,34 @@
                 </configuration>
             </plugin>
             <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>${version.clean-plugin}</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <!-- here the phase you need -->
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                        <configuration>
+                            <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                            <filesets>
+                                <fileset>
+                                    <directory>${basedir}/target/classes/webapp</directory>
+                                    <includes>
+                                        <include>*.js</include>
+                                        <include>*.js.map</include>
+                                        <include>*.html</include>
+                                        <include>*.ico</include>
+                                    </includes>
+                                </fileset>
+                            </filesets>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>${version.resources-plugin}</version>
                 <executions>
@@ -295,6 +325,7 @@
                             <resources>
                                 <resource>
                                     <directory>webapp/dist</directory>
+                                    <!-- TODO exclude the rest/ directory -->
                                     <filtering>false</filtering>
                                 </resource>
                             </resources>
