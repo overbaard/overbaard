@@ -33,7 +33,6 @@ npm-debug.log
 testem.log
 /typings
     "typed-immutable-record": "^0.0.6",
-/yarn.lock
 yarn-error.log
 
 # e2e
