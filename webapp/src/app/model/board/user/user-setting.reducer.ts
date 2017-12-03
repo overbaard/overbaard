@@ -208,3 +208,5 @@ interface InitialiseStatesPayload {
 }
 
 export const userSettingSelector = (state: AppState) => state.userSettings;
+const getShowBacklog = (state: UserSettingState) => state.showBacklog;
+export const showBacklogSelector = createSelector(userSettingSelector, getShowBacklog);

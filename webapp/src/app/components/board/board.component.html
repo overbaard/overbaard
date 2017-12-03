@@ -1,4 +1,4 @@
-<div (window:focus)="onFocus($event)" (window:blur)="onBlur($event)" (window:resize)="onResize($event)">
+<div (document:visibilitychange)="onDocumentVisiblityChange($event)" (window:resize)="onWindowResize($event)">
   <div id="board-outer">
     <div id="board-inner">
       <app-kanban-view

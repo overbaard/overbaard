@@ -1,4 +1,4 @@
-import {Action} from '@ngrx/store';
+import {Action, createSelector} from '@ngrx/store';
 import {AppState} from '../../../app-store';
 import {IssueTypeActions, issueTypeMetaReducer} from './issue-type/issue-type.reducer';
 import {IssueActions, issueMetaReducer} from './issue/issue.reducer';
@@ -258,3 +258,5 @@ function addAll(result: string[], input: any, ...keys: string[]) {
 }
 
 export const boardSelector = (state: AppState) => state.board;
+const getViewId = (state: BoardState) => state.viewId;
+export const boardViewIdSelector = createSelector(boardSelector, getViewId)

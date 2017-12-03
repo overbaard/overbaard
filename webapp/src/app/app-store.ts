@@ -7,18 +7,24 @@ import {UserSettingState} from './model/board/user/user-setting';
 import {storeFreeze} from 'ngrx-store-freeze';
 import {initialBoardState} from './model/board/data/board.model';
 import {initialUserSettingState} from './model/board/user/user-setting.model';
+import {ProgressLogState} from './model/global/progress-log/progress-log';
+import {progressLogReducer} from './model/global/progress-log/progress-log.reducer';
+import {initialProgressLogState} from './model/global/progress-log/progress-log.model';
 
 export interface AppState {
+  progressLog: ProgressLogState;
   board: BoardState;
   userSettings: UserSettingState;
 }
 
 export const reducers: ActionReducerMap<AppState> = {
+  progressLog: progressLogReducer,
   board: boardReducer,
   userSettings: userSettingReducer,
 };
 
 export const initialAppState: AppState = {
+  progressLog: initialProgressLogState,
   board: initialBoardState,
   userSettings: initialUserSettingState
 }

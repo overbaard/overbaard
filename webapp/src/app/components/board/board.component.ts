@@ -1,12 +1,11 @@
-import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, ElementRef, HostListener, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {AppHeaderService} from '../../services/app-header.service';
 import {BoardService} from '../../services/board.service';
 import {Store} from '@ngrx/store';
 import {AppState} from '../../app-store';
-import {BoardActions, boardSelector} from '../../model/board/data/board.reducer';
+import {BoardActions} from '../../model/board/data/board.reducer';
 import {Observable} from 'rxjs/Observable';
-import {BoardState} from '../../model/board/data/board';
 import 'rxjs/add/operator/skipWhile';
 import 'rxjs/add/operator/takeUntil';
 import 'rxjs/add/observable/combineLatest';
@@ -19,7 +18,6 @@ import {BoardViewModel} from '../../view-model/board/board-view';
 import {UserSettingState} from '../../model/board/user/user-setting';
 import {BoardViewMode} from '../../model/board/user/board-view-mode';
 import {BoardQueryParamsService} from '../../services/board-query-params.service';
-import {flatMap} from 'tslint/lib/utils';
 
 
 @Component({
@@ -46,8 +44,8 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   // Expose the enum to the template
   enumViewMode = BoardViewMode;
-
   constructor(
+    private _elementRef: ElementRef,
     private _route: ActivatedRoute,
     private _boardService: BoardService,
     private _appHeaderService: AppHeaderService,
@@ -65,8 +63,6 @@ export class BoardComponent implements OnInit, OnDestroy {
 
     // Parse the user settings from the query string first
 
-    const gotAllData$: Subject<boolean> = new Subject<boolean>();
-
     let userSettings: UserSettingState = null;
     this._store.dispatch(UserSettingActions.createInitialiseFromQueryString(this._route.snapshot.queryParams))
     this._store.select(userSettingSelector)
@@ -81,25 +77,9 @@ export class BoardComponent implements OnInit, OnDestroy {
           this.viewMode = userSettingsValue.viewMode;
           userSettings = userSettingsValue;
           // TODO progress and error handling
-          this._boardService.loadBoardData(userSettingsValue.boardCode, userSettings.showBacklog)
-            .takeUntil(gotAllData$)
-            .subscribe(
-              boardValue => {
-                // Deserialize the board
-                this._store.dispatch(BoardActions.createDeserializeBoard(boardValue));
-              }
-            );
+          this._boardService.loadBoardData(userSettingsValue.boardCode, userSettings.showBacklog);
         });
 
-
-    this._store.select<BoardState>(boardSelector)
-      .skipWhile(board => !board || board.viewId < 0)
-      .takeUntil(gotAllData$)
-      .subscribe(
-        board => {
-          gotAllData$.next(true);
-        }
-      );
 
     this.board$ = this.boardViewService.getBoardViewModel();
     this.userSettings$ = this._store.select<UserSettingState>(userSettingSelector);
@@ -113,20 +93,19 @@ export class BoardComponent implements OnInit, OnDestroy {
 
 
   ngOnDestroy(): void {
+    this._boardService.destroy();
     this._store.dispatch(BoardActions.createClearBoard());
     this._store.dispatch(UserSettingActions.createClearSettings());
     this._destroy$.next(true);
   }
 
-  onFocus($event: Event) {
-
+  onDocumentVisiblityChange(event: Event) {
+    // While this is more reliable that onBlur/onFocus it only gets hidden when the window is completely hidden
+    // (or another tab is visible)
+    this._boardService.visible = !event.target['hidden'];
   }
 
-  onBlur($event: Event) {
-
-  }
-
-  onResize($event: Event) {
+  onWindowResize(event: Event) {
     this.setWindowSize();
   }
 
@@ -184,13 +163,7 @@ export class BoardComponent implements OnInit, OnDestroy {
     // if we have the list with the backlog shown and then simply hide locally without doing a full reload, the rank changes we
     // get from the server will be based off the 'no backlog' indices, while we would have the list including the backlog
     // issues
-    this._boardService.loadBoardData(userSetting.boardCode, userSetting.showBacklog)
-      .take(1)
-      .subscribe(
-        boardValue => {
-          // Deserialize the board
-          this._store.dispatch(BoardActions.createDeserializeBoard(boardValue));
-        });
+    this._boardService.loadBoardData(userSetting.boardCode, userSetting.showBacklog);
   }
 
 
@@ -209,6 +182,5 @@ export class BoardComponent implements OnInit, OnDestroy {
       history.replaceState(null, null, url);
     }
   }
-
 }
 

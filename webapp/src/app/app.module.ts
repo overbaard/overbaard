@@ -29,6 +29,7 @@ import {ConfigurationComponent} from './components/config/configuration.componen
 import {BoardConfigurationComponent} from './components/config/board-configuration-component';
 import {RankViewEntryComponent} from './components/board/view/rank-view/rank-view-entry.component';
 import {RankViewContainerComponent} from './components/board/view/rank-view/rank-view-container.component';
+import {ProgressLogService} from './services/progress-log.service';
 
 @NgModule({
   declarations: [
@@ -65,6 +66,7 @@ import {RankViewContainerComponent} from './components/board/view/rank-view/rank
     {provide: APP_BASE_HREF, useValue: '/'},
     {provide: LocationStrategy, useClass: HashLocationStrategy},
     AppHeaderService,
+    ProgressLogService,
     RestUrlService
   ],
 

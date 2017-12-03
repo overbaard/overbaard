@@ -18,7 +18,6 @@ export class FixedHeaderView {
   boardLeftOffset = 0;
 
   onScrollBoardX(event: Event) {
-    console.log('SCROLLING header');
     const boardLeftOffset: number = event.target['scrollLeft'] * -1
     if (this.boardLeftOffset !== boardLeftOffset) {
       this.boardLeftOffset = boardLeftOffset;

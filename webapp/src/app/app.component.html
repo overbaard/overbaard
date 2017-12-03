@@ -3,3 +3,5 @@
   <a [routerLink]="['/config']">Config</a>
 </div>
 <router-outlet></router-outlet>
+
+<div class="wait-screen" *ngIf="loading$ | async">Loading</div>
