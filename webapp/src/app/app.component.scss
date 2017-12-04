@@ -1,5 +1,12 @@
 @import'../styles';
 
+.footer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 30px;
+}
+
 .app-header {
   min-height: $toolbar-height;
   max-height: $toolbar-height;
@@ -20,6 +27,7 @@
   left: 0px;
   height: 100%;
   width: 100%;
-  opacity: .8;
+  opacity: .9;
   z-index: 1000;
 }
+

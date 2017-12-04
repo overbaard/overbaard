@@ -1,13 +1,49 @@
 /* You can add global styles to this file, and also import other style files */
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import '~material-design-icons/iconfont/material-icons.css';
+
+body {
+  padding: 0;
+  margin: 0;
+  font-family: Roboto, sans-serif;
+}
+.app{
+  height: 100vh;
+}
+mat-toolbar {
+  z-index: 10;
+}
+.primary-color {
+  color: #3F51B5!important;
+}
+.accent-color {
+  color: #FF4081!important;
+}
+.background-primary-color {
+  background-color: #3F51B5!important;
+}
+.background-accent-color {
+  background-color: #FF4081!important;
+}
+.white-text {
+  color: #FFF!important;
+}
+
+
+
 $toolbar-height: 30px;
+/*
 body {
   margin:0;
   padding:0;
   font-family: 'Open Sans', Verdana, Arial, sans-serif;
 }
+*/
+
+
 
 /* Global link settings */
-a:link {
+/*a:link {
   text-decoration: none;
 }
 a:visited {
@@ -18,7 +54,7 @@ a:hover {
 }
 a:active {
   text-decoration: underline;
-}
+}*/
 
 
 

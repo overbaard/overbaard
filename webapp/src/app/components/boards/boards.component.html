@@ -1,4 +1,4 @@
-<div>
+<div class="boards-list">
   <li *ngFor="let board of boards$ | async">
     <a [routerLink]="['/board']" [queryParams]="{board: board.code}">{{board.name}}</a>
     [<a [routerLink]="['/board']" [queryParams]="{board: board.code, view: rankViewParameter}">rank</a>]

@@ -30,6 +30,9 @@ import {BoardConfigurationComponent} from './components/config/board-configurati
 import {RankViewEntryComponent} from './components/board/view/rank-view/rank-view-entry.component';
 import {RankViewContainerComponent} from './components/board/view/rank-view/rank-view-container.component';
 import {ProgressLogService} from './services/progress-log.service';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {MaterialModule} from './material.module';
+import {FlexLayoutModule} from '@angular/flex-layout';
 
 @NgModule({
   declarations: [
@@ -55,8 +58,11 @@ import {ProgressLogService} from './services/progress-log.service';
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
+    FlexLayoutModule,
     FormsModule,
     HttpClientModule,
+    MaterialModule,
     ReactiveFormsModule,
     AppRoutingModule,
     StoreModule.forRoot(reducers, {initialState: initialAppState, metaReducers: metaReducers}),

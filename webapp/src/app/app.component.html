@@ -1,7 +1,23 @@
-<div class="app-header">
+<section class="app flex-container" fxLayout="column" fxLayoutAlign="start stretch">
+<mat-toolbar color="primary" class="mat-elevation-z10">
+    Overbård
+  </mat-toolbar>
+  <div fxFlex="">
+    <router-outlet></router-outlet>
+  </div>
+  <div class="footer flex-container background-primary-color white-text">Overbård Version 0.1.0</div>
+</section>
+
+<mat-progress-spinner mode="indeterminate" *ngIf="loading$ | async"></mat-progress-spinner>
+<div class="wait-screen" *ngIf="loading$ | async">
+  <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+</div>
+
+
+<!--<div class="app-header">
   <a [routerLink]="['/boards']">Boards</a>
   <a [routerLink]="['/config']">Config</a>
 </div>
 <router-outlet></router-outlet>
 
-<div class="wait-screen" *ngIf="loading$ | async">Loading</div>
+<div class="wait-screen" *ngIf="loading$ | async">Loading</div>-->
