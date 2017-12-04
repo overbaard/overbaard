@@ -2,6 +2,9 @@
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @import '~material-design-icons/iconfont/material-icons.css';
 
+/* It would be nice to figure out how to store this locally */
+@import url('https://fonts.googleapis.com/icon?family=Roboto');
+
 body {
   padding: 0;
   margin: 0;
@@ -13,6 +16,8 @@ body {
 mat-toolbar {
   z-index: 10;
 }
+
+/* If we change the theme, we need to update these */
 .primary-color {
   color: #3F51B5!important;
 }

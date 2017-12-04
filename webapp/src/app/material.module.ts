@@ -1,13 +1,29 @@
 import {
-  MatButtonModule, MatCheckboxModule, MatProgressSpinner, MatProgressSpinnerModule, MatToolbar,
+  MatButtonModule,
+  MatCardModule,
+  MatCheckboxModule,
+  MatIconModule, MatListModule,
+  MatMenuModule,
+  MatProgressSpinnerModule, MatSidenavModule,
   MatToolbarModule
 } from '@angular/material';
-import {NgModule} from '@angular/core';
+import {NgModule, Type} from '@angular/core';
 
+// An attempt to avoid duplicating this in the imports and exports lists
+const materialModules: Array<Type<any>> = [
+  MatButtonModule,
+  MatCardModule,
+  MatCheckboxModule,
+  MatIconModule,
+  MatListModule,
+  MatMenuModule,
+  MatSidenavModule,
+  MatToolbarModule,
+  MatProgressSpinnerModule]
 
 @NgModule({
-  imports: [MatToolbarModule, MatProgressSpinnerModule, MatButtonModule, MatCheckboxModule],
-  exports: [MatToolbarModule, MatProgressSpinnerModule, MatButtonModule, MatCheckboxModule],
+  imports: materialModules,
+  exports: materialModules,
 })
 export class MaterialModule {
 }

@@ -14,6 +14,11 @@ export class AppComponent implements OnInit {
 
   loading$: Observable<boolean>;
 
+  readonly navItems = [
+    {name: 'Boards', route: '/boards'},
+    {name: 'Config', route: '/config'}
+  ];
+
   constructor(private _store: Store<AppState>) {
   }
 

@@ -1,33 +1,42 @@
 @import'../styles';
 
-.footer {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  height: 30px;
-}
-
-.app-header {
-  min-height: $toolbar-height;
-  max-height: $toolbar-height;
-  border: 0px;
-  padding: 0px;
-  margin: 0px;
-  background-color: aquamarine;
-}
-
-.wait-screen {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
+.root-container {
   position: absolute;
-  background-color: grey;
-  top: 0px;
-  left: 0px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.sidenav-container {
   height: 100%;
   width: 100%;
-  opacity: .9;
-  z-index: 1000;
+}
+.sidenav-navigation {
+  min-width:220px;
+}
+
+.inner-sidenav-content {
+  overflow: auto;
+  position: absolute;
+  bottom:0;
+  left:0;
+  right:0;
+  top:64px;
+}
+
+/* Absolute Center Spinner */
+.wait-screen {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  margin: auto;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(0,0,0,0.3);
 }
 

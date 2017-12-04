@@ -1,14 +1,44 @@
+<!--
 <section class="app flex-container" fxLayout="column" fxLayoutAlign="start stretch">
-<mat-toolbar color="primary" class="mat-elevation-z10">
+  <mat-toolbar class="mat-elevation-z10">
     Overbård
+
   </mat-toolbar>
-  <div fxFlex="">
+  <div fxFlex>
     <router-outlet></router-outlet>
   </div>
-  <div class="footer flex-container background-primary-color white-text">Overbård Version 0.1.0</div>
 </section>
+-->
 
-<mat-progress-spinner mode="indeterminate" *ngIf="loading$ | async"></mat-progress-spinner>
+<div class="root-container">
+  <mat-sidenav-container #navigation class="sidenav-container">
+    <mat-sidenav mode="over" #navigation class="sidenav-navigation">
+      <div class="flex-container">
+        <mat-nav-list fxLayout="column">
+          <a *ngFor="let navItem of navItems"
+             mat-list-item
+             (click)="navigation.close()"
+             routerLinkActive
+             [routerLink]="[navItem.route]">
+            {{navItem.name}}
+          </a>
+        </mat-nav-list>
+      </div>
+    </mat-sidenav>
+    <mat-toolbar color="primary" class="mat-elevation-z10"  style="min-height:64px;">
+      <span>
+        <button mat-icon-button (click)="navigation.open('mouse')">
+          <mat-icon>menu</mat-icon>
+        </button>
+      </span>
+      <span>Overbård</span>
+    </mat-toolbar>
+    <div class="inner-sidenav-content">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-container>
+</div>
+
 <div class="wait-screen" *ngIf="loading$ | async">
   <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
 </div>
