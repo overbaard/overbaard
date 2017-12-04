@@ -1,7 +1,6 @@
 import {AppState} from '../../../../app-store';
-import {Action} from '@ngrx/store';
+import {Action, createSelector} from '@ngrx/store';
 import {initialIssueTypeState, IssueType, IssueTypeState, IssueTypeUtil} from './issue-type.model';
-import {createSelector} from 'reselect';
 
 
 const DESERIALIZE_ALL_ISSUE_TYPES = 'DESERIALIZE_ALL_ISSUE_TYPES';

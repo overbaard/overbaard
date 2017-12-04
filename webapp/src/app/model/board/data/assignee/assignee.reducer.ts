@@ -1,7 +1,6 @@
-import {Action} from '@ngrx/store';
+import {Action, createSelector} from '@ngrx/store';
 import {Assignee, AssigneeState, AssigneeUtil, initialAssigneeState} from './assignee.model';
 import {AppState} from '../../../../app-store';
-import {createSelector} from 'reselect';
 import {OrderedMap} from 'immutable';
 
 const ADD_INITAL_ASSIGNEES = 'ADD_INITIAL_ASSIGNEES';

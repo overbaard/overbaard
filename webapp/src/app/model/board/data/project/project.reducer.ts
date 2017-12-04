@@ -1,4 +1,4 @@
-import {Action} from '@ngrx/store';
+import {Action, createSelector} from '@ngrx/store';
 import {
   BoardProject,
   initialProjectState,
@@ -9,7 +9,6 @@ import {
 } from './project.model';
 import {List, Map, OrderedMap} from 'immutable';
 import {AppState} from '../../../../app-store';
-import {createSelector} from 'reselect';
 import {cloneObject} from '../../../../common/object-util';
 
 const DESERIALIZE_PROJECTS = 'DESERIALIZE_PROJECTS';

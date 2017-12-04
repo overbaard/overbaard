@@ -1,7 +1,6 @@
 import {AppState} from '../../../../app-store';
 import {Action} from '@ngrx/store';
 import {DeserializeIssueLookupParams, initialIssueState, IssueChangeInfo, IssueState, IssueUtil} from './issue.model';
-import {createSelector} from 'reselect';
 import {List, Map} from 'immutable';
 import {BoardIssue} from './board-issue';
 
@@ -141,6 +140,5 @@ interface ChangeIssuesPayload {
 
 const getIssuesState = (state: AppState) => state.board.issues;
 const getIssues = (state: IssueState) => state.issues;
-export const issuesSelector = createSelector(getIssuesState, getIssues);
 
 

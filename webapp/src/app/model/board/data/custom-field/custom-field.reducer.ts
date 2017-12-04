@@ -1,8 +1,7 @@
-import {Action} from '@ngrx/store';
+import {Action, createSelector} from '@ngrx/store';
 import {Map, OrderedMap} from 'immutable';
 import {CustomField, CustomFieldState, CustomFieldUtil, initialCustomFieldState} from './custom-field.model';
 import {AppState} from '../../../../app-store';
-import {createSelector} from 'reselect';
 
 
 const DESERIALIZE_ALL_CUSTOM_FIELDS = 'DESERIALIZE_ALL_CUSTOM_FIELDS';

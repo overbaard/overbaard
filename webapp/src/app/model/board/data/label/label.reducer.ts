@@ -1,7 +1,6 @@
-import {Action} from '@ngrx/store';
+import {Action, createSelector} from '@ngrx/store';
 import {List} from 'immutable';
 import {initialLabelState, LabelState, LabelUtil} from './label.model';
-import {createSelector} from 'reselect';
 import {AppState} from '../../../../app-store';
 
 

@@ -25,7 +25,6 @@
     "@ngrx/store-devtools": "4.1.1",
     "core-js": "2.5.1",
     "immutable": "3.8.2",
-    "reselect": "3.0.1",
     "rxjs": "5.5.2",
     "typed-immutable-record": "0.0.6",
     "zone.js": "0.8.18"
