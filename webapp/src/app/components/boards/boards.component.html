@@ -1,46 +1,33 @@
-<div class="boards-list">
-  <li *ngFor="let board of boards$ | async">
-    <a [routerLink]="['/board']" [queryParams]="{board: board.code}">{{board.name}}</a>
-    [<a [routerLink]="['/board']" [queryParams]="{board: board.code, view: rankViewParameter}">rank</a>]
-  </li>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>BBBBBB</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>BBBBBB</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>BBBBBB</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>AAAAAA</p>
-  <p>BBBBBB</p>
+<div class="component-header">
+  <div class="mat-h1">
+    Boards
+  </div>
+</div>
+<div class="component-body">
+  <span>
+    This is a list of the boards configured in your Overbård instance.
+  </span>
+
+  <mat-nav-list>
+    <mat-list-item
+      *ngFor="let board of boards$ | async"
+      fxLayout="column">
+        <a matLine
+           [routerLink]="['/board']"
+           [queryParams]="{board: board.code}">{{ board.name}} </a>
+      <div matLine>
+        <div style="display: flex">
+          <a
+            class="rank-text"
+            [routerLink]="['/board']"
+            [queryParams]="{board: board.code}">Kanban</a>
+          <span style="width: 10px"></span>
+          <a
+            class="rank-text"
+            [routerLink]="['/board']"
+            [queryParams]="{board: board.code, view: rankViewParameter}">Rank</a>
+        </div>
+      </div>
+    </mat-list-item>
+  </mat-nav-list>
 </div>

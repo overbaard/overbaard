@@ -1,53 +1,62 @@
-<h2>Configuration</h2>
-<h3>Boards</h3>
-<div>
-  Select a board to update its config. For boards where you have the 'administer project' permission for the
-  main projects, you can edit and delete boards.
+<div class="component-header">
+  <div class="mat-h1">
+    Configuration
+  </div>
 </div>
-<div *ngIf="(config$ | async)?.boards.size === 0 ; else showBoards">
-  No boards are configured yet. Add some below.
-</div>
-<ng-template #showBoards>
-  <ul>
-    <li *ngFor="let board of (config$ | async)?.boards.values()">
-      <a href="view" (click)="toggleBoardSelection($event, board['id'])">{{board['name']}}</a>
-      <app-board-configuration
-        *ngIf="board['id'] === selected"
-        [configJson]="selectedBoardJson$ | async"
-        [canEdit]="board['edit']"
-        [boardName]="board['name']"
-        [jsonError]="editError"
-        [saved]="saved"
-        (deleteBoard)="onDeleteBoard($event)"
-        (saveBoard)="onSaveEditedBoard($event)"
-        (clearJsonError)="onClearEditJsonError($event)"
-      ></app-board-configuration>
-    </li>
-  </ul>
-</ng-template>
-<div>
-  <div>Create a new board</div>
-  <form (ngSubmit)="onSaveCreatedBoard()" [formGroup]="createForm" #f="ngForm">
-    <textarea cols="100" rows="15" name="editJson" formControlName="createJson" (keyup)="clearSaveJsonErrors()"></textarea>
-    <div *ngIf="createError">{{createError}}</div>
-    <div>
-      <button type="submit" [disabled]="!f.form.valid">Save</button>
-    </div>
-  </form>
-</div>
-<div *ngIf="(config$ | async)?.canEditRankCustomFieldId">
-  <hr/>
-  <div>Enter the custom field id for Jira Agile's 'Rank' attribute:</div>
+<div class="component-body">
+  <span>
+    This is a list of the boards configured in your Overbård instance.
+  </span>
+  <div class="mat-h2">Boards</div>
   <div>
-    <form (ngSubmit)="onSaveCustomFieldId()" [formGroup]="rankCustomFieldIdForm" #f="ngForm">
-      <div>
-        <input required="required" type="number"
-               formControlName="rankCustomFieldId"/>
-      </div>
+    Select a board to update its config. For boards where you have the 'administer project' permission for the
+    main projects, you can edit and delete boards.
+  </div>
+  <div *ngIf="(config$ | async)?.boards.size === 0 ; else showBoards">
+    No boards are configured yet. Add some below.
+  </div>
+  <ng-template #showBoards>
+    <ul>
+      <li *ngFor="let board of (config$ | async)?.boards.values()">
+        <a href="view" (click)="toggleBoardSelection($event, board['id'])">{{board['name']}}</a>
+        <app-board-configuration
+          *ngIf="board['id'] === selected"
+          [configJson]="selectedBoardJson$ | async"
+          [canEdit]="board['edit']"
+          [boardName]="board['name']"
+          [jsonError]="editError"
+          [saved]="saved"
+          (deleteBoard)="onDeleteBoard($event)"
+          (saveBoard)="onSaveEditedBoard($event)"
+          (clearJsonError)="onClearEditJsonError($event)"
+        ></app-board-configuration>
+      </li>
+    </ul>
+  </ng-template>
+  <div>
+    <div>Create a new board</div>
+    <form (ngSubmit)="onSaveCreatedBoard()" [formGroup]="createForm" #f="ngForm">
+      <textarea cols="100" rows="15" name="editJson" formControlName="createJson" (keyup)="clearSaveJsonErrors()"></textarea>
+      <div *ngIf="createError">{{createError}}</div>
       <div>
         <button type="submit" [disabled]="!f.form.valid">Save</button>
       </div>
     </form>
+  </div>
+  <div *ngIf="(config$ | async)?.canEditRankCustomFieldId">
+    <hr/>
+    <div>Enter the custom field id for Jira Agile's 'Rank' attribute:</div>
+    <div>
+      <form (ngSubmit)="onSaveCustomFieldId()" [formGroup]="rankCustomFieldIdForm" #f="ngForm">
+        <div>
+          <input required="required" type="number"
+                 formControlName="rankCustomFieldId"/>
+        </div>
+        <div>
+          <button type="submit" [disabled]="!f.form.valid">Save</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 

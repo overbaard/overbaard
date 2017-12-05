@@ -18,22 +18,40 @@ mat-toolbar {
 }
 
 /* If we change the theme, we need to update these */
+$primary-colour: #3F51B5!important;
+$accent-colour: #FF4081!important;
+$white-text: #FFF!important;
 .primary-color {
-  color: #3F51B5!important;
+  color: $primary-colour;
 }
 .accent-color {
-  color: #FF4081!important;
+  color: $accent-colour;
 }
 .background-primary-color {
-  background-color: #3F51B5!important;
+  background-color: $primary-colour;
 }
 .background-accent-color {
-  background-color: #FF4081!important;
+  background-color: $accent-colour;
 }
 .white-text {
-  color: #FFF!important;
+  color: $white-text;
 }
 
+
+.component-header {
+  margin-top: 0px;
+  background-color: $primary-colour;
+  color: $white-text;
+  padding-left: 25px;
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.component-body {
+  padding-left: 20px;
+  padding-top: 10px;
+}
 
 
 $toolbar-height: 30px;
