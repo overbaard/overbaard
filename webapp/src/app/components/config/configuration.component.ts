@@ -26,7 +26,6 @@ export class ConfigurationComponent implements OnInit {
   selected = -1;
   selectedBoardJson$: Observable<string>;
   editError: string;
-  saved: boolean;
 
   // For creating boards
   createForm: FormGroup;
@@ -45,7 +44,6 @@ export class ConfigurationComponent implements OnInit {
     this.createForm = new FormGroup({
       createJson: new FormControl('', Validators.required)
     });
-
   }
 
   private loadBoards() {
@@ -62,17 +60,21 @@ export class ConfigurationComponent implements OnInit {
         });
   }
 
-  toggleBoardSelection(event: MouseEvent, id: number) {
-    this.editError = null;
+  onOpenBoardForEdit(id: number) {
+    this.selected = id;
+    // TODO progress and errors
+    this.selectedBoardJson$ = this._boardsService.loadBoardConfigJson(id)
+      .map(data => this.formatAsJson(data));
+  }
+
+  onCloseBoardForEdit(id: number) {
     if (this.selected === id) {
-      this.selected = -1;
-    } else {
-      this.selected = id;
-      // TODO progress and errors
-      this.selectedBoardJson$ = this._boardsService.loadBoardConfigJson(id)
-        .map(data => this.formatAsJson(data));
+
     }
-    event.preventDefault();
+    if (this.selected === id) {
+      this.editError = null;
+      this.selected = -1;
+    }
   }
 
   private formatAsJson(data: any): string {
@@ -80,7 +82,6 @@ export class ConfigurationComponent implements OnInit {
   }
 
   onClearEditJsonError(event: Event) {
-    this.saved = false;
     this.editError = null;
   }
 
@@ -89,7 +90,6 @@ export class ConfigurationComponent implements OnInit {
   }
 
   onDeleteBoard(event: Event) {
-    this.saved = false;
     const id = this.selected;
 
     console.log('Deleting board');
@@ -108,7 +108,6 @@ export class ConfigurationComponent implements OnInit {
 
   onSaveCreatedBoard() {
     console.log('Saving created board');
-    this.saved = false;
     const json: string  = this.createForm.controls['createJson'].value;
     if (!this.checkJson(json)) {
       this.createError = 'Contents must be valid json';
@@ -134,7 +133,6 @@ export class ConfigurationComponent implements OnInit {
 
   onSaveEditedBoard(boardJson: string) {
     console.log('Saving edited board')
-    this.saved = false;
     if (!this.checkJson(boardJson)) {
       this.editError = 'Contents must be valid json';
       return;
@@ -146,7 +144,6 @@ export class ConfigurationComponent implements OnInit {
       .take(1)
       .subscribe(
         value => {
-          this.saved = true;
           this.config$.next(value)
         });
   }

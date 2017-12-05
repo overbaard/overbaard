@@ -1,0 +1,73 @@
+{
+  "id": 2,
+  "code": "POC2",
+  "name": "Test board",
+  "edit": true,
+  "config": {
+    "name": "Test board",
+    "code": "POC",
+    "owning-project": "SKP",
+    "rank-custom-field-id": 10009,
+    "states": [
+      {
+        "name": "Backlog",
+        "backlog": true
+      },
+      {
+        "name": "Selected for Development",
+        "header": "Work"
+      },
+      {
+        "name": "In Progress",
+        "header": "Work"
+      },
+      {
+        "name": "Done"
+      }
+    ],
+    "priorities": [
+      "Blocker",
+      "Critical",
+      "Major",
+      "Minor",
+      "Trivial"
+    ],
+    "issue-types": [
+      "Task",
+      "Story",
+      "Bug",
+      "Epic"
+    ],
+    "projects": {
+      "SKP": {
+        "query-filter": null,
+        "colour": "#4667CA",
+        "state-links": {
+          "Done": "Done",
+          "Selected for Development": "Selected for Development",
+          "In Progress": "In Progress",
+          "Backlog": "Backlog"
+        }
+      },
+      "SKBG": {
+        "query-filter": null,
+        "colour": "#CA6746",
+        "state-links": {
+          "Done": "Done",
+          "Backloglog": "Backlog",
+          "In Progress": "In Progress"
+        }
+      }
+    },
+    "linked-projects": {
+      "UP": {
+        "states": [
+          "Open",
+          "In Progress",
+          "Resolved",
+          "Done"
+        ]
+      }
+    }
+  }
+}

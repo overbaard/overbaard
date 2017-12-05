@@ -1,4 +1,7 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {
+  ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange,
+  SimpleChanges
+} from '@angular/core';
 import {BoardsService} from '../../services/boards.service';
 import {AppHeaderService} from '../../services/app-header.service';
 import {Observable} from 'rxjs/Observable';
@@ -14,7 +17,7 @@ import {Subject} from 'rxjs/Subject';
   providers: [BoardsService],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class BoardConfigurationComponent implements OnInit {
+export class BoardConfigurationComponent implements OnInit, OnChanges {
   @Input()
   configJson: string;
 
@@ -27,7 +30,6 @@ export class BoardConfigurationComponent implements OnInit {
   @Input()
   jsonError: string;
 
-
   @Output()
   deleteBoard: EventEmitter<null> = new EventEmitter<null>();
 
@@ -37,37 +39,29 @@ export class BoardConfigurationComponent implements OnInit {
   @Output()
   clearJsonError: EventEmitter<null> = new EventEmitter<null>();
 
-
-  // To propagate the enum definition to the template
-  readonly enumMode = Mode;
-  mode = Mode.VIEW
-
+  deleting = false;
   deleteForm: FormGroup;
   editForm: FormGroup;
 
-  private customFieldIdForm: FormGroup;
-
-  private _destroy$: Observable<null> = new Subject<null>()
-
-
-  constructor(private _boardsService: BoardsService,
-              appHeaderService: AppHeaderService) {
-    appHeaderService.setTitle('Configuration');
+  constructor() {
   }
 
   ngOnInit() {
+    this.editForm = new FormGroup({
+      editJson: new FormControl(this.configJson, Validators.required)
+    });
   }
 
-  @Input()
-  set saved(saved: boolean) {
-    if (saved && this.mode === Mode.EDIT) {
-      this.mode = Mode.VIEW;
+  ngOnChanges(changes: SimpleChanges) {
+    const configJsonChange: SimpleChange  = changes['configJson'];
+    if (configJsonChange && configJsonChange.currentValue && !configJsonChange.previousValue) {
+      this.editForm.controls['editJson'].setValue(configJsonChange.currentValue);
     }
   }
 
   onToggleDelete(event: Event) {
-    this.mode = this.mode !== Mode.DELETE ? Mode.DELETE : Mode.VIEW;
-    if (this.mode === Mode.DELETE) {
+    this.deleting = !this.deleting;
+    if (this.deleting) {
       this.deleteForm = new FormGroup({
         boardName: new FormControl('', Validators.compose([Validators.required, (control: FormControl) => {
             if (this.boardName !== control.value) {
@@ -79,18 +73,6 @@ export class BoardConfigurationComponent implements OnInit {
     }
     event.preventDefault();
   }
-
-  onToggleEdit(event: Event) {
-    this.clearJsonErrors();
-    this.mode = this.mode !== Mode.EDIT ? Mode.EDIT : Mode.VIEW;
-    if (this.mode === Mode.EDIT) {
-      this.editForm = new FormGroup({
-        editJson: new FormControl(this.configJson, Validators.required)
-      });
-    }
-    event.preventDefault();
-  }
-
 
   private formatAsJson(data: any): string {
     return JSON.stringify(data, null, 2);
@@ -107,14 +89,5 @@ export class BoardConfigurationComponent implements OnInit {
   onSaveBoard() {
     this.saveBoard.emit(this.editForm.value.editJson);
   }
-
-
 }
-
-enum Mode {
-  VIEW,
-  EDIT,
-  DELETE
-}
-
 
