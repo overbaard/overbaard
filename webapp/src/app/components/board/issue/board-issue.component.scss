@@ -1,7 +1,27 @@
-.host {
-  display: flex;
+.mat-card {
+  min-width: 190px;
+  max-width: 190px;
+  margin: 0px 0px 5px;
+  padding: 3px;
 }
-.issue {
+.mat-h3 {
+  margin-bottom: 0px;
+}
+.title-container {
+  display: flex;
+  padding: 1px;
+}
+.issue-key {
+  display: flex;
+  flex-grow: 1;
+}
+.initials {
+  display: flex;
+  flex-grow: 1;
+  justify-content: flex-end;
+}
+
+/*.issue {
   border: 1px solid #CCCCCC;
   border-collapse: collapse;
   border-radius: 3px;
@@ -12,4 +32,4 @@
   text-align: left;
   overflow-x: hidden;
   overflow-y: hidden;
-}
+}*/

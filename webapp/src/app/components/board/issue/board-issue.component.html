@@ -1,3 +1,16 @@
+<mat-card *ngIf="issue.visible">
+  <mat-card-title class="issue" style="">
+    <div class="title-container">
+      <div class="mat-h4 issue-key">{{issue.key}}</div>
+      <div class="mat-h4 initials"><span>{{issue.assignee.initials}}</span></div>
+    </div>
+  </mat-card-title>
+  <mat-card-content>
+    {{issue.summary}}
+    <!-- TODO avatar -->
+  </mat-card-content>
+</mat-card>
+<!--
 <div *ngIf="issue.visible" class="issue">
   <div>{{issue.visible}}</div>
   <div>{{issue.key}}</div>
@@ -9,4 +22,4 @@
     <span *ngIf="issue.assignee !== noAssignee; else emptyAssignee">{{issue.assignee.name}}</span>
     <ng-template #emptyAssignee>-</ng-template>
   </div>
-</div>
+</div>-->

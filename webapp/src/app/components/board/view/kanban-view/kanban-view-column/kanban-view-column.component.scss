@@ -2,14 +2,14 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  border-left: 1px black solid;
-  border-right: 1px black solid;
+  border-left: 1px white solid;
+  border-right: 1px white solid;
+  padding-top: 5px;
 }
 .column {
   display: flex;
   flex-direction: column;
   align-items: center;
-
 }
 .visible {
   min-width: 200px;

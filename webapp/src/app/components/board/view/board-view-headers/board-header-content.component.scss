@@ -1,3 +1,4 @@
+@import "../../../../../styles";
 :host {
   display: flex;
   flex-grow: 1;
@@ -7,7 +8,11 @@
   flex-grow: 1;
   flex-direction: column;
   justify-content: center;
-  border: solid 1px black;
+  background-color: $primary-colour;
+  color: white;
+  border-left: 1px solid white;
+  border-right: 1px solid white;
+  border-bottom: 1px solid white;
   text-align: center;
   cursor: pointer;
 }
