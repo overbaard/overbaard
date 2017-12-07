@@ -1,15 +1,3 @@
-<!--
-<section class="app flex-container" fxLayout="column" fxLayoutAlign="start stretch">
-  <mat-toolbar class="mat-elevation-z10">
-    Overbård
-
-  </mat-toolbar>
-  <div fxFlex>
-    <router-outlet></router-outlet>
-  </div>
-</section>
--->
-
 <div class="root-container">
   <mat-sidenav-container #navigation class="sidenav-container">
     <mat-sidenav mode="over" #navigation class="sidenav-navigation">
@@ -42,12 +30,3 @@
 <div class="wait-screen" *ngIf="loading$ | async">
   <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
 </div>
-
-
-<!--<div class="app-header">
-  <a [routerLink]="['/boards']">Boards</a>
-  <a [routerLink]="['/config']">Config</a>
-</div>
-<router-outlet></router-outlet>
-
-<div class="wait-screen" *ngIf="loading$ | async">Loading</div>-->

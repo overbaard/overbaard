@@ -1,17 +1,5 @@
 @import "../../../styles";
 
-table.board {
-  border-collapse: collapse;
-  border: 1px black solid;
-}
-td.cell {
-  border: 1px black solid;
-}
-td.visible {
-  min-width: 200px;
-  max-width: 200px;
-}
-
 #temp-control-button {
   width: 30px;
   height: 30px;
@@ -37,7 +25,7 @@ td.visible {
 #board-outer {
   background-color: #fff;
   position: absolute;
-  top: $toolbar-height;
+  top: 0px;
   left: 0px;
   right: 0px;
   bottom: 0px;
