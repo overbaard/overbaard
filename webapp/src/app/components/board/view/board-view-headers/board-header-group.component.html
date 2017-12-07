@@ -29,8 +29,7 @@
     *ngIf="!showStates"
     (mouseenter)="onMouseEnter($event)"
     (mouseleave)="onMouseLeave($event)"
-    [class.normal-colour]="!toggleColours"
-    [class.hover-colour]="toggleColours"
+    [ngClass]="classObj"
   >
     <!-- This is either a header that is a plain state (i.e not a category). If it is the backlog,
     there is only one state-->

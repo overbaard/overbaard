@@ -11,19 +11,17 @@
   justify-content: center;
   border-bottom: $header-border-bottom;
 }
-.header-content-empty {
+.header-content-backlog {
   @extend .header-content;
-  border-bottom: $header-empty-border-bottom;
-}
-.normal-colour {
-  background-color: $accent-colour;
-  color: white;
-  border-bottom: $header-border-bottom;
+  border-bottom: $header-border-bottom-backlog;
 }
 .hover-colour {
-  background-color: white;
-  color: black;
-  border-bottom: $header-border-bottom;
+  background-color: $primary-colour;
+  color: white;
+}
+.hover-colour-backlog {
+  @extend .hover-colour;
+  background-color: $accent-colour;
 }
 .left-border {
   border-left: $header-border-side;

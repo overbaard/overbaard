@@ -18,12 +18,16 @@
   max-width: $invisible-header-width;
 }
 .normal-colour {
-  background-color: $accent-colour;
-  color: white;
-  border-bottom: $header-border-bottom;
-}
-.hover-colour {
   background-color: white;
   color: black;
-  border-bottom: $header-border-bottom;
 }
+.hover-colour {
+  background-color: $primary-colour;
+  color: white;
+}
+.hover-colour-backlog {
+  @extend .hover-colour;
+  background-color: $accent-colour;
+}
+
+

@@ -31,9 +31,7 @@ export class BoardHeaderContentComponent implements OnInit {
   @Output()
   toggleColumnVisibility: EventEmitter<BoardHeader> = new EventEmitter<BoardHeader>();
 
-  classList: string[];
-
-  toggleColours = false;
+  classObj: Object = {};
 
   // Expose the enum to the component
   readonly enumViewMode = BoardViewMode;
@@ -41,33 +39,40 @@ export class BoardHeaderContentComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+    if (this.header.backlog) {
+      this.classObj['header-content-backlog'] = true;
+    } else {
+      this.classObj['header-content'] = true;
+    }
+
     if (this.performSizing) {
       if (this.viewMode === BoardViewMode.KANBAN) {
         if (this.header.visible) {
-          this.classList = ['state', 'visible'];
+          this.classObj['visible'] = true;
         } else {
-          this.classList = ['state', 'invisible'];
+          this.classObj['invisible'] = true;
         }
       } else {
-        this.classList = ['state', 'rank']
+        this.classObj['rank'] = true;
       }
     }
 
     if (this.leftBorder) {
-      this.classList.push('left-border');
+      this.classObj['left-border'] = true;
     }
     if (this.rightBoarder) {
-      this.classList.push('right-border');
+      this.classObj['right-border'] = true;
     }
   }
 
   onMouseEnter(event: MouseEvent) {
     if (!this.handleHover && this.viewMode === BoardViewMode.KANBAN) {
-      this.toggleColours = true;
+      this.classObj[this.header.backlog ? 'hover-colour-backlog' : 'hover-colour'] = true;
     }
   }
 
   onMouseLeave(event: MouseEvent) {
-    this.toggleColours = false;
+    this.classObj['hover-colour-backlog'] = false;
+    this.classObj['hover-colour'] = false;
   }
 }

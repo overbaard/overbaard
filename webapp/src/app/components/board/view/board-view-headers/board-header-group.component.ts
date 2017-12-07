@@ -24,7 +24,7 @@ export class BoardHeaderGroupComponent implements OnInit {
 
   showStates = true;
 
-  toggleColours = false;
+  classObj: Object = {};
 
   constructor() { }
 
@@ -70,11 +70,12 @@ export class BoardHeaderGroupComponent implements OnInit {
 
   onMouseEnter(event: MouseEvent) {
     if (!this.showStates) {
-      this.toggleColours = true;
+      this.classObj[this.header.backlog ? 'hover-colour-backlog' : 'hover-colour'] = true;
     }
   }
 
   onMouseLeave(event: MouseEvent) {
-    this.toggleColours = false;
+    this.classObj['hover-colour-backlog'] = false;
+    this.classObj['hover-colour'] = false;
   }
 }

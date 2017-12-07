@@ -1,15 +1,18 @@
 <div
-  class="header-content"
   *ngIf="viewMode === enumViewMode.KANBAN"
-  [ngClass]="classList"
+  [ngClass]="classObj"
   (mouseenter)="onMouseEnter($event)"
-  (mouseleave)="onMouseLeave($event)"
-  [class.hover-colour]="toggleColours">
-  <div *ngIf="header.visible">{{header.name}}</div>
-  <div *ngIf="!header.visible">{{header.abbreviation}}</div>
-  <div>{{header.visibleIssues}}/{{header.totalIssues}}</div>
+  (mouseleave)="onMouseLeave($event)">
+  <div *ngIf="header.visible">
+    <div>{{header.name}}</div>
+    <div class="mat-caption">{{header.visibleIssues}}/{{header.totalIssues}}</div>
+  </div>
+  <div *ngIf="!header.visible">
+    <div>{{header.abbreviation}}</div>
+    <div class="mat-caption">{{header.visibleIssues}}</div>
+  </div>
 </div>
-<div class="header-content" *ngIf="viewMode === enumViewMode.RANK" [ngClass]="classList">
+<div class="header-content" *ngIf="viewMode === enumViewMode.RANK" [ngClass]="classObj">
   <div >{{header.abbreviation}}</div>
   <div>{{header.visibleIssues}}</div>
 </div>
