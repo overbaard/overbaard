@@ -16,6 +16,12 @@ export class BoardHeaderContentComponent implements OnInit {
   @Input()
   viewMode: BoardViewMode;
 
+  @Input()
+  leftBorder = false;
+
+  @Input()
+  rightBoarder = false;
+
   @Output()
   toggleColumnVisibility: EventEmitter<BoardHeader> = new EventEmitter<BoardHeader>();
 
@@ -41,6 +47,13 @@ export class BoardHeaderContentComponent implements OnInit {
       } else {
         this.classList = ['state', 'rank']
       }
+    }
+
+    if (this.leftBorder) {
+      this.classList.push('left-border');
+    }
+    if (this.rightBoarder) {
+      this.classList.push('right-border');
     }
   }
 }

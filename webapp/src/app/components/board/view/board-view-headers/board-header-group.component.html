@@ -14,9 +14,11 @@
     *ngIf="showStates ; else stateOnlyHeader"
     class="header-line">
     <app-board-header-content
-      *ngFor="let stateHeader of header.states"
+      *ngFor="let stateHeader of header.states ; first as isFirst ; last as isLast"
       [header]="stateHeader"
       [viewMode]="viewMode"
+      [leftBorder]="!isFirst"
+      [rightBoarder]="!isLast"
       (click)="onToggleVisibility(stateHeader)"
     ></app-board-header-content>
   </div>

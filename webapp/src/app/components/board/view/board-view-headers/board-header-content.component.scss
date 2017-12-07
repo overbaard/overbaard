@@ -11,8 +11,6 @@
   justify-content: center;
   background-color: $accent-colour;
   color: white;
-  border-left: $header-border-side;
-  border-right: $header-border-side;
   border-bottom: $header-border-bottom;
   text-align: center;
   cursor: pointer;
@@ -24,7 +22,12 @@
 .header-content:hover {
   background-color: #F0F0F0;
 }
-
+.left-border {
+  border-left: $header-border-side;
+}
+.right-border {
+  border-right: $header-border-side;
+}
 .state {
   display: flex;
 }

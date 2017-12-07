@@ -2,6 +2,9 @@
 
 .header-group {
   height: 100%;
+  border-left: $header-border-side;
+  border-right: $header-border-side;
+
 }
 .header-line {
   display: flex;
