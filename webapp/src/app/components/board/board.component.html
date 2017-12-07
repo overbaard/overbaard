@@ -1,25 +1,44 @@
 <div (document:visibilitychange)="onDocumentVisiblityChange($event)" (window:resize)="onWindowResize($event)">
-  <div id="board-outer">
-    <div id="board-inner">
-      <app-kanban-view
-        *ngIf="(userSettings$ | async).viewMode === enumViewMode.KANBAN"
-        [board]="board$ | async"
-        [windowWidth]="windowWidth"
-        [windowHeight]="windowHeight"
-        (toggleColumnVisibility)="onToggleVisibility($event)"
-        (toggleBacklog)="onToggleBacklog($event)"
-        (toggleCollapsedSwimlane)="onToggleCollapsedSwimlane($event)"
-      >
-      </app-kanban-view>
-      <app-rank-view
-        *ngIf="(userSettings$ | async).viewMode === enumViewMode.RANK"
-        [board]="board$ | async"
-        [windowWidth]="windowWidth"
-        [windowHeight]="windowHeight">
-      </app-rank-view>
+  <mat-drawer-container class="drawer-container">
+    <mat-drawer mode="over" #settings class="drawer-settings" position="end">
+      <div>Hello Rostislav :)</div>
+      <div *ngIf="settingsOpen">Next step is to move the contol panel here</div>
+    </mat-drawer>
+    <div id="board-outer">
+      <div id="board-inner">
+        <app-kanban-view
+          *ngIf="(userSettings$ | async).viewMode === enumViewMode.KANBAN"
+          [board]="board$ | async"
+          [windowWidth]="windowWidth"
+          [windowHeight]="windowHeight"
+          (toggleColumnVisibility)="onToggleVisibility($event)"
+          (toggleBacklog)="onToggleBacklog($event)"
+          (toggleCollapsedSwimlane)="onToggleCollapsedSwimlane($event)"
+        >
+        </app-kanban-view>
+        <app-rank-view
+          *ngIf="(userSettings$ | async).viewMode === enumViewMode.RANK"
+          [board]="board$ | async"
+          [windowWidth]="windowWidth"
+          [windowHeight]="windowHeight">
+        </app-rank-view>
+      </div>
     </div>
-  </div>
+
+  </mat-drawer-container>
 </div>
+<button *ngIf="!settingsOpen"
+        mat-fab color="accent"
+        (click)="settings.open('mouse'); settingsOpen=true;"
+        class="settings-icon">
+  <mat-icon >settings</mat-icon>
+</button>
+<button *ngIf="settingsOpen"
+        mat-fab color="accent"
+        (click)="settings.close('mouse'); settingsOpen=false;"
+        class="settings-icon">
+  <mat-icon>clear</mat-icon>
+</button>
 <button id="temp-control-button" (click)="onToggleControlPanel($event)">*</button>
 <button id="temp-switch-view-button" (click)="onSwitchViewMode($event)">~</button>
 <app-control-panel

@@ -44,6 +44,7 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   // Expose the enum to the template
   enumViewMode = BoardViewMode;
+  settingsOpen: boolean;
   constructor(
     private _elementRef: ElementRef,
     private _route: ActivatedRoute,
