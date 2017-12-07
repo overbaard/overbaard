@@ -34,17 +34,11 @@
     <!-- This is either a header that is a plain state (i.e not a category). If it is the backlog,
     there is only one state-->
 
-    <div class="header-line">
-      <!-- Include an empty header line for when it
+    <div class="header-line" (click)="onToggleVisibility(header)">
       <!--
         If this is not a category for which we should show states, we want to align the state header content
         in the bottom section. So pass in an empty header and viewMode for those cases
       -->
-      <!--<app-board-header-content
-        [header]="null"
-        [viewMode]="null"
-        (click)="onToggleVisibility(header)"
-      ></app-board-header-content>-->
     </div>
     <div class="header-line">
       <!--
