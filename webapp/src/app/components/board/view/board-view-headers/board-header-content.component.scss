@@ -1,4 +1,5 @@
 @import "../../../../../styles";
+@import "../../board-styles";
 :host {
   display: flex;
   flex-grow: 1;
@@ -24,14 +25,14 @@
   display: flex;
 }
 .visible {
-  min-width: 200px;
-  max-width: 200px;
+  min-width: $visible-header-width;
+  max-width: $visible-header-width;
 }
 .invisible {
-  min-width: 40px;
-  max-width: 40px;
+  min-width: $invisible-header-width;
+  max-width: $invisible-header-width;
 }
 .rank {
-  min-width: 40px;
-  max-width: 40px;
+  min-width: $invisible-header-width;
+  max-width: $invisible-header-width;
 }

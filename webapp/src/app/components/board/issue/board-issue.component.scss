@@ -1,3 +1,5 @@
+@import "../../../../styles";
+
 .mat-card {
   min-width: 190px;
   max-width: 190px;
@@ -17,7 +19,24 @@
 .space-filler {
   flex-grow: 1;
 }
+/* The line, height and so */
+.menu-icon-base {
+  min-width: 12px;
+  max-width: 12px;
+  height: 24px;
+  line-height: 24px;
+  min-height: 24px;
+  font-size: 15px;
+  padding: 0;
+  margin: 0;
+}
 
+.mat-icon-button.menu-icon-button {
+  @extend .menu-icon-base;
+}
+.mat-icon.menu-icon {
+  @extend .menu-icon-base
+}
 /*.issue {
   border: 1px solid #CCCCCC;
   border-collapse: collapse;

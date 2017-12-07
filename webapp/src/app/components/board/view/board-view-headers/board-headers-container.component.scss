@@ -1,9 +1,10 @@
+@import "../../board-styles";
 .headers-container {
   display: flex;
   margin: 0;
   padding: 0;
-  min-height: 100px;
-  max-height: 100px;
+  min-height: $header-container-height;
+  max-height: $header-container-height;
 }
 .rank-issues-header {
   padding: 0px;

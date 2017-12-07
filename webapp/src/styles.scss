@@ -37,7 +37,7 @@ $white-text: #FFF!important;
   color: $white-text;
 }
 
-
+/* Styling of the general components */
 .component-header {
   margin-top: 0px;
   background-color: $primary-colour;
@@ -53,32 +53,4 @@ $white-text: #FFF!important;
   padding-right: 20px;
   padding-top: 10px;
 }
-
-
-$toolbar-height: 30px;
-/*
-body {
-  margin:0;
-  padding:0;
-  font-family: 'Open Sans', Verdana, Arial, sans-serif;
-}
-*/
-
-
-
-/* Global link settings */
-/*a:link {
-  text-decoration: none;
-}
-a:visited {
-  text-decoration: none;
-}
-a:hover {
-  text-decoration: underline;
-}
-a:active {
-  text-decoration: underline;
-}*/
-
-
 
