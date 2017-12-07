@@ -1,3 +1,4 @@
+@import "../../../board-styles";
 :host {
   display: flex;
 }
@@ -8,6 +9,8 @@
 
 }
 .hidden-backlog {
-  min-width: 50px;
-  max-width: 50px;
+  min-width: $invisible-header-width;
+  max-width: $invisible-header-width;
+  border-left: $header-border-side;
+  border-right: $header-border-side;
 }

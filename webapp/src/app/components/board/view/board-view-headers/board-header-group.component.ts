@@ -22,37 +22,18 @@ export class BoardHeaderGroupComponent implements OnInit {
   @Output()
   toggleBacklog: EventEmitter<BoardHeader> = new EventEmitter<BoardHeader>();
 
-  classList: string[];
   showStates = true;
 
   constructor() { }
 
   ngOnInit() {
-
     if (!this.header.category) {
       this.showStates = false;
     } else if (this.header.backlog) {
       if (this.viewMode === BoardViewMode.KANBAN) {
         this.showStates = this.header.visible && this.header.stateIndices.size > 1;
-      }
-    }
-
-    if (this.viewMode === BoardViewMode.KANBAN) {
-      if (this.header.backlog) {
-        if (this.header.visible) {
-          this.classList = ['backlog']
-        } else {
-          this.classList = ['backlog', 'hidden-backlog']
-        }
-      }
-    } else if (this.viewMode === BoardViewMode.RANK) {
-      if (this.header.backlog) {
-        if (this.header.category && this.showStates) {
-          this.classList = ['backlog'];
-        } else {
-          this.classList = this.classList = ['backlog', 'rank-backlog'];
-
-        }
+      } else {
+          this.showStates = this.header.stateIndices.size > 1;
       }
     }
   }

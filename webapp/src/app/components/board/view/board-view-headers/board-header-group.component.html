@@ -1,4 +1,4 @@
-<div class="header-group" [ngClass]="classList">
+<div class="header-group">
   <div class="header-line">
     <!--
       If this is not a category for which we should show states, we want to align the state header content
@@ -22,8 +22,11 @@
   </div>
   <ng-template #stateOnlyHeader>
     <div class="header-line">
+      <!--
+        If we were the backlog with just one state, use that state here
+      -->
       <app-board-header-content
-        [header]="header"
+        [header]="header.backlog ? header.states.get(0) : header"
         [viewMode]="viewMode"
         (click)="onToggleVisibility(header)"
       ></app-board-header-content>

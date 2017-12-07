@@ -21,7 +21,7 @@
     {"name": "Verified"},
     {"name": "Done"}
   ],
-  "backlog": 1,
+  "backlog": 3,
   "done": 1,
   "headers": ["Analysis", "Development", "QA"],
   "assignees" : [
