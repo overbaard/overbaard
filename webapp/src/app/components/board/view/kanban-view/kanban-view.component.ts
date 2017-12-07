@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output, SimpleChanges} from '@angular/core';
 import {FixedHeaderView} from '../fixed-header-view';
 import {BoardHeader} from '../../../../view-model/board/board-header';
 import {BoardViewMode} from '../../../../model/board/user/board-view-mode';

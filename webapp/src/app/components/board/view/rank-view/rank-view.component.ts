@@ -24,6 +24,7 @@ export class RankViewComponent extends FixedHeaderView implements OnInit, OnChan
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    super.ngOnChanges(changes);
     if (changes['board']) {
       const change: SimpleChange = changes['board'];
       if (change) {

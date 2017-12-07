@@ -112,6 +112,7 @@ export class BoardComponent implements OnInit, OnDestroy {
   private setWindowSize() {
     this.windowHeight = window.innerHeight;
     this.windowWidth = window.innerWidth;
+    console.log('---> SWS ' + this.windowHeight);
   }
 
   onToggleControlPanel($event: Event) {

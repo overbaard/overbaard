@@ -13,12 +13,12 @@
         </mat-nav-list>
       </div>
     </mat-sidenav>
-    <mat-toolbar color="primary" class="mat-elevation-z10"  style="min-height:64px;">
-      <span>
-        <button mat-icon-button (click)="navigation.open('mouse')">
-          <mat-icon>menu</mat-icon>
-        </button>
-      </span>
+    <mat-toolbar color="primary" class="mat-elevation-z10"  [ngStyle]="{'min-height': toolbarHeight, 'max-height': toolbarHeight}">
+    <span>
+      <button mat-icon-button (click)="navigation.open('mouse')">
+        <mat-icon>menu</mat-icon>
+      </button>
+    </span>
       <span>Overbård</span>
     </mat-toolbar>
     <div class="inner-sidenav-content">
