@@ -11,11 +11,15 @@
   justify-content: center;
   background-color: $accent-colour;
   color: white;
-  border-left: 1px solid white;
-  border-right: 1px solid white;
-  border-bottom: 1px solid white;
+  border-left: $header-border-side;
+  border-right: $header-border-side;
+  border-bottom: $header-border-bottom;
   text-align: center;
   cursor: pointer;
+}
+.header-content-empty {
+  @extend .header-content;
+  border-bottom: $header-empty-border-bottom;
 }
 .header-content:hover {
   background-color: #F0F0F0;

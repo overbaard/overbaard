@@ -1,5 +1,8 @@
+@import "../../../styles";
 /** Constants for the boards */
 $header-container-height: 100px;
 $visible-header-width: 200px;
 $invisible-header-width: 40px;
-$border-white: solid 1px white
+$header-border-bottom: solid 2px white;
+$header-empty-border-bottom: solid 2px $accent-colour;
+$header-border-side: solid 1px white;

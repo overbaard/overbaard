@@ -1,16 +1,13 @@
+@import "../../board-styles";
+
 .header-group {
-  display: flex;
-  flex-direction: column;
   height: 100%;
-}
-.header-category {
-  height: 100%;
-  width: 100%;
 }
 .header-line {
   display: flex;
   flex-grow: 1;
   width: 100%;
+  height: 50%;
 }
 .backlog {
   background-color: #CCCCCC;
@@ -20,6 +17,6 @@
   max-width: 50px;
 }
 .rank-backlog {
-  min-width: 40px;
-  max-width: 40px;
+  min-width: $invisible-header-width;
+  max-width: $invisible-header-width;
 }

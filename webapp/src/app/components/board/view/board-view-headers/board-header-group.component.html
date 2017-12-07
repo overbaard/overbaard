@@ -1,13 +1,17 @@
 <div class="header-group" [ngClass]="classList">
   <div class="header-line">
+    <!--
+      If this is not a category for which we should show states, we want to align the state header content
+      in the bottom section. So pass in an empty header and viewMode for those cases
+    -->
     <app-board-header-content
-      [header]="header"
-      [viewMode]="viewMode"
+      [header]="showStates ? header : null"
+      [viewMode]="showStates ? viewMode : null"
       (click)="onToggleVisibility(header)"
     ></app-board-header-content>
   </div>
   <div
-    *ngIf="showStates"
+    *ngIf="showStates ; else stateOnlyHeader"
     class="header-line">
     <app-board-header-content
       *ngFor="let stateHeader of header.states"
@@ -16,5 +20,14 @@
       (click)="onToggleVisibility(stateHeader)"
     ></app-board-header-content>
   </div>
-
+  <ng-template #stateOnlyHeader>
+    <div class="header-line">
+      <app-board-header-content
+        [header]="header"
+        [viewMode]="viewMode"
+        (click)="onToggleVisibility(header)"
+      ></app-board-header-content>
+    </div>
+  </ng-template>
 </div>
+

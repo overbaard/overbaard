@@ -28,13 +28,12 @@ export class BoardHeaderGroupComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+
     if (!this.header.category) {
       this.showStates = false;
     } else if (this.header.backlog) {
       if (this.viewMode === BoardViewMode.KANBAN) {
-        this.showStates = this.header.visible;
-      } else {
-        this.showStates = this.header.stateIndices.size > 1;
+        this.showStates = this.header.visible && this.header.stateIndices.size > 1;
       }
     }
 

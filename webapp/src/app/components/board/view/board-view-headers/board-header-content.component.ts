@@ -27,8 +27,12 @@ export class BoardHeaderContentComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+    if (!this.header) {
+      return;
+    }
+
     if (!this.header.category) {
-      if (this.viewMode === BoardViewMode.KANBAN){
+      if (this.viewMode === BoardViewMode.KANBAN) {
         if (this.header.visible) {
           this.classList = ['state', 'visible'];
         } else {
@@ -38,9 +42,5 @@ export class BoardHeaderContentComponent implements OnInit {
         this.classList = ['state', 'rank']
       }
     }
-  }
-
-  onToggleVisibility(header: BoardHeader) {
-    this.toggleColumnVisibility.emit(header);
   }
 }
