@@ -166,7 +166,7 @@
     "FEAT-1" : {
       "key": "FEAT-1",
       "state": 4,
-      "summary": "Issue number 1",
+      "summary": "Issue number 1. This has a longish description.",
       "priority": 0,
       "type": 2,
       "components": [0, 1],
@@ -179,7 +179,7 @@
     "FEAT-2" : {
       "key": "FEAT-2",
       "state": 4,
-      "summary": "Issue number 2",
+      "summary": "Issue number 2. This has a longer description than the last one, it will probably span a bit.",
       "priority": 1,
       "type": 3,
       "components": [1, 2],
@@ -191,7 +191,7 @@
     "FEAT-3" : {
       "key": "FEAT-3",
       "state": 3,
-      "summary": "Issue number 3",
+      "summary": "Issue number 3. This has a really, really long description which will span a lot. Whoever wrote this should perhaps use the description field instead of putting everything into the issue summary!",
       "priority": 2,
       "type": 0
     },

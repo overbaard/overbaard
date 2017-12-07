@@ -1,12 +1,19 @@
 <mat-card *ngIf="issue.visible">
-  <mat-card-title class="issue" style="">
-    <div class="title-container">
-      <div class="mat-h4 issue-key">{{issue.key}}</div>
-      <div class="mat-h4 initials"><span>{{issue.assignee.initials}}</span></div>
+  <mat-card-title class="issue">
+    <div class="title-container" [ngStyle]="{'background-color': issue.projectColour}">
+      <span class="mat-h4">{{issue.key}}</span>
+      <span class="space-filler"></span>
+      <span class="mat-h4">{{issue.assignee.initials}}</span>
+      <span class="mat-h4">
+        <button mat-icon-button>
+          <mat-icon>more_vert</mat-icon>
+        </button>
+      </span>
     </div>
   </mat-card-title>
   <mat-card-content>
-    {{issue.summary}}
+    <div class="mat-caption">{{issue.summary}}</div>
+
     <!-- TODO avatar -->
   </mat-card-content>
 </mat-card>

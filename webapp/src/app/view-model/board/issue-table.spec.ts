@@ -1,11 +1,12 @@
 import {
-  BoardStateInitializer, BoardViewObservableUtil, HeaderStateFactory,
+  BoardStateInitializer,
+  BoardViewObservableUtil,
+  HeaderStateFactory,
   IssuesFactory
 } from './board-view.common.spec';
 import {DeserializeIssueLookupParams} from '../../model/board/data/issue/issue.model';
 import {HeaderState} from '../../model/board/data/header/header.state';
 import {HeaderActions, headerMetaReducer} from '../../model/board/data/header/header.reducer';
-import {initialHeaderState} from '../../model/board/data/header/header.model';
 import 'rxjs/add/operator/take';
 import {IssueTable} from './issue-table';
 import {List, OrderedSet, Set} from 'immutable';

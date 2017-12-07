@@ -21,7 +21,8 @@ const DEFAULT_STATE: BoardIssueView = {
   parallelTasks: null,
   linkedIssues: List<Issue>(),
   ownState: -1,
-  visible: true
+  visible: true,
+  projectColour: 'red'
 };
 
 interface BoardIssueViewRecord extends TypedRecord<BoardIssueViewRecord>, BoardIssueView {
@@ -36,7 +37,7 @@ export class BoardIssueViewUtil {
     return <BoardIssueViewRecord>s;
   }
 
-  static createBoardIssue(issue: BoardIssue, visible: boolean): BoardIssueViewRecord {
+  static createBoardIssue(issue: BoardIssue, projectColour: string, visible: boolean): BoardIssueViewRecord {
     return ISSUE_FACTORY({
       key: issue.key,
       projectCode: issue.projectCode,
@@ -51,7 +52,8 @@ export class BoardIssueViewUtil {
       parallelTasks: issue.parallelTasks,
       linkedIssues: issue.linkedIssues,
       ownState: issue.ownState,
-      visible: visible
+      visible: visible,
+      projectColour: projectColour
     });
   }
 

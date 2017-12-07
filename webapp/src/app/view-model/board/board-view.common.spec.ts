@@ -6,10 +6,9 @@ import {initialUserSettingState} from '../../model/board/user/user-setting.model
 import {BoardUtil, initialBoardState} from '../../model/board/data/board.model';
 import {BoardState} from '../../model/board/data/board';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import {BoardHeaders} from './board-headers';
 import {Dictionary} from '../../common/dictionary';
 import {UserSettingActions, userSettingReducer} from '../../model/board/user/user-setting.reducer';
-import {DeserializeIssueLookupParams, initialIssueState, IssueState} from '../../model/board/data/issue/issue.model';
+import {DeserializeIssueLookupParams, IssueState} from '../../model/board/data/issue/issue.model';
 import {HeaderState} from '../../model/board/data/header/header.state';
 import {BoardProject, LinkedProject, ParallelTask, ProjectState} from '../../model/board/data/project/project.model';
 import {getTestIssueTypeState} from '../../model/board/data/issue-type/issue-type.reducer.spec';
@@ -39,7 +38,6 @@ import {BoardViewModel} from './board-view';
 import {BoardHeader} from './board-header';
 import {UserSettingState} from '../../model/board/user/user-setting';
 import {Action} from '@ngrx/store';
-import {main} from '@angular/compiler-cli/src/main';
 
 export class BoardViewObservableUtil {
   private _service: BoardViewModelHandler = new BoardViewModelHandler();

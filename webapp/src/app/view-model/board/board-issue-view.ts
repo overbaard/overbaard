@@ -5,6 +5,7 @@ import {BoardIssue} from '../../model/board/data/issue/board-issue';
  */
 export interface BoardIssueView extends BoardIssue {
   // TODO other fields as needed
+  projectColour: string;
   visible: boolean;
 }
 

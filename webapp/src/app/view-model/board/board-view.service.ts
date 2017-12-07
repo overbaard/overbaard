@@ -480,7 +480,7 @@ class IssueTableBuilder {
       case ChangeType.LOAD_BOARD: {
         const issues: Map<string, BoardIssueView> = Map<string, BoardIssueView>().asMutable();
         this._currentBoardState.issues.issues.forEach((issue, key) => {
-          const issueView: BoardIssueView = BoardIssueViewUtil.createBoardIssue(issue, true);
+          const issueView: BoardIssueView = this.createIssueView(issue, true);
           issues.set(key, issueView);
         });
         return issues.asImmutable();
@@ -498,7 +498,7 @@ class IssueTableBuilder {
             } else {
               issues = issues.asMutable();
               const issue: BoardIssue = this._currentBoardState.issues.issues.get(key);
-              const issueView: BoardIssueView = BoardIssueViewUtil.createBoardIssue(issue, true);
+              const issueView: BoardIssueView = this.createIssueView(issue, true);
               issues.set(key, issueView);
             }
           });
@@ -509,6 +509,11 @@ class IssueTableBuilder {
       default:
         return this._oldIssueTableState.issues;
     }
+  }
+
+  private createIssueView(issue: BoardIssue, visible: boolean): BoardIssueView {
+    const colour: string = this._currentBoardState.projects.boardProjects.get(issue.projectCode).colour;
+    return BoardIssueViewUtil.createBoardIssue(issue, colour, visible);
   }
 
   private filterIssues(issues: Map<string, BoardIssueView>): Map<string, BoardIssueView> {

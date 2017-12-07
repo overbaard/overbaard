@@ -323,7 +323,8 @@ describe('Apply filter tests', () => {
       parallelTasks: null,
       linkedIssues: List<Issue>(),
       ownState: -1,
-      visible: true
+      visible: true,
+      projectColour: 'red'
     }
   }
 });
