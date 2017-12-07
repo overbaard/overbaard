@@ -22,12 +22,12 @@
   color: black;
 }
 .hover-colour {
-  background-color: $primary-colour;
+  background-color: $header-colour;
   color: white;
 }
 .hover-colour-backlog {
   @extend .hover-colour;
-  background-color: $accent-colour;
+  background-color: $header-colour-backlog;
 }
 
 
