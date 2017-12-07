@@ -24,6 +24,8 @@ export class BoardHeaderGroupComponent implements OnInit {
 
   showStates = true;
 
+  toggleColours = false;
+
   constructor() { }
 
   ngOnInit() {
@@ -64,5 +66,15 @@ export class BoardHeaderGroupComponent implements OnInit {
         }
       }
     }
+  }
+
+  onMouseEnter(event: MouseEvent) {
+    if (!this.showStates) {
+      this.toggleColours = true;
+    }
+  }
+
+  onMouseLeave(event: MouseEvent) {
+    this.toggleColours = false;
   }
 }

@@ -17,15 +17,23 @@ export class BoardHeaderContentComponent implements OnInit {
   viewMode: BoardViewMode;
 
   @Input()
+  performSizing;
+
+  @Input()
   leftBorder = false;
 
   @Input()
   rightBoarder = false;
 
+  @Input()
+  handleHover = false;
+
   @Output()
   toggleColumnVisibility: EventEmitter<BoardHeader> = new EventEmitter<BoardHeader>();
 
   classList: string[];
+
+  toggleColours = false;
 
   // Expose the enum to the component
   readonly enumViewMode = BoardViewMode;
@@ -33,11 +41,7 @@ export class BoardHeaderContentComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    if (!this.header) {
-      return;
-    }
-
-    if (!this.header.category) {
+    if (this.performSizing) {
       if (this.viewMode === BoardViewMode.KANBAN) {
         if (this.header.visible) {
           this.classList = ['state', 'visible'];
@@ -55,5 +59,15 @@ export class BoardHeaderContentComponent implements OnInit {
     if (this.rightBoarder) {
       this.classList.push('right-border');
     }
+  }
+
+  onMouseEnter(event: MouseEvent) {
+    if (!this.handleHover && this.viewMode === BoardViewMode.KANBAN) {
+      this.toggleColours = true;
+    }
+  }
+
+  onMouseLeave(event: MouseEvent) {
+    this.toggleColours = false;
   }
 }

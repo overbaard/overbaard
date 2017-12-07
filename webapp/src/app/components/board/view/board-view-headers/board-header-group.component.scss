@@ -4,7 +4,8 @@
   height: 100%;
   border-left: $header-border-side;
   border-right: $header-border-side;
-
+  text-align: center;
+  cursor: pointer;
 }
 .header-line {
   display: flex;
@@ -15,4 +16,14 @@
 .rank-backlog {
   min-width: $invisible-header-width;
   max-width: $invisible-header-width;
+}
+.normal-colour {
+  background-color: $accent-colour;
+  color: white;
+  border-bottom: $header-border-bottom;
+}
+.hover-colour {
+  background-color: white;
+  color: black;
+  border-bottom: $header-border-bottom;
 }

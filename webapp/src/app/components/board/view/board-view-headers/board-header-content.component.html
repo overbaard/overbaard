@@ -1,8 +1,10 @@
-<!-- Display the empty header -->
-<div class="header-content-empty" *ngIf="!header">
-</div>
-<!-- viewMode only gets set when there is a header for these next two -->
-<div class="header-content" *ngIf="viewMode === enumViewMode.KANBAN" [ngClass]="classList">
+<div
+  class="header-content"
+  *ngIf="viewMode === enumViewMode.KANBAN"
+  [ngClass]="classList"
+  (mouseenter)="onMouseEnter($event)"
+  (mouseleave)="onMouseLeave($event)"
+  [class.hover-colour]="toggleColours">
   <div *ngIf="header.visible">{{header.name}}</div>
   <div *ngIf="!header.visible">{{header.abbreviation}}</div>
   <div>{{header.visibleIssues}}/{{header.totalIssues}}</div>

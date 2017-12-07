@@ -1,17 +1,16 @@
-<div class="header-group">
+<div
+  class="header-group normal-colour"
+  *ngIf="showStates ; else noStates"
+>
+  <!-- This is a header that is a category. If it is the backlog, it has more than one state -->
   <div class="header-line">
-    <!--
-      If this is not a category for which we should show states, we want to align the state header content
-      in the bottom section. So pass in an empty header and viewMode for those cases
-    -->
     <app-board-header-content
-      [header]="showStates ? header : null"
-      [viewMode]="showStates ? viewMode : null"
+      [header]="header"
+      [viewMode]="viewMode"
       (click)="onToggleVisibility(header)"
     ></app-board-header-content>
   </div>
   <div
-    *ngIf="showStates ; else stateOnlyHeader"
     class="header-line">
     <app-board-header-content
       *ngFor="let stateHeader of header.states ; first as isFirst ; last as isLast"
@@ -19,20 +18,47 @@
       [viewMode]="viewMode"
       [leftBorder]="!isFirst"
       [rightBoarder]="!isLast"
+      [performSizing]="true"
       (click)="onToggleVisibility(stateHeader)"
     ></app-board-header-content>
   </div>
-  <ng-template #stateOnlyHeader>
+</div>
+<ng-template #noStates>
+  <div
+    class="header-group"
+    *ngIf="!showStates"
+    (mouseenter)="onMouseEnter($event)"
+    (mouseleave)="onMouseLeave($event)"
+    [class.normal-colour]="!toggleColours"
+    [class.hover-colour]="toggleColours"
+  >
+    <!-- This is either a header that is a plain state (i.e not a category). If it is the backlog,
+    there is only one state-->
+
+    <div class="header-line">
+      <!-- Include an empty header line for when it
+      <!--
+        If this is not a category for which we should show states, we want to align the state header content
+        in the bottom section. So pass in an empty header and viewMode for those cases
+      -->
+      <!--<app-board-header-content
+        [header]="null"
+        [viewMode]="null"
+        (click)="onToggleVisibility(header)"
+      ></app-board-header-content>-->
+    </div>
     <div class="header-line">
       <!--
         If we were the backlog with just one state, use that state here
       -->
       <app-board-header-content
-        [header]="header.backlog ? header.states.get(0) : header"
+        [header]="header.backlog && header.visible ? header.states.get(0) : header"
         [viewMode]="viewMode"
+        [performSizing]="true"
         (click)="onToggleVisibility(header)"
       ></app-board-header-content>
     </div>
-  </ng-template>
-</div>
+  </div>
+</ng-template>
+
 

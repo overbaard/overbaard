@@ -9,27 +9,27 @@
   flex-grow: 1;
   flex-direction: column;
   justify-content: center;
-  background-color: $accent-colour;
-  color: white;
   border-bottom: $header-border-bottom;
-  text-align: center;
-  cursor: pointer;
 }
 .header-content-empty {
   @extend .header-content;
   border-bottom: $header-empty-border-bottom;
 }
-.header-content:hover {
-  background-color: #F0F0F0;
+.normal-colour {
+  background-color: $accent-colour;
+  color: white;
+  border-bottom: $header-border-bottom;
+}
+.hover-colour {
+  background-color: white;
+  color: black;
+  border-bottom: $header-border-bottom;
 }
 .left-border {
   border-left: $header-border-side;
 }
 .right-border {
   border-right: $header-border-side;
-}
-.state {
-  display: flex;
 }
 .visible {
   min-width: $visible-header-width;

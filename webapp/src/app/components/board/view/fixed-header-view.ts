@@ -34,7 +34,6 @@ export class FixedHeaderView implements OnChanges {
     if (heightChange) {
       const height = heightChange.currentValue;
       this.boardBodyHeight = (height - TOOLBAR_HEIGHT - BOARD_HEADERS_HEIGHT) + 'px';
-      console.log('--- fhv ' + this.boardBodyHeight);
     }
   }
 }
