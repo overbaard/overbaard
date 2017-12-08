@@ -32,12 +32,14 @@ import {RankViewContainerComponent} from './components/board/view/rank-view/rank
 import {ProgressLogService} from './services/progress-log.service';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialModule} from './material.module';
+import {BoardSettingsDrawerComponent} from './components/board/settings-drawer/settings-drawer.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     BoardsComponent,
     BoardComponent,
+    BoardSettingsDrawerComponent,
     ConfigurationComponent,
     BoardConfigurationComponent,
     KanbanViewComponent,

@@ -1,0 +1,42 @@
+<div>
+  <div class="mat-h1">Board Settings</div>
+  <mat-card>
+    <mat-card-title>General</mat-card-title>
+      <mat-card-content>
+      <div [formGroup]="swimlaneForm" #f="ngForm">
+        <mat-form-field>
+          <mat-select formControlName="swimlane" placeholder="Swimlane">
+            <!-- Don't set a value for the undefined one -->
+            <mat-option></mat-option>
+            <mat-option *ngFor="let sl of swimlaneList" value="{{sl.key}}">{{sl.display}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div *ngIf="userSettings.swimlane">
+          <a
+            href="Toggle Empty"
+            (click)="onShowEmptySwimlanes($event)"
+            mat-raised-button
+            color="primary"
+          >
+            <span *ngIf="userSettings.swimlaneShowEmpty">Hide Empty</span>
+            <span *ngIf="!userSettings.swimlaneShowEmpty">Show Empty</span>
+          </a>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+  <mat-accordion>
+    <mat-expansion-panel
+      *ngFor="let entry of filterList"
+      (opened)="onSelectFiltersToDisplay($event, entry)"
+      (closed)="onSelectFiltersToDisplay($event, null)">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          {{entry.display}}
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      entry
+    </mat-expansion-panel>
+  </mat-accordion>
+
+</div>

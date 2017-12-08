@@ -4,10 +4,12 @@ import {
   MatCheckboxModule,
   MatExpansionModule,
   MatFormFieldModule,
-  MatIconModule, MatInputModule,
+  MatIconModule,
+  MatInputModule,
   MatListModule,
   MatMenuModule,
   MatProgressSpinnerModule,
+  MatSelectModule,
   MatSidenavModule,
   MatToolbarModule
 } from '@angular/material';
@@ -25,6 +27,7 @@ const materialModules: Array<Type<any>> = [
   MatListModule,
   MatMenuModule,
   MatSidenavModule,
+  MatSelectModule,
   MatToolbarModule,
   MatProgressSpinnerModule]
 

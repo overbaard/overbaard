@@ -5,8 +5,9 @@
                 position="end"
                 (openedStart)="onOpenSettings()"
                 (openedChange)="onCompleteSettingsToggle($event);">
-      <div>Hello Rostislav :)</div>
-      <div *ngIf="openingSettings || settingsOpen">Next step is to move the contol panel here</div>
+      <app-board-settings-drawer
+        *ngIf="displaySettingsContent"
+        [userSettings]="userSettings$ | async"></app-board-settings-drawer>
     </mat-drawer>
     <div id="board-outer">
       <div id="board-inner">
