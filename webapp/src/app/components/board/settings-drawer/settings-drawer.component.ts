@@ -219,18 +219,13 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
 
   onOpenFilterPane(filter: FilterAttributes) {
     this.filtersToDisplay = filter;
+    this.currentFilterEntries = this.filterEntries[filter.key];
   }
 
   onCloseFilterPanel(filter: FilterAttributes) {
     if (this.filtersToDisplay === filter) {
       this.filtersToDisplay = null;
     }
-  }
-
-  onSelectFiltersToDisplay(event: MouseEvent, filter: FilterAttributes) {
-    event.preventDefault();
-    this.filtersToDisplay = filter;
-    this.currentFilterEntries = this.filterEntries[filter.key];
   }
 
   processFormValueChanges(value: any) {

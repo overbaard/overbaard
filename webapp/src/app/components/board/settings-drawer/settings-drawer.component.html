@@ -1,5 +1,6 @@
 <div>
   <div class="mat-h1">Board Settings</div>
+  <div>TODO A lot of this text is too big. Figure out how to resize it.</div>
   <mat-card>
     <mat-card-title>General</mat-card-title>
       <mat-card-content>
@@ -25,18 +26,39 @@
       </div>
     </mat-card-content>
   </mat-card>
-  <mat-accordion>
-    <mat-expansion-panel
-      *ngFor="let entry of filterList"
-      (opened)="onSelectFiltersToDisplay($event, entry)"
-      (closed)="onSelectFiltersToDisplay($event, null)">
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          {{entry.display}}
-        </mat-panel-title>
-      </mat-expansion-panel-header>
-      entry
-    </mat-expansion-panel>
-  </mat-accordion>
-
+  <mat-card>
+    <mat-card-title>Filters</mat-card-title>
+    <mat-accordion>
+      <mat-expansion-panel
+        *ngFor="let entry of filterList"
+        (opened)="onOpenFilterPane(entry)"
+        (closed)="onCloseFilterPanel(entry)">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            {{entry.display}}
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <!-- TODO investigate pulling this into a separate component -->
+        <div *ngIf="filtersToDisplay === entry">
+          <div [formGroup]="filterForm" #f="ngForm">
+            <div formGroupName="{{filtersToDisplay.key}}">
+              <div *ngFor="let entry of currentFilterEntries">
+                <div *ngIf="!entry.children; else parallelTasksForm">
+                  <mat-checkbox formControlName="{{entry.key}}">{{entry.display}}</mat-checkbox>
+                </div>
+                <ng-template #parallelTasksForm>
+                  <div formGroupName="{{entry.key}}">
+                    <div class="mat-h4">{{entry.display}}</div>
+                    <div *ngFor="let childEntry of entry.children">
+                      <mat-checkbox formControlName="{{childEntry.key}}">{{childEntry.display}}</mat-checkbox>
+                    </div>
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </mat-card>
 </div>

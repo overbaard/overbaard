@@ -69,6 +69,9 @@ export class ConfigurationComponent implements OnInit {
 
   onCloseBoardForEdit(id: number) {
     if (this.selected === id) {
+
+    }
+    if (this.selected === id) {
       this.editError = null;
       this.selected = -1;
     }
