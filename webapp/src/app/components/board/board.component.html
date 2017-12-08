@@ -1,8 +1,12 @@
 <div (document:visibilitychange)="onDocumentVisiblityChange($event)" (window:resize)="onWindowResize($event)">
   <mat-drawer-container class="drawer-container">
-    <mat-drawer mode="over" #settings class="drawer-settings" position="end">
+    <mat-drawer mode="over" #settings
+                class="drawer-settings"
+                position="end"
+                (openedStart)="onOpenSettings()"
+                (openedChange)="onCompleteSettingsToggle($event);">
       <div>Hello Rostislav :)</div>
-      <div *ngIf="settingsOpen">Next step is to move the contol panel here</div>
+      <div *ngIf="openingSettings || settingsOpen">Next step is to move the contol panel here</div>
     </mat-drawer>
     <div id="board-outer">
       <div id="board-inner">
@@ -29,13 +33,13 @@
 </div>
 <button *ngIf="!settingsOpen"
         mat-fab color="accent"
-        (click)="settings.open('mouse'); settingsOpen=true;"
+        (click)="settings.open('mouse'); "
         class="settings-icon">
   <mat-icon >settings</mat-icon>
 </button>
 <button *ngIf="settingsOpen"
         mat-fab color="accent"
-        (click)="settings.close('mouse'); settingsOpen=false;"
+        (click)="settings.close('mouse');"
         class="settings-icon">
   <mat-icon>clear</mat-icon>
 </button>

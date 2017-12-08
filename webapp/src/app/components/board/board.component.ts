@@ -18,6 +18,7 @@ import {BoardViewModel} from '../../view-model/board/board-view';
 import {UserSettingState} from '../../model/board/user/user-setting';
 import {BoardViewMode} from '../../model/board/user/board-view-mode';
 import {BoardQueryParamsService} from '../../services/board-query-params.service';
+import {MatDrawer} from '@angular/material';
 
 
 @Component({
@@ -44,7 +45,9 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   // Expose the enum to the template
   enumViewMode = BoardViewMode;
+  openingSettings: boolean;
   settingsOpen: boolean;
+
   constructor(
     private _elementRef: ElementRef,
     private _route: ActivatedRoute,
@@ -171,6 +174,22 @@ export class BoardComponent implements OnInit, OnDestroy {
   onToggleCollapsedSwimlane(key: string) {
     this._store.dispatch(UserSettingActions.createToggleCollapsedSwimlane(key));
   }
+
+  onOpenSettings() {
+    this.openingSettings = true;
+  }
+
+  onCompleteSettingsToggle(open: boolean) {
+    this.settingsOpen = open;
+    this.openingSettings = false;
+  }
+
+  get displaySettingsContent(): boolean {
+    // We want the ngIf where this is used to display the settings content while the drawer is opening, not wait until
+    // it is opened.
+    return this.settingsOpen || this.openingSettings;
+  }
+
 
   private updateLink(queryString: string) {
     if (queryString) {
