@@ -81,14 +81,12 @@ export class BoardHeaderGroupComponent implements OnInit {
   }
 
   onMouseEnter(event: MouseEvent) {
-    if (!this.showStates) {
-      console.log('Setting hovering to true');
+    if (!this.showStates && this.viewMode === BoardViewMode.KANBAN) {
       this.hovering = true;
     }
   }
 
   onMouseLeave(event: MouseEvent) {
-    console.log('Setting hovering to false');
     this.hovering = false;
   }
 }

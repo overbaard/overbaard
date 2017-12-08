@@ -67,7 +67,7 @@ export class BoardHeaderContentComponent implements OnInit {
   }
 
   onMouseEnter(event: MouseEvent) {
-    if (!this.handleHover && this.viewMode === BoardViewMode.KANBAN) {
+    if (!this.handleHover) {
       this.hovering = true;
     }
   }
@@ -80,7 +80,6 @@ export class BoardHeaderContentComponent implements OnInit {
 
   @Input()
   set hovering(hovering: boolean) {
-    console.log('Received hovering ' + hovering);
     if (hovering) {
       this.classObj[this.header.backlog ? 'hover-colour-backlog' : 'hover-colour'] = true;
     } else {
