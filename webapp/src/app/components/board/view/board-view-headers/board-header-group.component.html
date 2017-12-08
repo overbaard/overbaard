@@ -48,6 +48,8 @@
         [header]="header.backlog && header.visible ? header.states.get(0) : header"
         [viewMode]="viewMode"
         [performSizing]="true"
+        [handleHover]="true"
+        [hovering]="isHovering"
         (click)="onToggleVisibility(header)"
       ></app-board-header-content>
     </div>

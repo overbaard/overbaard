@@ -25,6 +25,7 @@ export class BoardHeaderContentComponent implements OnInit {
   @Input()
   rightBoarder = false;
 
+  // Whether we handle our own hovering events or get the ones from the parent
   @Input()
   handleHover = false;
 
@@ -67,12 +68,25 @@ export class BoardHeaderContentComponent implements OnInit {
 
   onMouseEnter(event: MouseEvent) {
     if (!this.handleHover && this.viewMode === BoardViewMode.KANBAN) {
-      this.classObj[this.header.backlog ? 'hover-colour-backlog' : 'hover-colour'] = true;
+      this.hovering = true;
     }
   }
 
   onMouseLeave(event: MouseEvent) {
-    this.classObj['hover-colour-backlog'] = false;
-    this.classObj['hover-colour'] = false;
+    if (!this.handleHover) {
+      this.hovering = false;
+    }
   }
+
+  @Input()
+  set hovering(hovering: boolean) {
+    console.log('Received hovering ' + hovering);
+    if (hovering) {
+      this.classObj[this.header.backlog ? 'hover-colour-backlog' : 'hover-colour'] = true;
+    } else {
+      this.classObj['hover-colour-backlog'] = false;
+      this.classObj['hover-colour'] = false;
+    }
+  }
+
 }

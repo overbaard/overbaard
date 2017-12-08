@@ -25,6 +25,7 @@ export class BoardHeaderGroupComponent implements OnInit {
   showStates = true;
 
   classObj: Object = {};
+  isHovering: boolean;
 
   constructor() { }
 
@@ -68,14 +69,26 @@ export class BoardHeaderGroupComponent implements OnInit {
     }
   }
 
+  @Input()
+  set hovering(hovering: boolean) {
+    if (hovering) {
+      this.classObj[this.header.backlog ? 'hover-colour-backlog' : 'hover-colour'] = true;
+    } else {
+      this.classObj['hover-colour-backlog'] = false;
+      this.classObj['hover-colour'] = false;
+    }
+    this.isHovering = hovering;
+  }
+
   onMouseEnter(event: MouseEvent) {
     if (!this.showStates) {
-      this.classObj[this.header.backlog ? 'hover-colour-backlog' : 'hover-colour'] = true;
+      console.log('Setting hovering to true');
+      this.hovering = true;
     }
   }
 
   onMouseLeave(event: MouseEvent) {
-    this.classObj['hover-colour-backlog'] = false;
-    this.classObj['hover-colour'] = false;
+    console.log('Setting hovering to false');
+    this.hovering = false;
   }
 }
