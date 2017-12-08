@@ -10,8 +10,7 @@
 
   <mat-nav-list>
     <mat-list-item
-      *ngFor="let board of boards$ | async"
-      fxLayout="column">
+      *ngFor="let board of boards$ | async">
         <a matLine
            [routerLink]="['/board']"
            [queryParams]="{board: board.code}">{{ board.name}} </a>

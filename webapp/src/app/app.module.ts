@@ -32,7 +32,6 @@ import {RankViewContainerComponent} from './components/board/view/rank-view/rank
 import {ProgressLogService} from './services/progress-log.service';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialModule} from './material.module';
-import {FlexLayoutModule} from '@angular/flex-layout';
 
 @NgModule({
   declarations: [
@@ -59,7 +58,6 @@ import {FlexLayoutModule} from '@angular/flex-layout';
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-    FlexLayoutModule,
     FormsModule,
     HttpClientModule,
     MaterialModule,

@@ -1,8 +1,8 @@
 <div class="root-container">
   <mat-sidenav-container #navigation class="sidenav-container">
     <mat-sidenav mode="over" #navigation class="sidenav-navigation">
-      <div class="flex-container">
-        <mat-nav-list fxLayout="column">
+      <div>
+        <mat-nav-list>
           <a *ngFor="let navItem of navItems"
              mat-list-item
              (click)="navigation.close()"
