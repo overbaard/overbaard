@@ -1,16 +1,40 @@
 <div class="root-container">
   <mat-sidenav-container #navigation class="sidenav-container">
     <mat-sidenav mode="over" #navigation class="sidenav-navigation">
-      <div>
+      <div style="display: flex; flex-direction: column; width: 100%; height: 100%">
         <mat-nav-list>
           <a *ngFor="let navItem of navItems"
              mat-list-item
              (click)="navigation.close()"
              routerLinkActive
              [routerLink]="[navItem.route]">
+            <mat-icon>{{navItem.icon}}</mat-icon>
             {{navItem.name}}
           </a>
         </mat-nav-list>
+        <div class="space-filler"></div>
+        <div style="display: flex; flex-direction: column; width: 100%">
+          <mat-nav-list>
+            <mat-list-item>
+              <a href="https://github.com/overbaard/overbaard">
+                <img src="../assets/images/GitHub-Mark-32px.png" height="20px" width="20px">
+                GitHub
+              </a>
+            </mat-list-item>
+            <a
+              href="https://github.com/overbaard/overbaard/userguide/README.md"
+               mat-list-item>
+              <mat-icon>help</mat-icon>
+              Help
+            </a>
+          </mat-nav-list>
+          <mat-list>
+            <mat-list-item>
+              <div class="mat-caption">Overbård version {{version$ | async}}</div>
+            </mat-list-item>
+          </mat-list>
+
+        </div>
       </div>
     </mat-sidenav>
     <mat-toolbar color="primary" class="mat-elevation-z10"  [ngStyle]="{'min-height': toolbarHeight, 'max-height': toolbarHeight}">

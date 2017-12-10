@@ -33,6 +33,7 @@ import {ProgressLogService} from './services/progress-log.service';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialModule} from './material.module';
 import {BoardSettingsDrawerComponent} from './components/board/settings-drawer/settings-drawer.component';
+import {VersionService} from './services/version.service';
 
 @NgModule({
   declarations: [
@@ -73,7 +74,8 @@ import {BoardSettingsDrawerComponent} from './components/board/settings-drawer/s
     {provide: LocationStrategy, useClass: HashLocationStrategy},
     AppHeaderService,
     ProgressLogService,
-    RestUrlService
+    RestUrlService,
+    VersionService
   ],
 
   bootstrap: [AppComponent]
