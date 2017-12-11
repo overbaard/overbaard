@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {AppState} from '../../../app-store';
 import {Store} from '@ngrx/store';
 import {Dictionary} from '../../../common/dictionary';
@@ -38,6 +38,7 @@ import {ParallelTask} from '../../../model/board/data/project/project.model';
 import {UserSettingActions} from '../../../model/board/user/user-setting.reducer';
 import {Subject} from 'rxjs/Subject';
 import {UserSettingState} from '../../../model/board/user/user-setting';
+import {BoardViewMode} from '../../../model/board/user/board-view-mode';
 
 @Component({
   selector: 'app-board-settings-drawer',
@@ -64,6 +65,12 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
   currentFilterEntries: FilterFormEntry[];
 
   private _destroy$: Subject<null> = new Subject<null>();
+
+  // Expose the enum to the template
+  enumViewMode = BoardViewMode;
+  @Output()
+  switchViewMode: EventEmitter<null> = new EventEmitter<null>();
+
 
   constructor(private _store: Store<AppState>) {
   }
@@ -243,6 +250,15 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
     event.preventDefault();
     this._store.dispatch(UserSettingActions.createToggleShowEmptySwimlanes());
   }
+
+  onSwitchViewMode(event: Event) {
+    // There is some logic here which belongs better in the board component so emit an event and let the board
+    // handle it
+    this.switchViewMode.emit();
+    event.preventDefault();
+  }
+
+
 }
 
 interface FilterFormEntry {

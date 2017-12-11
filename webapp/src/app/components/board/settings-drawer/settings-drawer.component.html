@@ -5,6 +5,18 @@
     <mat-card-title>General</mat-card-title>
       <mat-card-content>
       <div [formGroup]="swimlaneForm" #f="ngForm">
+        <div>
+          Current {{userSettings.boardCode}} View:
+          <a
+            href="Toggle View"
+            (click)="onSwitchViewMode($event)"
+            mat-raised-button
+            color="primary"
+          >
+            <span *ngIf="userSettings.viewMode === enumViewMode.KANBAN">Rank</span>
+            <span *ngIf="userSettings.viewMode === enumViewMode.RANK">Kanban</span>
+          </a>
+        </div>
         <mat-form-field>
           <mat-select formControlName="swimlane" placeholder="Swimlane">
             <!-- Don't set a value for the undefined one -->
@@ -12,13 +24,12 @@
             <mat-option *ngFor="let sl of swimlaneList" value="{{sl.key}}">{{sl.display}}</mat-option>
           </mat-select>
         </mat-form-field>
-        <div *ngIf="userSettings.swimlane">
-          <a
+        <div>
+          <a *ngIf="userSettings.swimlane"
             href="Toggle Empty"
             (click)="onShowEmptySwimlanes($event)"
             mat-raised-button
-            color="primary"
-          >
+            color="primary">
             <span *ngIf="userSettings.swimlaneShowEmpty">Hide Empty</span>
             <span *ngIf="!userSettings.swimlaneShowEmpty">Show Empty</span>
           </a>

@@ -7,7 +7,9 @@
                 (openedChange)="onCompleteSettingsToggle($event);">
       <app-board-settings-drawer
         *ngIf="displaySettingsContent"
-        [userSettings]="userSettings$ | async"></app-board-settings-drawer>
+        [userSettings]="userSettings$ | async"
+        (switchViewMode)="onSwitchViewMode()"
+      ></app-board-settings-drawer>
     </mat-drawer>
     <div id="board-outer">
       <div id="board-inner">
@@ -44,4 +46,3 @@
         class="settings-icon">
   <mat-icon>clear</mat-icon>
 </button>
-<button id="temp-switch-view-button" (click)="onSwitchViewMode($event)">~</button>

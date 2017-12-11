@@ -45,6 +45,7 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   // Expose the enum to the template
   enumViewMode = BoardViewMode;
+
   openingSettings: boolean;
   settingsOpen: boolean;
 
@@ -148,7 +149,7 @@ export class BoardComponent implements OnInit, OnDestroy {
     this._store.dispatch(UserSettingActions.createToggleVisibility(newValue, header.stateIndices));
   }
 
-  onSwitchViewMode(event: Event) {
+  onSwitchViewMode() {
     // Update the view
     this.userSettings$.take(1).subscribe(originalUs => {
       this._store.dispatch(UserSettingActions.createSwitchBoardViewAction());
