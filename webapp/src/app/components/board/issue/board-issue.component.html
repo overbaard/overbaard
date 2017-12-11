@@ -1,9 +1,13 @@
 <mat-card *ngIf="issue.visible">
-  <mat-card-title class="issue">
+  <mat-card-title class="issue" (mouseenter)="calculateTooltips()">
     <div class="title-container">
-      <span class="mat-h4">{{issue.key}}</span>
-      <span class="space-filler"></span>
-      <span class="mat-h4">{{issue.assignee.initials}}</span>
+      <span class="title-container"
+            matTooltip="{{cardTooltip}}"
+            [matTooltipClass]="{'card-tooltip': true}">
+        <span class="mat-h4">{{issue.key}}</span>
+        <span class="space-filler"></span>
+      </span>
+      <span class="mat-h4" matTooltip="{{issue.assignee.name}}">{{issue.assignee.initials}}</span>
       <span class="mat-h4">
         <button mat-icon-button class="menu-icon-button">
           <mat-icon class="menu-icon">more_vert</mat-icon>
@@ -20,7 +24,7 @@
     </div>
     <div class="mat-caption">
       <div class="full-summary">
-        <div class="avatar-container">
+        <div class="avatar-container" matTooltip="{{issue.assignee.name}}">
           <img
             *ngIf="issue.assignee.avatar"
             class="avatar"
@@ -31,7 +35,6 @@
         </div>
         {{issue.summary}}
       </div>
-
     </div>
 
     <!-- TODO avatar -->

@@ -14,6 +14,7 @@
 }
 .title-container {
   display: flex;
+  flex-grow: 1;
 }
 /* The line, height and so */
 .menu-icon-base {
@@ -62,8 +63,17 @@ img.avatar {
   line-height: 32px;
 }
 .full-summary {
-  min-height: 40px;
+  min-height: 34px;
 }
+
+/**
+This needs styling in the global styles.scss as mentioned in
+https://github.com/angular/material2/issues/8316#issuecomment-342987304
+This feels safer than using ViewEncapsulation.NONE
+.card-tooltip {
+}
+ */
+
 
 /*.issue {
   border: 1px solid #CCCCCC;

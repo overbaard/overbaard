@@ -11,7 +11,7 @@ import {
   MatProgressSpinnerModule,
   MatSelectModule,
   MatSidenavModule,
-  MatToolbarModule
+  MatToolbarModule, MatTooltipModule
 } from '@angular/material';
 import {NgModule, Type} from '@angular/core';
 
@@ -26,10 +26,11 @@ const materialModules: Array<Type<any>> = [
   MatInputModule,
   MatListModule,
   MatMenuModule,
+  MatProgressSpinnerModule,
   MatSidenavModule,
   MatSelectModule,
   MatToolbarModule,
-  MatProgressSpinnerModule]
+  MatTooltipModule]
 
 @NgModule({
   imports: materialModules,
