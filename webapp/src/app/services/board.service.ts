@@ -45,7 +45,7 @@ export class BoardService {
       .take(1)
       .subscribe(
         data => {
-          this._store.dispatch(BoardActions.createDeserializeBoard(data));
+          this._store.dispatch(BoardActions.createDeserializeBoard(this._restUrlService.jiraUrl, data));
           this.recreateChangePollerAndStartPolling(boardCode, backlog);
         }
       );
@@ -165,7 +165,6 @@ class ChangePoller {
         url += '?backlog=' + true;
       }
       const path: string = this._restUrlService.caclulateRestUrl(url);
-      console.log(`${new Date().toLocaleTimeString()} Poll ${path} (${this._errorCount})`);
       this._currentPollTimerSubscription = executeRequest(null, BoardService._bigTimeout, this._http.get(path))
         .take(1)
         .subscribe(

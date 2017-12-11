@@ -109,9 +109,10 @@ describe('Board reducer tests', () => {
     it('Full', () => {
       // Configures everything that can be
       const boardState: BoardState = boardReducer(
-        initialBoardState, BoardActions.createDeserializeBoard(getTestBoardsInput()));
+        initialBoardState, BoardActions.createDeserializeBoard('http://jira.example.com/', getTestBoardsInput()));
       expect(boardState.viewId).toBe(10);
       expect(boardState.rankCustomFieldId).toBe(12345);
+      expect(boardState.jiraUrl).toBe('http://jira.example.com/')
 
       // Do some sanity checking of the contents. The individual reducer tests do in-depth checking
 
@@ -201,9 +202,10 @@ describe('Board reducer tests', () => {
       delete input['blacklist'];
       // Configures everything that can be
       const boardState: BoardState = boardReducer(
-        initialBoardState, BoardActions.createDeserializeBoard(input));
+        initialBoardState, BoardActions.createDeserializeBoard('http://jira1.example.com/', input));
       expect(boardState.viewId).toBe(10);
       expect(boardState.rankCustomFieldId).toBe(12345);
+      expect(boardState.jiraUrl).toBe('http://jira1.example.com/');
 
       // Do some sanity checking of the contents. The individual reducer tests do in-depth checking
 
@@ -266,7 +268,7 @@ describe('Board reducer tests', () => {
     let boardState: BoardState;
     beforeEach(() => {
       boardState = boardReducer(
-        initialBoardState, BoardActions.createDeserializeBoard(getTestBoardsInput()));
+        initialBoardState, BoardActions.createDeserializeBoard('http://www.example.com/jira/', getTestBoardsInput()));
     });
 
     it ('Empty', () => {
@@ -330,7 +332,8 @@ describe('Board reducer tests', () => {
       const newState: BoardState = boardReducer(boardState, BoardActions.createChanges(changes));
       expect(newState.viewId).toBe(11);
       // These will never change via changes
-      checkSameStateEntries(boardState, newState, 'rankCustomField', '_headers', 'headers', 'priorities', 'issueTypes', 'projects');
+      checkSameStateEntries(boardState, newState, 'jiraUrl', 'rankCustomField', '_headers',
+        'headers', 'priorities', 'issueTypes', 'projects');
 
       // Do some sanity checking of the contents. The individual reducer tests do in-depth checking
 
@@ -393,7 +396,8 @@ describe('Board reducer tests', () => {
       const newState: BoardState = boardReducer(boardState, BoardActions.createChanges(changes));
       expect(newState.viewId).toBe(11);
 
-      checkSameStateEntries(boardState, newState, '_headers', 'headers', 'assignees', 'issueTypes', 'priorities', 'components',
+      checkSameStateEntries(boardState, newState, 'jiraUrl', '_headers', 'headers', 'assignees', 'issueTypes',
+        'priorities', 'components',
         'labels', 'fixVersions', 'customFields', 'projects', 'issues');
 
       const rankState: RankState = newState.ranks;
@@ -421,7 +425,8 @@ describe('Board reducer tests', () => {
       const newState: BoardState = boardReducer(boardState, BoardActions.createChanges(changes));
       expect(newState.viewId).toBe(11);
 
-      checkSameStateEntries(boardState, newState, '_headers', 'headers', 'assignees', 'issueTypes', 'priorities', 'components',
+      checkSameStateEntries(boardState, newState, 'jiraUrl', '_headers', 'headers', 'assignees',
+        'issueTypes', 'priorities', 'components',
         'labels', 'fixVersions', 'customFields', 'projects', 'issues');
 
       const rankState: RankState = newState.ranks;

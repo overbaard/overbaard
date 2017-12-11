@@ -6,23 +6,30 @@ export class RestUrlService {
   private static OVERBAARD_FRAGMENT = 'overbaard';
   static readonly OVERBAARD_REST_PREFIX = 'rest/' + RestUrlService.OVERBAARD_FRAGMENT + '/1.0';
 
-  private _overbaardPrefix: string;
-  private _localDebug: boolean;
-  private _testRunner: boolean;
-  private _jiraUrl: string;
+  private readonly _overbaardPrefix: string;
+  private readonly _localDebug: boolean;
+  private readonly _testRunner: boolean;
+  private readonly _jiraUrl: string;
 
   constructor() {
     const location: Location = window.location;
+    const index: number = location.href.indexOf('/' + RestUrlService.OVERBAARD_FRAGMENT + '/');
 
-    let index: number = location.href.indexOf('/' + RestUrlService.OVERBAARD_FRAGMENT + '/');
     this._overbaardPrefix = index >= 0 ? location.href.substr(0, index) + '/' : null;
     this._localDebug = location.hostname === 'localhost' && location.port === '4200';
     // In our current test setup the url http://localhost:9876/context.html is used by the runner
     this._testRunner = location.hostname === 'localhost' && location.port === '9876';
+
     if (this._overbaardPrefix) {
-      index = this._overbaardPrefix.indexOf('/' + RestUrlService.OVERBAARD_FRAGMENT + '/');
-      this._jiraUrl = this._overbaardPrefix.substr(0, index);
+      this._jiraUrl = this._overbaardPrefix;
+    } else if (this._localDebug) {
+      // Return the locally running Jira instance since this is still where the icons etc are loaded from
+      this._jiraUrl =  'http://localhost:2990/jira/';
     }
+  }
+
+  get jiraUrl(): string {
+    return this._jiraUrl;
   }
 
   caclulateRestUrl(path: string): string {

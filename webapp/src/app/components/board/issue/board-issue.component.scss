@@ -16,6 +16,13 @@
   display: flex;
   flex-grow: 1;
 }
+.issue-link {
+  color: rgba(0,0,0,.87);
+  text-decoration: none;
+}
+.issue-link:hover {
+  text-decoration: underline;
+}
 /* The line, height and so */
 .menu-icon-base {
   min-width: 24px;
@@ -55,6 +62,10 @@
 }
 img.avatar {
   border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 32px;
+  line-height: 32px;
 }
 .avatar-icon {
   width: 32px;

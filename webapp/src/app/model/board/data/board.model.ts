@@ -16,6 +16,7 @@ import {BoardState} from './board';
 const DEFAULT_STATE: BoardState = {
   viewId: -1,
   rankCustomFieldId: -1,
+  jiraUrl: null,
   headers: initialHeaderState,
   assignees: initialAssigneeState,
   issueTypes: initialIssueTypeState,

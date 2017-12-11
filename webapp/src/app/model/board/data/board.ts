@@ -14,6 +14,7 @@ import {BlacklistState} from './blacklist/blacklist.model';
 export interface BoardState {
   viewId: number;
   rankCustomFieldId: number;
+  jiraUrl: string;
   headers: HeaderState;
   assignees: AssigneeState;
   issueTypes: IssueTypeState;

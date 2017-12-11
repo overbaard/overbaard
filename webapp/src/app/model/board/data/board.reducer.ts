@@ -57,7 +57,7 @@ class ClearBoardAction implements Action {
 }
 
 class DeserializeBoardAction extends BoardDataAction {
-  constructor(payload: any) {
+  constructor(readonly jiraUrl: string, payload: any) {
     super(DESERIALIZE_BOARD, payload);
   }
 }
@@ -74,15 +74,15 @@ export class BoardActions {
     return new ClearBoardAction();
   }
 
-  static createDeserializeBoard(input: any) {
-    return new DeserializeBoardAction(input);
+  static createDeserializeBoard(jiraUrl: string, input: any) {
+    return new DeserializeBoardAction(jiraUrl, input);
   }
 
   static createChanges(input: any) {
     if (input['changes']) {
       return new ProcessBoardChangesAction(input['changes']);
     };
-    return new DeserializeBoardAction(input);
+    return new DeserializeBoardAction(null, input);
   }
 }
 
@@ -93,7 +93,8 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
       return initialBoardState;
     }
     case DESERIALIZE_BOARD: {
-      const input = (<DeserializeBoardAction>action).payload;
+      const dbAction: DeserializeBoardAction = <DeserializeBoardAction>action;
+      const input = dbAction.payload;
       const viewId: number = input['view'];
       const rankCustomFieldId = input['rank-custom-field-id'];
       const headerState: HeaderState =
@@ -152,6 +153,7 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
       return BoardUtil.withMutatons(state, mutable => {
         mutable.viewId = viewId;
         mutable.rankCustomFieldId = rankCustomFieldId;
+        mutable.jiraUrl = dbAction.jiraUrl;
         mutable.headers =  headerState;
         mutable.assignees = assigneeState;
         mutable.issueTypes = issueTypeState;
@@ -215,6 +217,7 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
       const newState: BoardState = {
         viewId: viewId,
         rankCustomFieldId: state.rankCustomFieldId,
+        jiraUrl: state.jiraUrl,
         headers: state.headers,
         assignees: assigneeState,
         issueTypes: state.issueTypes,

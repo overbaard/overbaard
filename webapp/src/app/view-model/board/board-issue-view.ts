@@ -7,6 +7,7 @@ export interface BoardIssueView extends BoardIssue {
   // TODO other fields as needed
   projectColour: string;
   visible: boolean;
+  issueUrl: string;
 }
 
 

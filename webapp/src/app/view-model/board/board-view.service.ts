@@ -513,7 +513,7 @@ class IssueTableBuilder {
 
   private createIssueView(issue: BoardIssue, visible: boolean): BoardIssueView {
     const colour: string = this._currentBoardState.projects.boardProjects.get(issue.projectCode).colour;
-    return BoardIssueViewUtil.createBoardIssue(issue, colour, visible);
+    return BoardIssueViewUtil.createBoardIssue(issue, this._currentBoardState.jiraUrl, colour, visible);
   }
 
   private filterIssues(issues: Map<string, BoardIssueView>): Map<string, BoardIssueView> {

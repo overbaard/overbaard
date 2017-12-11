@@ -22,7 +22,8 @@ const DEFAULT_STATE: BoardIssueView = {
   linkedIssues: List<Issue>(),
   ownState: -1,
   visible: true,
-  projectColour: 'red'
+  projectColour: 'red',
+  issueUrl: ''
 };
 
 interface BoardIssueViewRecord extends TypedRecord<BoardIssueViewRecord>, BoardIssueView {
@@ -37,7 +38,8 @@ export class BoardIssueViewUtil {
     return <BoardIssueViewRecord>s;
   }
 
-  static createBoardIssue(issue: BoardIssue, projectColour: string, visible: boolean): BoardIssueViewRecord {
+  static createBoardIssue(issue: BoardIssue, jiraUrl: string, projectColour: string, visible: boolean): BoardIssueViewRecord {
+    const issueUrl = `${jiraUrl}browse/${issue.key}`;
     return ISSUE_FACTORY({
       key: issue.key,
       projectCode: issue.projectCode,
@@ -53,7 +55,8 @@ export class BoardIssueViewUtil {
       linkedIssues: issue.linkedIssues,
       ownState: issue.ownState,
       visible: visible,
-      projectColour: projectColour
+      projectColour: projectColour,
+      issueUrl: issueUrl
     });
   }
 

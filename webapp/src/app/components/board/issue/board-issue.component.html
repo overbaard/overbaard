@@ -4,7 +4,12 @@
       <span class="title-container"
             matTooltip="{{cardTooltip}}"
             [matTooltipClass]="{'card-tooltip': true}">
-        <span class="mat-h4">{{issue.key}}</span>
+        <span class="mat-h4">
+          <!-- When using issue.issueUrl here, although I am using the full url it gets truncated to /browse/FEAT-1 -->
+          <a href="View in Jira"
+             target="_blank"
+             class="issue-link"
+             (click)="openIssue($event)">{{issue.key}}</a></span>
         <span class="space-filler"></span>
       </span>
       <span class="mat-h4" matTooltip="{{issue.assignee.name}}">{{issue.assignee.initials}}</span>
@@ -40,16 +45,3 @@
     <!-- TODO avatar -->
   </mat-card-content>
 </mat-card>
-<!--
-<div *ngIf="issue.visible" class="issue">
-  <div>{{issue.visible}}</div>
-  <div>{{issue.key}}</div>
-  <div>{{issue.summary}}</div>
-  <div>Priortity: {{issue.priority.name}}</div>
-  <div>Type: {{issue.type.name}}</div>
-  <div>
-    Assignee:
-    <span *ngIf="issue.assignee !== noAssignee; else emptyAssignee">{{issue.assignee.name}}</span>
-    <ng-template #emptyAssignee>-</ng-template>
-  </div>
-</div>-->

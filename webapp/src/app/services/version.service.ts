@@ -20,7 +20,7 @@ export class VersionService {
       const path: string = this._restUrlService.caclulateRestUrl('rest/overbaard/1.0/version');
       return this._http.get(path)
         .timeout(this._timeout)
-        .map(d => {console.log('xxxxx' + d); return d['overbaard-version'];})
+        .map(d => d['overbaard-version'])
         .catch((response: HttpErrorResponse) => {
           // TODO log error properly
           console.log(response);
