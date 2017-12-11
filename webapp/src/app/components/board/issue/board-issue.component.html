@@ -1,6 +1,6 @@
 <mat-card *ngIf="issue.visible">
   <mat-card-title class="issue">
-    <div class="title-container" [ngStyle]="{'background-color': issue.projectColour}">
+    <div class="title-container">
       <span class="mat-h4">{{issue.key}}</span>
       <span class="space-filler"></span>
       <span class="mat-h4">{{issue.assignee.initials}}</span>
@@ -12,7 +12,27 @@
     </div>
   </mat-card-title>
   <mat-card-content>
-    <div class="mat-caption">{{issue.summary}}</div>
+    <!-- TODO pull these out of the data -->
+    <div class="info-colours">
+      <div class="project-colour" style="border-bottom-color: red"></div>
+      <div class="colour" style="border-bottom-color: blue"></div>
+      <div class="colour"  style="border-bottom-color: orange"></div>
+    </div>
+    <div class="mat-caption">
+      <div class="full-summary">
+        <div class="avatar-container">
+          <img
+            *ngIf="issue.assignee.avatar"
+            class="avatar"
+            src="{{issue.assignee.avatar}}">
+          <mat-icon
+            *ngIf="!issue.assignee.avatar"
+            class="avatar-icon">person_outline</mat-icon>
+        </div>
+        {{issue.summary}}
+      </div>
+
+    </div>
 
     <!-- TODO avatar -->
   </mat-card-content>

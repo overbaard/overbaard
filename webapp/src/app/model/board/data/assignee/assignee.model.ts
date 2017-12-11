@@ -64,8 +64,8 @@ export class AssigneeUtil {
   private static calculateInitials(name: string): string {
 
     const arr: string[] = name.split(' ');
+    let ret = '';
     if (arr.length === 1) {
-      let ret = '';
       for (let i = 0; i < 3 && i < arr[0].length; i++) {
         let char: string = arr[0][i];
         if (i === 0) {
@@ -77,7 +77,7 @@ export class AssigneeUtil {
       }
       return ret;
     }
-    let ret = '';
+    ret = '';
     for (let i = 0; i < 3 && i < arr.length; i++) {
       ret = ret + arr[i][0];
     }

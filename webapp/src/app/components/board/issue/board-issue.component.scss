@@ -14,12 +14,11 @@
 }
 .title-container {
   display: flex;
-  padding: 1px;
 }
 /* The line, height and so */
 .menu-icon-base {
-  min-width: 12px;
-  max-width: 12px;
+  min-width: 24px;
+  max-width: 24px;
   height: 24px;
   line-height: 24px;
   min-height: 24px;
@@ -34,6 +33,38 @@
 .mat-icon.menu-icon {
   @extend .menu-icon-base
 }
+.info-colours {
+  display: flex;
+
+}
+.priority-type {
+  display: flex;
+}
+.colour {
+  flex-grow: 1;
+  border-bottom: 2px solid black;
+}
+.project-colour {
+  @extend .colour;
+  flex-grow: 2;
+}
+.avatar-container {
+  padding-top: 2px;
+  float: right;
+}
+img.avatar {
+  border-radius: 50%;
+}
+.avatar-icon {
+  width: 32px;
+  height: 32px;
+  font-size: 32px;
+  line-height: 32px;
+}
+.full-summary {
+  min-height: 40px;
+}
+
 /*.issue {
   border: 1px solid #CCCCCC;
   border-collapse: collapse;

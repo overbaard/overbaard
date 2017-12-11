@@ -29,7 +29,6 @@ export class FixedHeaderView implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log(changes);
     const heightChange: SimpleChange = changes['windowHeight'];
     if (heightChange) {
       const height = heightChange.currentValue;
