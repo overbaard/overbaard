@@ -14,7 +14,6 @@ import {BoardComponent} from './components/board/board.component';
 import {AppHeaderService} from './services/app-header.service';
 import {KanbanViewComponent} from './components/board/view/kanban-view/kanban-view.component';
 import {RankViewComponent} from './components/board/view/rank-view/rank-view.component';
-import {ControlPanelComponent} from './components/board/control-panel/control-panel.component';
 import {BoardHeadersContainerComponent} from './components/board/view/board-view-headers/board-headers-container.component';
 import {BoardHeaderGroupComponent} from './components/board/view/board-view-headers/board-header-group.component';
 import {BoardHeaderContentComponent} from './components/board/view/board-view-headers/board-header-content.component';
@@ -55,8 +54,7 @@ import {VersionService} from './services/version.service';
     BoardHeaderContentComponent,
     BoardHeaderGroupComponent,
     BoardHeadersContainerComponent,
-    BoardIssueComponent,
-    ControlPanelComponent
+    BoardIssueComponent
   ],
   imports: [
     BrowserModule,

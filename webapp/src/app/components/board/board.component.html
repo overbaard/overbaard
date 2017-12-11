@@ -44,9 +44,4 @@
         class="settings-icon">
   <mat-icon>clear</mat-icon>
 </button>
-<button id="temp-control-button" (click)="onToggleControlPanel($event)">*</button>
 <button id="temp-switch-view-button" (click)="onSwitchViewMode($event)">~</button>
-<app-control-panel
-  *ngIf="showControlPanel"
-  [userSettings]="userSettings$ | async"
-></app-control-panel>
