@@ -18,9 +18,9 @@
   <mat-card-content>
     <!-- TODO pull these out of the data -->
     <div class="info-colours">
-      <div class="project-colour" style="border-bottom-color: red"></div>
-      <div class="colour" style="border-bottom-color: blue"></div>
-      <div class="colour"  style="border-bottom-color: orange"></div>
+      <div class="project-colour" [ngStyle]="{'border-bottom-color': issue.projectColour}"></div>
+      <div class="colour" [ngStyle]="{'border-bottom-color': issue.priority.colour}"></div>
+      <div class="colour"  [ngStyle]="{'border-bottom-color': issue.type.colour}"></div>
     </div>
     <div class="mat-caption">
       <div class="full-summary">

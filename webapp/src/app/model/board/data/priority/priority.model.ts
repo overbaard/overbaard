@@ -8,7 +8,7 @@ export interface PriorityState {
 
 export interface Priority {
   name: string;
-  icon: string;
+  colour: string;
 }
 
 const DEFAULT_STATE: PriorityState = {
@@ -17,7 +17,7 @@ const DEFAULT_STATE: PriorityState = {
 
 const DEFAULT_PRIORITY: Priority = {
   name: null,
-  icon: null
+  colour: null
 };
 
 interface PriorityRecord extends TypedRecord<PriorityRecord>, Priority {

@@ -20,6 +20,7 @@ import static org.overbaard.jira.impl.Constants.ASSIGNEES;
 import static org.overbaard.jira.impl.Constants.AVATAR;
 import static org.overbaard.jira.impl.Constants.BACKLOG;
 import static org.overbaard.jira.impl.Constants.BLACKLIST;
+import static org.overbaard.jira.impl.Constants.COLOUR;
 import static org.overbaard.jira.impl.Constants.COMPONENTS;
 import static org.overbaard.jira.impl.Constants.CUSTOM;
 import static org.overbaard.jira.impl.Constants.DISPLAY;
@@ -119,8 +120,8 @@ public class BoardManagerTest extends AbstractBoardTest {
                 new BoardComponentsChecker("C1", "C2"),
                 new BoardLabelsChecker("L1", "L2", "L3"),
                 new BoardFixVersionsChecker("F1", "F2", "F3"));
-        checkNameAndIcon(boardNode, "priorities", "highest", "high", "low", "lowest");
-        checkNameAndIcon(boardNode, "issue-types", "task", "bug", "feature");
+        checkNameAndColour(boardNode, "priorities", "highest", "high", "low", "lowest");
+        checkNameAndColour(boardNode, "issue-types", "task", "bug", "feature");
 
         ModelNode allIssues = getIssuesCheckingSize(boardNode, 7);
         checkIssue(allIssues, "TDP-1", IssueType.TASK, Priority.HIGHEST, "One", 0,
@@ -150,8 +151,8 @@ public class BoardManagerTest extends AbstractBoardTest {
 
         ModelNode boardNode = getJson(0, new BoardAssigneeChecker("jason", "kabir"),
                 new BoardComponentsChecker("C1", "C2"));
-        checkNameAndIcon(boardNode, "priorities", "highest", "high", "low", "lowest");
-        checkNameAndIcon(boardNode, "issue-types", "task", "bug", "feature");
+        checkNameAndColour(boardNode, "priorities", "highest", "high", "low", "lowest");
+        checkNameAndColour(boardNode, "issue-types", "task", "bug", "feature");
 
         ModelNode allIssues = getIssuesCheckingSize(boardNode, 4);
         checkIssue(allIssues, "TBG-1", IssueType.TASK, Priority.HIGHEST, "One", 0, new ComponentsChecker(0), new AssigneeChecker(1));
@@ -191,8 +192,8 @@ public class BoardManagerTest extends AbstractBoardTest {
         ModelNode boardNode = getJson(0, new BoardAssigneeChecker("brian", "jason", "kabir"),
                 new BoardComponentsChecker("C1", "C2", "C3"),
                 new BoardLabelsChecker("L1", "L2"), new BoardFixVersionsChecker("F1", "F2"));
-        checkNameAndIcon(boardNode, "priorities", "highest", "high", "low", "lowest");
-        checkNameAndIcon(boardNode, "issue-types", "task", "bug", "feature");
+        checkNameAndColour(boardNode, "priorities", "highest", "high", "low", "lowest");
+        checkNameAndColour(boardNode, "issue-types", "task", "bug", "feature");
 
         ModelNode allIssues = getIssuesCheckingSize(boardNode, 11);
         checkIssue(allIssues, "TDP-1", IssueType.TASK, Priority.HIGHEST, "One", 0, new ComponentsChecker(0), new AssigneeChecker(2));
@@ -1243,8 +1244,8 @@ public class BoardManagerTest extends AbstractBoardTest {
         //include them anyway
         ModelNode boardNode = getJson(0, new BoardAssigneeChecker("brian", "kabir"),
                 new BoardComponentsChecker("C1", "C2", "C3"), new BoardLabelsChecker("L1"), new BoardFixVersionsChecker("F1"));
-        checkNameAndIcon(boardNode, "priorities", "highest", "high", "low", "lowest");
-        checkNameAndIcon(boardNode, "issue-types", "task", "bug", "feature");
+        checkNameAndColour(boardNode, "priorities", "highest", "high", "low", "lowest");
+        checkNameAndColour(boardNode, "issue-types", "task", "bug", "feature");
 
         ModelNode allIssues = getIssuesCheckingSize(boardNode, 3);
         checkIssue(allIssues, "TDP-3", IssueType.TASK, Priority.HIGH, "Three", 2, new AssigneeChecker(0));
@@ -1258,8 +1259,8 @@ public class BoardManagerTest extends AbstractBoardTest {
         //Now check with the backlog
         boardNode = getJson(0, true, new BoardAssigneeChecker("brian", "kabir"),
                 new BoardComponentsChecker("C1", "C2", "C3"), new BoardLabelsChecker("L1"), new BoardFixVersionsChecker("F1"));
-        checkNameAndIcon(boardNode, "priorities", "highest", "high", "low", "lowest");
-        checkNameAndIcon(boardNode, "issue-types", "task", "bug", "feature");
+        checkNameAndColour(boardNode, "priorities", "highest", "high", "low", "lowest");
+        checkNameAndColour(boardNode, "issue-types", "task", "bug", "feature");
 
         allIssues = getIssuesCheckingSize(boardNode, 6);
         checkIssue(allIssues, "TDP-1", IssueType.TASK, Priority.HIGH, "One", 0,
@@ -1297,8 +1298,8 @@ public class BoardManagerTest extends AbstractBoardTest {
         //Although the assignees and components used in the done part of the board should not be included, and neither
         //include them anyway
         ModelNode boardNode = getJson(0, new BoardAssigneeChecker("kabir"));
-        checkNameAndIcon(boardNode, "priorities", "highest", "high", "low", "lowest");
-        checkNameAndIcon(boardNode, "issue-types", "task", "bug", "feature");
+        checkNameAndColour(boardNode, "priorities", "highest", "high", "low", "lowest");
+        checkNameAndColour(boardNode, "issue-types", "task", "bug", "feature");
 
         //The issues in the 'done' columns should not be included in the board.
         ModelNode allIssues = getIssuesCheckingSize(boardNode, 3);
@@ -2276,13 +2277,14 @@ public class BoardManagerTest extends AbstractBoardTest {
         }
     }
 
-    private void checkNameAndIcon(ModelNode board, String type, String...names) {
+    private void checkNameAndColour(ModelNode board, String type, String...names) {
         List<ModelNode> entries = board.get(type).asList();
         Assert.assertEquals(entries.size(), names.length);
         for (int i = 0 ; i < names.length ; i++) {
             ModelNode entry = entries.get(i);
-            Assert.assertEquals(names[i], entry.get("name").asString());
-            Assert.assertEquals("/icons/" + type + "/" + names[i] + ".png", entry.get(ICON).asString());
+            String name = entry.get("name").asString();
+            Assert.assertEquals(names[i], name);
+            Assert.assertEquals("colour-" + names[i], entry.get(COLOUR).asString());
         }
     }
 

@@ -312,8 +312,8 @@ describe('Apply filter tests', () => {
     return {
       key: 'ISSUE-1',
       projectCode: 'ISSUE',
-      priority: {name: 'high', icon: null},
-      type: {name: 'bug', icon: null},
+      priority: {name: 'high', colour: null},
+      type: {name: 'bug', colour: null},
       summary: 'Hello',
       assignee: NO_ASSIGNEE,
       components: OrderedSet<string>(['C1', 'C2']),

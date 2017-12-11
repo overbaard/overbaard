@@ -24,19 +24,19 @@ import org.overbaard.jira.impl.Constants;
 /**
  * @author Kabir Khan
  */
-public class NameAndUrl {
+public class NameAndColour {
     private final String name;
-    private final String iconUrl;
+    private final String colour;
 
-    public NameAndUrl(String name, String iconUrl) {
+    public NameAndColour(String name, String colour) {
         this.name = name;
-        this.iconUrl = iconUrl;
+        this.colour = colour;
     }
 
     public void serialize(ModelNode parent) {
         ModelNode modelNode = new ModelNode();
         modelNode.get(NAME).set(name);
-        modelNode.get(Constants.ICON).set(iconUrl);
+        modelNode.get(Constants.COLOUR).set(colour);
         parent.add(modelNode);
     }
 

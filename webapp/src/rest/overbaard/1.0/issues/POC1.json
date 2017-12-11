@@ -44,37 +44,37 @@
   "priorities" : [
     {
       "name" : "Blocker",
-      "icon" : "/images/icons/priorities/blocker.png"
+      "colour" : "red"
     },
     {
       "name" : "Major",
-      "icon" : "/images/icons/priorities/major.png"
+      "colour" : "orange"
     },
     {
       "name" : "Minor",
-      "icon" : "/images/icons/priorities/minor.png"
+      "colour" : "blue"
     },
     {
       "name" : "Trivial",
-      "icon" : "/images/icons/priorities/trivial.png"
+      "colour" : "green"
     }
   ],
   "issue-types" : [
     {
       "name" : "Task",
-      "icon" : "/images/icons/issuetypes/task.png"
+      "colour" : "yellowgreen"
     },
     {
       "name" : "Story",
-      "icon" : "/images/icons/issuetypes/story.png"
+      "colour" : "grey"
     },
     {
       "name" : "Bug",
-      "icon" : "/images/icons/issuetypes/bug.png"
+      "colour" : "red"
     },
     {
       "name" : "Epic",
-      "icon" : "/images/icons/issuetypes/epic.png"
+      "colour" : "blue"
     }
   ],
   "custom": {

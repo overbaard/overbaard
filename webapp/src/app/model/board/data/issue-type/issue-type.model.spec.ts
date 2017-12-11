@@ -6,7 +6,7 @@ describe('Issue Type unit tests', () => {
   describe('Deserialize', () => {
     const input: any = cloneObject({
       name : 'Task',
-      icon : 'https://example.com/task.png'
+      colour : 'green'
     });
 
     it('Deserialize', () => {
@@ -14,7 +14,7 @@ describe('Issue Type unit tests', () => {
       const issueType: IssueType = IssueTypeUtil.fromJS(input);
       expect(issueType).toEqual(jasmine.anything());
       expect(issueType.name).toEqual('Task');
-      expect(issueType.icon).toEqual('https://example.com/task.png');
+      expect(issueType.colour).toEqual('green');
     });
   });
 });

@@ -6,7 +6,7 @@ describe('Priority unit tests', () => {
   describe('Deserialize', () => {
     const input: any = cloneObject({
       name : 'Blocker',
-      icon : 'https://example.com/blocker.png'
+      colour : 'red'
     });
 
     it('Deserialize', () => {
@@ -14,7 +14,7 @@ describe('Priority unit tests', () => {
       const priority: Priority = PriorityUtil.fromJS(input);
       expect(priority).toEqual(jasmine.anything());
       expect(priority.name).toEqual('Blocker');
-      expect(priority.icon).toEqual('https://example.com/blocker.png');
+      expect(priority.colour).toEqual('red');
     });
   });
 });

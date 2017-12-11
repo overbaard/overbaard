@@ -9,15 +9,15 @@
     {"name": "S-D"}
   ],
   "priorities": [
-    "highest",
-    "high",
-    "low",
-    "lowest"
+    {"name": "highest", "colour": "colour-highest"},
+    {"name": "high", "colour": "colour-high"},
+    {"name": "low", "colour": "colour-low"},
+    {"name": "lowest", "colour": "colour-lowest"}
   ],
   "issue-types": [
-    "task",
-    "bug",
-    "feature"
+    {"name": "task", "colour": "colour-task"},
+    {"name": "bug", "colour": "colour-bug"},
+    {"name": "feature", "colour": "colour-feature"}
   ],
   "custom": [
     {

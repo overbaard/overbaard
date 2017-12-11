@@ -7,7 +7,7 @@ export interface IssueTypeState {
 
 export interface IssueType {
   name: string;
-  icon: string;
+  colour: string;
 }
 
 const DEFAULT_STATE: IssueTypeState = {
@@ -16,7 +16,7 @@ const DEFAULT_STATE: IssueTypeState = {
 
 const DEFAULT_ISSUE: IssueType = {
   name: null,
-  icon: null
+  colour: null
 };
 
 interface IssueTypeRecord extends TypedRecord<IssueTypeRecord>, IssueType {

@@ -16,6 +16,23 @@
 
 package org.overbaard.jira.impl.config;
 
+import static org.overbaard.jira.impl.Constants.CODE;
+import static org.overbaard.jira.impl.Constants.COLOUR;
+import static org.overbaard.jira.impl.Constants.CUSTOM;
+import static org.overbaard.jira.impl.Constants.FIELDS;
+import static org.overbaard.jira.impl.Constants.ISSUE_TYPES;
+import static org.overbaard.jira.impl.Constants.LINKED;
+import static org.overbaard.jira.impl.Constants.LINKED_PROJECTS;
+import static org.overbaard.jira.impl.Constants.MAIN;
+import static org.overbaard.jira.impl.Constants.NAME;
+import static org.overbaard.jira.impl.Constants.OWNER;
+import static org.overbaard.jira.impl.Constants.OWNING_PROJECT;
+import static org.overbaard.jira.impl.Constants.PARALLEL_TASKS;
+import static org.overbaard.jira.impl.Constants.PRIORITIES;
+import static org.overbaard.jira.impl.Constants.PROJECTS;
+import static org.overbaard.jira.impl.Constants.RANK_CUSTOM_FIELD_ID;
+import static org.overbaard.jira.impl.Constants.STATES;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -57,10 +74,10 @@ public class BoardConfig {
     private final BoardStates boardStates;
     private final Map<String, BoardProjectConfig> boardProjects;
     private final Map<String, LinkedProjectConfig> linkedProjects;
-    private final Map<String, NameAndUrl> priorities;
+    private final Map<String, NameAndColour> priorities;
     private final Map<String, Integer> priorityIndex;
     private final List<String> priorityNames;
-    private final Map<String, NameAndUrl> issueTypes;
+    private final Map<String, NameAndColour> issueTypes;
     private final Map<String, Integer> issueTypeIndex;
     private final List<String> issueTypeNames;
 
@@ -71,7 +88,7 @@ public class BoardConfig {
                         long rankCustomFieldId,
                         BoardStates boardStates,
                         Map<String, BoardProjectConfig> boardProjects, Map<String, LinkedProjectConfig> linkedProjects,
-                        Map<String, NameAndUrl> priorities, Map<String, NameAndUrl> issueTypes,
+                        Map<String, NameAndColour> priorities, Map<String, NameAndColour> issueTypes,
                         CustomFieldRegistry<CustomFieldConfig> customFields,
                         ParallelTaskConfig parallelTaskConfig) {
 
@@ -117,16 +134,16 @@ public class BoardConfig {
 
     public static BoardConfig load(JiraInjectables jiraInjectables,
                                     int id, String owningUserKey, ModelNode boardNode, long rankCustomFieldId) {
-        final String code = Util.getRequiredChild(boardNode, "Group", null, Constants.CODE).asString();
-        final String boardName = Util.getRequiredChild(boardNode, "Group", null, Constants.NAME).asString();
-        final String owningProjectName = Util.getRequiredChild(boardNode, "Group", boardName, Constants.OWNING_PROJECT).asString();
+        final String code = Util.getRequiredChild(boardNode, "Group", null, CODE).asString();
+        final String boardName = Util.getRequiredChild(boardNode, "Group", null, NAME).asString();
+        final String owningProjectName = Util.getRequiredChild(boardNode, "Group", boardName, OWNING_PROJECT).asString();
 
-        final BoardStates boardStates = BoardStates.loadBoardStates(boardNode.get(Constants.STATES));
+        final BoardStates boardStates = BoardStates.loadBoardStates(boardNode.get(STATES));
         final CustomFieldRegistry<CustomFieldConfig> customFields =
                 new CustomFieldRegistry<>(Collections.unmodifiableMap(loadCustomFields(jiraInjectables, boardNode)));
         final ParallelTaskConfig parallelTaskConfig = loadParallelTasks(jiraInjectables, customFields, boardNode);
 
-        final ModelNode projects = Util.getRequiredChild(boardNode, "Group", boardName, Constants.PROJECTS);
+        final ModelNode projects = Util.getRequiredChild(boardNode, "Group", boardName, PROJECTS);
         final ModelNode mainProject = projects.remove(owningProjectName);
         if (mainProject == null || !mainProject.isDefined()) {
             throw new IllegalStateException("Project group '" + boardName + "' specifies '" + owningProjectName + "' as its main project but it does not exist");
@@ -141,7 +158,7 @@ public class BoardConfig {
             mainProjects.put(projectName, BoardProjectConfig.load(boardStates, projectName, project, customFields, parallelTaskConfig));
         }
 
-        final ModelNode linked = boardNode.get(Constants.LINKED_PROJECTS);
+        final ModelNode linked = boardNode.get(LINKED_PROJECTS);
         final Map<String, LinkedProjectConfig> linkedProjects = new LinkedHashMap<>();
         if (linked.isDefined()) {
             for (String projectName : linked.keys()) {
@@ -155,16 +172,16 @@ public class BoardConfig {
                 boardStates,
                 Collections.unmodifiableMap(mainProjects),
                 Collections.unmodifiableMap(linkedProjects),
-                Collections.unmodifiableMap(loadPriorities(jiraInjectables.getPriorityManager(), boardNode.get(Constants.PRIORITIES).asList())),
-                Collections.unmodifiableMap(loadIssueTypes(jiraInjectables.getIssueTypeManager(), boardNode.get(Constants.ISSUE_TYPES).asList())),
+                Collections.unmodifiableMap(loadPriorities(jiraInjectables.getPriorityManager(), boardNode.get(PRIORITIES).asList())),
+                Collections.unmodifiableMap(loadIssueTypes(jiraInjectables.getIssueTypeManager(), boardNode.get(ISSUE_TYPES).asList())),
                 customFields,
                 parallelTaskConfig);
         return boardConfig;
     }
 
     private static Map<String, CustomFieldConfig> loadCustomFields(final JiraInjectables jiraInjectables, final ModelNode boardNode) {
-        if (boardNode.hasDefined(Constants.CUSTOM)) {
-            ModelNode custom = boardNode.get(Constants.CUSTOM);
+        if (boardNode.hasDefined(CUSTOM)) {
+            ModelNode custom = boardNode.get(CUSTOM);
             if (custom.getType() != ModelType.LIST) {
                 throw new OverbaardValidationException("The \"custom\" element must be an array");
             }
@@ -181,8 +198,8 @@ public class BoardConfig {
     }
 
     private static ParallelTaskConfig loadParallelTasks(JiraInjectables jiraInjectables, CustomFieldRegistry<CustomFieldConfig> customFields, ModelNode boardNode) {
-        if (boardNode.hasDefined(Constants.PARALLEL_TASKS, Constants.FIELDS)) {
-            ModelNode parallelTasks = boardNode.get(Constants.PARALLEL_TASKS, Constants.FIELDS);
+        if (boardNode.hasDefined(PARALLEL_TASKS, FIELDS)) {
+            ModelNode parallelTasks = boardNode.get(PARALLEL_TASKS, FIELDS);
             ParallelTaskConfig config = ParallelTaskConfig.load(jiraInjectables, customFields, parallelTasks);
             if (config.getConfigs().size() > 0) {
                 return config;
@@ -191,41 +208,54 @@ public class BoardConfig {
         return null;
     }
 
-    private static Map<String, NameAndUrl> loadIssueTypes(IssueTypeManager issueTypeManager, List<ModelNode> typeNodes) {
+    private static Map<String, NameAndColour> loadIssueTypes(IssueTypeManager issueTypeManager, List<ModelNode> typeNodes) {
         final Collection<IssueType> allTypes = issueTypeManager.getIssueTypes();
         Map<String, IssueType> types = new HashMap<>();
         for (IssueType type : allTypes) {
             types.put(type.getName(), type);
         }
-        Map<String, NameAndUrl> issueTypes = new LinkedHashMap<>();
+        Map<String, NameAndColour> issueTypes = new LinkedHashMap<>();
         for (ModelNode typeNode : typeNodes) {
-            IssueType type = types.get(typeNode.asString());
-            if (type == null) {
-                throw new OverbaardValidationException(typeNode.asString() + " is not a known issue type in this Jira instance");
+            if (!typeNode.hasDefined(NAME)) {
+                throw new OverbaardValidationException("All \"issue-types\" must have a \"name\"");
             }
-            issueTypes.put(type.getName(), new NameAndUrl(type.getName(), type.getIconUrl()));
+            if (!typeNode.hasDefined(COLOUR)) {
+                throw new OverbaardValidationException("All \"issue-types\" must have a \"colour\"");
+            }
+            IssueType type = types.get(typeNode.get(NAME).asString());
+            if (type == null) {
+                throw new OverbaardValidationException(typeNode.get(NAME).asString() + " is not a known issue type in this Jira instance");
+            }
+            issueTypes.put(type.getName(), new NameAndColour(type.getName(), typeNode.get(COLOUR).asString()));
         }
         return issueTypes;
     }
 
-    private static Map<String, NameAndUrl> loadPriorities(PriorityManager priorityManager, List<ModelNode> priorityNodes) {
+    private static Map<String, NameAndColour> loadPriorities(PriorityManager priorityManager, List<ModelNode> priorityNodes) {
         final Collection<Priority> allPriorities = priorityManager.getPriorities();
         Map<String, Priority> priorities = new HashMap<>();
         for (Priority priority : allPriorities) {
             priorities.put(priority.getName(), priority);
         }
-        Map<String, NameAndUrl> priorityMap = new LinkedHashMap<>();
+        Map<String, NameAndColour> priorityMap = new LinkedHashMap<>();
         for (ModelNode priorityNode : priorityNodes) {
-            Priority priority = priorities.get(priorityNode.asString());
-            if (priority == null) {
-                throw new OverbaardValidationException(priorityNode.asString() + " is not a known priority name in this Jira instance");
+            if (!priorityNode.hasDefined(NAME)) {
+                throw new OverbaardValidationException("All \"priorities\" must have a \"name\"");
             }
-            priorityMap.put(priority.getName(), new NameAndUrl(priority.getName(), priority.getIconUrl()));
+            if (!priorityNode.hasDefined(COLOUR)) {
+                throw new OverbaardValidationException("All \"priorities\" must have a \"colour\"");
+            }
+            Priority priority = priorities.get(priorityNode.get(NAME).asString());
+            if (priority == null) {
+                throw new OverbaardValidationException(priorityNode.get(NAME).asString() + " is not a known priority name in this Jira instance");
+            }
+
+            priorityMap.put(priority.getName(), new NameAndColour(priority.getName(), priorityNode.get(COLOUR).asString()));
         }
         return priorityMap;
     }
 
-    private void getIndexMap(Map<String, NameAndUrl> original, Map<String, Integer> index, List<String> list) {
+    private void getIndexMap(Map<String, NameAndColour> original, Map<String, Integer> index, List<String> list) {
         for (String key : original.keySet()) {
             index.put(key, index.size());
             list.add(key);
@@ -271,31 +301,31 @@ public class BoardConfig {
      * @param boardNode The node to serialize the board to
      */
     public void serializeModelNodeForBoard(ModelNode boardNode) {
-        boardNode.get(Constants.RANK_CUSTOM_FIELD_ID).set(rankCustomFieldId);
+        boardNode.get(RANK_CUSTOM_FIELD_ID).set(rankCustomFieldId);
 
         boardStates.toModelNodeForBoard(boardNode);
 
-        ModelNode prioritiesNode = boardNode.get(Constants.PRIORITIES);
+        ModelNode prioritiesNode = boardNode.get(PRIORITIES);
         prioritiesNode.setEmptyList();
-        for (NameAndUrl priority : priorities.values()) {
+        for (NameAndColour priority : priorities.values()) {
             priority.serialize(prioritiesNode);
         }
 
-        ModelNode issueTypesNode = boardNode.get(Constants.ISSUE_TYPES);
+        ModelNode issueTypesNode = boardNode.get(ISSUE_TYPES);
         issueTypesNode.setEmptyList();
-        for (NameAndUrl issueType : issueTypes.values()) {
+        for (NameAndColour issueType : issueTypes.values()) {
             issueType.serialize(issueTypesNode);
         }
 
-        final ModelNode projects = boardNode.get(Constants.PROJECTS);
-        projects.get(Constants.OWNER).set(ownerProjectCode);
+        final ModelNode projects = boardNode.get(PROJECTS);
+        projects.get(OWNER).set(ownerProjectCode);
 
-        final ModelNode main = projects.get(Constants.MAIN);
+        final ModelNode main = projects.get(MAIN);
         main.setEmptyObject();
         for (BoardProjectConfig project : boardProjects.values()) {
             project.serializeModelNodeForBoard(this, main);
         }
-        final ModelNode linked = projects.get(Constants.LINKED);
+        final ModelNode linked = projects.get(LINKED);
         linked.setEmptyObject();
         for (LinkedProjectConfig project : linkedProjects.values()) {
             project.serializeModelNodeForBoard(this, linked);
@@ -307,40 +337,40 @@ public class BoardConfig {
      */
     public ModelNode serializeModelNodeForConfig() {
         ModelNode boardNode = new ModelNode();
-        boardNode.get(Constants.NAME).set(name);
-        boardNode.get(Constants.CODE).set(code);
-        boardNode.get(Constants.OWNING_PROJECT).set(ownerProjectCode);
+        boardNode.get(NAME).set(name);
+        boardNode.get(CODE).set(code);
+        boardNode.get(OWNING_PROJECT).set(ownerProjectCode);
 
         boardStates.toModelNodeForConfig(boardNode);
 
-        ModelNode prioritiesNode = boardNode.get(Constants.PRIORITIES);
-        for (NameAndUrl priority : priorities.values()) {
-            prioritiesNode.add(priority.getName());
+        ModelNode prioritiesNode = boardNode.get(PRIORITIES).setEmptyList();
+        for (NameAndColour priority : priorities.values()) {
+            priority.serialize(prioritiesNode);
         }
 
-        ModelNode issueTypesNode = boardNode.get(Constants.ISSUE_TYPES);
-        for (NameAndUrl issueType : issueTypes.values()) {
-            issueTypesNode.add(issueType.getName());
+        ModelNode issueTypesNode = boardNode.get(ISSUE_TYPES).setEmptyList();
+        for (NameAndColour issueType : issueTypes.values()) {
+            issueType.serialize(issueTypesNode);
         }
 
         if (customFields.hasConfigs()) {
-            ModelNode customNode = boardNode.get(Constants.CUSTOM);
+            ModelNode customNode = boardNode.get(CUSTOM);
             for (CustomFieldConfig cfg : customFields.values()) {
                 customNode.add(cfg.serializeForConfig());
             }
         }
 
         if (parallelTaskConfig != null) {
-            ModelNode parallelTaskFieldsNode = boardNode.get(Constants.PARALLEL_TASKS, Constants.FIELDS);
+            ModelNode parallelTaskFieldsNode = boardNode.get(PARALLEL_TASKS, FIELDS);
             parallelTaskFieldsNode.set(parallelTaskConfig.serializeForConfig());
         }
 
-        final ModelNode projectsNode = boardNode.get(Constants.PROJECTS);
+        final ModelNode projectsNode = boardNode.get(PROJECTS);
         for (BoardProjectConfig project : boardProjects.values()) {
             projectsNode.get(project.getCode()).set(project.serializeModelNodeForConfig());
         }
 
-        final ModelNode linkedProjectsNode = boardNode.get(Constants.LINKED_PROJECTS);
+        final ModelNode linkedProjectsNode = boardNode.get(LINKED_PROJECTS);
         linkedProjectsNode.setEmptyObject();
         for (LinkedProjectConfig project : linkedProjects.values()) {
             linkedProjectsNode.get(project.getCode()).set(project.serializeModelNodeForConfig());

@@ -9,11 +9,11 @@ import {getTestLabelsInput} from '../label/label.reducer.spec';
 export function getTestPrioritiesInput(): any {
   return cloneObject([{
       name: 'Blocker',
-      icon: '/priorities/blocker.png'
+      colour: 'red'
     },
     {
       name: 'Major',
-      icon: '/priorities/major.png'
+      colour: 'orange'
     }
   ]);
 }
@@ -36,8 +36,8 @@ describe('Priority reducer tests', () => {
     expect(keys[0]).toEqual('Blocker');
     expect(keys[1]).toEqual('Major');
 
-    checkPriority(state.priorities.get('Blocker'), 'Blocker', '/priorities/blocker.png');
-    checkPriority(state.priorities.get('Major'), 'Major', '/priorities/major.png');
+    checkPriority(state.priorities.get('Blocker'), 'Blocker', 'red');
+    checkPriority(state.priorities.get('Major'), 'Major', 'orange');
   });
 
   it ('Deserialize same state', () => {
@@ -48,10 +48,10 @@ describe('Priority reducer tests', () => {
     expect(stateA).toBe(stateB);
   });
 
-  function checkPriority(priority: Priority, name: string, icon: string) {
+  function checkPriority(priority: Priority, name: string, colour: string) {
     expect(priority).toEqual(jasmine.anything());
     expect(priority.name).toEqual(name);
-    expect(priority.icon).toEqual(icon);
+    expect(priority.colour).toEqual(colour);
   }
 });
 

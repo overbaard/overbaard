@@ -7,11 +7,11 @@ export function getTestIssueTypesInput(): any {
   return cloneObject([
     {
       name: 'task',
-      icon: '/types/task.png'
+      colour: 'green'
     },
     {
       name: 'bug',
-      icon: '/types/bug.png'
+      colour: 'red'
     }
   ]);
 }
@@ -34,8 +34,8 @@ describe('IssueType reducer tests', () => {
     expect(keys[0]).toEqual('task');
     expect(keys[1]).toEqual('bug');
 
-    checkIssueType(state.types.get('task'), 'task', '/types/task.png');
-    checkIssueType(state.types.get('bug'), 'bug', '/types/bug.png');
+    checkIssueType(state.types.get('task'), 'task', 'green');
+    checkIssueType(state.types.get('bug'), 'bug', 'red');
   });
 
   it ('Deserialize same state', () => {
@@ -46,9 +46,9 @@ describe('IssueType reducer tests', () => {
     expect(stateA).toBe(stateB);
   });
 
-  function checkIssueType(issueType: IssueType, name: string, icon: string) {
+  function checkIssueType(issueType: IssueType, name: string, colour: string) {
     expect(issueType).toEqual(jasmine.anything());
     expect(issueType.name).toEqual(name);
-    expect(issueType.icon).toEqual(icon);
+    expect(issueType.colour).toEqual(colour);
   }
 });
