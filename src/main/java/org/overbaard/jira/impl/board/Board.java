@@ -205,7 +205,7 @@ public class Board {
     }
 
     private static Assignee createAssignee(JiraInjectables jiraInjectables, ApplicationUser boardOwner, ApplicationUser assigneeUser) {
-        URI avatarUrl = jiraInjectables.getAvatarService().getAvatarURL(boardOwner, assigneeUser, Avatar.Size.NORMAL);
+        URI avatarUrl = jiraInjectables.getAvatarService().getAvatarURL(boardOwner, assigneeUser, Avatar.Size.MEDIUM);
         Assignee assignee = Assignee.create(assigneeUser, avatarUrl.toString());
         return assignee;
     }
