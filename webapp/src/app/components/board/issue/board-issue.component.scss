@@ -50,7 +50,12 @@
 }
 .colour {
   flex-grow: 1;
-  border-bottom: 2px solid black;
+  border-bottom: 4px solid black;
+}
+.colour-splitter{
+  min-width: 3px;
+  max-width: 3px;
+  border-bottom: 4px solid white;
 }
 .project-colour {
   @extend .colour;

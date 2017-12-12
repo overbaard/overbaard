@@ -22,9 +22,17 @@
   <mat-card-content>
     <!-- TODO pull these out of the data -->
     <div class="info-colours">
-      <div class="project-colour" [ngStyle]="{'border-bottom-color': issue.projectColour}"></div>
-      <div class="colour" [ngStyle]="{'border-bottom-color': issue.priority.colour}"></div>
-      <div class="colour"  [ngStyle]="{'border-bottom-color': issue.type.colour}"></div>
+      <div class="project-colour"
+           [ngStyle]="{'border-bottom-color': issue.projectColour}"
+           matTooltip="Project: {{issue.projectCode}}"></div>
+      <div class="colour-splitter"></div>
+      <div class="colour"
+           [ngStyle]="{'border-bottom-color': issue.priority.colour}"
+            matTooltip="Priority: {{issue.priority.name}}"></div>
+      <div class="colour-splitter"></div>
+      <div class="colour"
+           [ngStyle]="{'border-bottom-color': issue.type.colour}"
+            matTooltip="Issue Type: {{issue.type.name}}"></div>
     </div>
     <div class="mat-caption">
       <div class="full-summary">
