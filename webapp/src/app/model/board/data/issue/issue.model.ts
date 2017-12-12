@@ -378,7 +378,7 @@ export class IssueUtil {
           } else if (key === 'selectedParallelTasks') {
               mutable.selectedParallelTasks = mutable.selectedParallelTasks ? mutable.selectedParallelTasks : List<number>();
               change.selectedParallelTasks.forEach((v, i) => {
-                if (!!v) {
+                if (!isNaN(v)) {
                   mutable.selectedParallelTasks = mutable.selectedParallelTasks.set(i, v);
                 }
               });

@@ -21,13 +21,16 @@
           (toggleColumnVisibility)="onToggleVisibility($event)"
           (toggleBacklog)="onToggleBacklog($event)"
           (toggleCollapsedSwimlane)="onToggleCollapsedSwimlane($event)"
+          (updateParallelTask)="onUpdateParallelTask($event)"
         >
         </app-kanban-view>
         <app-rank-view
           *ngIf="(userSettings$ | async).viewMode === enumViewMode.RANK"
           [board]="board$ | async"
           [windowWidth]="windowWidth"
-          [windowHeight]="windowHeight">
+          [windowHeight]="windowHeight"
+          (updateParallelTask)="onUpdateParallelTask($event)"
+        >
         </app-rank-view>
       </div>
     </div>

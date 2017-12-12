@@ -33,6 +33,8 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialModule} from './material.module';
 import {BoardSettingsDrawerComponent} from './components/board/settings-drawer/settings-drawer.component';
 import {VersionService} from './services/version.service';
+import {ParallelTaskSelectorComponent} from './components/board/issue/parallel-task-selector.component';
+import {ParallelTaskComponent} from './components/board/issue/parallel-task.component';
 
 @NgModule({
   declarations: [
@@ -54,8 +56,11 @@ import {VersionService} from './services/version.service';
     BoardHeaderContentComponent,
     BoardHeaderGroupComponent,
     BoardHeadersContainerComponent,
-    BoardIssueComponent
+    BoardIssueComponent,
+    ParallelTaskComponent,
+    ParallelTaskSelectorComponent
   ],
+  entryComponents: [ParallelTaskSelectorComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,

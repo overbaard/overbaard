@@ -1,7 +1,6 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, OnInit, Output} from '@angular/core';
-import {BoardHeader} from '../../../../../view-model/board/board-header';
-import {List} from 'immutable';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {BoardViewModel} from '../../../../../view-model/board/board-view';
+import {UpdateParallelTaskEvent} from '../../../../../events/update-parallel-task.event';
 
 @Component({
   selector: 'app-kanban-normal-view',
@@ -17,7 +16,8 @@ export class KanbanNormalViewComponent implements OnInit {
   @Output()
   scrollTableBodyX: EventEmitter<number> = new EventEmitter<number>();
 
-  private _lastLeftOffset = 0;
+  @Output()
+  updateParallelTask: EventEmitter<UpdateParallelTaskEvent> = new EventEmitter<UpdateParallelTaskEvent>();
 
   constructor() {
   }
@@ -28,5 +28,9 @@ export class KanbanNormalViewComponent implements OnInit {
   // trackBy is a hint to angular to be able to keep (i.e. don't destroy and recreate) as many components as possible
   columnTrackByFn(index: number, key: string) {
     return index;
+  }
+
+  onUpdateParallelTask(event: UpdateParallelTaskEvent) {
+    this.updateParallelTask.emit(event);
   }
 }

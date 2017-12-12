@@ -1,7 +1,8 @@
 import {
   MatButtonModule,
   MatCardModule,
-  MatCheckboxModule, MatChipsModule,
+  MatCheckboxModule,
+  MatDialogModule,
   MatExpansionModule,
   MatFormFieldModule,
   MatIconModule,
@@ -11,7 +12,8 @@ import {
   MatProgressSpinnerModule,
   MatSelectModule,
   MatSidenavModule,
-  MatToolbarModule, MatTooltipModule
+  MatToolbarModule,
+  MatTooltipModule
 } from '@angular/material';
 import {NgModule, Type} from '@angular/core';
 
@@ -20,7 +22,7 @@ const materialModules: Array<Type<any>> = [
   MatButtonModule,
   MatCardModule,
   MatCheckboxModule,
-  MatChipsModule,
+  MatDialogModule,
   MatExpansionModule,
   MatFormFieldModule,
   MatIconModule,

@@ -1,7 +1,14 @@
-import {ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChange, SimpleChanges} from '@angular/core';
+import {
+  ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange,
+  SimpleChanges
+} from '@angular/core';
 import {BoardIssueView} from '../../../view-model/board/board-issue-view';
 import {Assignee, NO_ASSIGNEE} from '../../../model/board/data/assignee/assignee.model';
 import {Set} from 'immutable';
+import {ParallelTask} from '../../../model/board/data/project/project.model';
+import {MatDialog} from '@angular/material';
+import {ParallelTaskSelectorComponent} from './parallel-task-selector.component';
+import {UpdateParallelTaskEvent} from '../../../events/update-parallel-task.event';
 
 @Component({
   selector: 'app-board-issue',
@@ -12,10 +19,15 @@ import {Set} from 'immutable';
 export class BoardIssueComponent implements OnInit, OnChanges {
 
   readonly noAssignee: Assignee = NO_ASSIGNEE;
+
   @Input()
   issue: BoardIssueView;
 
+  @Output()
+  updateParallelTask: EventEmitter<UpdateParallelTaskEvent> = new EventEmitter<UpdateParallelTaskEvent>();
+
   cardTooltip: string;
+
 
   constructor() { }
 
@@ -56,6 +68,10 @@ export class BoardIssueComponent implements OnInit, OnChanges {
     }
   }
 
+  onUpdateParallelTask(event: UpdateParallelTaskEvent) {
+    this.updateParallelTask.emit(event);
+  }
+
   private formatPossiblyEmptySet(set: Set<string>): string {
     if (!set || set.size === 0) {
       return '-';
@@ -71,10 +87,5 @@ export class BoardIssueComponent implements OnInit, OnChanges {
       s += v;
     });
     return s;
-  }
-
-  getSelectedParallelTaskColour(index: number): string {
-    const optionIndex: number = this.issue.selectedParallelTasks.get(index);
-    return this.issue.parallelTasks.get(index).options.get(optionIndex).colour;
   }
 }

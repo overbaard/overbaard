@@ -1,0 +1,28 @@
+<div class="dialog-wrapper">
+  <div class="mat-h4">{{parallelTask.name}}</div>
+  <mat-dialog-content>
+    <div class="options-wrapper">
+      <div
+        *ngFor="let option of parallelTask.options ; let i = index"
+        class="option"
+        (mouseover)="onOverOption(i)"
+        (mouseout)="onOverOption(-1)"
+      >
+        <div
+          class="option-body"
+          [class.pointer]="option !== issueOption"
+          [ngStyle]="{'background-color': option.colour}"
+          (click)="onSelectOption(i)"
+        ></div>
+        <div
+          class="option-footer"
+          [class.issue-option]="option === issueOption"
+          [class.selected-option]="option !== issueOption && option === selectedOption"
+        ></div>
+      </div>
+    </div>
+    <div class="mat-caption">
+      {{option.name}}
+    </div>
+  </mat-dialog-content>
+</div>

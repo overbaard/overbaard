@@ -194,14 +194,16 @@
       "state": 3,
       "summary": "Issue number 3. This has a really, really long description which will span a lot. Whoever wrote this should perhaps use the description field instead of putting everything into the issue summary!",
       "priority": 2,
-      "type": 0
+      "type": 0,
+      "parallel-tasks": [1, 2]
     },
     "FEAT-4" : {
       "key": "FEAT-4",
       "state": 6,
       "summary": "Issue number 3",
       "priority": 2,
-      "type": 0
+      "type": 0,
+      "parallel-tasks": [1, 1]
     },
     "FEAT-5" : {
       "key": "FEAT-5",

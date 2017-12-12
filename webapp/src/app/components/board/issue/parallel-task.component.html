@@ -1,0 +1,8 @@
+<div
+  class="parallel-task-entry"
+  matTooltip="{{parallelTask.name}}: {{selectedOption.name}}"
+  [matTooltipClass]="'card-tooltip'"
+  [ngStyle]="{'border-color': selectedOption.colour}"
+  (click)="onOpenDialog($event)"
+  >{{parallelTask.display}}
+</div>

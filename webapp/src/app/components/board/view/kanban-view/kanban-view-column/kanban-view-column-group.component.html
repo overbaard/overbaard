@@ -1,22 +1,22 @@
 <!-- trackBy is a hint to angular to be able to keep (i.e. don't destroy and recreate) as many components as possible -->
 
 <div *ngIf="groupType === visible_bl_or_normal_state" class="column">
-  <!--<div>single {{header.visible}}</div>-->
   <app-kanban-view-column
     [header]="header"
     [issueKeys]="table.get(header.stateIndices.get(0))"
     [issues]="issues"
     [displayIssues]="displayIssues"
+    (updateParallelTask)="onUpdateParallelTask($event)"
   ></app-kanban-view-column>
 </div>
 <div *ngIf="groupType === visible_bl_or_normal_category" class="column">
-  <!--<div>multiple</div>-->
   <app-kanban-view-column
     *ngFor="let header of header.states ; trackBy: columnTrackByFn"
     [header]="header"
     [issueKeys]="table.get(header.stateIndices.get(0))"
     [issues]="issues"
     [displayIssues]="displayIssues"
+    (updateParallelTask)="onUpdateParallelTask($event)"
   ></app-kanban-view-column>
 </div>
 <div *ngIf="groupType === invisible_bl" class="column hidden-backlog">

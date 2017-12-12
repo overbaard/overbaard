@@ -20,6 +20,7 @@ import {BoardViewMode} from '../../model/board/user/board-view-mode';
 import {BoardQueryParamsService} from '../../services/board-query-params.service';
 import {MatDrawer} from '@angular/material';
 import {UrlService} from '../../services/url.service';
+import {UpdateParallelTaskEvent} from '../../events/update-parallel-task.event';
 
 
 @Component({
@@ -120,10 +121,6 @@ export class BoardComponent implements OnInit, OnDestroy {
     this.windowWidth = window.innerWidth;
   }
 
-  onToggleControlPanel($event: Event) {
-    this.showControlPanel = !this.showControlPanel;
-  }
-
   onToggleBacklog(backlogHeader: BoardHeader) {
     // A decision about whether to pass up toggleVisibility or toggleBacklog is made in BoardHeaderGroupComponent
     this._store.dispatch(UserSettingActions.createToggleBacklog(backlogHeader));
@@ -175,6 +172,12 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   onToggleCollapsedSwimlane(key: string) {
     this._store.dispatch(UserSettingActions.createToggleCollapsedSwimlane(key));
+  }
+
+  onUpdateParallelTask(event: UpdateParallelTaskEvent) {
+    this.userSettings$.take(1).subscribe(us => {
+      this._boardService.setParallelTaskOption(us.boardCode, us.showBacklog, event.issueKey, event.taskIndex, event.selectedOptionIndex);
+    });
   }
 
   onOpenSettings() {

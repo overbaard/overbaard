@@ -1,4 +1,4 @@
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
+import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {UrlService} from './url.service';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
@@ -46,7 +46,38 @@ export class BoardService {
       .subscribe(
         data => {
           this._store.dispatch(BoardActions.createDeserializeBoard(this._restUrlService.jiraUrl, data));
-          this.recreateChangePollerAndStartPolling(boardCode, backlog);
+          this.recreateChangePollerAndStartPolling(boardCode, backlog, false);
+        }
+      );
+  }
+
+  setParallelTaskOption(boardCode: string, backlog: boolean, issueKey: string, taskIndex: number, selectedOptionIndex: number) {
+    // Cancel any background polling
+    if (this._changePoller) {
+      this._changePoller.destroy();
+      this._changePoller = null;
+    }
+
+    const progress: Progress = this._progressLog.startLoading();
+
+    const path: string = this._restUrlService.caclulateRestUrl(
+      UrlService.OVERBAARD_REST_PREFIX + '/issues/' + boardCode + '/parallel/' + issueKey);
+    console.log('Updating parallel task ' + path);
+    const payload = {
+      'task-index': taskIndex,
+      'option-index': selectedOptionIndex
+    }
+
+    return executeRequest(
+      progress,
+      BoardService._bigTimeout,
+      this._http.put(path, JSON.stringify(payload), {
+        headers : this.createHeaders()
+      }))
+      .take(1)
+      .subscribe(
+        data => {
+          this.recreateChangePollerAndStartPolling(boardCode, backlog, true, 0);
         }
       );
   }
@@ -63,13 +94,20 @@ export class BoardService {
     }
   }
 
-  recreateChangePollerAndStartPolling(boardCode: string, backlog: boolean) {
+  recreateChangePollerAndStartPolling(boardCode: string, backlog: boolean, progressOnFirst: boolean, initialWait?: number) {
     if (this._changePoller) {
       this._changePoller.destroy();
       this._changePoller = name;
     }
-    this._changePoller = new ChangePoller(boardCode, backlog, this._store, this._restUrlService, this._http);
-    this._changePoller.startPolling();
+    this._changePoller =
+      new ChangePoller(boardCode, backlog, this._store, this._restUrlService, this._http,
+        progressOnFirst ? this._progressLog : null);
+    this._changePoller.startPolling(initialWait);
+  }
+
+  private createHeaders(): HttpHeaders {
+    return new HttpHeaders()
+      .append('Content-Type', 'application/json');
   }
 }
 
@@ -91,7 +129,8 @@ class ChangePoller {
     private readonly _backlog: boolean,
     private readonly _store: Store<AppState>,
     private readonly _restUrlService: UrlService,
-    private readonly _http: HttpClient) {
+    private readonly _http: HttpClient,
+    private _progressLog: ProgressLogService) {
 
     this._pollParameters$ = Observable.combineLatest(
       this._store.select(boardViewIdSelector),
@@ -107,7 +146,7 @@ class ChangePoller {
     const restartPolling: boolean = visible && !this._visible && this._wasInvisibleDuringPoll;
     if (restartPolling) {
       this.destroy();
-      poller = new ChangePoller(this._boardCode, this._backlog, this._store, this._restUrlService, this._http);
+      poller = new ChangePoller(this._boardCode, this._backlog, this._store, this._restUrlService, this._http, this._progressLog);
       poller.startPolling(0);
     } else {
       poller._visible = visible;
@@ -164,14 +203,22 @@ class ChangePoller {
       if (params.showBacklog) {
         url += '?backlog=' + true;
       }
+      let progress: Progress;
+      if (this._progressLog) {
+        progress = this._progressLog.startLoading();
+        // Only want the first progress in some cases
+        this._progressLog = null;
+      }
       const path: string = this._restUrlService.caclulateRestUrl(url);
       this._currentPollTimerSubscription = executeRequest(null, BoardService._bigTimeout, this._http.get(path))
         .take(1)
         .subscribe(
           data => {
+            if (progress) {
+              progress.complete();
+            }
             if (!this._destroyed) {
               this._errorCount = 0;
-              console.log('Polled');
               if (!this._destroyed) {
                 this._store.dispatch(BoardActions.createChanges(data));
                 this.pollBoard();
@@ -183,6 +230,9 @@ class ChangePoller {
               console.log('Error polling');
               this._errorCount++;
               if (this._errorCount >= ChangePoller._maxErrorCount) {
+                if (progress) {
+                  // TODO show error
+                }
                 console.log(`Error count is ${this._errorCount}. Giving up polling.`)
                 this.destroy();
               }

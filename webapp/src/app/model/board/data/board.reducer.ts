@@ -57,7 +57,7 @@ class ClearBoardAction implements Action {
 }
 
 class DeserializeBoardAction extends BoardDataAction {
-  constructor(readonly jiraUrl: string, payload: any) {
+    constructor(readonly jiraUrl: string, payload: any) {
     super(DESERIALIZE_BOARD, payload);
   }
 }

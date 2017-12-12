@@ -28,6 +28,7 @@
       [issues]="board.issueTable.issues"
       [table]="swimlane.table"
       [displayIssues]="!swimlane.collapsed"
+      (updateParallelTask)="onUpdateParallelTask($event)"
     ></app-kanban-view-column-group>
   </div>
 </div>

@@ -4,6 +4,7 @@
     <app-board-issue
       *ngFor="let issueKey of issueKeys ; trackBy: issueTrackByFn "
       [issue]="issues.get(issueKey)"
+      (updateParallelTask)="onUpdateParallelTask($event)"
     ></app-board-issue>
   </div>
 </div>

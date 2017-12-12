@@ -1,6 +1,7 @@
-import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {RankViewEntry} from '../../../../view-model/board/rank-view-entry';
 import {BoardIssueView} from '../../../../view-model/board/board-issue-view';
+import {UpdateParallelTaskEvent} from '../../../../events/update-parallel-task.event';
 
 @Component({
   selector: 'app-rank-view-entry',
@@ -20,10 +21,17 @@ export class RankViewEntryComponent implements OnInit {
   @Input()
   statesDummyArray: number[];
 
+  @Output()
+  updateParallelTask: EventEmitter<UpdateParallelTaskEvent> = new EventEmitter<UpdateParallelTaskEvent>();
+
   constructor() {
   }
 
   ngOnInit() {
+  }
+
+  onUpdateParallelTask(event: UpdateParallelTaskEvent) {
+    this.updateParallelTask.emit(event);
   }
 
 }

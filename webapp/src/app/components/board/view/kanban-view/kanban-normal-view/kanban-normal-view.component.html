@@ -4,6 +4,7 @@
   [header]="header"
   [issues]="board.issueTable.issues"
   [table]="board.issueTable.table"
+  (updateParallelTask)="onUpdateParallelTask($event)"
 ></app-kanban-view-column-group>
 
 

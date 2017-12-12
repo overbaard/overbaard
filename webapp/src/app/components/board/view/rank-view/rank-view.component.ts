@@ -1,6 +1,10 @@
-import {ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChange, SimpleChanges} from '@angular/core';
+import {
+  ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange,
+  SimpleChanges
+} from '@angular/core';
 import {FixedHeaderView} from '../fixed-header-view';
 import {BoardViewMode} from '../../../../model/board/user/board-view-mode';
+import {UpdateParallelTaskEvent} from '../../../../events/update-parallel-task.event';
 
 @Component({
   selector: 'app-rank-view',
@@ -11,6 +15,10 @@ import {BoardViewMode} from '../../../../model/board/user/board-view-mode';
 export class RankViewComponent extends FixedHeaderView implements OnInit, OnChanges {
 
   readonly viewMode = BoardViewMode.RANK;
+
+  @Output()
+  updateParallelTask: EventEmitter<UpdateParallelTaskEvent> = new EventEmitter<UpdateParallelTaskEvent>();
+
 
   // Just an array here to be able to do 'for s of states; let i = index' in the template
   statesDummyArray: number[];
@@ -38,4 +46,9 @@ export class RankViewComponent extends FixedHeaderView implements OnInit, OnChan
       this.board.headers.headersList.reduce((sum, header) => sum += header.stateIndices.size, 0);
     this.statesDummyArray = new Array<number>(numberStates);
   }
+
+  onUpdateParallelTask(event: UpdateParallelTaskEvent) {
+    this.updateParallelTask.emit(event);
+  }
+
 }

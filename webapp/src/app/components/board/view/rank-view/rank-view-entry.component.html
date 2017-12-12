@@ -3,6 +3,7 @@
   <div class="rank-issue">
     <app-board-issue
       [issue]="issue"
+      (updateParallelTask)="onUpdateParallelTask($event)"
     ></app-board-issue>
   </div>
   <div *ngFor="let unused of statesDummyArray ; let i = index" class="cell">

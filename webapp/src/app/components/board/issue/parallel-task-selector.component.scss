@@ -1,0 +1,47 @@
+@import "../../../../styles";
+.dialog-wrapper {
+  padding: 3px;
+  display: flex;
+  flex-direction: column;
+}
+.mat-h4 {
+  margin: 0px;
+  text-align: center;
+}
+.mat-dialog-content {
+  padding: 0px;
+  margin: 0px;
+}
+.options-wrapper {
+  display: flex;
+  justify-content: center;
+}
+.option {
+  min-width: 20px;
+  max-width: 20px;
+  display: flex;
+  flex-direction: column;
+  min-height: 20px;
+  margin-left: 1px;
+  margin-right: 1px;
+}
+.option-body {
+  flex-grow: 1;
+}
+.option-footer {
+  min-height: 2px;
+  background-color: white;
+  border-bottom: 2px white solid;
+}
+.issue-option {
+  border-bottom-color: darkgray;
+}
+.selected-option {
+  border-bottom-color: $primary-colour;
+}
+.mat-caption {
+  text-align: center;
+}
+.pointer {
+  cursor: pointer;
+}

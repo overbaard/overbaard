@@ -1,8 +1,12 @@
-import {ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChange, SimpleChanges} from '@angular/core';
+import {
+  ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange,
+  SimpleChanges
+} from '@angular/core';
 import {List, Map} from 'immutable';
 import {BoardIssueView} from '../../../../../view-model/board/board-issue-view';
 import {IssueTable} from '../../../../../view-model/board/issue-table';
 import {BoardHeader} from '../../../../../view-model/board/board-header';
+import {UpdateParallelTaskEvent} from '../../../../../events/update-parallel-task.event';
 
 @Component({
   selector: 'app-kanban-view-column-group]',
@@ -24,6 +28,10 @@ export class KanbanViewColumnGroupComponent implements OnInit, OnChanges {
   // If a swimlane is collapsed, we still need to display empty columns so the header has the correct width
   @Input()
   displayIssues = true;
+
+  @Output()
+  updateParallelTask: EventEmitter<UpdateParallelTaskEvent> = new EventEmitter<UpdateParallelTaskEvent>();
+
 
   readonly visible_bl_or_normal_state = 0;
   readonly visible_bl_or_normal_category = 1;
@@ -55,4 +63,9 @@ export class KanbanViewColumnGroupComponent implements OnInit, OnChanges {
   issueTrackByFn(index: number, key: string) {
     return key;
   }
+
+  onUpdateParallelTask(event: UpdateParallelTaskEvent) {
+    this.updateParallelTask.emit(event);
+  }
+
 }

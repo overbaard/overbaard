@@ -17,6 +17,14 @@ mat-toolbar {
   z-index: 10;
 }
 
+/*
+Override the padding (24px) in MatDialog since it is impossible to get rid of it in our own components.
+Components wanting this padding should introduce it again
+ */
+.mat-dialog-container {
+  padding: 0 !important;
+}
+
 /* If we change the theme, we need to update these */
 $primary-colour: #3F51B5!important;
 $accent-colour: #FF4081!important;

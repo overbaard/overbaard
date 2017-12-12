@@ -3,5 +3,6 @@
   [rankEntry]="rankEntry"
   [issue]="board.issueTable.issues.get(rankEntry.issueKey)"
   [statesDummyArray]="statesDummyArray"
+  (updateParallelTask)="onUpdateParallelTask($event)"
 >
 </app-rank-view-entry>

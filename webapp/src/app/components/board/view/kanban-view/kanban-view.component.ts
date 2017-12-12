@@ -2,6 +2,7 @@ import {ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output, Simple
 import {FixedHeaderView} from '../fixed-header-view';
 import {BoardHeader} from '../../../../view-model/board/board-header';
 import {BoardViewMode} from '../../../../model/board/user/board-view-mode';
+import {UpdateParallelTaskEvent} from '../../../../events/update-parallel-task.event';
 
 @Component({
   selector: 'app-kanban-view',
@@ -19,6 +20,10 @@ export class KanbanViewComponent extends FixedHeaderView implements OnInit {
 
   @Output()
   toggleCollapsedSwimlane: EventEmitter<string> = new EventEmitter<string>();
+
+  @Output()
+  updateParallelTask: EventEmitter<UpdateParallelTaskEvent> = new EventEmitter<UpdateParallelTaskEvent>();
+
 
   readonly viewMode =  BoardViewMode.KANBAN;
 
@@ -40,6 +45,10 @@ export class KanbanViewComponent extends FixedHeaderView implements OnInit {
 
   onToggleCollapsedSwimlane(key: string) {
     this.toggleCollapsedSwimlane.emit(key);
+  }
+
+  onUpdateParallelTask(event: UpdateParallelTaskEvent) {
+    this.updateParallelTask.emit(event);
   }
 
 }

@@ -50,12 +50,13 @@
       </div>
     </div>
     <div *ngIf="issue.selectedParallelTasks" class="parallel-tasks-container">
-      <div
+      <!-- Display of the parallel tasks -->
+      <app-parallel-task
         *ngFor="let pt of issue.parallelTasks ; let i = index"
-        class="parallel-task-entry"
-        matTooltip="{{pt.name}}: {{pt.display}}"
-        [matTooltipClass]="'card-tooltip'"
-        [ngStyle]="{'border-color': getSelectedParallelTaskColour(i)}">{{pt.display}}</div>
+        [issue]="issue"
+        [taskIndex]="i"
+        (updateParallelTask)="onUpdateParallelTask($event)"
+      ></app-parallel-task>
     </div>
   </mat-card-content>
 </mat-card>

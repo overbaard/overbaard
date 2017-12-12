@@ -514,8 +514,8 @@ describe('Issue unit tests', () => {
       it ('Parallel tasks', () => {
         input['parallel-tasks'] = [0, 0];
         const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
-        // Clear a custom field
-        const updated = updateIssue(issue, {
+
+        let updated = updateIssue(issue, {
           key: 'P2-1', 'parallel-tasks': {'1': 2}
         });
 
@@ -525,10 +525,22 @@ describe('Issue unit tests', () => {
           lookupParams.assignees.get('bob'),
           'Issue summary', 4)
           .key('P2-1')
-          // Since we are just getting the information here that will be the input to the issue
-          // change, we will have a null element at index 0
           .selectedParallelTaskOptions(0, 2)
           .check();
+
+        // Check setting it back to zero again works too
+        updated = updateIssue(updated, {
+          key: 'P2-1', 'parallel-tasks': {'1': 0}
+        });
+        new IssueChecker(updated,
+          lookupParams.issueTypes.get('task'),
+          lookupParams.priorities.get('Blocker'),
+          lookupParams.assignees.get('bob'),
+          'Issue summary', 4)
+          .key('P2-1')
+          .selectedParallelTaskOptions(0, 0)
+          .check();
+
       });
     });
 
