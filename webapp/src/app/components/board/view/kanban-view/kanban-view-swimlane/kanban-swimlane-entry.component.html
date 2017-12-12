@@ -5,7 +5,17 @@
     (mouseenter)="onMouseEnter()"
     (mouseleave)="onMouseLeave()"
     [ngClass]="classObj"
-  >{{swimlane.display}}</div>
+  >
+    <span class="header-icon" style="display: flex">
+      <mat-icon
+        *ngIf="swimlane.collapsed"
+      >chevron_right</mat-icon>
+      <mat-icon
+        *ngIf="!swimlane.collapsed"
+      >keyboard_arrow_down</mat-icon>
+      <span class="mat-h4">{{swimlane.display}}</span>
+    </span>
+  </div>
   <div
     class="swimlane-content"
     *ngIf="!swimlane.collapsed"
