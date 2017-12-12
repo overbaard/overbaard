@@ -1,7 +1,10 @@
 <div *ngIf="visible">
   <div
-    class="swimlane-header"
+    class="swimlane-header header-colour"
     (click)="onToggleCollapsedSwimlane($event, swimlane.key)"
+    (mouseenter)="onMouseEnter()"
+    (mouseleave)="onMouseLeave()"
+    [ngClass]="classObj"
   >{{swimlane.display}}</div>
   <div
     class="swimlane-content"

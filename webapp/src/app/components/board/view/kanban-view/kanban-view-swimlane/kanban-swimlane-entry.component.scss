@@ -1,19 +1,21 @@
-:host {
-}
-.swimlane-header-container {
-  width: 100%;
-}
+@import "../../../../../../styles";
+
 .swimlane-header {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-height: 25px;
-  max-height: 25px;
-  border: 1px black solid;
+  min-height: 30px;
+  max-height: 30px;
+  border-bottom: 1px solid $primary-colour;
   cursor: pointer;
 }
-.swimlane-header:hover {
-  background-color: #F0F0F0;
+.header-colour {
+  background-color: white;
+  color: $primary-colour;
+}
+.header-colour-hover {
+  background-color: $primary-colour;
+  color: white;
 }
 .swimlane-content {
   display: flex;

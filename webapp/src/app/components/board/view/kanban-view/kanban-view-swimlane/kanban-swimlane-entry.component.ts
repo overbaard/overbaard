@@ -27,6 +27,8 @@ export class KanbanSwimlaneEntryComponent implements OnInit, OnChanges {
 
   visible: boolean;
 
+  classObj: Object = {'header-colour': true};
+
   constructor() {
   }
 
@@ -49,5 +51,15 @@ export class KanbanSwimlaneEntryComponent implements OnInit, OnChanges {
 
   onToggleCollapsedSwimlane(event: MouseEvent, key: string) {
     this.toggleCollapsedSwimlane.emit(key);
+  }
+
+  onMouseEnter() {
+    this.classObj['header-colour'] = false;
+    this.classObj['header-colour-hover'] = true;
+  }
+
+  onMouseLeave() {
+    this.classObj['header-colour'] = true;
+    this.classObj['header-colour-hover'] = false;
   }
 }
