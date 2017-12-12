@@ -175,7 +175,7 @@ describe('Board reducer tests', () => {
         .labels('L-10', 'L-20')
         .customField('Custom-1', 'c1-A', 'First C1')
         .customField('Custom-2', 'c2-B', 'Second C2')
-        .selectedParallelTaskOptions('One')
+        .selectedParallelTaskOptions(0)
         .check();
       const issue2 = issues.get('P1-2');
       expect(issue2.key).toEqual('P1-2');

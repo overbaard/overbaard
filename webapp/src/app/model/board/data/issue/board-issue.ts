@@ -4,6 +4,7 @@ import {IssueType} from '../issue-type/issue-type.model';
 import {List, Map, OrderedSet} from 'immutable';
 import {CustomField} from '../custom-field/custom-field.model';
 import {Issue} from './issue';
+import {ParallelTask, ParallelTaskOption} from '../project/project.model';
 
 export interface BoardIssue extends Issue {
   projectCode: string;
@@ -14,7 +15,8 @@ export interface BoardIssue extends Issue {
   labels: OrderedSet<string>;
   fixVersions: OrderedSet<string>;
   customFields: Map<string, CustomField>;
-  parallelTasks: List<string>;
+  parallelTasks: List<ParallelTask>;
+  selectedParallelTasks: List<number>;
   linkedIssues: List<Issue>;
   ownState: number;
 

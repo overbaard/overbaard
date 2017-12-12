@@ -4,7 +4,7 @@ import {Priority} from '../priority/priority.model';
 import {IssueType} from '../issue-type/issue-type.model';
 import {fromJS, List, Map, OrderedMap, OrderedSet} from 'immutable';
 import {CustomField} from '../custom-field/custom-field.model';
-import {BoardProject, ParallelTask} from '../project/project.model';
+import {BoardProject, ParallelTask, ParallelTaskOption} from '../project/project.model';
 import {cloneObject} from '../../../../common/object-util';
 import {BoardIssue} from './board-issue';
 import {Issue} from './issue';
@@ -41,6 +41,7 @@ const DEFAULT_ISSUE: BoardIssue = {
   fixVersions: null,
   customFields: Map<string, CustomField>(),
   parallelTasks: null,
+  selectedParallelTasks: null,
   linkedIssues: List<Issue>(),
   ownState: -1
 };
@@ -290,13 +291,9 @@ export class IssueUtil {
     }
 
     if (input['parallel-tasks']) {
-      const ptList: List<ParallelTask> = params.parallelTasks.get(projectCode);
-      const parallelTasksInput: any[] = input['parallel-tasks'];
-      for (let i = 0 ; i < parallelTasksInput.length ; i++) {
-        const parallelTask: ParallelTask = ptList.get(i);
-        parallelTasksInput[i] = parallelTask.options.get(parallelTasksInput[i]);
-      }
-      input['parallelTasks'] = List<string>(parallelTasksInput);
+      const parallelTasksInput: number[] = input['parallel-tasks'];
+      input['parallelTasks'] = params.parallelTasks.get(projectCode);
+      input['selectedParallelTasks'] = List<number>(parallelTasksInput);
       delete input['parallel-tasks'];
     }
 
@@ -316,6 +313,8 @@ export class IssueUtil {
 
   static issueChangeFromJs(input: any, params: DeserializeIssueLookupParams): BoardIssue {
     let customFields: Map<string, CustomField>;
+    const key: string = input['key'];
+    const projectCode: string = IssueUtil.productCodeFromKey(input['key']);
     if (input['custom']) {
       const customInput: any = input['custom'];
       customFields = Map<string, CustomField>().withMutations(mutable => {
@@ -330,22 +329,19 @@ export class IssueUtil {
         }
       });
     }
-    let parallelTasks: List<string>;
+    let selectedParallelTasks: List<number>;
     if (input['parallel-tasks']) {
-      const parallelInput: any = input['parallel-tasks'];
-      parallelTasks = List<string>().withMutations(mutable => {
-        for (const key of Object.keys(parallelInput).sort((a, b) => parseInt(a, 10) - parseInt(b, 10))) {
-          const taskIndex = parseInt(key, 10);
-          const optionIndex = parallelInput[key];
-          const taskList: List<ParallelTask> = params.parallelTasks.get(IssueUtil.productCodeFromKey(input['key']));
-          const optionString = taskList.get(taskIndex).options.get(optionIndex);
-          mutable.set(taskIndex, optionString);
-        }
-      });
+      const parallelTasksInput: Object = input['parallel-tasks'];
+      const parallelTasks: List<ParallelTask> = params.parallelTasks.get(projectCode);
+      const selected: number[] = new Array<number>(parallelTasks.size);
+      for (const indexKey of Object.keys(parallelTasksInput)) {
+        selected[Number(indexKey)] = parallelTasksInput[indexKey];
+      }
+      selectedParallelTasks = List<number>(selected);
     }
     return {
-      key: input['key'],
-      projectCode: IssueUtil.productCodeFromKey(input['key']),
+      key: key,
+      projectCode: projectCode,
       ownState: input['state'] ? params.getOwnStateNameToOwnIndex(input['key']).get(input['state']) : null,
       summary: input['summary'],
       assignee: input['unassigned'] ? NO_ASSIGNEE : params.assignees.get(input['assignee']),
@@ -355,7 +351,8 @@ export class IssueUtil {
       labels: IssueUtil.getClearableStringSet(input, 'clear-labels', 'labels'),
       fixVersions: IssueUtil.getClearableStringSet(input, 'clear-fix-versions', 'fix-versions'),
       customFields: customFields,
-      parallelTasks: parallelTasks,
+      parallelTasks: null,
+      selectedParallelTasks: selectedParallelTasks,
       linkedIssues: null // This isn't settable from the events at the moment, and only happens on full board refresh
     };
   }
@@ -378,11 +375,11 @@ export class IssueUtil {
                 mutable.customFields = mutable.customFields.delete(cfKey);
               }
             });
-          } else if (key === 'parallelTasks') {
-              mutable.parallelTasks = mutable.parallelTasks ? mutable.parallelTasks : List<string>();
-              change.parallelTasks.forEach((v, i) => {
+          } else if (key === 'selectedParallelTasks') {
+              mutable.selectedParallelTasks = mutable.selectedParallelTasks ? mutable.selectedParallelTasks : List<number>();
+              change.selectedParallelTasks.forEach((v, i) => {
                 if (!!v) {
-                  mutable.parallelTasks = mutable.parallelTasks.set(i, v);
+                  mutable.selectedParallelTasks = mutable.selectedParallelTasks.set(i, v);
                 }
               });
           } else {

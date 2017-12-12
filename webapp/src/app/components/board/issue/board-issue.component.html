@@ -3,7 +3,7 @@
     <div class="title-container">
       <span class="title-container"
             matTooltip="{{cardTooltip}}"
-            [matTooltipClass]="{'card-tooltip': true}">
+            [matTooltipClass]="'card-tooltip'">
         <span class="mat-h4">
           <a href="{{issue.issueUrl}}"
              target="_blank"
@@ -20,7 +20,6 @@
     </div>
   </mat-card-title>
   <mat-card-content>
-    <!-- TODO pull these out of the data -->
     <div class="info-colours">
       <div class="project-colour"
            [ngStyle]="{'border-bottom-color': issue.projectColour}"
@@ -48,7 +47,13 @@
         {{issue.summary}}
       </div>
     </div>
-
-    <!-- TODO avatar -->
+    <div *ngIf="issue.selectedParallelTasks" class="parallel-tasks-container">
+      <div
+        *ngFor="let pt of issue.parallelTasks ; let i = index"
+        class="parallel-task-entry"
+        matTooltip="{{pt.name}}: {{pt.display}}"
+        [matTooltipClass]="'card-tooltip'"
+        [ngStyle]="{'border-color': getSelectedParallelTaskColour(i)}">{{pt.display}}</div>
+    </div>
   </mat-card-content>
 </mat-card>

@@ -72,4 +72,9 @@ export class BoardIssueComponent implements OnInit, OnChanges {
     });
     return s;
   }
+
+  getSelectedParallelTaskColour(index: number): string {
+    const optionIndex: number = this.issue.selectedParallelTasks.get(index);
+    return this.issue.parallelTasks.get(index).options.get(optionIndex).colour;
+  }
 }

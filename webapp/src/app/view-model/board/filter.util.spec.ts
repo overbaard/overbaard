@@ -257,7 +257,7 @@ describe('Apply filter tests', () => {
           linkedProjects: null,
           parallelTasks: tasks
         }
-        issue.parallelTasks = List<string>(['One', 'Dos']);
+        issue.selectedParallelTasks = List<number>([0, 1]);
       });
       it ('Matches one', () => {
         expect(filtersFromQs({'pt.CD': 'One'}).filterVisible(issue)).toBe(true);
@@ -321,10 +321,12 @@ describe('Apply filter tests', () => {
       fixVersions: OrderedSet<string>(['F1', 'F2']),
       customFields: Map<string, CustomField>(),
       parallelTasks: null,
+      selectedParallelTasks: null,
       linkedIssues: List<Issue>(),
       ownState: -1,
       visible: true,
-      projectColour: 'red'
+      projectColour: 'red',
+      issueUrl: 'x'
     }
   }
 });

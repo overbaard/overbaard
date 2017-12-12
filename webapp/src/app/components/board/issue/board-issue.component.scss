@@ -81,6 +81,16 @@ img.avatar {
 .full-summary {
   min-height: 34px;
 }
+.parallel-tasks-container {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+.parallel-task-entry {
+  border-bottom: 3px solid;
+  margin-right: 3px;
+  cursor: pointer;
+}
 
 /**
 This needs styling in the global styles.scss as mentioned in

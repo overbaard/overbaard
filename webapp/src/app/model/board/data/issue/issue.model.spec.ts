@@ -231,7 +231,7 @@ describe('Issue unit tests', () => {
         lookupParams.assignees.get('bob'),
         'Issue summary', 4)
         .key('P2-100')
-        .selectedParallelTaskOptions('Three', 'Dos')
+        .selectedParallelTaskOptions(2, 1)
         .check();
     });
   });
@@ -507,7 +507,7 @@ describe('Issue unit tests', () => {
           lookupParams.assignees.get('bob'),
           'Issue summary', 4)
           .key('P2-1')
-          .selectedParallelTaskOptions('Two', 'Tres')
+          .selectedParallelTaskOptions(1, 2)
           .check();
       });
 
@@ -525,7 +525,9 @@ describe('Issue unit tests', () => {
           lookupParams.assignees.get('bob'),
           'Issue summary', 4)
           .key('P2-1')
-          .selectedParallelTaskOptions('One', 'Tres')
+          // Since we are just getting the information here that will be the input to the issue
+          // change, we will have a null element at index 0
+          .selectedParallelTaskOptions(0, 2)
           .check();
       });
     });
@@ -574,7 +576,7 @@ describe('Issue unit tests', () => {
           .fixVersions('F-10', 'F-20')
           .customField('Custom-1', 'c1-C', 'Third C1')
           .customField('Custom-2', 'c2-B', 'Second C2')
-          .selectedParallelTaskOptions('Two', 'Tres')
+          .selectedParallelTaskOptions(1, 2)
           .check();
       });
     });
@@ -604,7 +606,7 @@ export class IssueChecker {
   private _labels: string[];
   private _fixVersions: string[];
   private _customFields: Dictionary<CustomField>;
-  private _parallelTasks: string[];
+  private _parallelTasks: number[];
 
 
 
@@ -656,7 +658,7 @@ export class IssueChecker {
     return this;
   }
 
-  selectedParallelTaskOptions(...selectedOptions: string[]): IssueChecker {
+  selectedParallelTaskOptions(...selectedOptions: number[]): IssueChecker {
     this._parallelTasks = selectedOptions;
     return this;
   }
@@ -725,10 +727,10 @@ export class IssueChecker {
     }
 
     if (this._parallelTasks) {
-      const options: List<string> = this._issue.parallelTasks;
+      const options: List<number> = this._issue.selectedParallelTasks;
       expect(options.toArray()).toEqual(this._parallelTasks);
     } else {
-      expect(this._issue.parallelTasks).not.toEqual(jasmine.anything());
+      expect(this._issue.selectedParallelTasks).not.toEqual(jasmine.anything());
     }
 
     // checkIssueConvenienceMethods(this._issue);

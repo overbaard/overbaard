@@ -6,6 +6,7 @@ export interface ProjectState {
   owner: string;
   boardProjects: OrderedMap<string, BoardProject>;
   linkedProjects: Map<string, LinkedProject>;
+  // Parallel tasks ordered by project
   parallelTasks: Map<string, List<ParallelTask>>;
 }
 
@@ -26,7 +27,12 @@ export interface LinkedProject extends BaseProject {
 export interface ParallelTask {
   name: string;
   display: string;
-  options: List<string>;
+  options: List<ParallelTaskOption>;
+}
+
+export interface ParallelTaskOption {
+  name: string,
+  colour: string
 }
 
 const DEFAULT_STATE: ProjectState = {
@@ -54,6 +60,11 @@ const DEFAULT_PARALLEL_TASK: ParallelTask = {
   options: null
 };
 
+const DEFAULT_PARALLEL_TASK_OPTION: ParallelTaskOption = {
+  name: null,
+  colour: null
+}
+
 
 interface ProjectStateRecord extends TypedRecord<ProjectStateRecord>, ProjectState {
 }
@@ -67,10 +78,15 @@ interface LinkedProjectRecord extends TypedRecord<LinkedProjectRecord>, LinkedPr
 interface ParallelTaskRecord extends TypedRecord<ParallelTaskRecord>, ParallelTask {
 }
 
+interface ParallelTaskOptionRecord extends TypedRecord<ParallelTaskOptionRecord>, ParallelTaskOption {
+}
+
 const STATE_FACTORY = makeTypedFactory<ProjectState, ProjectStateRecord>(DEFAULT_STATE);
 const BOARD_PROJECT_FACTORY = makeTypedFactory<BoardProject, BoardProjectRecord>(DEFAULT_BOARD_PROJECT);
 const LINKED_PROJECT_FACTORY = makeTypedFactory<LinkedProject, LinkedProjectRecord>(DEFAULT_LINKED_PROJECT);
 const PARALLEL_TASK_FACTORY = makeTypedFactory<ParallelTask, ParallelTaskRecord>(DEFAULT_PARALLEL_TASK);
+const PARALLEL_TASK_OPTION_FACTORY = makeTypedFactory<ParallelTaskOption, ParallelTaskOptionRecord>(DEFAULT_PARALLEL_TASK_OPTION);
+
 export const initialProjectState: ProjectState = STATE_FACTORY(DEFAULT_STATE);
 
 export class ProjectUtil {
@@ -94,8 +110,20 @@ export class ProjectUtil {
   }
 
   static parallelTaskFromJs(input: any): ParallelTask {
-    input['options'] = List<string>(input['options']);
-    return PARALLEL_TASK_FACTORY(input);
+    const optionsInput: string[] = input['options'];
+    const colours: string[] = this.calculateColourTable(optionsInput.length);
+
+    const options: List<ParallelTaskOption> = List<ParallelTaskOption>().withMutations(mutable => {
+      for (let i = 0 ; i < optionsInput.length ; i++) {
+        mutable.push(PARALLEL_TASK_OPTION_FACTORY({name: optionsInput[i], colour: colours[i]}));
+      }
+    });
+
+    return PARALLEL_TASK_FACTORY({
+      name: input['name'],
+      display: input['display'],
+      options: options
+    });
   }
 
   static toStateRecord(s: ProjectState): ProjectStateRecord {
@@ -115,5 +143,62 @@ export class ProjectUtil {
     });
 
     return ownToBoard;
+  }
+
+  private static calculateColourTable(length: number): string[] {
+    const odd: boolean = length % 2 === 1;
+    let len: number = length;
+    if (!odd) {
+      // Insert a fake half-way element to simplify the calculations
+      len = length + 1;
+    }
+    const max = 255;
+    const halfLength: number = Math.floor(len / 2);
+
+    const increment: number = max / 2 / halfLength;
+
+    const table: string[] = new Array(length);
+    let insertIndex = 0;
+
+    for (let i = 0; i < len; i++) {
+      let red = 0;
+      let green = 0;
+      if (i === halfLength) {
+        red = max;
+        green = max;
+        if (!odd) {
+          // Skip this fake element
+          continue;
+        }
+      } else if (i < halfLength) {
+        red = max;
+        green = i === 0 ? 0 : Math.round(max / 2 + increment * i);
+      } else {
+        // The yellow to green part of the scale is a bit too shiny, so reduce the brightness
+        // while keeping the red to green ratio
+        const adjustment: number = 4 / 5;
+        if (i === len - 1) {
+          red = 0;
+          green = 220;
+        } else {
+          red = Math.round((max - increment * (i - halfLength)));
+          green = Math.round(max * adjustment);
+        }
+      }
+
+      const colourString: string = '#' + this.toHex(red) + this.toHex(green) + '00';
+      table[insertIndex] = colourString;
+      // console.log(insertIndex + " " + colourString + " " + red + " " + green);
+      insertIndex++;
+    }
+    return table;
+  }
+
+  private static toHex(i: number): string {
+    let s: string = i.toString(16);
+    if (s.length === 1) {
+      s = '0' + s;
+    }
+    return s;
   }
 }

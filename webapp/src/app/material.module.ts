@@ -1,7 +1,7 @@
 import {
   MatButtonModule,
   MatCardModule,
-  MatCheckboxModule,
+  MatCheckboxModule, MatChipsModule,
   MatExpansionModule,
   MatFormFieldModule,
   MatIconModule,
@@ -20,6 +20,7 @@ const materialModules: Array<Type<any>> = [
   MatButtonModule,
   MatCardModule,
   MatCheckboxModule,
+  MatChipsModule,
   MatExpansionModule,
   MatFormFieldModule,
   MatIconModule,

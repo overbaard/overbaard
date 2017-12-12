@@ -120,7 +120,8 @@ export class AllFilters {
     this._parallelTaskFilters.forEach((f, k) => {
       if (indicesForProject) {
         const index: number = indicesForProject.get(k);
-        if (!issue.parallelTasks || !f.doFilter(issue.parallelTasks.get(index))) {
+        if (!issue.parallelTasks ||
+          !f.doFilter(issue.parallelTasks.get(index).options.get(issue.selectedParallelTasks.get(index)).name)) {
           visible = false;
           return false;
         }

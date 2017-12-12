@@ -53,7 +53,6 @@ export class ProjectActions {
       }
     }
 
-
     const payload: ProjectState = {
       owner: owner,
       boardProjects: boardProjects.asImmutable(),

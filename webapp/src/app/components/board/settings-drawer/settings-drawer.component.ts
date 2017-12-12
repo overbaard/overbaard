@@ -125,6 +125,8 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
     this.swimlaneList = this.filterList
       .filter(fa => fa.swimlaneOption)
       .map(fa => FilterFormEntry(fa.key, fa.display));
+
+
   }
 
   ngOnDestroy() {
@@ -188,9 +190,9 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
               const taskGroup: FormGroup = new FormGroup({});
 
               parallelTask.options.forEach((option, i) => {
-                options[i] = FilterFormEntry(option, option);
+                options[i] = FilterFormEntry(option.name, option.name);
                 const filteredOptions: Set<string> = filterState.parallelTask.get(parallelTask.display);
-                taskGroup.addControl(option, new FormControl(!!filteredOptions && filteredOptions.contains(option)));
+                taskGroup.addControl(option.name, new FormControl(!!filteredOptions && filteredOptions.contains(option.name)));
               });
 
               filterFormEntries.push(FilterFormEntry(parallelTask.display, parallelTask.name, options));
