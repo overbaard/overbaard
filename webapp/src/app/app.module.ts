@@ -9,7 +9,7 @@ import {initialAppState, metaReducers, reducers} from './app-store';
 import {StoreDevtoolsModule} from '@ngrx/store-devtools';
 import {environment} from '../environments/environment';
 import {BoardsComponent} from './components/boards/boards.component';
-import {RestUrlService} from './services/rest-url.service';
+import {UrlService} from './services/url.service';
 import {BoardComponent} from './components/board/board.component';
 import {AppHeaderService} from './services/app-header.service';
 import {KanbanViewComponent} from './components/board/view/kanban-view/kanban-view.component';
@@ -72,7 +72,7 @@ import {VersionService} from './services/version.service';
     {provide: LocationStrategy, useClass: HashLocationStrategy},
     AppHeaderService,
     ProgressLogService,
-    RestUrlService,
+    UrlService,
     VersionService
   ],
 

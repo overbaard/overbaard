@@ -19,7 +19,7 @@ import {UserSettingState} from '../../model/board/user/user-setting';
 import {BoardViewMode} from '../../model/board/user/board-view-mode';
 import {BoardQueryParamsService} from '../../services/board-query-params.service';
 import {MatDrawer} from '@angular/material';
-import {RestUrlService} from '../../services/rest-url.service';
+import {UrlService} from '../../services/url.service';
 
 
 @Component({

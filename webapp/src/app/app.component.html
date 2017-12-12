@@ -17,7 +17,8 @@
           <mat-nav-list>
             <mat-list-item>
               <a href="https://github.com/overbaard/overbaard">
-                <img src="../assets/images/GitHub-Mark-32px.png" height="20px" width="20px">
+                <!-- Need to do a bit of trickery here to fool angular-cli/webpack to use the proper URL -->
+                <img src="{{localImageUrl('GitHub-Mark-32px.png')}}" height="20px" width="20px">
                 GitHub
               </a>
             </mat-list-item>

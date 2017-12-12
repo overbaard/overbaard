@@ -6,6 +6,7 @@ import {progressLogLoadingSelector} from './model/global/progress-log/progress-l
 import {MatToolbar} from '@angular/material';
 import {TOOLBAR_HEIGHT} from './common/view-constants';
 import {VersionService} from './services/version.service';
+import {UrlService} from './services/url.service';
 
 @Component({
   selector: 'app-root',
@@ -26,7 +27,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   ];
 
 
-  constructor(private _store: Store<AppState>, private _versionService: VersionService) {
+  constructor(private _store: Store<AppState>, private _versionService: VersionService, private _urlService: UrlService) {
   }
 
   ngOnInit() {
@@ -36,5 +37,12 @@ export class AppComponent implements OnInit, AfterViewInit {
 
 
   ngAfterViewInit(): void {
+  }
+
+  /**
+   * @see UrlService.localImageUrl()
+   */
+  localImageUrl(name: string): string {
+    return this._urlService.localImageUrl(name);
   }
 }

@@ -5,7 +5,7 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/timeout';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/observable/throw';
-import {RestUrlService} from './rest-url.service';
+import {UrlService} from './url.service';
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {Progress, ProgressLogService} from './progress-log.service';
 
@@ -13,26 +13,26 @@ import {Progress, ProgressLogService} from './progress-log.service';
 export class BoardsService {
   private _timeout = 30000;
 
-  constructor(private _restUrlService: RestUrlService, private _httpClient: HttpClient, private _progressLog: ProgressLogService) {
+  constructor(private _restUrlService: UrlService, private _httpClient: HttpClient, private _progressLog: ProgressLogService) {
   }
 
   loadBoardsList(summaryOnly: boolean): Observable<any[]> {
     const progress: Progress = this._progressLog.startLoading();
     const path: string = this._restUrlService.caclulateRestUrl(
-      summaryOnly ? RestUrlService.OVERBAARD_REST_PREFIX + '/boards' : RestUrlService.OVERBAARD_REST_PREFIX + '/boards?full=true');
+      summaryOnly ? UrlService.OVERBAARD_REST_PREFIX + '/boards' : UrlService.OVERBAARD_REST_PREFIX + '/boards?full=true');
     return this.executeRequest(progress, this._httpClient.get(path))
       .map(r => summaryOnly ? r['configs'] : r);
   }
 
   loadBoardConfigJson(boardId: number): Observable<any> {
     const progress: Progress = this._progressLog.startLoading();
-    const path: string = this._restUrlService.caclulateRestUrl(RestUrlService.OVERBAARD_REST_PREFIX + '/boards/' + boardId);
+    const path: string = this._restUrlService.caclulateRestUrl(UrlService.OVERBAARD_REST_PREFIX + '/boards/' + boardId);
     return this.executeRequest(progress, this._httpClient.get(path));
   }
 
   createBoard(json: string): Observable<Object> {
     const progress: Progress = this._progressLog.startLoading();
-    const path: string = this._restUrlService.caclulateRestUrl(RestUrlService.OVERBAARD_REST_PREFIX + '/boards');
+    const path: string = this._restUrlService.caclulateRestUrl(UrlService.OVERBAARD_REST_PREFIX + '/boards');
     return this.executeRequest(
       progress,
       this._httpClient.post(path, json, {
@@ -42,7 +42,7 @@ export class BoardsService {
 
   saveBoard(id: number, json: string): Observable<Object> {
     const progress: Progress = this._progressLog.startLoading();
-    const path: string = this._restUrlService.caclulateRestUrl(RestUrlService.OVERBAARD_REST_PREFIX + '/boards/' + id);
+    const path: string = this._restUrlService.caclulateRestUrl(UrlService.OVERBAARD_REST_PREFIX + '/boards/' + id);
     return this.executeRequest(
       progress,
       this._httpClient
@@ -54,7 +54,7 @@ export class BoardsService {
   deleteBoard(id: number): Observable<Object> {
     const progress: Progress = this._progressLog.startLoading();
 
-    const path: string = this._restUrlService.caclulateRestUrl(RestUrlService.OVERBAARD_REST_PREFIX + '/boards/' + id);
+    const path: string = this._restUrlService.caclulateRestUrl(UrlService.OVERBAARD_REST_PREFIX + '/boards/' + id);
     console.log('Deleting board ' + path);
     return this.executeRequest(
       progress,
@@ -67,7 +67,7 @@ export class BoardsService {
   saveRankCustomFieldId(id: number): Observable<Object> {
     const progress: Progress = this._progressLog.startLoading();
 
-    const path: string = this._restUrlService.caclulateRestUrl(RestUrlService.OVERBAARD_REST_PREFIX + '/rankCustomFieldId');
+    const path: string = this._restUrlService.caclulateRestUrl(UrlService.OVERBAARD_REST_PREFIX + '/rankCustomFieldId');
     console.log('Saving custom field id ' + path);
     const payload: string = JSON.stringify({id: id});
     return this.executeRequest(

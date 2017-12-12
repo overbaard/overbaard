@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import 'rxjs/add/operator/catch';
-import {RestUrlService} from './rest-url.service';
+import {UrlService} from './url.service';
 import {ProgressLogService} from './progress-log.service';
 import {Observable} from 'rxjs/Observable';
 
@@ -12,7 +12,7 @@ export class VersionService {
     private _timeout = 20000;
 
 
-    constructor(private _http: HttpClient, private _restUrlService: RestUrlService, private _progressError: ProgressLogService) {
+    constructor(private _http: HttpClient, private _restUrlService: UrlService, private _progressError: ProgressLogService) {
     }
 
 

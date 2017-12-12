@@ -1,7 +1,7 @@
 import {async, TestBed} from '@angular/core/testing';
 
 import {RouterTestingModule} from '@angular/router/testing';
-import {RestUrlService} from '../services/rest-url.service';
+import {UrlService} from './url.service';
 import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
 import {BoardsService} from './boards.service';
 import {HttpErrorResponse} from '@angular/common/http';
@@ -17,7 +17,7 @@ xdescribe('Boards Service', () => {
         RouterTestingModule,
         HttpClientTestingModule
       ],
-      providers: [RestUrlService, BoardsService, ProgressLogService]
+      providers: [UrlService, BoardsService, ProgressLogService]
     })
       .compileComponents();
 

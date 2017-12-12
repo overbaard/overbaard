@@ -10,11 +10,12 @@ import {environment} from './environments/environment';
 
 
 function calculatePublicPath(): string {
-  const searchElement = '/download/resources/org.overbaard.overbaard/webapp/';
+  const searchElement = '/overbaard/';
   const location: Location = window.location;
   const href: string = location.href;
   const index: number = href.indexOf(searchElement);
   if (index < 0) {
+    // We are running in a test server setup
     let url: string = location.protocol + '//';
     url += location.hostname;
     if (location.port) {
@@ -23,16 +24,8 @@ function calculatePublicPath(): string {
     url += '/';
     return url;
   } else {
-    // Do the http(s):// slashes
-    // First slash, the second one will be the next index
-    let slashIndex: number = href.indexOf('/', 0);
-    // Find the third slash which should be the root url
-    slashIndex = href.indexOf('/', slashIndex + 2);
-    let url: string = searchElement;
-    if (index > slashIndex) {
-      url = href.substr(slashIndex, index) + url;
-    }
-    return url;
+    // We are running in the plugin
+    return href.substr(0, index) + '/';
   }
 }
 

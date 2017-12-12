@@ -5,11 +5,10 @@
             matTooltip="{{cardTooltip}}"
             [matTooltipClass]="{'card-tooltip': true}">
         <span class="mat-h4">
-          <!-- When using issue.issueUrl here, although I am using the full url it gets truncated to /browse/FEAT-1 -->
-          <a href="View in Jira"
+          <a href="{{issue.issueUrl}}"
              target="_blank"
              class="issue-link"
-             (click)="openIssue($event)">{{issue.key}}</a></span>
+             >{{issue.key}}</a></span>
         <span class="space-filler"></span>
       </span>
       <span class="mat-h4" matTooltip="{{issue.assignee.name}}">{{issue.assignee.initials}}</span>

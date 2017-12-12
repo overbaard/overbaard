@@ -1,5 +1,5 @@
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
-import {RestUrlService} from './rest-url.service';
+import {UrlService} from './url.service';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/timeout';
@@ -18,7 +18,7 @@ export class BoardService {
 
   private _changePoller: ChangePoller;
 
-  constructor(private readonly _restUrlService: RestUrlService,
+  constructor(private readonly _restUrlService: UrlService,
               private readonly _http: HttpClient,
               private readonly _progressLog: ProgressLogService,
               private readonly _store: Store<AppState>) {
@@ -33,7 +33,7 @@ export class BoardService {
     }
 
     const progress: Progress = this._progressLog.startLoading();
-    let url = RestUrlService.OVERBAARD_REST_PREFIX + '/issues/' + boardCode;
+    let url = UrlService.OVERBAARD_REST_PREFIX + '/issues/' + boardCode;
     if (backlog) {
       url += '?backlog=' + true;
     }
@@ -90,7 +90,7 @@ class ChangePoller {
     private readonly _boardCode: string,
     private readonly _backlog: boolean,
     private readonly _store: Store<AppState>,
-    private readonly _restUrlService: RestUrlService,
+    private readonly _restUrlService: UrlService,
     private readonly _http: HttpClient) {
 
     this._pollParameters$ = Observable.combineLatest(
@@ -160,7 +160,7 @@ class ChangePoller {
 
   private doPoll(params: PollParameters) {
     if (!this._destroyed) {
-      let url: string = RestUrlService.OVERBAARD_REST_PREFIX + '/issues/' + params.boardCode + '/updates/' + params.viewId;
+      let url: string = UrlService.OVERBAARD_REST_PREFIX + '/issues/' + params.boardCode + '/updates/' + params.viewId;
       if (params.showBacklog) {
         url += '?backlog=' + true;
       }

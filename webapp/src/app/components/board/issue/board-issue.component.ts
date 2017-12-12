@@ -72,9 +72,4 @@ export class BoardIssueComponent implements OnInit, OnChanges {
     });
     return s;
   }
-
-  // Workaround some strange replacement in the real links
-  openIssue(event: MouseEvent) {
-    window.open(this.issue.issueUrl);
-  }
 }
