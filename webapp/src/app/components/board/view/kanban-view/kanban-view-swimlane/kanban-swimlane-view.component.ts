@@ -20,6 +20,9 @@ export class KanbanSwimlaneViewComponent implements OnInit {
   @Output()
   toggleCollapsedSwimlane: EventEmitter<string> = new EventEmitter<string>();
 
+  @Input()
+  headerTextOffset: number;
+
   private _lastLeftOffset = 0;
 
   constructor() {

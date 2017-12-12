@@ -1,4 +1,4 @@
-<div class="headers-container" [ngStyle]="{'margin-left':boardLeftOffset+'px'}">
+<div class="headers-container" [ngStyle]="{'margin-left': boardLeftOffset + 'px'}">
   <div *ngIf="viewMode === enumViewMode.RANK" class="rank-issues-header"></div>
   <app-board-header-group
     *ngFor="let header of headers.headersList"

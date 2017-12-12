@@ -16,6 +16,7 @@
     *ngIf="board.issueTable.swimlaneInfo"
     [board]="board"
     (scroll)="onScrollBoardX($event)"
+    [headerTextOffset]="boardLeftOffset * -1"
     (toggleCollapsedSwimlane)="onToggleCollapsedSwimlane($event)"
   ></app-kanban-swimlane-view>
 </div>

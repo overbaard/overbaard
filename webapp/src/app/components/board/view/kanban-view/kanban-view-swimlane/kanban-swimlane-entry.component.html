@@ -6,7 +6,10 @@
     (mouseleave)="onMouseLeave()"
     [ngClass]="classObj"
   >
-    <span class="header-icon" style="display: flex">
+    <span
+      class="header-icon"
+      style="display: flex"
+      [ngStyle]="{'margin-left': headerTextOffset + 'px'}">
       <mat-icon
         *ngIf="swimlane.collapsed"
       >chevron_right</mat-icon>
@@ -18,13 +21,13 @@
   </div>
   <div
     class="swimlane-content"
-    *ngIf="!swimlane.collapsed"
   >
     <app-kanban-view-column-group
       *ngFor="let header of board.headers.headersList ; trackBy: columnTrackByFn"
       [header]="header"
       [issues]="board.issueTable.issues"
       [table]="swimlane.table"
+      [displayIssues]="!swimlane.collapsed"
     ></app-kanban-view-column-group>
   </div>
 </div>

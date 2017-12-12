@@ -22,6 +22,9 @@ export class KanbanSwimlaneEntryComponent implements OnInit, OnChanges {
   @Input()
   swimlane: SwimlaneData;
 
+  @Input()
+  headerTextOffset: number;
+
   @Output()
   toggleCollapsedSwimlane: EventEmitter<string> = new EventEmitter<string>();
 

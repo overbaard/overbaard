@@ -21,6 +21,10 @@ export class KanbanViewColumnGroupComponent implements OnInit, OnChanges {
   @Input()
   table: List<List<string>>;
 
+  // If a swimlane is collapsed, we still need to display empty columns so the header has the correct width
+  @Input()
+  displayIssues = true;
+
   readonly visible_bl_or_normal_state = 0;
   readonly visible_bl_or_normal_category = 1;
   readonly invisible_bl = 2;

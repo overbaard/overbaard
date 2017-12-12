@@ -21,6 +21,10 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
   @Input()
   issueKeys: List<string>;
 
+  // If a swimlane is collapsed, we still need to display empty columns so the header has the correct width
+  @Input()
+  displayIssues = true;
+
   classList: string[];
 
   constructor() { }

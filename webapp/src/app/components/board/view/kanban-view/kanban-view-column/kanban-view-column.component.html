@@ -1,9 +1,11 @@
 <div *ngIf="header.visible" class="column visible">
   <!-- trackBy is a hint to angular to be able to keep (i.e. don't destroy and recreate) as many components as possible -->
-  <app-board-issue
-    *ngFor="let issueKey of issueKeys ; trackBy: issueTrackByFn "
-    [issue]="issues.get(issueKey)"
-  ></app-board-issue>
+  <div *ngIf="displayIssues">
+    <app-board-issue
+      *ngFor="let issueKey of issueKeys ; trackBy: issueTrackByFn "
+      [issue]="issues.get(issueKey)"
+    ></app-board-issue>
+  </div>
 </div>
 <div *ngIf="!header.visible" class="column invisible">
 </div>
