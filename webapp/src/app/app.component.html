@@ -15,19 +15,25 @@
         <div class="space-filler"></div>
         <div style="display: flex; flex-direction: column; width: 100%">
           <mat-nav-list>
-            <mat-list-item>
-              <a href="https://github.com/overbaard/overbaard">
-                <!-- Need to do a bit of trickery here to fool angular-cli/webpack to use the proper URL -->
-                <img src="{{localImageUrl('GitHub-Mark-32px.png')}}" height="20px" width="20px">
-                GitHub
-              </a>
-            </mat-list-item>
+            <a
+              href="{{jiraUrl}}"
+              mat-list-item>
+              <mat-icon>home</mat-icon>
+              Jira
+            </a>
             <a
               href="https://github.com/overbaard/overbaard/userguide/README.md"
-               mat-list-item>
+              mat-list-item>
               <mat-icon>help</mat-icon>
               Help
             </a>
+            <mat-list-item>
+              <a href="https://github.com/overbaard/overbaard">
+                <!-- Need to do a bit of trickery here to fool angular-cli/webpack to use the proper URL -->
+                <img src="{{localImageUrl('GitHub-Mark-32px.png')}}" class="gh-link-image">
+                GitHub
+              </a>
+            </mat-list-item>
           </mat-nav-list>
           <mat-list>
             <mat-list-item>

@@ -45,4 +45,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   localImageUrl(name: string): string {
     return this._urlService.localImageUrl(name);
   }
+
+  get jiraUrl(): string {
+    return this._urlService.jiraUrl;
+  }
 }
