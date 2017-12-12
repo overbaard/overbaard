@@ -3,7 +3,9 @@
     <div class="title-container">
       <span class="title-container"
             matTooltip="{{cardTooltip}}"
-            [matTooltipClass]="'card-tooltip'">
+            [matTooltipClass]="'card-tooltip'"
+            [matTooltipShowDelay]="500"
+      >
         <span class="mat-h4">
           <a href="{{issue.issueUrl}}"
              target="_blank"
