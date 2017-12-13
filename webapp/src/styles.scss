@@ -63,4 +63,15 @@ $white-text: #FFF!important;
   font-size: 12px;
 }
 
+@mixin sized-icon-button-class($size, $font-size, $line-height) {
+  min-width: $size;
+  max-width: $size;
+  height: $size;
+  line-height: $line-height;
+  min-height: $size;
+  font-size: $font-size;
+  padding: 0;
+  margin: 0;
+}
+
 

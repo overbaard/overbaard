@@ -22,15 +22,9 @@
 }
 .mat-h4 {
   margin: 0px;
+  white-space: nowrap;
 }
 .header-icon {
-  min-width: 24px;
-  max-width: 24px;
-  height: 24px;
-  line-height: 24px;
-  min-height: 24px;
-  font-size: 15px;
-  padding: 0;
-  margin: 0;
+  @include sized-icon-button-class(24px, 15px, 24px)
 }
 

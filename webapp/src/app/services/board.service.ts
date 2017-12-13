@@ -69,7 +69,7 @@ export class BoardService {
       this._changePoller = name;
     }
     this._changePoller = new ChangePoller(boardCode, backlog, this._store, this._restUrlService, this._http);
-    this._changePoller.startPolling()
+    this._changePoller.startPolling();
   }
 }
 
