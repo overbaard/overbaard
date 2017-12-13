@@ -57,6 +57,7 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
   @Output()
   switchViewMode: EventEmitter<null> = new EventEmitter<null>();
 
+  viewModeForm: FormGroup;
   swimlaneForm: FormGroup;
   filterForm: FormGroup;
 
@@ -89,9 +90,12 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
 
     this.filterList = filterList;
 
+    this.viewModeForm = new FormGroup({});
     this.swimlaneForm = new FormGroup({});
     this.filterForm = new FormGroup({});
 
+    this.viewModeForm.addControl('viewMode',
+      new FormControl(this.getViewModeString(this.userSettings.viewMode)));
     this.swimlaneForm.addControl('swimlane', new FormControl(this.userSettings.swimlane));
 
     this.createGroupFromObservable(this._store.select(boardProjectsSelector), PROJECT_ATTRIBUTES,
@@ -126,6 +130,9 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
     this.swimlaneForm.valueChanges
       .takeUntil(this._destroy$)
       .subscribe(value => this.processSwimlaneChange(value));
+    this.viewModeForm.valueChanges
+      .takeUntil(this._destroy$)
+      .subscribe(value => this.processViewModeChange(value));
 
     this.swimlaneList = this.filterList
       .filter(fa => fa.swimlaneOption)
@@ -284,16 +291,20 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
     this._store.dispatch(UserSettingActions.createUpdateSwimlane(sl));
   }
 
+  processViewModeChange(value: any) {
+    const vm: string = value['viewMode'];
+    // TODO make the reducers take something better than just a toggle
+    if (this.getViewModeString(this.userSettings.viewMode) !== vm) {
+      // There is some logic here which belongs better in the board component so emit an event and let the board
+      // handle it
+      this.switchViewMode.emit();
+
+    }
+  }
+
   onShowEmptySwimlanes(event: MouseEvent) {
     event.preventDefault();
     this._store.dispatch(UserSettingActions.createToggleShowEmptySwimlanes());
-  }
-
-  onSwitchViewMode(event: Event) {
-    // There is some logic here which belongs better in the board component so emit an event and let the board
-    // handle it
-    this.switchViewMode.emit();
-    event.preventDefault();
   }
 
   getSelectionTooltip(attributes: FilterAttributes): string {
@@ -365,6 +376,15 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
     }
     if (entry.customField) {
       return this.userSettings.filters.customField.get(entry.key);
+    }
+    return null;
+  }
+
+  private getViewModeString(viewMode: BoardViewMode) {
+    if (viewMode === BoardViewMode.KANBAN) {
+      return 'kanban';
+    } else if (viewMode === BoardViewMode.RANK) {
+      return 'rank';
     }
     return null;
   }
