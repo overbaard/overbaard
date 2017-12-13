@@ -6,6 +6,8 @@
     ></app-board-issue>
   </div>
   <div *ngFor="let unused of statesDummyArray ; let i = index" class="cell">
-    <div *ngIf="rankEntry.boardIndex === i">x</div>
+    <div class="inner-cell">
+      <div *ngIf="rankEntry.boardIndex === i"  class="selected-cell"></div>
+    </div>
   </div>
 </div>
