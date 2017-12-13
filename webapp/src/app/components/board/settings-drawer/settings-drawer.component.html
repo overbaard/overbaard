@@ -1,6 +1,4 @@
 <div>
-  <div class="mat-h1">Board Settings</div>
-  <div>TODO A lot of this text is too big. Figure out how to resize it.</div>
   <mat-card>
     <mat-card-title>General</mat-card-title>
       <mat-card-content>
@@ -46,7 +44,24 @@
         (closed)="onCloseFilterPanel(entry)">
         <mat-expansion-panel-header>
           <mat-panel-title>
-            {{entry.display}}
+            <div class="filter-panel-header">
+              <div style="flex-grow: 1">
+                {{entry.display}}
+              </div>
+              <div *ngIf="getSelectionTooltip(entry).length > 0">
+                <a
+                  mat-icon-button
+                  color="accent"
+                  class="cancel-button"
+                  matTooltip="{{getSelectionTooltip(entry)}}"
+                  [matTooltipClass]="'card-tooltip'"
+                  (click)="onClearFilter(entry)"
+                >
+                  <mat-icon class="cancel-button">cancel</mat-icon>
+                </a>
+                <!-- class="cancel-button" -->
+              </div>
+            </div>
           </mat-panel-title>
         </mat-expansion-panel-header>
         <!-- TODO investigate pulling this into a separate component -->

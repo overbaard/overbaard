@@ -54,23 +54,28 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
   @Input()
   userSettings: UserSettingState;
 
+  @Output()
+  switchViewMode: EventEmitter<null> = new EventEmitter<null>();
+
   swimlaneForm: FormGroup;
   filterForm: FormGroup;
 
   swimlaneList: FilterFormEntry[];
   filterList: FilterAttributes[] = [];
+  filterEntryDictionary: Dictionary<Dictionary<FilterFormEntry>> = {};
   filterEntries: Dictionary<FilterFormEntry[]> = {};
 
   filtersToDisplay: FilterAttributes = null;
   currentFilterEntries: FilterFormEntry[];
 
+  filterTooltips: Dictionary<string> = {};
+
   private _destroy$: Subject<null> = new Subject<null>();
 
   // Expose the enum to the template
   enumViewMode = BoardViewMode;
-  @Output()
-  switchViewMode: EventEmitter<null> = new EventEmitter<null>();
 
+  clearingFilter: FilterAttributes;
 
   constructor(private _store: Store<AppState>) {
   }
@@ -115,8 +120,8 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
 
 
     this.filterForm.valueChanges
-      .takeUntil(this._destroy$)
       .debounceTime(150)  // Timeout here for when we clear form to avoid costly recalculation of everything
+      .takeUntil(this._destroy$)
       .subscribe(value => this.processFormValueChanges(value));
     this.swimlaneForm.valueChanges
       .takeUntil(this._destroy$)
@@ -174,6 +179,7 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
             return;
           }
           this.filterList.push(PARALLEL_TASK_ATTRIBUTES);
+          const filterFormEntryDictionary: Dictionary<FilterFormEntry> = {};
           const filterFormEntries: FilterFormEntry[] = [];
           const done: Dictionary<boolean> = {};
           const parallelTasksGroup: FormGroup = new FormGroup({});
@@ -195,11 +201,14 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
                 taskGroup.addControl(option.name, new FormControl(!!filteredOptions && filteredOptions.contains(option.name)));
               });
 
-              filterFormEntries.push(FilterFormEntry(parallelTask.display, parallelTask.name, options));
+              const entry = FilterFormEntry(parallelTask.display, parallelTask.name, options);
+              filterFormEntryDictionary[entry.key] = entry;
+              filterFormEntries.push(entry);
               parallelTasksGroup.addControl(parallelTask.display, taskGroup);
             });
           }));
 
+          this.filterEntryDictionary[PARALLEL_TASK_ATTRIBUTES.key] = filterFormEntryDictionary;
           this.filterEntries[PARALLEL_TASK_ATTRIBUTES.key] = filterFormEntries;
           this.filterForm.addControl(PARALLEL_TASK_ATTRIBUTES.key, parallelTasksGroup);
         }
@@ -210,20 +219,21 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
     if (filter.hasNone) {
       filterFormEntries.unshift(FilterFormEntry(this.none, 'None'));
     }
-    this.filterEntries[filter.key] = filterFormEntries;
     let set: Set<string> = setFilterGetter();
     if (!set) {
       set = Set<string>();
     }
+    const filterFormEntryDictionary: Dictionary<FilterFormEntry> = {};
     const group: FormGroup = new FormGroup({});
-
     filterFormEntries.forEach(entry => {
+      filterFormEntryDictionary[entry.key] = entry;
       const control: FormControl = new FormControl(set.contains(entry.key));
       group.addControl(entry.key, control);
     });
 
+    this.filterEntries[filter.key] = filterFormEntries;
+    this.filterEntryDictionary[filter.key] = filterFormEntryDictionary;
     this.filterForm.addControl(filter.key, group);
-
   }
 
   onOpenFilterPane(filter: FilterAttributes) {
@@ -237,10 +247,36 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
     }
   }
 
+
+  onClearFilter(filter: FilterAttributes) {
+    event.preventDefault();
+    event.stopPropagation();
+    // This gets cleared by processFormValueChanges
+    this.clearingFilter = filter;
+    const set: Set<string> = this.getNonParallelTaskSet(filter);
+    if (set) {
+      const group: FormGroup = <FormGroup>this.filterForm.controls[filter.key];
+      set.forEach(k => group.controls[k].setValue(false));
+    }
+
+    if (filter === PARALLEL_TASK_ATTRIBUTES) {
+      const group: FormGroup = <FormGroup>this.filterForm.controls[filter.key];
+      this.userSettings.filters.parallelTask.forEach((ptSet, key) => {
+        const taskGroup: FormGroup = <FormGroup>group.controls[key];
+        ptSet.forEach(k => taskGroup.controls[k].setValue(false));
+      });
+    }
+  }
+
   processFormValueChanges(value: any) {
-    const obj: Object = value[this.filtersToDisplay.key];
-    this._store.dispatch(BoardFilterActions.createUpdateFilter(this.filtersToDisplay, obj));
+    console.log('updated ' + value);
+    // clearingFilter is set by the onClearFilter()
+    const filter: FilterAttributes = this.clearingFilter ? this.clearingFilter : this.filtersToDisplay;
+    const obj: Object = value[filter.key];
+    this._store.dispatch(BoardFilterActions.createUpdateFilter(filter, obj));
     this.filterForm.reset(value);
+    this.filterTooltips[filter.key] = null;
+    this.clearingFilter = null;
   }
 
   processSwimlaneChange(value: any) {
@@ -260,7 +296,78 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
     event.preventDefault();
   }
 
+  getSelectionTooltip(attributes: FilterAttributes): string {
+    let tooltip: string = this.filterTooltips[attributes.key];
+    if (!tooltip) {
+      tooltip = this.createSelectionTooltip(attributes);
+      this.filterTooltips[attributes.key] = tooltip;
+    }
+    return tooltip;
+  }
 
+  createSelectionTooltip(attributes: FilterAttributes): string {
+    const set: Set<string> = this.getNonParallelTaskSet(attributes);
+    if (set && set.size > 0) {
+      const lookup: Dictionary<FilterFormEntry> = this.filterEntryDictionary[attributes.key];
+      let first = true;
+      let tooltip = '';
+      set.forEach(key => {
+        if (first) {
+          first = false;
+        } else {
+          tooltip += '\n';
+        }
+        tooltip += lookup[key].display;
+      });
+      return tooltip;
+    }
+    if (attributes === PARALLEL_TASK_ATTRIBUTES) {
+      let first = true;
+      let tooltip = '';
+      const taskEntries: FilterFormEntry[] = this.filterEntries[attributes.key];
+      for (const taskEntry of taskEntries) {
+        const taskSet: Set<string> = this.userSettings.filters.parallelTask.get(taskEntry.key);
+        if (taskSet && taskSet.size > 0) {
+          if (first) {
+            first = false;
+          } else {
+            tooltip += '\n\n';
+          }
+          tooltip += taskEntry.display + ':';
+          taskSet.forEach(key => {
+            // For parallel tasks the key and the display value is the same so there is no need to look up
+            tooltip += '\n' + key;
+          });
+
+        }
+      }
+      return tooltip;
+    }
+    return '';
+  }
+
+  private getNonParallelTaskSet(entry: FilterAttributes): Set<string> {
+    switch (entry) {
+      case PROJECT_ATTRIBUTES:
+        return this.userSettings.filters.project;
+      case ISSUE_TYPE_ATTRIBUTES:
+        return this.userSettings.filters.issueType;
+      case PRIORITY_ATTRIBUTES:
+        return this.userSettings.filters.priority;
+      case ASSIGNEE_ATTRIBUTES:
+        return this.userSettings.filters.assignee;
+      case COMPONENT_ATTRIBUTES:
+        return this.userSettings.filters.component;
+      case LABEL_ATTRIBUTES:
+        return this.userSettings.filters.label;
+      case FIX_VERSION_ATTRIBUTES:
+        return this.userSettings.filters.fixVersion;
+    }
+    if (entry.customField) {
+      return this.userSettings.filters.customField.get(entry.key);
+    }
+    return null;
+  }
 }
 
 interface FilterFormEntry {

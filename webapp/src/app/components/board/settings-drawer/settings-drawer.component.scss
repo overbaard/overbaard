@@ -1,0 +1,9 @@
+@import "../../../../styles";
+
+.filter-panel-header {
+  display: flex;
+  width: 100%;
+}
+.cancel-button {
+  @include sized-icon-button-class(18px, 18px, 18px);
+}
