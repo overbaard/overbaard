@@ -179,7 +179,7 @@
     "FEAT-2" : {
       "key": "FEAT-2",
       "state": 4,
-      "summary": "Issue number 2. This has a longer description than the last one, it will probably span a bit.",
+      "summary": "Issue number 2. Serious issue in org.jboss.some.package.somewhere.SomeClass. Will the long word get wrapped?",
       "priority": 1,
       "type": 3,
       "components": [1, 2],
@@ -200,7 +200,7 @@
     "FEAT-4" : {
       "key": "FEAT-4",
       "state": 6,
-      "summary": "Issue number 3",
+      "summary": "Issue number 4.",
       "priority": 2,
       "type": 0,
       "parallel-tasks": [1, 1]
@@ -208,14 +208,14 @@
     "FEAT-5" : {
       "key": "FEAT-5",
       "state": 4,
-      "summary": "Issue number 3",
+      "summary": "Issue number 5",
       "priority": 2,
       "type": 0
     },
     "FEAT-6" : {
       "key": "FEAT-5",
       "state": 7,
-      "summary": "Issue number 3",
+      "summary": "Issue number 6",
       "priority": 2,
       "assignee": 1,
       "type": 0
