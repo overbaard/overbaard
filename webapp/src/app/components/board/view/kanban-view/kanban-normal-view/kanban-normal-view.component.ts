@@ -1,6 +1,8 @@
 import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {BoardViewModel} from '../../../../../view-model/board/board-view';
 import {UpdateParallelTaskEvent} from '../../../../../events/update-parallel-task.event';
+import {IssueSummaryLevel} from '../../../../../model/board/user/issue-summary-level';
+import {IssueDetailState} from '../../../../../model/board/user/issue-detail/issue-detail.model';
 
 @Component({
   selector: 'app-kanban-normal-view',

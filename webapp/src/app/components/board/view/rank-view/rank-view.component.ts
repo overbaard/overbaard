@@ -5,6 +5,7 @@ import {
 import {FixedHeaderView} from '../fixed-header-view';
 import {BoardViewMode} from '../../../../model/board/user/board-view-mode';
 import {UpdateParallelTaskEvent} from '../../../../events/update-parallel-task.event';
+import {IssueSummaryLevel} from '../../../../model/board/user/issue-summary-level';
 
 @Component({
   selector: 'app-rank-view',
@@ -18,7 +19,6 @@ export class RankViewComponent extends FixedHeaderView implements OnInit, OnChan
 
   @Output()
   updateParallelTask: EventEmitter<UpdateParallelTaskEvent> = new EventEmitter<UpdateParallelTaskEvent>();
-
 
   // Just an array here to be able to do 'for s of states; let i = index' in the template
   statesDummyArray: number[];

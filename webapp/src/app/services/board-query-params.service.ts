@@ -11,6 +11,7 @@ import {List, OrderedSet, Set} from 'immutable';
 import {BoardFilterState} from '../model/board/user/board-filter/board-filter.model';
 import {BoardViewMode} from '../model/board/user/board-view-mode';
 import {Injectable} from '@angular/core';
+import {IssueSummaryLevel} from '../model/board/user/issue-summary-level';
 
 @Injectable()
 export class BoardQueryParamsService {
@@ -51,6 +52,12 @@ export class BoardQueryParamsHandler {
           }
           if (userSettingState.viewMode === BoardViewMode.RANK) {
             params.push('view=rv');
+          }
+          if (userSettingState.issueDetail.issueSummaryLevel !== IssueSummaryLevel.FULL) {
+            params.push(`isl=${userSettingState.issueDetail.issueSummaryLevel}`)
+          }
+          if (!userSettingState.issueDetail.parallelTasks) {
+            params.push('vpt=false');
           }
           if (userSettingState.swimlane) {
             params.push(`swimlane=${encodeURIComponent(userSettingState.swimlane)}`);

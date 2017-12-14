@@ -1,38 +1,67 @@
 <div>
   <mat-card>
-    <mat-card-title>General</mat-card-title>
-      <mat-card-content>
-        <div [formGroup]="viewModeForm" #f="ngForm">
-          <mat-form-field>
-            <mat-select formControlName="viewMode" placeholder="View mode">
-              <mat-option value="kanban">Kanban</mat-option>
-              <mat-option value="rank">Rank</mat-option>
-            </mat-select>
-          </mat-form-field>
+    <mat-card-header>
+      <mat-card-title><div class="mat-h4 card-header">General</div></mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div [formGroup]="viewModeForm" #f="ngForm">
+        <mat-form-field>
+          <mat-select formControlName="viewMode" placeholder="View mode">
+            <mat-option value="kanban">Kanban</mat-option>
+            <mat-option value="rank">Rank</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div [formGroup]="swimlaneForm" #f="ngForm">
+        <mat-form-field>
+          <mat-select formControlName="swimlane" placeholder="Swimlane">
+            <!-- Don't set a value for the undefined one -->
+            <mat-option></mat-option>
+            <mat-option *ngFor="let sl of swimlaneList" value="{{sl.key}}">{{sl.display}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div>
+          <a *ngIf="userSettings.swimlane"
+            href="Toggle Empty"
+            (click)="onShowEmptySwimlanes($event)"
+            mat-raised-button
+            color="primary">
+            <span *ngIf="userSettings.swimlaneShowEmpty">Hide Empty</span>
+            <span *ngIf="!userSettings.swimlaneShowEmpty">Show Empty</span>
+          </a>
         </div>
-        <div [formGroup]="swimlaneForm" #f="ngForm">
-          <mat-form-field>
-            <mat-select formControlName="swimlane" placeholder="Swimlane">
-              <!-- Don't set a value for the undefined one -->
-              <mat-option></mat-option>
-              <mat-option *ngFor="let sl of swimlaneList" value="{{sl.key}}">{{sl.display}}</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <div>
-            <a *ngIf="userSettings.swimlane"
-              href="Toggle Empty"
-              (click)="onShowEmptySwimlanes($event)"
-              mat-raised-button
-              color="primary">
-              <span *ngIf="userSettings.swimlaneShowEmpty">Hide Empty</span>
-              <span *ngIf="!userSettings.swimlaneShowEmpty">Show Empty</span>
-            </a>
-          </div>
-        </div>
+      </div>
     </mat-card-content>
   </mat-card>
   <mat-card>
-    <mat-card-title>Filters</mat-card-title>
+    <mat-card-header>
+      <mat-card-title><div class="mat-h4 card-header">Issue Details</div></mat-card-title>
+    </mat-card-header>
+    <mat-accordion>
+      <mat-card-content>
+        <div>
+          <mat-slider
+            color="primary"
+            [min]="0"
+            [max]="3"
+            [value]="userSettings.issueDetail.issueSummaryLevel"
+            (change)="onIssueDetailsChange($event)">
+            <mat-hint>Summary level</mat-hint>
+          </mat-slider>
+        </div>
+        <div>
+          <mat-checkbox
+            [checked]="userSettings.issueDetail.parallelTasks"
+            color="primary"
+            (change)="onChangeShowParallelTasks($event)">Parallel Tasks</mat-checkbox>
+        </div>
+      </mat-card-content>
+    </mat-accordion>
+  </mat-card>
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title><div class="mat-h4 card-header">Filters</div></mat-card-title>
+    </mat-card-header>
     <mat-accordion>
       <mat-expansion-panel
         *ngFor="let entry of filterList"

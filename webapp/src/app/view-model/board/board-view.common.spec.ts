@@ -38,6 +38,7 @@ import {BoardViewModel} from './board-view';
 import {BoardHeader} from './board-header';
 import {UserSettingState} from '../../model/board/user/user-setting';
 import {Action} from '@ngrx/store';
+import {IssueSummaryLevel} from '../../model/board/user/issue-summary-level';
 
 export class BoardViewObservableUtil {
   private _service: BoardViewModelHandler = new BoardViewModelHandler();
@@ -328,6 +329,10 @@ export class UserSettingUpdater {
 
   toggleCollapsedSwimlane(key: string): BoardViewObservableUtil {
     return this.emitState(UserSettingActions.createToggleCollapsedSwimlane(key));
+  }
+
+  updateIssueSummaryLevel(level: IssueSummaryLevel): BoardViewObservableUtil {
+    return this.emitState(UserSettingActions.createUpdateIssueSummaryLevel(level));
   }
 
   private emitState(action: Action): BoardViewObservableUtil {

@@ -9,6 +9,8 @@ import {ParallelTask} from '../../../model/board/data/project/project.model';
 import {MatDialog} from '@angular/material';
 import {ParallelTaskSelectorComponent} from './parallel-task-selector.component';
 import {UpdateParallelTaskEvent} from '../../../events/update-parallel-task.event';
+import {IssueSummaryLevel} from '../../../model/board/user/issue-summary-level';
+import {IssueDetailState} from '../../../model/board/user/issue-detail/issue-detail.model';
 
 @Component({
   selector: 'app-board-issue',
@@ -26,6 +28,9 @@ export class BoardIssueComponent implements OnInit, OnChanges {
   @Output()
   updateParallelTask: EventEmitter<UpdateParallelTaskEvent> = new EventEmitter<UpdateParallelTaskEvent>();
 
+  @Input()
+  issueDetailState: IssueDetailState;
+
   cardTooltip: string;
 
 
@@ -39,6 +44,18 @@ export class BoardIssueComponent implements OnInit, OnChanges {
     if (issue && issue.currentValue !== issue.previousValue) {
       this.cardTooltip = null;
     }
+  }
+
+  get showSummary(): boolean {
+    return this.issueDetailState.issueSummaryLevel > IssueSummaryLevel.HEADER_ONLY;
+  }
+
+  get showAvatar(): boolean {
+    return this.issueDetailState.issueSummaryLevel > IssueSummaryLevel.SHORT_SUMMARY_NO_AVATAR;
+  }
+
+  get shortSummary(): boolean {
+    return this.issueDetailState.issueSummaryLevel < IssueSummaryLevel.FULL;
   }
 
   calculateTooltips() {

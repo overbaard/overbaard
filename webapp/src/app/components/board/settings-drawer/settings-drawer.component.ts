@@ -39,6 +39,8 @@ import {UserSettingActions} from '../../../model/board/user/user-setting.reducer
 import {Subject} from 'rxjs/Subject';
 import {UserSettingState} from '../../../model/board/user/user-setting';
 import {BoardViewMode} from '../../../model/board/user/board-view-mode';
+import {MatCheckboxChange, MatSliderChange} from '@angular/material';
+import {toIssueSummaryLevel} from '../../../model/board/user/issue-summary-level';
 
 @Component({
   selector: 'app-board-settings-drawer',
@@ -94,8 +96,7 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
     this.swimlaneForm = new FormGroup({});
     this.filterForm = new FormGroup({});
 
-    this.viewModeForm.addControl('viewMode',
-      new FormControl(this.getViewModeString(this.userSettings.viewMode)));
+    this.viewModeForm.addControl('viewMode', new FormControl(this.getViewModeString(this.userSettings.viewMode)));
     this.swimlaneForm.addControl('swimlane', new FormControl(this.userSettings.swimlane));
 
     this.createGroupFromObservable(this._store.select(boardProjectsSelector), PROJECT_ATTRIBUTES,
@@ -387,6 +388,14 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
       return 'rank';
     }
     return null;
+  }
+
+  onIssueDetailsChange(event: MatSliderChange) {
+    this._store.dispatch(UserSettingActions.createUpdateIssueSummaryLevel(toIssueSummaryLevel(event.value)));
+  }
+
+  onChangeShowParallelTasks(event: MatCheckboxChange) {
+    this._store.dispatch(UserSettingActions.createUpdateShowParallelTasks(event.checked));
   }
 }
 

@@ -35,6 +35,7 @@ import {boardSelector} from '../../model/board/data/board.reducer';
 import {userSettingSelector} from '../../model/board/user/user-setting.reducer';
 import {RankViewEntry} from './rank-view-entry';
 import {BoardViewMode} from '../../model/board/user/board-view-mode';
+import {IssueDetailState} from '../../model/board/user/issue-detail/issue-detail.model';
 
 @Injectable()
 export class BoardViewModelService {
@@ -97,6 +98,8 @@ export class BoardViewModelHandler {
           changeType = ChangeType.TOGGLE_SWIMLANE_SHOW_EMPTY;
         } else if (userSettingState.collapsedSwimlanes !== this._lastUserSettingState.collapsedSwimlanes) {
           changeType = ChangeType.TOGGLE_SWIMLANE_COLLAPSED;
+        } else if (userSettingState.issueDetail !== this._lastUserSettingState.issueDetail) {
+          changeType = ChangeType.UPDATE_ISSUE_DETAIL;
         }
       }
 
@@ -141,10 +144,15 @@ class BoardViewBuilder {
     headersBuilder.updateIssueHeaderCounts(issueTable, issueTableBuilder.visibleIssueCounts);
 
     const newHeaders: BoardHeaders = headersBuilder.build();
-    if (newHeaders !== this._oldBoardView.headers || issueTable !== this._oldBoardView.issueTable) {
+    const newIssueDetail: IssueDetailState = this._currentUserSettingState.issueDetail;
+    if (
+      newHeaders !== this._oldBoardView.headers ||
+      issueTable !== this._oldBoardView.issueTable ||
+      newIssueDetail !== this._oldBoardView.issueDetail) {
       return BoardViewModelUtil.updateBoardViewModel(this._oldBoardView, model => {
         model.headers = newHeaders,
-        model.issueTable = issueTable
+        model.issueTable = issueTable,
+        model.issueDetail = newIssueDetail
       });
     } else {
       return this._oldBoardView;
@@ -562,6 +570,8 @@ class IssueTableBuilder {
       case ChangeType.APPLY_FILTERS:
       case ChangeType.CHANGE_SWIMLANE:
       case ChangeType.CHANGE_COLUMN_VISIBILITY:
+      case ChangeType.TOGGLE_SWIMLANE_COLLAPSED:
+      case ChangeType.UPDATE_ISSUE_DETAIL:
         return;
     }
 
@@ -654,10 +664,13 @@ class IssueTableBuilder {
       }
     }
 
-    this.populateSwimlanes(swimlaneBuilder, issues, table);
-    swimlaneBuilder.applySwimlaneFilters();
+    if (swimlaneBuilder) {
+      this.populateSwimlanes(swimlaneBuilder, issues, table);
+      swimlaneBuilder.applySwimlaneFilters();
 
-    return swimlaneBuilder.build();
+      return swimlaneBuilder.build();
+    }
+    return this._oldIssueTableState.swimlaneInfo;
   }
 
   private populateSwimlanes(swimlaneBuilder: SwimlaneInfoBuilder,
@@ -776,9 +789,7 @@ class SwimlaneInfoBuilder {
   private constructor(
     private _boardState: BoardState,
     private _userSettingState: UserSettingState,
-    private readonly _issueMatcher:
-      (issue: BoardIssueView, dataBuilders:
-        OrderedMap<string, SwimlaneDataBuilder>) => SwimlaneDataBuilder[],
+    private _issueMatcher: (issue: BoardIssueView, dataBuilders: OrderedMap<string, SwimlaneDataBuilder>) => SwimlaneDataBuilder[],
     private readonly _dataBuilders: Map<string, SwimlaneDataBuilder>,
     private readonly _existing: SwimlaneInfo) {
   }
@@ -1134,7 +1145,8 @@ enum ChangeType {
   CHANGE_COLUMN_VISIBILITY,
   TOGGLE_SWIMLANE_SHOW_EMPTY,
   TOGGLE_SWIMLANE_COLLAPSED,
-  SWITCH_VIEW_MODE
+  SWITCH_VIEW_MODE,
+  UPDATE_ISSUE_DETAIL
 }
 
 function collapsed(userSettingState: UserSettingState, key: string): boolean {

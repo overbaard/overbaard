@@ -8,6 +8,7 @@ import {List} from 'immutable';
 import {UserSettingState} from './user-setting';
 import {BoardViewMode} from './board-view-mode';
 import {BoardHeader} from '../../../view-model/board/board-header';
+import {IssueSummaryLevel} from './issue-summary-level';
 
 describe('User setting reducer tests', () => {
   describe('Querystring tests', () => {
@@ -28,7 +29,9 @@ describe('User setting reducer tests', () => {
       const qs: Dictionary<string> = {
         board: 'TEST',
         project: 'P1',
-        swimlane: 'assignee'
+        swimlane: 'assignee',
+        'isl': '0',
+        'vpt': 'true'
       };
       const state: UserSettingState = userSettingReducer(
         initialUserSettingState,
@@ -37,6 +40,7 @@ describe('User setting reducer tests', () => {
       settingChecker.boardCode = 'TEST';
       settingChecker.filterChecker.project = ['P1'];
       settingChecker.swimlane = 'assignee';
+      settingChecker.issueSummaryLevel = IssueSummaryLevel.HEADER_ONLY;
       settingChecker.check(state)
     });
     it ('With Querystring, bl=false and visible columns', () => {
@@ -48,7 +52,9 @@ describe('User setting reducer tests', () => {
         swimlane: 'project',
         showEmptySl: 'true',
         visible: '1,5,7',
-        'visible-sl': 'a,b,c'
+        'visible-sl': 'a,b,c',
+        'isl': '1',
+        'vpt': 'false'
       };
       const state: UserSettingState = userSettingReducer(
         initialUserSettingState,
@@ -62,6 +68,8 @@ describe('User setting reducer tests', () => {
       settingChecker.defaultColumnVisibility = false;
       settingChecker.collapsedSwimlanes = {a: false, b: false, c: false};
       settingChecker.defaultSwimlaneCollapsed = true;
+      settingChecker.issueSummaryLevel = IssueSummaryLevel.SHORT_SUMMARY_NO_AVATAR;
+      settingChecker.parallelTasks = false;
       settingChecker.check(state)
     });
     it ('With Querystring, bl=true and hidden columns', () => {
@@ -73,7 +81,8 @@ describe('User setting reducer tests', () => {
         swimlane: 'project',
         showEmptySl: 'false',
         hidden: '2,6,8',
-        'hidden-sl': 'd,e,f'
+        'hidden-sl': 'd,e,f',
+        'isl': '2'
       };
       const state: UserSettingState = userSettingReducer(
         initialUserSettingState,
@@ -86,6 +95,7 @@ describe('User setting reducer tests', () => {
       settingChecker.visibleColumns = {2: false, 6: false, 8: false}
       settingChecker.collapsedSwimlanes = {d: true, e: true, f: true};
       settingChecker.defaultSwimlaneCollapsed = false;
+      settingChecker.issueSummaryLevel = IssueSummaryLevel.SHORT_SUMMARY;
 
       settingChecker.check(state)
     });
@@ -108,6 +118,26 @@ describe('User setting reducer tests', () => {
       const checker: SettingChecker = new SettingChecker();
       checker.boardCode = 'TEST';
       checker.filterChecker.project = ['P2', 'P3'];
+      checker.check(state);
+    });
+
+    it ('Update issue summary level', () => {
+      state = userSettingReducer(state, UserSettingActions.createUpdateIssueSummaryLevel(IssueSummaryLevel.SHORT_SUMMARY_NO_AVATAR));
+      const checker: SettingChecker = new SettingChecker();
+      checker.boardCode = 'TEST';
+      checker.issueSummaryLevel = IssueSummaryLevel.SHORT_SUMMARY_NO_AVATAR;
+      checker.check(state);
+    });
+
+    it ('Update show parallel tasks', () => {
+      state = userSettingReducer(state, UserSettingActions.createUpdateShowParallelTasks(false));
+      const checker: SettingChecker = new SettingChecker();
+      checker.boardCode = 'TEST';
+      checker.parallelTasks = false;
+      checker.check(state);
+
+      state = userSettingReducer(state, UserSettingActions.createUpdateShowParallelTasks(true));
+      checker.parallelTasks = true;
       checker.check(state);
     });
 
@@ -594,6 +624,8 @@ class SettingChecker {
   showEmptySwimlane = false;
   defaultSwimlaneCollapsed = false;
   collapsedSwimlanes: any;
+  issueSummaryLevel: IssueSummaryLevel = IssueSummaryLevel.FULL;
+  parallelTasks = true;
 
   constructor() {
     for (const key of Object.keys(this.filterChecker)) {
@@ -628,5 +660,7 @@ class SettingChecker {
     } else {
       expect(state.collapsedSwimlanes.toObject()).toEqual(this.collapsedSwimlanes);
     }
+    expect(state.issueDetail.issueSummaryLevel).toBe(this.issueSummaryLevel);
+    expect(state.issueDetail.parallelTasks).toBe(this.parallelTasks);
   }
 }

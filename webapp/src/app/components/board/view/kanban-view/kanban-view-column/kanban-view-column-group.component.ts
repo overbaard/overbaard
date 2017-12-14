@@ -7,6 +7,8 @@ import {BoardIssueView} from '../../../../../view-model/board/board-issue-view';
 import {IssueTable} from '../../../../../view-model/board/issue-table';
 import {BoardHeader} from '../../../../../view-model/board/board-header';
 import {UpdateParallelTaskEvent} from '../../../../../events/update-parallel-task.event';
+import {IssueSummaryLevel} from '../../../../../model/board/user/issue-summary-level';
+import {IssueDetailState} from '../../../../../model/board/user/issue-detail/issue-detail.model';
 
 @Component({
   selector: 'app-kanban-view-column-group]',
@@ -24,6 +26,9 @@ export class KanbanViewColumnGroupComponent implements OnInit, OnChanges {
 
   @Input()
   table: List<List<string>>;
+
+  @Input()
+  issueDetailState: IssueDetailState;
 
   // If a swimlane is collapsed, we still need to display empty columns so the header has the correct width
   @Input()

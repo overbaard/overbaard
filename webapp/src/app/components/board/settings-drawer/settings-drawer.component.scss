@@ -7,3 +7,13 @@
 .cancel-button {
   @include sized-icon-button-class(18px, 18px, 18px);
 }
+.mat-h4 {
+  margin-bottom: 0px;
+}
+.mat-card {
+  padding-top: 18px;
+  padding-bottom: 12px;
+}
+.card-header {
+  /*margin: -8px;*/
+}

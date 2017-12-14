@@ -2,6 +2,8 @@ import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output}
 import {RankViewEntry} from '../../../../view-model/board/rank-view-entry';
 import {BoardIssueView} from '../../../../view-model/board/board-issue-view';
 import {UpdateParallelTaskEvent} from '../../../../events/update-parallel-task.event';
+import {IssueSummaryLevel} from '../../../../model/board/user/issue-summary-level';
+import {IssueDetailState} from '../../../../model/board/user/issue-detail/issue-detail.model';
 
 @Component({
   selector: 'app-rank-view-entry',

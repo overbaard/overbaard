@@ -4,6 +4,8 @@
 import {Input, OnChanges, SimpleChange, SimpleChanges} from '@angular/core';
 import {BoardViewModel} from '../../../view-model/board/board-view';
 import {BOARD_HEADERS_HEIGHT, TOOLBAR_HEIGHT} from '../../../common/view-constants';
+import {IssueSummaryLevel} from '../../../model/board/user/issue-summary-level';
+import {IssueDetailState} from '../../../model/board/user/issue-detail/issue-detail.model';
 
 export class FixedHeaderView implements OnChanges {
 
@@ -15,6 +17,9 @@ export class FixedHeaderView implements OnChanges {
 
   @Input()
   windowWidth: number;
+
+  @Input()
+  issueDetailState: IssueDetailState;
 
   boardLeftOffset = 0;
 

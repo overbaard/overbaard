@@ -13,6 +13,7 @@ import {List, OrderedSet, Set} from 'immutable';
 import {Dictionary} from '../../common/dictionary';
 import {BoardViewModel} from './board-view';
 import {BoardHeader} from './board-header';
+import {initialIssueDetailState} from '../../model/board/user/issue-detail/issue-detail.model';
 
 describe('Issue Table observer tests', () => {
 
@@ -1211,6 +1212,9 @@ class BoardChecker {
   }
 
   checkBoard(board: BoardViewModel) {
+    // We are not changing the issue details in this test
+    expect(board.issueDetail).toBe(initialIssueDetailState);
+
     const issueTable: IssueTable = board.issueTable;
 
     const actualTable: string[][] = [];

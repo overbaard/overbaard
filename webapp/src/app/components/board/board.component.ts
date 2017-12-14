@@ -41,7 +41,6 @@ export class BoardComponent implements OnInit, OnDestroy {
   windowWidth: number;
 
   userSettings$: Observable<UserSettingState>;
-  showControlPanel = false;
 
   private _destroy$: Subject<boolean> = new Subject<boolean>();
 

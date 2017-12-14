@@ -71,9 +71,13 @@ img.avatar {
   font-size: 32px;
   line-height: 32px;
 }
-.full-summary {
+.summary {
   min-height: 34px;
   word-wrap:break-word;
+}
+.short-summary {
+  max-height: 40px;
+  overflow: hidden;
 }
 .parallel-tasks-container {
   display: flex;

@@ -8,6 +8,7 @@ import {IssueTable} from './issue-table';
 import {BoardHeaders} from './board-headers';
 import {SwimlaneInfo} from './swimlane-info';
 import {RankViewEntry} from './rank-view-entry';
+import {initialIssueDetailState} from '../../model/board/user/issue-detail/issue-detail.model';
 
 
 const DEFAULT_BOARD_HEADERS: BoardHeaders = {
@@ -16,7 +17,8 @@ const DEFAULT_BOARD_HEADERS: BoardHeaders = {
 
 const DEFAULT_BOARD_VIEW: BoardViewModel = {
   headers: null,    // The initial state will have this set to initialBoardHeaders, declared below
-  issueTable: null  // The initial state will have this set to initialIssueTable, declared below
+  issueTable: null,  // The initial state will have this set to initialIssueTable, declared below
+  issueDetail: initialIssueDetailState
 };
 
 
@@ -92,7 +94,9 @@ const initialBoardHeaders: BoardHeaders = BOARD_HEADERS_FACTORY(DEFAULT_BOARD_HE
 export const initialIssueTable: IssueTable = ISSUE_TABLE_STATE_FACTORY(DEFAULT_ISSUE_TABLE);
 export const initialBoardViewModel: BoardViewModel = BOARD_VIEW_MODEL_FACTORY({
   headers: initialBoardHeaders,
-  issueTable: initialIssueTable});
+  issueTable: initialIssueTable,
+  issueDetail: initialIssueDetailState
+});
 
 export class BoardViewModelUtil {
   static updateBoardViewModel(boardViewModel: BoardViewModel, mutate: (boardViewModel: BoardViewModel) => any): BoardViewModel {

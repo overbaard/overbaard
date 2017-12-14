@@ -14,6 +14,8 @@ import {List, Map, Set} from 'immutable';
 import {BoardFilterUtil, initialBoardFilterState} from '../model/board/user/board-filter/board-filter.model';
 import {HeaderUtil, initialHeaderState} from '../model/board/data/header/header.model';
 import {HeaderState} from '../model/board/data/header/header.state';
+import {IssueSummaryLevel} from '../model/board/user/issue-summary-level';
+import {IssueDetailUtil} from '../model/board/user/issue-detail/issue-detail.model';
 
 describe('Boards Query Parameters Service Tests', () => {
   const userSettingSubject: Subject<UserSettingState> = new BehaviorSubject<UserSettingState>(initialUserSettingState);
@@ -73,6 +75,10 @@ describe('Boards Query Parameters Service Tests', () => {
         mutable.boardCode = 'TEST&=123';
         mutable.showBacklog = false;
         mutable.viewMode = BoardViewMode.KANBAN;
+        mutable.issueDetail = IssueDetailUtil.updateIssueDetailState(mutable.issueDetail, issueDetail => {
+          issueDetail.issueSummaryLevel = IssueSummaryLevel.FULL;
+          issueDetail.parallelTasks = true;
+        });
       });
       userSettingSubject.next(newSetting);
       urlObservable.take(1).subscribe(s => {
@@ -98,6 +104,10 @@ describe('Boards Query Parameters Service Tests', () => {
         mutable.boardCode = 'TEST&=123';
         mutable.showBacklog = true;
         mutable.viewMode = BoardViewMode.RANK;
+        mutable.issueDetail = IssueDetailUtil.updateIssueDetailState(mutable.issueDetail, issueDetail => {
+          issueDetail.issueSummaryLevel = IssueSummaryLevel.SHORT_SUMMARY_NO_AVATAR;
+          issueDetail.parallelTasks = false;
+        })
         mutable.forceBacklog = true;
         mutable.swimlane = 'project'; // Not really valid when we use rank but still
         mutable.filters = BoardFilterUtil.updateBoardFilterState(initialBoardFilterState, mutable2 => {

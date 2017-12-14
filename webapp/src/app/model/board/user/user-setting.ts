@@ -1,6 +1,7 @@
 import {BoardFilterState} from './board-filter/board-filter.model';
 import {Map} from 'immutable';
 import {BoardViewMode} from './board-view-mode';
+import {IssueDetailState} from './issue-detail/issue-detail.model';
 
 export interface UserSettingState {
   boardCode: string;
@@ -19,4 +20,7 @@ export interface UserSettingState {
   defaultCollapsedSwimlane: boolean;
   /** The collapsed swimlanes if any, initially set up by the query parameters */
   collapsedSwimlanes: Map<string, boolean>;
+
+  issueDetail: IssueDetailState;
+
 }

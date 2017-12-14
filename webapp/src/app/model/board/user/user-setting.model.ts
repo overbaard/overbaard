@@ -1,8 +1,10 @@
 import {initialBoardFilterState} from './board-filter/board-filter.model';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
-import {List, Map} from 'immutable';
+import {Map} from 'immutable';
 import {UserSettingState} from './user-setting';
 import {BoardViewMode} from './board-view-mode';
+import {IssueSummaryLevel} from './issue-summary-level';
+import {initialIssueDetailState} from './issue-detail/issue-detail.model';
 
 const DEFAULT_STATE: UserSettingState = {
   boardCode: '',
@@ -15,8 +17,10 @@ const DEFAULT_STATE: UserSettingState = {
   defaultColumnVisibility: true,
   columnVisibilities: Map<number, boolean>(),
   defaultCollapsedSwimlane: false,
-  collapsedSwimlanes: Map<string, boolean>()
+  collapsedSwimlanes: Map<string, boolean>(),
+  issueDetail: initialIssueDetailState
 };
+
 
 interface UserSettingStateRecord extends TypedRecord<UserSettingStateRecord>, UserSettingState {
 }
@@ -31,9 +35,4 @@ export class UserSettingUtil {
       return mutate(mutable);
     });
   }
-
-  static fromObject(object: UserSettingState) {
-    return STATE_FACTORY(object);
-  }
-
 }

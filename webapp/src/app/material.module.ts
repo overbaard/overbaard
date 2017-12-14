@@ -11,7 +11,7 @@ import {
   MatMenuModule,
   MatProgressSpinnerModule,
   MatSelectModule,
-  MatSidenavModule,
+  MatSidenavModule, MatSliderModule,
   MatToolbarModule,
   MatTooltipModule
 } from '@angular/material';
@@ -32,6 +32,7 @@ const materialModules: Array<Type<any>> = [
   MatProgressSpinnerModule,
   MatSidenavModule,
   MatSelectModule,
+  MatSliderModule,
   MatToolbarModule,
   MatTooltipModule]
 

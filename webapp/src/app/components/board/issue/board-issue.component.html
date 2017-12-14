@@ -35,28 +35,37 @@
            [ngStyle]="{'border-bottom-color': issue.type.colour}"
             matTooltip="Issue Type: {{issue.type.name}}"></div>
     </div>
-    <div class="full-summary">
-      <div class="mat-caption">
-        <div class="avatar-container" matTooltip="{{issue.assignee.name}}">
-          <img
-            *ngIf="issue.assignee.avatar"
-            class="avatar"
-            src="{{issue.assignee.avatar}}">
-          <mat-icon
-            *ngIf="!issue.assignee.avatar"
-            class="avatar-icon">person_outline</mat-icon>
-        </div>
+    <div
+      *ngIf="showSummary; else noSummary"
+      class="summary">
+      <div
+        *ngIf="showAvatar"
+        class="avatar-container" matTooltip="{{issue.assignee.name}}">
+        <img
+          *ngIf="issue.assignee.avatar"
+          class="avatar"
+          src="{{issue.assignee.avatar}}">
+        <mat-icon
+          *ngIf="!issue.assignee.avatar"
+          class="avatar-icon">person_outline</mat-icon>
+      </div>
+      <div class="mat-caption"
+           [class.short-summary]="shortSummary">
         {{issue.summary}}
       </div>
+
+      <ng-container *ngTemplateOutlet="noSummary"></ng-container>
     </div>
-    <div *ngIf="issue.selectedParallelTasks" class="parallel-tasks-container">
-      <!-- Display of the parallel tasks -->
-      <app-parallel-task
-        *ngFor="let pt of issue.parallelTasks ; let i = index"
-        [issue]="issue"
-        [taskIndex]="i"
-        (updateParallelTask)="onUpdateParallelTask($event)"
-      ></app-parallel-task>
-    </div>
+    <ng-template #noSummary>
+      <div *ngIf="issue.selectedParallelTasks && issueDetailState.parallelTasks" class="parallel-tasks-container">
+        <!-- Display of the parallel tasks -->
+        <app-parallel-task
+          *ngFor="let pt of issue.parallelTasks ; let i = index"
+          [issue]="issue"
+          [taskIndex]="i"
+          (updateParallelTask)="onUpdateParallelTask($event)"
+        ></app-parallel-task>
+      </div>
+    </ng-template>
   </mat-card-content>
 </mat-card>

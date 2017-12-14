@@ -11,6 +11,8 @@ import {
 import {UserSettingState} from './user-setting';
 import {AppState} from '../../../app-store';
 import {BoardViewMode} from './board-view-mode';
+import {IssueSummaryLevel, toIssueSummaryLevel} from './issue-summary-level';
+import {IssueDetailState, IssueDetailUtil} from './issue-detail/issue-detail.model';
 
 const CLEAR_SETTINGS = 'CLEAR_SETTINGS';
 
@@ -20,6 +22,8 @@ const TOGGLE_BACKLOG = 'TOGGLE_HIDE_BACKLOG';
 const TOGGLE_SHOW_EMPTY_SWIMLANES = 'TOGGLE_SHOW_EMPTY_SWIMLANES';
 const TOGGLE_COLLAPSED_SWIMLANE = 'TOGGLE_COLLAPSED_SWIMLANE';
 const SWITCH_BOARD_VIEW = 'SWITCH_BOARD_VIEW';
+const UPDATE_ISSUE_DETAIL_LEVEL = 'UPDATE_ISSUE_DETAIL_LEVEL';
+const UPDATE_SHOW_PARALLEL_TASKS = 'UPDATE_SHOW_PARALLEL_TASKS';
 
 class ClearSettingsAction implements Action {
   readonly type = CLEAR_SETTINGS;
@@ -61,6 +65,18 @@ class SwitchBoardViewAction {
   }
 }
 
+class UpdateIssueSummaryLevelAction {
+  readonly type = UPDATE_ISSUE_DETAIL_LEVEL;
+  constructor(readonly payload: IssueSummaryLevel) {
+  }
+}
+
+class UpdateShowParallelTasksAction {
+  readonly type = UPDATE_SHOW_PARALLEL_TASKS;
+  constructor(readonly payload: boolean) {
+  }
+}
+
 export class UserSettingActions {
   static createClearSettings() {
     return new ClearSettingsAction();
@@ -93,6 +109,14 @@ export class UserSettingActions {
   static createSwitchBoardViewAction(): Action {
     return new SwitchBoardViewAction();
   }
+
+  static createUpdateIssueSummaryLevel(level: IssueSummaryLevel): Action {
+    return new UpdateIssueSummaryLevelAction(level);
+  }
+
+  static createUpdateShowParallelTasks(show: boolean): Action {
+    return new UpdateShowParallelTasksAction(show);
+  }
 }
 
 export function userSettingReducer(state: UserSettingState = initialUserSettingState, action: Action): UserSettingState {
@@ -111,6 +135,12 @@ export function userSettingReducer(state: UserSettingState = initialUserSettingS
         mutable.filters = boardFilterMetaReducer(state.filters, action);
         mutable.defaultColumnVisibility = initAction.getVisibleColumnDefault();
         mutable.columnVisibilities = initAction.parseVisibleColumns();
+          mutable.issueDetail = IssueDetailUtil.updateIssueDetailState(mutable.issueDetail, issueDetail => {
+            if (params['isl']) {
+              issueDetail.issueSummaryLevel = toIssueSummaryLevel(Number(params['isl']));
+            }
+            issueDetail.parallelTasks = !(params['vpt'] === 'false');
+          });
         mutable.swimlane = params['swimlane'];
         if (mutable.swimlane) {
           mutable.swimlaneShowEmpty = params['showEmptySl'] === 'true';
@@ -190,6 +220,22 @@ export function userSettingReducer(state: UserSettingState = initialUserSettingS
         }
       });
     }
+    case UPDATE_ISSUE_DETAIL_LEVEL: {
+      const newLevel: IssueSummaryLevel = (<UpdateIssueSummaryLevelAction>action).payload;
+      return UserSettingUtil.updateUserSettingState(state, settingState => {
+        settingState.issueDetail = IssueDetailUtil.updateIssueDetailState(settingState.issueDetail, issueDetail => {
+          issueDetail.issueSummaryLevel = newLevel;
+        });
+      });
+    }
+    case UPDATE_SHOW_PARALLEL_TASKS: {
+      const show: boolean = (<UpdateShowParallelTasksAction>action).payload;
+      return UserSettingUtil.updateUserSettingState(state, settingState => {
+        settingState.issueDetail = IssueDetailUtil.updateIssueDetailState(settingState.issueDetail, issueDetail => {
+          issueDetail.parallelTasks = show;
+        });
+      });
+    }
   }
   // Delegate other actions like updating the filters
   return UserSettingUtil.updateUserSettingState(state, mutable => {
@@ -200,11 +246,6 @@ export function userSettingReducer(state: UserSettingState = initialUserSettingS
 interface ToggleVisibilityPayload {
   newValue: boolean;
   states: List<number>;
-}
-
-interface InitialiseStatesPayload {
-  numStates: number;
-  backlog: number;
 }
 
 export const userSettingSelector = (state: AppState) => state.userSettings;

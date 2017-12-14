@@ -3,6 +3,8 @@ import {SwimlaneData} from '../../../../../view-model/board/swimlane-data';
 import {BoardViewModel} from '../../../../../view-model/board/board-view';
 import {SwimlaneInfo} from '../../../../../view-model/board/swimlane-info';
 import {UpdateParallelTaskEvent} from '../../../../../events/update-parallel-task.event';
+import {IssueSummaryLevel} from '../../../../../model/board/user/issue-summary-level';
+import {IssueDetailState} from '../../../../../model/board/user/issue-detail/issue-detail.model';
 
 @Component({
   selector: 'app-kanban-swimlane-view',

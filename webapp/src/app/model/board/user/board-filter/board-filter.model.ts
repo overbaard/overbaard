@@ -1,6 +1,5 @@
 import {Map, Set} from 'immutable';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
-import {BoardIssueView} from '../../../../view-model/board/board-issue-view';
 
 export interface BoardFilterState {
   project: Set<string>;
