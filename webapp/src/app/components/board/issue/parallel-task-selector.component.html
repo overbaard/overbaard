@@ -1,10 +1,11 @@
 <div class="dialog-wrapper">
-  <div class="mat-h4">{{parallelTask.name}}</div>
+  <div class="mat-caption">{{parallelTask.name}}</div>
   <mat-dialog-content>
     <div class="options-wrapper">
       <div
         *ngFor="let option of parallelTask.options ; let i = index"
         class="option"
+        matTooltip="{{option.name}}"
         (mouseover)="onOverOption(i)"
         (mouseout)="onOverOption(-1)"
       >
@@ -17,12 +18,9 @@
         <div
           class="option-footer"
           [class.issue-option]="option === issueOption"
-          [class.selected-option]="option !== issueOption && option === selectedOption"
+          [ngStyle]="{'border-bottom-color': option !== issueOption && option === selectedOption ? option.colour : null}"
         ></div>
       </div>
-    </div>
-    <div class="mat-caption">
-      {{option.name}}
     </div>
   </mat-dialog-content>
 </div>
