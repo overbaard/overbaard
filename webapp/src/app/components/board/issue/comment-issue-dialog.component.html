@@ -1,0 +1,32 @@
+<div class="dialog-wrapper">
+  <div class="mat-h4">
+    Comment on {{issue.key}}
+  </div>
+  <div class="mat-caption">{{issue.summary}}</div>
+  <form (ngSubmit)="onSave()" [formGroup]="commentForm" #f="ngForm">
+    <mat-form-field style="width: 100%">
+      <textarea
+        matInput
+        matTextareaAutosize
+        matAutosizeMinRows="10"
+        matAutosizeMaxRows="10"
+        name="comment"
+        formControlName="comment"
+      >
+      </textarea>
+    </mat-form-field>
+    <div>
+      <a
+        href="cancel"
+        (click)="onCancel($event)"
+        mat-raised-button
+        color="accent"
+      >Cancel</a>
+      <button
+        type="submit"
+        mat-raised-button
+        color="primary"
+      >Save</button>
+    </div>
+  </form>
+</div>

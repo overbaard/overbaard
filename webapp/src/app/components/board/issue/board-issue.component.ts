@@ -1,16 +1,26 @@
 import {
-  ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange,
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChange,
   SimpleChanges
 } from '@angular/core';
 import {BoardIssueView} from '../../../view-model/board/board-issue-view';
 import {Assignee, NO_ASSIGNEE} from '../../../model/board/data/assignee/assignee.model';
 import {Set} from 'immutable';
-import {ParallelTask} from '../../../model/board/data/project/project.model';
 import {MatDialog} from '@angular/material';
-import {ParallelTaskSelectorComponent} from './parallel-task-selector.component';
 import {UpdateParallelTaskEvent} from '../../../events/update-parallel-task.event';
 import {IssueSummaryLevel} from '../../../model/board/user/issue-summary-level';
 import {IssueDetailState} from '../../../model/board/user/issue-detail/issue-detail.model';
+import {MoveIssueDialogComponent} from './move-issue-dialog.component';
+import {CommentIssueDialogComponent} from './comment-issue-dialog.component';
+import {BoardService} from '../../../services/board.service';
+import {RankIssueDialogComponent} from './rank-issue-dialog.component';
+import {BoardViewMode} from '../../../model/board/user/board-view-mode';
 
 @Component({
   selector: 'app-board-issue',
@@ -31,10 +41,15 @@ export class BoardIssueComponent implements OnInit, OnChanges {
   @Input()
   issueDetailState: IssueDetailState;
 
+  @Input()
+  viewMode: BoardViewMode = BoardViewMode.KANBAN;
+
   cardTooltip: string;
 
+  viewModeEnum = BoardViewMode;
 
-  constructor() { }
+
+  constructor(public menuDialog: MatDialog, private _boardService: BoardService) { }
 
   ngOnInit() {
   }
@@ -104,5 +119,32 @@ export class BoardIssueComponent implements OnInit, OnChanges {
       s += v;
     });
     return s;
+  }
+
+  onOpenMoveIssueDialog(event: MouseEvent) {
+    const dialogRef = this.menuDialog.open(MoveIssueDialogComponent, {
+      data: {
+        issue: this.issue,
+        boardService: this._boardService
+      }
+    });
+  }
+
+  onOpenCommentIssueDialog(event: MouseEvent) {
+    const dialogRef = this.menuDialog.open(CommentIssueDialogComponent, {
+      data: {
+        issue: this.issue,
+        boardService: this._boardService
+      }
+    });
+  }
+
+  onOpenRankIssueDialog(event: MouseEvent) {
+    const dialogRef = this.menuDialog.open(RankIssueDialogComponent, {
+      data: {
+        issue: this.issue,
+        boardService: this._boardService
+      }
+    });
   }
 }

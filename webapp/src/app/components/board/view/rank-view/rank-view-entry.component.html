@@ -3,6 +3,8 @@
   <div class="rank-issue">
     <app-board-issue
       [issue]="issue"
+      [viewMode]="rankViewMode"
+      [issueDetailState]="issueDetailState"
       (updateParallelTask)="onUpdateParallelTask($event)"
     ></app-board-issue>
   </div>

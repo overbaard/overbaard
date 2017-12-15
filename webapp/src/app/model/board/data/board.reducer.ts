@@ -263,3 +263,4 @@ function addAll(result: string[], input: any, ...keys: string[]) {
 export const boardSelector = (state: AppState) => state.board;
 const getViewId = (state: BoardState) => state.viewId;
 export const boardViewIdSelector = createSelector(boardSelector, getViewId)
+

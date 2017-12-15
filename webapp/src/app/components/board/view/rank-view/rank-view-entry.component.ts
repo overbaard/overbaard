@@ -2,7 +2,7 @@ import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output}
 import {RankViewEntry} from '../../../../view-model/board/rank-view-entry';
 import {BoardIssueView} from '../../../../view-model/board/board-issue-view';
 import {UpdateParallelTaskEvent} from '../../../../events/update-parallel-task.event';
-import {IssueSummaryLevel} from '../../../../model/board/user/issue-summary-level';
+import {BoardViewMode} from '../../../../model/board/user/board-view-mode';
 import {IssueDetailState} from '../../../../model/board/user/issue-detail/issue-detail.model';
 
 @Component({
@@ -23,8 +23,14 @@ export class RankViewEntryComponent implements OnInit {
   @Input()
   statesDummyArray: number[];
 
+  @Input()
+  issueDetailState: IssueDetailState;
+
+
   @Output()
   updateParallelTask: EventEmitter<UpdateParallelTaskEvent> = new EventEmitter<UpdateParallelTaskEvent>();
+
+  rankViewMode: BoardViewMode = BoardViewMode.RANK;
 
   constructor() {
   }

@@ -35,6 +35,10 @@ import {BoardSettingsDrawerComponent} from './components/board/settings-drawer/s
 import {VersionService} from './services/version.service';
 import {ParallelTaskSelectorComponent} from './components/board/issue/parallel-task-selector.component';
 import {ParallelTaskComponent} from './components/board/issue/parallel-task.component';
+import {MoveIssueDialogComponent} from './components/board/issue/move-issue-dialog.component';
+import {CommentIssueDialogComponent} from './components/board/issue/comment-issue-dialog.component';
+import {MatSnackBar} from '@angular/material';
+import {RankIssueDialogComponent} from './components/board/issue/rank-issue-dialog.component';
 
 @NgModule({
   declarations: [
@@ -58,9 +62,16 @@ import {ParallelTaskComponent} from './components/board/issue/parallel-task.comp
     BoardHeadersContainerComponent,
     BoardIssueComponent,
     ParallelTaskComponent,
-    ParallelTaskSelectorComponent
+    ParallelTaskSelectorComponent,
+    MoveIssueDialogComponent,
+    CommentIssueDialogComponent,
+    RankIssueDialogComponent
   ],
-  entryComponents: [ParallelTaskSelectorComponent],
+  entryComponents: [
+    CommentIssueDialogComponent,
+    MoveIssueDialogComponent,
+    ParallelTaskSelectorComponent,
+    RankIssueDialogComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -84,4 +95,8 @@ import {ParallelTaskComponent} from './components/board/issue/parallel-task.comp
   bootstrap: [AppComponent]
 })
 export class AppModule {
+  constructor() {
+  }
+
+
 }

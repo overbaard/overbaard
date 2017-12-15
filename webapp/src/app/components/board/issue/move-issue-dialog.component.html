@@ -1,0 +1,21 @@
+<div class="dialog-wrapper">
+  <div class="mat-h4">
+    Move {{issue.key}} from {{currentBoardState}}
+  </div>
+  <div class="mat-caption">{{issue.summary}}</div>
+  <div
+    class="state-list-container">
+    <mat-nav-list dense>
+      <mat-list-item dense
+        *ngFor="let stateInfo of stateInfos"
+        [class.current-state]="stateInfo.currentState"
+        [class.disabled]="!stateInfo.ownState">
+        <a
+          *ngIf="stateInfo.ownState"
+          (click)="onSelectToState(stateInfo)">{{stateInfo.boardState}}</a>
+        <span
+          *ngIf="!stateInfo.ownState">{{stateInfo.boardState}}</span>
+      </mat-list-item>
+    </mat-nav-list>
+  </div>
+</div>

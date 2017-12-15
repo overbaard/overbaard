@@ -15,7 +15,13 @@
       </span>
       <span class="mat-h4" matTooltip="{{issue.assignee.name}}">{{issue.assignee.initials}}</span>
       <span class="mat-h4">
-        <button mat-icon-button class="menu-icon-button">
+        <button
+          mat-icon-button
+          class="menu-icon-button"
+          [matMenuTriggerFor]="issueMenu">
+
+          <!-- (click)="onClickMenuButton()" -->
+          <!--[matMenuTriggerFor]="issueMenu">-->
           <mat-icon class="menu-icon">more_vert</mat-icon>
         </button>
       </span>
@@ -69,3 +75,17 @@
     </ng-template>
   </mat-card-content>
 </mat-card>
+
+<mat-menu #issueMenu="matMenu">
+  <button
+    mat-menu-item
+    *ngIf="viewMode === viewModeEnum.KANBAN"
+    (click)="onOpenMoveIssueDialog($event)"><mat-icon>swap_horiz</mat-icon><span>Move</span></button>
+  <button
+    mat-menu-item
+    *ngIf="viewMode === viewModeEnum.RANK"
+    (click)="onOpenRankIssueDialog($event)"><mat-icon>swap_vert</mat-icon><span>Rank</span></button>
+  <button
+    mat-menu-item
+    (click)="onOpenCommentIssueDialog($event)"><mat-icon>comment</mat-icon><span>Comment</span></button>
+</mat-menu>

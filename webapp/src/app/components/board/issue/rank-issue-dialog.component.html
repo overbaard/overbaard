@@ -1,0 +1,25 @@
+<div class="dialog-wrapper">
+  <div class="mat-h4">
+    Rank {{issue.key}}
+  </div>
+  <div class="mat-caption">{{issue.summary}}</div>
+  <div
+    class="rank-list-container">
+    <mat-nav-list dense>
+      <mat-list-item dense
+        *ngFor="let current of issues; let i = index"
+        [class.current-state]="current.key === issue.key">
+        <a
+          *ngIf="current.key !== issue.key"
+          (click)="onRankIssueBefore($event, i)"><span class="issue-entry">{{current.key}} - {{current.summary}}</span></a>
+        <span
+          class="issue-entry"
+          *ngIf="current.key === issue.key">{{current.key}} - {{current.summary}}</span>
+      </mat-list-item>
+      <mat-list-item dense>
+        <a
+           (click)="onRankIssueBefore($event, -1)">-- END --</a>
+      </mat-list-item>
+    </mat-nav-list>
+  </div>
+</div>

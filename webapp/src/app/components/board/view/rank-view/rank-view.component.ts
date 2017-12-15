@@ -1,11 +1,16 @@
 import {
-  ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange,
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChange,
   SimpleChanges
 } from '@angular/core';
 import {FixedHeaderView} from '../fixed-header-view';
 import {BoardViewMode} from '../../../../model/board/user/board-view-mode';
 import {UpdateParallelTaskEvent} from '../../../../events/update-parallel-task.event';
-import {IssueSummaryLevel} from '../../../../model/board/user/issue-summary-level';
 
 @Component({
   selector: 'app-rank-view',

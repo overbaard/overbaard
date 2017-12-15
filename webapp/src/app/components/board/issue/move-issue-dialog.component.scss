@@ -1,0 +1,33 @@
+@import "../../../../styles";
+.dialog-wrapper {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  min-width: 350px;
+  max-width: 350px;
+}
+.mat-h4 {
+  margin: 0px;
+  color: $primary-colour;
+}
+.mat-dialog-content {
+  padding: 0px;
+  margin: 0px;
+}
+
+.state-list-container {
+  display: flex;
+  flex-direction: column;
+  max-height: 300px;
+  overflow: scroll;
+  border: 1px solid rgba(0,0,0,.50);
+}
+.current-state {
+  color: $primary-colour;
+}
+
+.disabled {
+  color: rgba(0,0,0,.50)!important;
+  /* This does not work */
+  cursor: default!important;
+}

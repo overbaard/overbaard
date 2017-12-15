@@ -2,6 +2,7 @@
   *ngFor="let rankEntry of board.issueTable.rankView"
   [rankEntry]="rankEntry"
   [issue]="board.issueTable.issues.get(rankEntry.issueKey)"
+  [issueDetailState]="board.issueDetail"
   [statesDummyArray]="statesDummyArray"
   (updateParallelTask)="onUpdateParallelTask($event)"
 >

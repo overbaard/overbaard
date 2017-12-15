@@ -11,7 +11,7 @@ import {
   MatMenuModule,
   MatProgressSpinnerModule,
   MatSelectModule,
-  MatSidenavModule, MatSliderModule,
+  MatSidenavModule, MatSliderModule, MatSnackBarModule,
   MatToolbarModule,
   MatTooltipModule
 } from '@angular/material';
@@ -30,6 +30,7 @@ const materialModules: Array<Type<any>> = [
   MatListModule,
   MatMenuModule,
   MatProgressSpinnerModule,
+  MatSnackBarModule,
   MatSidenavModule,
   MatSelectModule,
   MatSliderModule,

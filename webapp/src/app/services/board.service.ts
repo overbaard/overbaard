@@ -11,10 +11,12 @@ import {Store} from '@ngrx/store';
 import {AppState} from '../app-store';
 import {BoardActions, boardViewIdSelector} from '../model/board/data/board.reducer';
 import {showBacklogSelector} from '../model/board/user/user-setting.reducer';
+import {BoardIssueView} from '../view-model/board/board-issue-view';
 
 @Injectable()
 export class BoardService {
   static readonly _bigTimeout: number = 60000;
+  static readonly _smallTimeout: number = 20000;
 
   private _changePoller: ChangePoller;
 
@@ -27,10 +29,8 @@ export class BoardService {
 
   loadBoardData(boardCode: string, backlog: boolean) {
     // Cancel any background polling
-    if (this._changePoller) {
-      this._changePoller.destroy();
-      this._changePoller = null;
-    }
+    // Cancel any background polling
+    this.stopPolling();
 
     const progress: Progress = this._progressLog.startLoading();
     let url = UrlService.OVERBAARD_REST_PREFIX + '/issues/' + boardCode;
@@ -53,10 +53,8 @@ export class BoardService {
 
   setParallelTaskOption(boardCode: string, backlog: boolean, issueKey: string, taskIndex: number, selectedOptionIndex: number) {
     // Cancel any background polling
-    if (this._changePoller) {
-      this._changePoller.destroy();
-      this._changePoller = null;
-    }
+    // Cancel any background polling
+    this.stopPolling();
 
     const progress: Progress = this._progressLog.startLoading();
 
@@ -68,7 +66,7 @@ export class BoardService {
       'option-index': selectedOptionIndex
     }
 
-    return executeRequest(
+    executeRequest(
       progress,
       BoardService._bigTimeout,
       this._http.put(path, JSON.stringify(payload), {
@@ -82,6 +80,135 @@ export class BoardService {
       );
   }
 
+  saveIssueComment(boardCode: string, backlog: boolean, issue: BoardIssueView, comment: string, success: () => void) {
+    // Cancel any background polling
+    this.stopPolling();
+
+    const progress: Progress = this._progressLog.startLoading(`Commented on issue ${issue.key}`);
+
+    const path: string = this._restUrlService.jiraUrl + 'rest/api/2/issue/' + issue.key + '/comment';
+
+    const payload: any = {body: comment};
+
+    executeRequest(
+      progress,
+      BoardService._bigTimeout,
+      this._http.post(path, JSON.stringify(payload), {
+        headers : this.createHeaders()
+      }))
+      .take(1)
+      .subscribe(
+        data => {
+          success();
+          this.recreateChangePollerAndStartPolling(boardCode, backlog, true, 0);
+        }
+      );
+  }
+
+  rankIssue(rankCustomFieldId: number, boardCode: string, issue: BoardIssueView, beforeKey: string, afterKey: string, success: () => void) {
+    // Cancel any background polling
+    this.stopPolling();
+
+    let msg = `Ranked issue ${issue.key} `;
+    if (beforeKey) {
+      msg += `before ${beforeKey}`;
+    } else {
+      msg += 'to the end';
+    }
+    const progress: Progress = this._progressLog.startLoading(msg);
+    const path: string = this._restUrlService.jiraUrl + 'rest/greenhopper/1.0/rank';
+    console.log('Ranking issue ' + path);
+
+    const payload: any = {
+      customFieldId: rankCustomFieldId,
+      issueKeys: [issue.key],
+    };
+    if (beforeKey) {
+      payload.rankBeforeKey = beforeKey;
+    }
+    if (afterKey) {
+      payload.rankAfterKey = afterKey;
+    }
+    console.log(JSON.stringify(payload));
+
+    executeRequest(
+      progress,
+      BoardService._bigTimeout,
+      this._http.put(path, JSON.stringify(payload), {
+        headers : this.createHeaders()
+      }))
+      .take(1)
+      .subscribe(
+        data => {
+          success();
+          this.recreateChangePollerAndStartPolling(boardCode, true, true, 0);
+        }
+      );
+  }
+
+  moveIssue(boardCode: string, showBacklog: boolean, issue: BoardIssueView, boardState: string, ownState: string, success: () => void) {
+    // Cancel any background polling
+    this.stopPolling();
+
+    const progress: Progress = this._progressLog.startLoading(`Moved ${issue.key} to the ${boardState} column`);
+
+    // First get the transitions
+    const path = this._restUrlService.jiraUrl + 'rest/api/2/issue/' + issue.key + '/transitions';
+    console.log('Getting transitions for issue ' + path);
+    executeRequest(
+      progress,
+      BoardService._smallTimeout,
+      this._http.get(path))
+      .take(1)
+      .subscribe(data => {
+        this.getTransitionsAndPerformMove(boardCode, showBacklog, progress, issue, boardState, ownState, success, data);
+      });
+  }
+
+  private getTransitionsAndPerformMove(
+    boardCode: string, showBacklog: boolean, progress: Progress, issue: BoardIssueView, boardState: string,
+    ownState: string, success: () => void, transitionsValue: any) {
+
+    let transitionId = -1;
+    const transitions: any[] = transitionsValue['transitions'];
+    for (const transition of transitions) {
+      if (transition['to']) {
+        if (transition['to']['name'] === ownState) {
+          transitionId = transition.id;
+          break;
+        }
+      }
+    }
+
+    if (transitionId === -1) {
+      let state: string = boardState;
+      if (ownState !== boardState) {
+        state = state + '(' + ownState + ')';
+      }
+      progress.error('Could not find a valid transition to ' + state);
+      return;
+    }
+
+    const path = this._restUrlService.jiraUrl + 'rest/api/2/issue/' + issue.key + '/transitions';
+    const payload: any = {transition: {id: transitionId}};
+    console.log('Moving issue ' + path);
+
+    executeRequest(
+      progress,
+      BoardService._bigTimeout,
+      this._http.post(path, JSON.stringify(payload), {
+        headers : this.createHeaders()
+      }))
+      .take(1)
+      .subscribe(
+        data => {
+          success();
+          this.recreateChangePollerAndStartPolling(boardCode, showBacklog, true, 0);
+        }
+      );
+  }
+
+
   set visible(visible: boolean) {
     if (this._changePoller) {
       this._changePoller = this._changePoller.setVisible(visible);
@@ -94,7 +221,14 @@ export class BoardService {
     }
   }
 
-  recreateChangePollerAndStartPolling(boardCode: string, backlog: boolean, progressOnFirst: boolean, initialWait?: number) {
+  private stopPolling() {
+    if (this._changePoller) {
+      this._changePoller.destroy();
+      this._changePoller = null;
+    }
+  }
+
+  private recreateChangePollerAndStartPolling(boardCode: string, backlog: boolean, progressOnFirst: boolean, initialWait?: number) {
     if (this._changePoller) {
       this._changePoller.destroy();
       this._changePoller = name;
@@ -109,6 +243,7 @@ export class BoardService {
     return new HttpHeaders()
       .append('Content-Type', 'application/json');
   }
+
 }
 
 class ChangePoller {
