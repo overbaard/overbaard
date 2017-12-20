@@ -7,7 +7,8 @@ import {LogEntry} from './log-entry';
 const START_LOADING = 'START_LOADING';
 const COMPLETE_LOADING = 'COMPLETE_LOADING';
 const LOG_MESSAGE = 'LOG_MESSAGE';
-const CLEAR_FIRST_MESSAGE = 'CLEAR_FIRST_MESSAGE'
+const CLEAR_FIRST_MESSAGE = 'CLEAR_FIRST_MESSAGE';
+const NOT_LOGGED_IN = 'NOT_LOGGED_IN';
 
 
 export class StartLoadingAction implements Action {
@@ -28,6 +29,10 @@ export class ClearFirstMessageAction implements Action {
   type = CLEAR_FIRST_MESSAGE;
 }
 
+export class NotLoggedInAction implements Action {
+  type = NOT_LOGGED_IN;
+}
+
 export class ProgressLogActions {
 
   static createStartLoading(): Action {
@@ -45,16 +50,24 @@ export class ProgressLogActions {
   static createClearFirstMessage() {
     return new ClearFirstMessageAction();
   }
+
+  static createNotLoggedIn() {
+    return new NotLoggedInAction();
+  }
 }
 
 export function progressLogReducer(state: ProgressLogState = initialProgressLogState, action: Action): ProgressLogState {
 
   switch (action.type) {
     case START_LOADING: {
-      return ProgressLogUtil.updateProgressLogState(state, mutable => mutable.loading = true);
+      return ProgressLogUtil.updateProgressLogState(state, mutable => mutable.loading++);
     }
     case COMPLETE_LOADING: {
-      return ProgressLogUtil.updateProgressLogState(state, mutable => mutable.loading = false);
+      return ProgressLogUtil.updateProgressLogState(state, mutable => {
+        if (mutable.loading > 0) {
+          mutable.loading--;
+        }
+      });
     }
     case LOG_MESSAGE: {
       const logEntry: LogEntry = (<LogMessageAction>action).payload;
@@ -67,15 +80,22 @@ export function progressLogReducer(state: ProgressLogState = initialProgressLogS
         mutable.messages = mutable.messages.remove(0);
       });
     }
+    case NOT_LOGGED_IN: {
+      return ProgressLogUtil.updateProgressLogState(state, mutable => {
+        mutable.notLoggedIn = true;
+      });
+    }
   }
   return state;
 }
 
 export const progressLogSelector = (state: AppState) => state.progressLog;
-const getLoading = (state: ProgressLogState) => state.loading;
+const getLoading = (state: ProgressLogState) => state.loading > 0;
 const getCurrentMessage = (state: ProgressLogState) => {
   return state.messages.size > 0 ? state.messages.get(0) : null;
 }
+const getNotLoggedIn = (state: ProgressLogState) => state.notLoggedIn;
 export const progressLogLoadingSelector = createSelector(progressLogSelector, getLoading);
 export const progressLogCurrentMessageSelector = createSelector(progressLogSelector, getCurrentMessage);
+export const notLoggedInSelector = createSelector(progressLogSelector, getNotLoggedIn);
 

@@ -5,7 +5,7 @@ import {LogEntry} from './log-entry';
 import {List} from 'immutable';
 
 const DEFAULT_STATE: ProgressLogState = {
-  loading: true,
+  loading: 0,
   messages: List<LogEntry>(),
   notLoggedIn: false
 };

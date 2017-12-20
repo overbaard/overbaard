@@ -12,8 +12,8 @@ import {Subject} from 'rxjs/Subject';
 
 @Component({
   selector: 'app-board-configuration',
-  templateUrl: './board-configuration-component.html',
-  styleUrls: ['./board-configuration-component.scss'],
+  templateUrl: './board-configuration.component.html',
+  styleUrls: ['./board-configuration.component.scss'],
   providers: [BoardsService],
   changeDetection: ChangeDetectionStrategy.OnPush
 })

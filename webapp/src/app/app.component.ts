@@ -3,6 +3,7 @@ import {AppState} from './app-store';
 import {Store} from '@ngrx/store';
 import {Observable} from 'rxjs/Observable';
 import {
+  notLoggedInSelector,
   ProgressLogActions,
   progressLogCurrentMessageSelector,
   progressLogLoadingSelector
@@ -14,6 +15,7 @@ import {UrlService} from './services/url.service';
 import {Subject} from 'rxjs/Subject';
 import 'rxjs/add/operator/takeUntil'
 import {LogEntry} from './model/global/progress-log/log-entry';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -37,6 +39,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
 
   constructor(
+    private _router: Router,
     private _store: Store<AppState>, private _versionService: VersionService,
     private _urlService: UrlService, private _snackBar: MatSnackBar) {
   }
@@ -57,7 +60,18 @@ export class AppComponent implements OnInit, AfterViewInit {
             this._store.dispatch(ProgressLogActions.createClearFirstMessage());
           });
         }
-      })
+      });
+
+    this._store
+      .select(notLoggedInSelector)
+      .takeUntil(this.destroy$)
+      .subscribe(notLoggedIn => {
+        console.log('----> not logged in: ' + notLoggedIn);
+        if (notLoggedIn) {
+          console.log('---> navigating to loging page');
+          this._router.navigate(['/login']);
+        }
+      });
   }
 
 
@@ -65,7 +79,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     const config: MatSnackBarConfig = new MatSnackBarConfig();
     config.verticalPosition = 'bottom';
     config.horizontalPosition = 'center';
-    config.duration = logEntry.error ? 10000 : 4000;
+    if (!logEntry.error) {
+      config.duration = 4000;
+    }
+
     // TODO For some reason this does not work
     config.panelClass = logEntry.error ? ['error-log'] : undefined;
     return this._snackBar.open(logEntry.message, 'Close', config);

@@ -25,7 +25,7 @@ import {KanbanSwimlaneViewComponent} from './components/board/view/kanban-view/k
 import {KanbanSwimlaneEntryComponent} from './components/board/view/kanban-view/kanban-view-swimlane/kanban-swimlane-entry.component';
 import {HttpClientModule} from '@angular/common/http';
 import {ConfigurationComponent} from './components/config/configuration.component';
-import {BoardConfigurationComponent} from './components/config/board-configuration-component';
+import {BoardConfigurationComponent} from './components/config/board-configuration.component';
 import {RankViewEntryComponent} from './components/board/view/rank-view/rank-view-entry.component';
 import {RankViewContainerComponent} from './components/board/view/rank-view/rank-view-container.component';
 import {ProgressLogService} from './services/progress-log.service';
@@ -39,6 +39,7 @@ import {MoveIssueDialogComponent} from './components/board/issue/move-issue-dial
 import {CommentIssueDialogComponent} from './components/board/issue/comment-issue-dialog.component';
 import {MatSnackBar} from '@angular/material';
 import {RankIssueDialogComponent} from './components/board/issue/rank-issue-dialog.component';
+import {LoginComponent} from './components/login/login.component';
 
 @NgModule({
   declarations: [
@@ -54,6 +55,7 @@ import {RankIssueDialogComponent} from './components/board/issue/rank-issue-dial
     KanbanViewColumnComponent,
     KanbanSwimlaneViewComponent,
     KanbanSwimlaneEntryComponent,
+    LoginComponent,
     RankViewComponent,
     RankViewContainerComponent,
     RankViewEntryComponent,

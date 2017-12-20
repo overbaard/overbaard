@@ -29,10 +29,9 @@ export class BoardService {
 
   loadBoardData(boardCode: string, backlog: boolean) {
     // Cancel any background polling
-    // Cancel any background polling
     this.stopPolling();
 
-    const progress: Progress = this._progressLog.startLoading();
+    const progress: Progress = this._progressLog.startUserAction();
     let url = UrlService.OVERBAARD_REST_PREFIX + '/issues/' + boardCode;
     if (backlog) {
       url += '?backlog=' + true;
@@ -41,6 +40,7 @@ export class BoardService {
     return executeRequest(
       progress,
       BoardService._bigTimeout,
+      () => {},
       this._http.get(path))
       .take(1)
       .subscribe(
@@ -56,7 +56,7 @@ export class BoardService {
     // Cancel any background polling
     this.stopPolling();
 
-    const progress: Progress = this._progressLog.startLoading();
+    const progress: Progress = this._progressLog.startUserAction();
 
     const path: string = this._restUrlService.caclulateRestUrl(
       UrlService.OVERBAARD_REST_PREFIX + '/issues/' + boardCode + '/parallel/' + issueKey);
@@ -69,6 +69,7 @@ export class BoardService {
     executeRequest(
       progress,
       BoardService._bigTimeout,
+      () => this.recreateChangePollerAndStartPolling(boardCode, backlog, true, 0),
       this._http.put(path, JSON.stringify(payload), {
         headers : this.createHeaders()
       }))
@@ -84,7 +85,7 @@ export class BoardService {
     // Cancel any background polling
     this.stopPolling();
 
-    const progress: Progress = this._progressLog.startLoading(`Commented on issue ${issue.key}`);
+    const progress: Progress = this._progressLog.startUserAction(`Commented on issue ${issue.key}`);
 
     const path: string = this._restUrlService.jiraUrl + 'rest/api/2/issue/' + issue.key + '/comment';
 
@@ -93,6 +94,7 @@ export class BoardService {
     executeRequest(
       progress,
       BoardService._bigTimeout,
+      () => this.recreateChangePollerAndStartPolling(boardCode, backlog, true, 0),
       this._http.post(path, JSON.stringify(payload), {
         headers : this.createHeaders()
       }))
@@ -115,7 +117,7 @@ export class BoardService {
     } else {
       msg += 'to the end';
     }
-    const progress: Progress = this._progressLog.startLoading(msg);
+    const progress: Progress = this._progressLog.startUserAction(msg);
     const path: string = this._restUrlService.jiraUrl + 'rest/greenhopper/1.0/rank';
     console.log('Ranking issue ' + path);
 
@@ -129,11 +131,12 @@ export class BoardService {
     if (afterKey) {
       payload.rankAfterKey = afterKey;
     }
-    console.log(JSON.stringify(payload));
+    // console.log(JSON.stringify(payload));
 
     executeRequest(
       progress,
       BoardService._bigTimeout,
+      () => this.recreateChangePollerAndStartPolling(boardCode, true, true, 0),
       this._http.put(path, JSON.stringify(payload), {
         headers : this.createHeaders()
       }))
@@ -150,15 +153,19 @@ export class BoardService {
     // Cancel any background polling
     this.stopPolling();
 
-    const progress: Progress = this._progressLog.startLoading(`Moved ${issue.key} to the ${boardState} column`);
+    const progress: Progress = this._progressLog.startUserAction(`Moved ${issue.key} to the ${boardState} column`);
 
     // First get the transitions
     const path = this._restUrlService.jiraUrl + 'rest/api/2/issue/' + issue.key + '/transitions';
     console.log('Getting transitions for issue ' + path);
-    executeRequest(
-      progress,
-      BoardService._smallTimeout,
-      this._http.get(path))
+    // Don't use executeRequest here to keep the progress open until we actually do the transition
+    this._http.get(path)
+      .timeout(BoardService._smallTimeout)
+      .catch((err: HttpErrorResponse) => {
+        progress.errorResponse(err);
+        this.recreateChangePollerAndStartPolling(boardCode, showBacklog, true, 0);
+        return Observable.throw(err);
+      })
       .take(1)
       .subscribe(data => {
         this.getTransitionsAndPerformMove(boardCode, showBacklog, progress, issue, boardState, ownState, success, data);
@@ -185,7 +192,7 @@ export class BoardService {
       if (ownState !== boardState) {
         state = state + '(' + ownState + ')';
       }
-      progress.error('Could not find a valid transition to ' + state);
+      progress.logError('Could not find a valid transition to ' + state);
       return;
     }
 
@@ -196,6 +203,7 @@ export class BoardService {
     executeRequest(
       progress,
       BoardService._bigTimeout,
+      () => this.recreateChangePollerAndStartPolling(boardCode, showBacklog, true, 0),
       this._http.post(path, JSON.stringify(payload), {
         headers : this.createHeaders()
       }))
@@ -234,8 +242,7 @@ export class BoardService {
       this._changePoller = name;
     }
     this._changePoller =
-      new ChangePoller(boardCode, backlog, this._store, this._restUrlService, this._http,
-        progressOnFirst ? this._progressLog : null);
+      new ChangePoller(boardCode, backlog, this._store, this._restUrlService, this._http, this._progressLog, progressOnFirst);
     this._changePoller.startPolling(initialWait);
   }
 
@@ -265,7 +272,8 @@ class ChangePoller {
     private readonly _store: Store<AppState>,
     private readonly _restUrlService: UrlService,
     private readonly _http: HttpClient,
-    private _progressLog: ProgressLogService) {
+    private _progressLog: ProgressLogService,
+    private readonly _showProgress: boolean) {
 
     this._pollParameters$ = Observable.combineLatest(
       this._store.select(boardViewIdSelector),
@@ -281,7 +289,7 @@ class ChangePoller {
     const restartPolling: boolean = visible && !this._visible && this._wasInvisibleDuringPoll;
     if (restartPolling) {
       this.destroy();
-      poller = new ChangePoller(this._boardCode, this._backlog, this._store, this._restUrlService, this._http, this._progressLog);
+      poller = new ChangePoller(this._boardCode, this._backlog, this._store, this._restUrlService, this._http, this._progressLog, false);
       poller.startPolling(0);
     } else {
       poller._visible = visible;
@@ -338,20 +346,16 @@ class ChangePoller {
       if (params.showBacklog) {
         url += '?backlog=' + true;
       }
-      let progress: Progress;
-      if (this._progressLog) {
-        progress = this._progressLog.startLoading();
-        // Only want the first progress in some cases
-        this._progressLog = null;
-      }
+
+      const progress: Progress = this._progressLog.startAction(this._showProgress);
       const path: string = this._restUrlService.caclulateRestUrl(url);
-      this._currentPollTimerSubscription = executeRequest(null, BoardService._bigTimeout, this._http.get(path))
+      // Don't use execute request since we want to handle the errors differently
+      this._currentPollTimerSubscription = this._http.get(path)
+        .timeout(BoardService._bigTimeout)
         .take(1)
         .subscribe(
           data => {
-            if (progress) {
-              progress.complete();
-            }
+            progress.complete();
             if (!this._destroyed) {
               this._errorCount = 0;
               if (!this._destroyed) {
@@ -361,17 +365,18 @@ class ChangePoller {
             }
           },
           error => {
+            let handledProgress = false;
             if (!this._destroyed) {
-              console.log('Error polling');
               this._errorCount++;
               if (this._errorCount >= ChangePoller._maxErrorCount) {
-                if (progress) {
-                  // TODO show error
-                }
-                console.log(`Error count is ${this._errorCount}. Giving up polling.`)
+                progress.logError(`Error count is ${this._errorCount}. Giving up polling.`);
+                handledProgress = true;
                 this.destroy();
               }
               this.pollBoard();
+            }
+            if (!handledProgress) {
+              progress.complete();
             }
           }
         );
@@ -385,17 +390,17 @@ interface PollParameters {
   showBacklog: boolean;
 }
 
-function executeRequest<T>(progress: Progress, timeout: number, observable: Observable<T>): Observable<T> {
+function executeRequest<T>(progress: Progress, timeout: number, errorCallback: () => void, observable: Observable<T>): Observable<T> {
   let ret: Observable<T> = observable
     .timeout(timeout);
-  if (progress) {
-    ret = ret.do(d => progress.complete())
-  }
-  return ret.catch((response: HttpErrorResponse) => {
-    // TODO log error properly
-    console.log(response);
-    if (response instanceof HttpErrorResponse) {
+
+  ret = ret.do(d => progress.complete())
+
+  return ret.catch((err: HttpErrorResponse) => {
+    if (errorCallback) {
+      errorCallback();
     }
-    return Observable.throw(response);
+    progress.errorResponse(err);
+    return Observable.throw(err);
   });
 }
