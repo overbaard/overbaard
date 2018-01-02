@@ -1,4 +1,5 @@
 @import "../../../../../styles";
+@import "../../board-styles";
 :host {
   display: flex;
   width: 100%;
@@ -15,8 +16,9 @@
   text-align: center;
 }
 .rank-issue {
-  min-width: 250px;
-  max-width: 250px;
+  padding-left: $rank-issue-padding-left;
+  min-width: $rank-issue-width;
+  max-width: $rank-issue-width;
   border: 1px white solid;
 }
 .inner-cell {
