@@ -43,7 +43,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  z-index: 999;
+  z-index: 2000; /*Dialogs have 1000, so we need to be bigger! */
   margin: auto;
   top: 0;
   left: 0;
