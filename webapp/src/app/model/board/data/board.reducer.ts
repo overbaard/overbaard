@@ -150,7 +150,7 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
       const blacklistState: BlacklistState =
         metaReducers.blacklist(state.blacklist, BlacklistActions.createDeserializeBlacklist(input['blacklist']));
 
-      return BoardUtil.withMutatons(state, mutable => {
+      return BoardUtil.withMutations(state, mutable => {
         mutable.viewId = viewId;
         mutable.rankCustomFieldId = rankCustomFieldId;
         mutable.jiraUrl = dbAction.jiraUrl;
@@ -214,25 +214,17 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
         metaReducers.blacklist(state.blacklist, BlacklistActions.createChangeBlacklist(input['blacklist']))
         : state.blacklist;
 
-      const newState: BoardState = {
-        viewId: viewId,
-        rankCustomFieldId: state.rankCustomFieldId,
-        jiraUrl: state.jiraUrl,
-        headers: state.headers,
-        assignees: assigneeState,
-        issueTypes: state.issueTypes,
-        priorities: state.priorities,
-        components: componentState,
-        fixVersions: fixVersionState,
-        labels: labelState,
-        customFields: customFieldState,
-        projects: state.projects,
-        issues: issueState,
-        ranks: rankState,
-        blacklist: blacklistState
-      };
-
-      return BoardUtil.recordFromObject(newState);
+      return BoardUtil.withMutations(state, mutable => {
+        mutable.viewId = viewId;
+        mutable.assignees = assigneeState;
+        mutable.components = componentState;
+        mutable.fixVersions = fixVersionState;
+        mutable.labels = labelState;
+        mutable.customFields = customFieldState;
+        mutable.issues = issueState;
+        mutable.ranks = rankState;
+        mutable.blacklist = blacklistState;
+      });
     }
     default:
       return state;

@@ -1,5 +1,6 @@
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {List} from 'immutable';
+import {LabelState} from '../label/label.model';
 
 
 export interface FixVersionState {
@@ -17,9 +18,10 @@ const STATE_FACTORY = makeTypedFactory<FixVersionState, FixVersionStateRecord>(D
 export const initialFixVersionState: FixVersionState = STATE_FACTORY(DEFAULT_STATE);
 
 export class FixVersionUtil {
-  static toStateRecord(s: FixVersionState): FixVersionStateRecord {
-    // TODO do some checks. TS does not allow use of instanceof when the type is an interface (since they are compiled away)
-    return <FixVersionStateRecord>s;
+  static withMutations(s: FixVersionState, mutate: (mutable: FixVersionState) => any): FixVersionState {
+    return (<FixVersionStateRecord>s).withMutations(mutable => {
+      mutate(mutable);
+    });
   }
 }
 

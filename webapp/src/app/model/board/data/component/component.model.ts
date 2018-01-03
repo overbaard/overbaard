@@ -1,5 +1,6 @@
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {List} from 'immutable';
+import {PriorityState} from '../priority/priority.model';
 
 
 export interface ComponentState {
@@ -17,9 +18,11 @@ const STATE_FACTORY = makeTypedFactory<ComponentState, ComponentStateRecord>(DEF
 export const initialComponentState: ComponentState = STATE_FACTORY(DEFAULT_STATE);
 
 export class ComponentUtil {
-  static toStateRecord(s: ComponentState): ComponentStateRecord {
-    // TODO do some checks. TS does not allow use of instanceof when the type is an interface (since they are compiled away)
-    return <ComponentStateRecord>s;
+
+  static withMutations(s: ComponentState, mutate: (mutable: ComponentState) => any): ComponentState {
+    return (<ComponentStateRecord>s).withMutations(mutable => {
+      mutate(mutable);
+    });
   }
 }
 

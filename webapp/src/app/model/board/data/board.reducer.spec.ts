@@ -21,6 +21,7 @@ import {IssueChecker} from './issue/issue.model.spec';
 import {BoardState} from './board';
 import {BoardUtil, initialBoardState} from './board.model';
 import {HeaderState} from './header/header.state';
+import {TypedRecord} from 'typed-immutable-record';
 
 export function getTestBoardsInput(): any {
   return cloneObject(
@@ -442,7 +443,7 @@ describe('Board reducer tests', () => {
     });
 
     function checkSameStateEntries(originalState: BoardState, currentState: BoardState, ...included: string[]) {
-      for (const key of BoardUtil.toStateRecord(originalState).keySeq().toArray()) {
+      for (const key of (<BoardStateRecord>originalState).keySeq().toArray()) {
         if (key === 'viewId') {
           continue;
         }
@@ -464,3 +465,7 @@ describe('Board reducer tests', () => {
   });
 
 });
+
+// Just duplicate the board state record interface here for now. I don't want to export it
+interface BoardStateRecord extends TypedRecord<BoardStateRecord>, BoardState {
+}

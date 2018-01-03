@@ -58,11 +58,11 @@ export function rankMetaReducer(state: RankState = initialRankState, action: Act
   switch (action.type) {
     case DESERIALIZE_RANKS: {
       const payload: RankState = (<DeserializeRanksAction>action).payload;
-      const newState: RankState = RankUtil.toStateRecord(state).withMutations(mutable => {
-        mutable.rankedIssueKeys = payload.rankedIssueKeys;
+      return RankUtil.withMutations(state, mutable => {
+        if (!mutable.rankedIssueKeys.equals(payload.rankedIssueKeys)) {
+          mutable.rankedIssueKeys = payload.rankedIssueKeys;
+        }
       });
-
-      return RankUtil.toStateRecord(newState).equals(RankUtil.toStateRecord(state)) ? state : newState;
     }
     case RERANK: {
       const payload: RerankPayload = (<RerankAction>action).payload;
@@ -80,7 +80,7 @@ export function rankMetaReducer(state: RankState = initialRankState, action: Act
           });
         }
 
-        const newState: RankState = RankUtil.toStateRecord(state).withMutations(mutable => {
+        const newState: RankState = RankUtil.withMutations(state, mutable => {
           mutable.rankedIssueKeys = rankedByProject;
         });
         return newState;

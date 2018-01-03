@@ -1,5 +1,6 @@
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {OrderedMap} from 'immutable';
+import {FixVersionState} from '../fix-version/fix-version.model';
 
 
 export interface CustomFieldState {
@@ -35,9 +36,10 @@ export class CustomFieldUtil {
       return CUSTOM_FIELD_FACTORY(input);
   }
 
-  static toStateRecord(s: CustomFieldState): CustomFieldStateRecord {
-    // TODO do some checks. TS does not allow use of instanceof when the type is an interface (since they are compiled away)
-    return <CustomFieldStateRecord>s;
+  static withMutations(s: CustomFieldState, mutate: (mutable: CustomFieldState) => any): CustomFieldState {
+    return (<CustomFieldStateRecord>s).withMutations(mutable => {
+      mutate(mutable);
+    });
   }
 }
 

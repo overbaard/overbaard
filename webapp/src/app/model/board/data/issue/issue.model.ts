@@ -8,6 +8,7 @@ import {BoardProject, ParallelTask, ParallelTaskOption} from '../project/project
 import {cloneObject} from '../../../../common/object-util';
 import {BoardIssue} from './board-issue';
 import {Issue} from './issue';
+import {BlacklistState, BlacklistStateRecord} from '../blacklist/blacklist.model';
 
 export interface IssueState {
   issues: Map<string, BoardIssue>;
@@ -418,14 +419,17 @@ export class IssueUtil {
     return null;
   }
 
-  static toStateRecord(s: IssueState): IssueStateRecord {
-    // TODO do some checks. TS does not allow use of instanceof when the type is an interface (since they are compiled away)
-    return <IssueStateRecord>s;
+  static withMutations(s: IssueState, mutate: (mutable: IssueState) => any): IssueState {
+    return (<IssueStateRecord>s).withMutations(mutable => {
+      mutate(mutable);
+    });
   }
 
-  static toIssueRecord(i: BoardIssue): BoardIssueRecord {
-    // TODO do some checks. TS does not allow use of instanceof when the type is an interface (since they are compiled away)
-    return <BoardIssueRecord>i;
+  static issuesEqual(i1: BoardIssue, i2: BoardIssue): boolean {
+    if (!i1 && i2) {
+      return false;
+    }
+    return (<BoardIssueRecord>i1).equals(<BoardIssueRecord>i2);
   }
 
   private static lookupStringsFromIndexArray(input: number[], lookup: List<string>): string[] {

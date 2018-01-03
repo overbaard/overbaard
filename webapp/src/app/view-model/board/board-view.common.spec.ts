@@ -144,7 +144,7 @@ export class BoardStateInitializer {
   emitBoardChange(mainUtil: BoardViewObservableUtil): void {
     const headerState: HeaderState = this._headerStateFactory.createHeaderState(mainUtil.boardState.headers);
     const projectState: ProjectState = this.createProjectState();
-    const boardState: BoardState = BoardUtil.toStateRecord(mainUtil.boardState).withMutations(mutable => {
+    const boardState: BoardState = BoardUtil.withMutations(mainUtil.boardState, mutable => {
       mutable.viewId = 1;
       mutable.headers = headerState;
       mutable.projects = projectState;
@@ -230,7 +230,7 @@ export class BoardStateUpdater {
   }
 
   emit(): BoardViewObservableUtil {
-    const boardState: BoardState = BoardUtil.toStateRecord(this._mainUtil.boardState).withMutations(mutable => {
+    const boardState: BoardState = BoardUtil.withMutations(this._mainUtil.boardState, mutable => {
       mutable.viewId = mutable.viewId + 1;
       mutable.issues = issueMetaReducer(
         this._mainUtil.boardState.issues,

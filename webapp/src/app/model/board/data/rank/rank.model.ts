@@ -6,6 +6,7 @@
  */
 import {List, Map} from 'immutable';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
+import {ProjectState} from '../project/project.model';
 
 export interface RankState {
   rankedIssueKeys: Map<string, List<string>>;
@@ -23,8 +24,10 @@ const STATE_FACTORY = makeTypedFactory<RankState, RankStateRecord>(DEFAULT_STATE
 export const initialRankState: RankState = STATE_FACTORY(DEFAULT_STATE);
 
 export class RankUtil {
-   static toStateRecord(s: RankState): RankStateRecord {
-    // TODO do some checks. TS does not allow use of instanceof when the type is an interface (since they are compiled away)
-    return <RankStateRecord>s;
+
+  static withMutations(s: RankState, mutate: (mutable: RankState) => any): RankState {
+    return (<RankStateRecord>s).withMutations(mutable => {
+      mutate(mutable);
+    });
   }
 }

@@ -39,25 +39,23 @@ export function componentMetaReducer(state: ComponentState = initialComponentSta
   switch (action.type) {
     case DESERIALIZE_ALL_COMPONENTS: {
       const payload: List<string> = (<DeserializeComponentsAction>action).payload;
-      const newState: ComponentState = ComponentUtil.toStateRecord(state).withMutations(mutable => {
-        mutable.components = payload;
+      return ComponentUtil.withMutations(state, mutable => {
+        if (!payload.equals(mutable.components)) {
+          mutable.components = payload;
+        }
       });
-      if ((ComponentUtil.toStateRecord(newState)).equals(ComponentUtil.toStateRecord(state))) {
-        return state;
-      }
-      return newState;
     }
     case ADD_COMPONENTS: {
       const payload: List<string> = (<AddComponentsAction>action).payload;
       if (payload.size > 0) {
-
-
         const newComponents: List<string> = state.components.concat(payload)
           .sort((a, b) => a.toLocaleLowerCase().localeCompare(b.toLocaleLowerCase()))
           .toList();
 
-        return ComponentUtil.toStateRecord(state).withMutations(mutable => {
-          mutable.components = newComponents;
+        return ComponentUtil.withMutations(state, mutable => {
+          if (!payload.equals(mutable.components)) {
+            mutable.components = newComponents;
+          }
         });
       }
       return state;

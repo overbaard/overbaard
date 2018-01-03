@@ -45,10 +45,7 @@ export function blacklistMetaReducer(state: BlacklistState = initialBlacklistSta
   switch (action.type) {
     case DESERIALIZE_BLACKLIST: {
       const payload: BlacklistState = (<DeserializeBlacklistAction>action).payload;
-      if ((BlacklistUtil.toStateRecord(payload)).equals(BlacklistUtil.toStateRecord(state))) {
-        return state;
-      }
-      return payload;
+      return updateState(state, payload.issues, payload.issueTypes, payload.priorities, payload.states);
     }
     case BLACKLIST_CHANGES: {
       const payload: BlacklistChange = (<BlacklistChangesAction>action).payload;
@@ -60,12 +57,7 @@ export function blacklistMetaReducer(state: BlacklistState = initialBlacklistSta
         if (payload.removedIssues.size > 0) {
           issues = removeIssues(issues, payload.removedIssues);
         }
-        return BlacklistUtil.createStateRecord({
-          states: states,
-          issueTypes: issueTypes,
-          priorities: priorities,
-          issues: issues
-        });
+        return updateState(state, issues, issueTypes, priorities, states);
       }
       return state;
     }
@@ -73,6 +65,25 @@ export function blacklistMetaReducer(state: BlacklistState = initialBlacklistSta
       return state;
   }
 };
+
+function updateState(
+  state: BlacklistState, issues: List<string>,
+  issueTypes: List<string>, priorities: List<string>, states: List<string>): BlacklistState {
+  return BlacklistUtil.withMutations(state, mutable => {
+    if (!mutable.issues.equals(issues)) {
+      mutable.issues = issues;
+    }
+    if (!mutable.issueTypes.equals(issueTypes)) {
+      mutable.issueTypes = issueTypes;
+    }
+    if (!mutable.priorities.equals(priorities)) {
+      mutable.priorities = priorities;
+    }
+    if (!mutable.states.equals(states)) {
+      mutable.states = states;
+    }
+  });
+}
 
 function mergeListsAndSortIfNecessary(original: List<string>, additions: List<string>): List<string> {
   if (additions.size === 0) {

@@ -1,5 +1,6 @@
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {OrderedMap} from 'immutable';
+import {IssueTypeState} from '../issue-type/issue-type.model';
 
 
 export interface PriorityState {
@@ -35,9 +36,10 @@ export class PriorityUtil {
     return PRIORITY_FACTORY(input);
   }
 
-  static toStateRecord(s: PriorityState): PriorityStateRecord {
-    // TODO do some checks. TS does not allow use of instanceof when the type is an interface (since they are compiled away)
-    return <PriorityStateRecord>s;
+  static withMutations(s: PriorityState, mutate: (mutable: PriorityState) => any): PriorityState {
+    return (<PriorityStateRecord>s).withMutations(mutable => {
+      mutate(mutable);
+    });
   }
 };
 

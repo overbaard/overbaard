@@ -1,5 +1,6 @@
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {OrderedMap} from 'immutable';
+import {BoardState} from '../board';
 
 export interface AssigneeState {
   assignees: OrderedMap<string, Assignee>;
@@ -56,9 +57,10 @@ export class AssigneeUtil {
     return ASSIGNEE_FACTORY(<Assignee>clone);
   }
 
-  static toStateRecord(s: AssigneeState): AssigneeStateRecord {
-    // TODO do some checks. TS does not allow use of instanceof when the type is an interface (since they are compiled away)
-    return <AssigneeStateRecord>s;
+  static withMutations(s: AssigneeState, mutate: (mutable: AssigneeState) => any): AssigneeState {
+    return (<AssigneeStateRecord>s).withMutations(mutable => {
+      mutate(mutable);
+    });
   }
 
   private static calculateInitials(name: string): string {

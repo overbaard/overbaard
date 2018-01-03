@@ -49,7 +49,7 @@ describe('Boards Query Parameters Service Tests', () => {
     });
 
     it ('Board State only is ignored', () => {
-      const newBoard: BoardState = BoardUtil.withMutatons(initialBoardState, mutable => {
+      const newBoard: BoardState = BoardUtil.withMutations(initialBoardState, mutable => {
         mutable.viewId = 999;
       });
       boardSubject.next(newBoard);
@@ -87,7 +87,7 @@ describe('Boards Query Parameters Service Tests', () => {
       });
     });
     it ('Everything apart from visibilities', () => {
-      const newBoard: BoardState = BoardUtil.withMutatons(initialBoardState, mutable => {
+      const newBoard: BoardState = BoardUtil.withMutations(initialBoardState, mutable => {
         mutable.viewId = 999;
         mutable.headers = {
           states: List<string>(['a', 'b', 'c', 'd']),
@@ -143,7 +143,7 @@ describe('Boards Query Parameters Service Tests', () => {
     describe('Column', () => {
       let headerState: HeaderState;
       beforeEach(() => {
-        headerState = HeaderUtil.withMutatons(initialHeaderState, hdr => {
+        headerState = HeaderUtil.withMutations(initialHeaderState, hdr => {
           hdr.states = List<string>(['a', 'b', 'c', 'd', 'd', 'e', 'f', 'g', 'h']);
           hdr.backlog = 0;
         });
@@ -151,7 +151,7 @@ describe('Boards Query Parameters Service Tests', () => {
       describe('No Backlog', () => {
         let board: BoardState;
         beforeEach(() => {
-          board = BoardUtil.withMutatons(initialBoardState, mutable => {
+          board = BoardUtil.withMutations(initialBoardState, mutable => {
             mutable.viewId = 999;
             mutable.headers = headerState;
           });
@@ -206,7 +206,7 @@ describe('Boards Query Parameters Service Tests', () => {
               expect(s).toContain('hidden=1,2,3');
               expect(s).not.toContain('visible');
             });
-            board = BoardUtil.withMutatons(initialBoardState, mutable => {
+            board = BoardUtil.withMutations(initialBoardState, mutable => {
               mutable.viewId = 999;
               mutable.headers = headerState;
             });
@@ -260,7 +260,7 @@ describe('Boards Query Parameters Service Tests', () => {
               expect(s).toContain('visible=1,2,3');
               expect(s).not.toContain('hidden');
             });
-            board = BoardUtil.withMutatons(initialBoardState, mutable => {
+            board = BoardUtil.withMutations(initialBoardState, mutable => {
               mutable.viewId = 999;
               mutable.headers = headerState;
             });
@@ -309,10 +309,10 @@ describe('Boards Query Parameters Service Tests', () => {
       describe('Backlog', () => {
         let board: BoardState;
         beforeEach(() => {
-          headerState = HeaderUtil.withMutatons(headerState, hdr => {
+          headerState = HeaderUtil.withMutations(headerState, hdr => {
             hdr.backlog = 2;
           });
-          board = BoardUtil.withMutatons(initialBoardState, mutable => {
+          board = BoardUtil.withMutations(initialBoardState, mutable => {
             mutable.viewId = 999;
             mutable.headers = headerState;
           });

@@ -1,5 +1,6 @@
 import {List} from 'immutable';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
+import {PriorityState} from '../priority/priority.model';
 
 export interface BlacklistState {
   states: List<string>;
@@ -34,13 +35,10 @@ export class BlacklistUtil {
     return STATE_FACTORY(state);
   }
 
-  static createStateRecord(nonRecord: BlacklistState) {
-    return STATE_FACTORY(nonRecord);
-  }
-
-  static toStateRecord(s: BlacklistState): BlacklistStateRecord {
-    // TODO do some checks. TS does not allow use of instanceof when the type is an interface (since they are compiled away)
-    return <BlacklistStateRecord>s;
+  static withMutations(s: BlacklistState, mutate: (mutable: BlacklistState) => any): BlacklistState {
+    return (<BlacklistStateRecord>s).withMutations(mutable => {
+      mutate(mutable);
+    });
   }
 }
 

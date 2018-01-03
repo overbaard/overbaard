@@ -67,7 +67,7 @@ export function issueMetaReducer(state: IssueState = initialIssueState, action: 
       newMap = Map<string, BoardIssue>().withMutations(mutable => {
         payload.forEach((issue, key) => {
           const existing: BoardIssue = state.issues.get(key);
-          if (existing == null || !IssueUtil.toIssueRecord(existing).equals(IssueUtil.toIssueRecord(issue))) {
+          if (existing == null || !IssueUtil.issuesEqual(existing, issue)) {
             // It is a new issue, or an existing one with a change
             mutable.set(key, issue);
             changed.set(issue.key, IssueUtil.createChangeInfo(existing, issue));
@@ -83,26 +83,21 @@ export function issueMetaReducer(state: IssueState = initialIssueState, action: 
       changed = changed.asImmutable();
 
 
-      if (newMap.equals(state.issues)) {
-        return IssueUtil.toStateRecord(state).withMutations(mutable => {
-          mutable.lastChanged = changed;
-          mutable.issues = state.issues;
-        });
-      }
-      return IssueUtil.toStateRecord(state).withMutations(mutable => {
+      return IssueUtil.withMutations(state, mutable => {
         mutable.lastChanged = changed;
-        mutable.issues = newMap;
+        if (!newMap.equals(mutable.issues)) {
+          mutable.issues = newMap;
+        }
       });
     }
     case CHANGE_ISSUES: {
       const payload: ChangeIssuesPayload = (<ChangeIssuesAction>action).payload;
       if (!payload.issueChanges && !payload.deletedIssues) {
-        return IssueUtil.toStateRecord(state).withMutations(mutable => {
+        return IssueUtil.withMutations(state, mutable => {
           mutable.lastChanged = Map<string, IssueChangeInfo>();
-          mutable.issues = state.issues;
         });
       }
-      return IssueUtil.toStateRecord(state).withMutations(mState => {
+      return IssueUtil.withMutations(state, mState => {
         const changed: Map<string, IssueChangeInfo> = Map<string, IssueChangeInfo>().asMutable();
         if (payload.issueChanges) {
           mState.issues = mState.issues.withMutations(mIssues => {

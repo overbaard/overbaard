@@ -69,14 +69,18 @@ export function projectMetaReducer(state: ProjectState = initialProjectState, ac
   switch (action.type) {
     case DESERIALIZE_PROJECTS: {
       const payload: ProjectState = (<DeserializeProjectsAction>action).payload;
-      const newState: ProjectState = ProjectUtil.toStateRecord(state).withMutations(mutable => {
+      return ProjectUtil.withMutations(state, mutable => {
         mutable.owner = payload.owner;
-        mutable.boardProjects = payload.boardProjects;
-        mutable.linkedProjects = payload.linkedProjects;
-        mutable.parallelTasks = payload.parallelTasks;
+        if (!mutable.boardProjects.equals(payload.boardProjects)) {
+          mutable.boardProjects = payload.boardProjects;
+        }
+        if (!mutable.linkedProjects.equals(payload.linkedProjects)) {
+          mutable.linkedProjects = payload.linkedProjects;
+        }
+        if (!mutable.parallelTasks.equals(payload.parallelTasks)) {
+          mutable.parallelTasks = payload.parallelTasks;
+        }
       });
-
-      return ProjectUtil.toStateRecord(newState).equals(ProjectUtil.toStateRecord(state)) ? state : newState;
     }
   }
   return state;

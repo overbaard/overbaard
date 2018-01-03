@@ -1,6 +1,7 @@
 import {List, Map, OrderedMap} from 'immutable';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {HeaderState} from '../header/header.state';
+import {CustomFieldState} from '../custom-field/custom-field.model';
 
 export interface ProjectState {
   owner: string;
@@ -126,9 +127,10 @@ export class ProjectUtil {
     });
   }
 
-  static toStateRecord(s: ProjectState): ProjectStateRecord {
-    // TODO do some checks. TS does not allow use of instanceof when the type is an interface (since they are compiled away)
-    return <ProjectStateRecord>s;
+  static withMutations(s: ProjectState, mutate: (mutable: ProjectState) => any): ProjectState {
+    return (<ProjectStateRecord>s).withMutations(mutable => {
+      mutate(mutable);
+    });
   }
 
   // TOOD store this as a field in the project? It would mean more stuff to compare if doing the plain equals of the state in the reducer

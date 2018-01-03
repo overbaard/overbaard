@@ -34,11 +34,6 @@ const ISSUE_FACTORY = makeTypedFactory<BoardIssueView, BoardIssueViewRecord>(DEF
 
 export class BoardIssueViewUtil {
 
-  static toIssueRecord(s: BoardIssueView): BoardIssueViewRecord {
-    // TODO do some checks. TS does not allow use of instanceof when the type is an interface (since they are compiled away)
-    return <BoardIssueViewRecord>s;
-  }
-
   static createBoardIssue(issue: BoardIssue, jiraUrl: string, projectColour: string, visible: boolean): BoardIssueViewRecord {
     const issueUrl = `${jiraUrl}browse/${issue.key}`;
     return ISSUE_FACTORY({
@@ -63,11 +58,11 @@ export class BoardIssueViewUtil {
   }
 
   static equals(one: BoardIssueView, two: BoardIssueView) {
-    return BoardIssueViewUtil.toIssueRecord(one).equals(BoardIssueViewUtil.toIssueRecord(two));
+    return (<BoardIssueViewRecord>one).equals(<BoardIssueViewRecord>two);
   }
 
   static updateVisibility(issue: BoardIssueView, visible: boolean): BoardIssueView {
-    return BoardIssueViewUtil.toIssueRecord(issue).withMutations(mutable => {
+    return (<BoardIssueViewRecord>issue).withMutations(mutable => {
       mutable.visible = visible;
     })
   }

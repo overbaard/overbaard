@@ -36,13 +36,11 @@ export function priorityMetaReducer(state: PriorityState = initialPriorityState,
           mutable.set(type.name, type);
         }
       });
-      const newState: PriorityState = PriorityUtil.toStateRecord(state).withMutations(mutable => {
-        mutable.priorities = priorities;
+      return PriorityUtil.withMutations(state, mutable => {
+        if (!mutable.priorities.equals(priorities)) {
+          mutable.priorities = priorities;
+        }
       });
-      if (PriorityUtil.toStateRecord(newState).equals(PriorityUtil.toStateRecord(state))) {
-        return state;
-      }
-      return newState;
     }
     default:
       return state;

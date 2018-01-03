@@ -38,16 +38,7 @@ const STATE_FACTORY = makeTypedFactory<BoardState, BoardStateRecord>(DEFAULT_STA
 export const initialBoardState: BoardState = STATE_FACTORY(DEFAULT_STATE);
 
 export class BoardUtil {
-  static recordFromObject(o: BoardState): BoardState {
-    return STATE_FACTORY(o);
-  }
-
-  static toStateRecord(s: BoardState): BoardStateRecord {
-    // TODO do some checks. TS does not allow use of instanceof when the type is an interface (since they are compiled away)
-    return <BoardStateRecord>s;
-  }
-
-  static withMutatons(s: BoardState, mutate: (mutable: BoardState) => any): BoardState {
+  static withMutations(s: BoardState, mutate: (mutable: BoardState) => any): BoardState {
     return (<BoardStateRecord>s).withMutations(mutable => {
       mutate(mutable);
     });

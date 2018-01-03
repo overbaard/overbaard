@@ -64,12 +64,11 @@ export function customFieldMetaReducer(state: CustomFieldState = initialCustomFi
   switch (action.type) {
     case DESERIALIZE_ALL_CUSTOM_FIELDS: {
       const payload: OrderedMap<string, OrderedMap<string, CustomField>> = (<DeserializeCustomFieldsAction>action).payload;
-      const newState = CustomFieldUtil.toStateRecord(state).withMutations(mutable => {
-        mutable.fields = payload;
+      const newState = CustomFieldUtil.withMutations(state, mutable => {
+        if (!mutable.fields.equals(payload)) {
+          mutable.fields = payload;
+        }
       });
-      if ((CustomFieldUtil.toStateRecord(newState)).equals(CustomFieldUtil.toStateRecord(state))) {
-        return state;
-      }
       return newState;
     }
     case ADD_CUSTOM_FIELDS: {
@@ -84,7 +83,7 @@ export function customFieldMetaReducer(state: CustomFieldState = initialCustomFi
                 customFields);
           });
         });
-        return CustomFieldUtil.toStateRecord(state).withMutations(mutable => {
+        return CustomFieldUtil.withMutations(state, mutable => {
           mutable.fields = fields;
         });
       }

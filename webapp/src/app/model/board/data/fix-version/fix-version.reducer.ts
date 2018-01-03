@@ -39,13 +39,11 @@ export function fixVersionMetaReducer(state: FixVersionState = initialFixVersion
   switch (action.type) {
     case DESERIALIZE_ALL_FIX_VERSIONS: {
       const payload: List<string> = (<DeserializeFixVersionsAction>action).payload;
-      const newState: FixVersionState = FixVersionUtil.toStateRecord(state).withMutations(mutable => {
-        mutable.versions = payload;
+      return FixVersionUtil.withMutations(state, mutable => {
+        if (!mutable.versions.equals(payload)) {
+          mutable.versions = payload;
+        }
       });
-      if ((FixVersionUtil.toStateRecord(newState)).equals(FixVersionUtil.toStateRecord(state))) {
-        return state;
-      }
-      return newState;
     }
     case ADD_FIX_VERSIONS: {
       const payload: List<string> = (<AddFixVersionsAction>action).payload;
@@ -53,7 +51,7 @@ export function fixVersionMetaReducer(state: FixVersionState = initialFixVersion
 
         const newFixVersions: List<string> = state.versions.concat(payload)
           .sort((a, b) => a.toLocaleLowerCase().localeCompare(b.toLocaleLowerCase())).toList();
-        return FixVersionUtil.toStateRecord(state).withMutations(mutable => {
+        return FixVersionUtil.withMutations(state, mutable => {
           mutable.versions = newFixVersions;
         });
       }

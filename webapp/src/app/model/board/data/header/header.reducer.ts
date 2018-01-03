@@ -22,8 +22,11 @@ export function headerMetaReducer(state: HeaderState = initialHeaderState, actio
   switch (action.type) {
     case DESERIALIZE_HEADERS: {
       const payload: DeserializeHeadersPayload = (<DeserializeHeadersAction>action).payload;
-      const newState = HeaderUtil.withMutatons(state, mutable => {
-        mutable.categories = List<string>(payload.headers);
+      const newState = HeaderUtil.withMutations(state, mutable => {
+        const categories: List<string> = List<string>(payload.headers);
+        if (!mutable.categories.equals(categories)) {
+          mutable.categories = categories;
+        }
         mutable.backlog = payload.backlog;
 
         const sizeNotIncludingDone = payload.states.length - payload.done;
@@ -42,13 +45,16 @@ export function headerMetaReducer(state: HeaderState = initialHeaderState, actio
           }
         });
 
-        mutable.states = states.asImmutable();
-        mutable.wip = wip.asImmutable();
-        mutable.stateToCategoryMappings = stateToCategoryMappings.asImmutable();
+        if (!mutable.states.equals(states)) {
+          mutable.states = states.asImmutable();
+        }
+        if (!mutable.wip.equals(wip)) {
+          mutable.wip = wip.asImmutable();
+        }
+        if (!mutable.stateToCategoryMappings.equals(stateToCategoryMappings)) {
+          mutable.stateToCategoryMappings = stateToCategoryMappings.asImmutable();
+        }
       });
-      if (HeaderUtil.toStateRecord(newState).equals(HeaderUtil.toStateRecord(state))) {
-        return state;
-      }
       return newState;
     }
   }

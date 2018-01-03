@@ -41,29 +41,22 @@ export function labelMetaReducer(state: LabelState = initialLabelState, action: 
   switch (action.type) {
     case DESERIALIZE_ALL_LABELS: {
       const payload: List<string> = (<DeserializeLabelsAction>action).payload;
-      const newState: LabelState = LabelUtil.toStateRecord(state).withMutations(mutable => {
-        mutable.labels = payload;
+      const newState: LabelState = LabelUtil.withMutations(state, mutable => {
+        if (!payload.equals(mutable.labels)) {
+          if (!mutable.labels.equals(payload)) {
+            mutable.labels = payload;
+          }
+        }
       });
-      if ((LabelUtil.toStateRecord(newState)).equals(LabelUtil.toStateRecord(state))) {
-        return state;
-      }
       return newState;
     }
     case ADD_LABELS: {
       const payload: List<string> = (<AddLabelsAction>action).payload;
       if (payload.size > 0) {
-        //
-        // let newLabels: List<string> = state.labels.withMutations(mutable => {
-        //   payload.forEach(v => mutable.push(v));
-        // }).asImmutable();
-        //
-        // newLabels = newLabels.sort((a, b) => a.toLocaleLowerCase().localeCompare(b.toLocaleLowerCase()))
-        //   .toList();
-
         const newLabels: List<string> = state.labels.concat(payload)
           .sort((a, b) => a.toLocaleLowerCase().localeCompare(b.toLocaleLowerCase()))
           .toList();
-        return LabelUtil.toStateRecord(state).withMutations(mutable => {
+        return LabelUtil.withMutations(state, mutable => {
           mutable.labels = newLabels;
         });
       }

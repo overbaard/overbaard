@@ -65,14 +65,11 @@ function addAssignees(state: AssigneeState, added: Assignee[]): AssigneeState {
   assignees = <OrderedMap<string, Assignee>>assignees.sort(
     (valueA, valueB) => valueA.name.toLocaleLowerCase().localeCompare(valueB.name.toLocaleLowerCase()));
 
-  const newState: AssigneeState = AssigneeUtil.toStateRecord(state).withMutations(mutable => {
-    mutable.assignees = assignees;
+  return AssigneeUtil.withMutations(state, mutable => {
+    if (!mutable.assignees.equals(assignees)) {
+      mutable.assignees = assignees;
+    }
   });
-
-  if (AssigneeUtil.toStateRecord(newState).equals(AssigneeUtil.toStateRecord(state))) {
-    return state;
-  }
-  return newState;
 }
 
 const getAssigneesState = (state: AppState) => state.board.assignees;
