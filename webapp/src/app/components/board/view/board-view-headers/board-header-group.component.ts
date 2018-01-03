@@ -27,6 +27,8 @@ export class BoardHeaderGroupComponent implements OnInit {
   classObj: Object = {};
   isHovering: boolean;
 
+  readonly enumViewMode = BoardViewMode;
+
   constructor() { }
 
   ngOnInit() {

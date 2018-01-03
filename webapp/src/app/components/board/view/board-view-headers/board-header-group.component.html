@@ -1,5 +1,6 @@
 <div
   class="header-group normal-colour"
+  [class.cursor-pointer]="viewMode == enumViewMode.KANBAN"
   *ngIf="showStates ; else noStates"
 >
   <!-- This is a header that is a category. If it is the backlog, it has more than one state -->
@@ -27,6 +28,7 @@
   <div
     class="header-group normal-colour"
     *ngIf="!showStates"
+    [class.cursor-pointer]="viewMode == enumViewMode.KANBAN"
     (mouseenter)="onMouseEnter($event)"
     (mouseleave)="onMouseLeave($event)"
     [ngClass]="classObj"
