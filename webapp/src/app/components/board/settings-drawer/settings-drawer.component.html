@@ -70,19 +70,47 @@
         <mat-expansion-panel-header>
           <mat-panel-title>
             <div class="filter-panel-header">
-              <div style="flex-grow: 1">
-                {{entry.display}}
+              <div
+                style="flex-grow: 1"
+                matTooltip="{{filtersToDisplay === entry ? '' : getSelectionTooltip(entry)}}"
+                [matTooltipClass]="'card-tooltip'">
+                <span>
+                  {{entry.display}}
+                </span>
               </div>
-              <div *ngIf="getSelectionTooltip(entry).length > 0">
+
+              <!-- 'Toolbar' buttons -->
+              <div *ngIf="filtersToDisplay === entry">
                 <a
                   mat-icon-button
                   color="accent"
-                  class="cancel-button"
-                  matTooltip="{{getSelectionTooltip(entry)}}"
-                  [matTooltipClass]="'card-tooltip'"
+                  class="filter-toolbar-button"
                   (click)="onClearFilter(entry)"
+                  matTooltip="Invert selection"
                 >
-                  <mat-icon class="cancel-button">cancel</mat-icon>
+                  <mat-icon class="filter-toolbar-button">invert_colors</mat-icon>
+                </a>
+              </div>
+              <div *ngIf="filtersToDisplay === entry">
+                <a
+                  mat-icon-button
+                  color="accent"
+                  class="filter-toolbar-button"
+                  (click)="onClearFilter(entry)"
+                  matTooltip="Select all"
+                >
+                  <mat-icon class="filter-toolbar-button">select_all</mat-icon>
+                </a>
+              </div>
+              <div *ngIf="getSelectionTooltip(entry).length > 0 || filtersToDisplay === entry">
+                <a
+                  mat-icon-button
+                  color="accent"
+                  class="filter-toolbar-button"
+                  (click)="onClearFilter(entry)"
+                  matTooltip="Clear all"
+                >
+                  <mat-icon class="filter-toolbar-button">cancel</mat-icon>
                 </a>
                 <!-- class="cancel-button" -->
               </div>

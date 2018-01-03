@@ -312,6 +312,9 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
     let tooltip: string = this.filterTooltips[attributes.key];
     if (!tooltip) {
       tooltip = this.createSelectionTooltip(attributes);
+      if (tooltip.length > 0) {
+        tooltip = attributes.display + '\n\n' + tooltip;
+      }
       this.filterTooltips[attributes.key] = tooltip;
     }
     return tooltip;
