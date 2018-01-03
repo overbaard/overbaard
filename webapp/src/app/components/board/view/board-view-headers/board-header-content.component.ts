@@ -1,4 +1,7 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {
+  ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange,
+  SimpleChanges
+} from '@angular/core';
 import {BoardHeader} from '../../../../view-model/board/board-header';
 import {BoardViewMode} from '../../../../model/board/user/board-view-mode';
 
@@ -8,7 +11,7 @@ import {BoardViewMode} from '../../../../model/board/user/board-view-mode';
   styleUrls: ['./board-header-content.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class BoardHeaderContentComponent implements OnInit {
+export class BoardHeaderContentComponent implements OnInit, OnChanges {
 
   @Input()
   header: BoardHeader;
@@ -33,6 +36,8 @@ export class BoardHeaderContentComponent implements OnInit {
   toggleColumnVisibility: EventEmitter<BoardHeader> = new EventEmitter<BoardHeader>();
 
   classObj: Object = {};
+
+  tooltip: string;
 
   // Expose the enum to the component
   readonly enumViewMode = BoardViewMode;
@@ -66,6 +71,15 @@ export class BoardHeaderContentComponent implements OnInit {
     }
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    const headerChange: SimpleChange = changes['header'];
+    if (headerChange) {
+      if (headerChange.previousValue !== headerChange.currentValue) {
+        this.createTooltip();
+      }
+    }
+  }
+
   onMouseEnter(event: MouseEvent) {
     if (!this.handleHover) {
       this.hovering = true;
@@ -88,4 +102,24 @@ export class BoardHeaderContentComponent implements OnInit {
     }
   }
 
+  get exceededWip(): boolean {
+    return this.header.wip > 0 && this.header.totalIssues > this.header.wip;
+  }
+
+  private createTooltip() {
+    this.tooltip =
+      `${this.header.name}\n\n`;
+
+    if (this.header.helpText) {
+      this.tooltip +=
+        `${this.header.helpText}\n\n`;
+    }
+    this.tooltip +=
+      `Visible issues: ${this.header.visibleIssues}\nTotal issues: ${this.header.totalIssues}`;
+
+    if (this.header.wip) {
+      this.tooltip +=
+        `\nWip: ${this.header.wip}`;
+    }
+  }
 }

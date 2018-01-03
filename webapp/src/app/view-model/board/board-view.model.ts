@@ -103,6 +103,7 @@ export class BoardViewModelUtil {
   static updateBoardViewModel(boardViewModel: BoardViewModel, mutate: (boardViewModel: BoardViewModel) => any): BoardViewModel {
     return (<BoardViewModelRecord>boardViewModel).withMutations(mutable => {
       return mutate(mutable);
+
     });
   }
 

@@ -2,17 +2,30 @@
   *ngIf="viewMode === enumViewMode.KANBAN"
   [ngClass]="classObj"
   (mouseenter)="onMouseEnter($event)"
-  (mouseleave)="onMouseLeave($event)">
+  (mouseleave)="onMouseLeave($event)"
+  matTooltip="{{tooltip}}"
+  [matTooltipClass]="'card-tooltip'"
+  [matTooltipShowDelay]="800"
+>
   <div *ngIf="header.visible">
     <div>{{header.name}}</div>
-    <div class="mat-caption">{{header.visibleIssues}}/{{header.totalIssues}}</div>
+    <div class="mat-caption" [class.exceeded-wip]="exceededWip">
+      {{header.visibleIssues}}/{{header.totalIssues}}
+    </div>
   </div>
   <div *ngIf="!header.visible">
     <div>{{header.abbreviation}}</div>
-    <div class="mat-caption">{{header.visibleIssues}}</div>
+    <div class="mat-caption" [class.exceeded-wip]="exceededWip">{{header.visibleIssues}}</div>
   </div>
 </div>
-<div class="header-content" *ngIf="viewMode === enumViewMode.RANK" [ngClass]="classObj">
+<div
+  *ngIf="viewMode === enumViewMode.RANK"
+  class="header-content"
+  [ngClass]="classObj"
+  matTooltip="{{tooltip}}"
+  [matTooltipClass]="'card-tooltip'"
+  [matTooltipShowDelay]="800"
+>
   <div >{{header.abbreviation}}</div>
-  <div>{{header.visibleIssues}}</div>
+  <div class="mat-caption" [class.exceeded-wip]="exceededWip">{{header.visibleIssues}}</div>
 </div>

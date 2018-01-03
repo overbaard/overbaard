@@ -1,0 +1,20 @@
+{
+  "Backlog Pool": "Unordered issues.",
+  "Backlog P2": "Next in line to be worked on.",
+  "Backlog P1": "These are coming very soon.",
+  "Analysis Dev": "Development are doing analysis.\nThis will result in an analysis document.",
+  "Analysis Handoff": "Queue/buffer for QE to do analysis.",
+  "Analysis QA": "Analysis is being done by QE.",
+  "Dev TODO": "QE and Dev agree on the analysis.",
+  "Design/POC": "The issue is being designed.",
+  "Dev In Progress": "Development is happening.",
+  "Awaiting Merge": "A pull request has been opened, and is undergoing review.",
+  "Stalled": "The issue is blocked due to external factors.",
+  "Awaiting Build": "The issue has been merged and is waiting for the next build for testing.",
+  "Verification TODO": "The issue is part of a build ready for testing.",
+  "QA In Progress": "The issue is being tested.",
+  "Awaiting Docs": "The issue is tested, but we are waiting for the docs.",
+  "Docs Verification": "The docs are being verified.",
+  "Verified": "The docs are verified.",
+  "Done": "All done!"
+}
