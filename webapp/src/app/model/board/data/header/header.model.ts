@@ -1,9 +1,10 @@
-import {List} from 'immutable';
+import {List, Map} from 'immutable';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {HeaderState} from './header.state';
 
 const DEFAULT_STATE: HeaderState = {
   states: List<string>(),
+  helpTexts: Map<string, string>(),
   wip: List<number>(),
   categories: List<string>(),
   stateToCategoryMappings: List<number>(),

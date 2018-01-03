@@ -75,7 +75,11 @@ export class BoardViewModelHandler {
           changeType = ChangeType.UPDATE_BOARD_AFTER_BACKLOG_TOGGLE;
           this._forcedRefresh = false;
         } else {
-          changeType = this._lastBoardState === initialBoardState ? ChangeType.LOAD_BOARD : ChangeType.UPDATE_BOARD;
+          if (this._lastBoardState.headers.helpTexts !== boardState.headers.helpTexts) {
+            changeType = ChangeType.INIT_HELP_TEXTS;
+          } else {
+            changeType = this._lastBoardState === initialBoardState ? ChangeType.LOAD_BOARD : ChangeType.UPDATE_BOARD;
+          }
         }
       } else if (boardState.viewId >= 0) {
         if (userSettingState.filters !== this._lastUserSettingState.filters) {
@@ -175,7 +179,9 @@ class HeadersBuilder {
   initialiseHeaders(): HeadersBuilder {
     this._headers = this._oldBoardView.headers;
 
-    if (this._oldHeaderState !== this._currentHeaderState) {
+    if (this._changeType === ChangeType.INIT_HELP_TEXTS) {
+      this.populateHelpTexts();
+    } else if (this._oldHeaderState !== this._currentHeaderState) {
       this.populateHeaders();
     }
 
@@ -221,6 +227,35 @@ class HeadersBuilder {
       }
     }
     this._headers = BoardViewModelUtil.createBoardHeaders(headerList.asImmutable());
+  }
+
+  private populateHelpTexts() {
+
+    const statesList: List<BoardHeader> = this.flattenHeaders();
+
+    const updatedStates: Map<number, BoardHeader> = Map<number, BoardHeader>().asMutable();
+    statesList.forEach((state, i) => {
+      const newState: BoardHeader = this.updateHeaderHelpText(state);
+      if (newState !== state) {
+        updatedStates.set(i, newState);
+      }
+    });
+
+    // We have already modified the states with help texts so there is no need to update further
+    // However this convenience method will take care of updating all the nested structures
+    const headersList: List<BoardHeader> = this.updateHeaders(updatedStates);
+
+    this._headers = BoardViewModelUtil.updateBoardHeaders(this._headers, boardHeaders => {
+      boardHeaders.headersList = headersList;
+    });
+  }
+
+  private updateHeaderHelpText(header: BoardHeader): BoardHeader {
+    const help: string = this._currentHeaderState.helpTexts.get(header.name);
+    if (!help) {
+      return header;
+    }
+    return BoardViewModelUtil.updateBoardHeader(header, mutable => mutable.helpText = help);
   }
 
   private toggleBacklog() {
@@ -314,9 +349,9 @@ class HeadersBuilder {
   }
 
   private updateHeaders(updatedStates: Map<number, BoardHeader>,
-                        startCategory: (h: BoardHeader) => void,
-                        categoryState: (updated: BoardHeader) => void,
-                        finaliseCategory: (mutable: BoardHeader) => void): List<BoardHeader> {
+                        startCategory?: (h: BoardHeader) => void,
+                        categoryState?: (updated: BoardHeader) => void,
+                        finaliseCategory?: (mutable: BoardHeader) => void): List<BoardHeader> {
     let headersList: List<BoardHeader> = this._headers.headersList;
     this._headers.headersList.forEach((h, i) => {
       if (!h.category) {
@@ -325,19 +360,25 @@ class HeadersBuilder {
           headersList = headersList.asMutable().set(i, updated);
         }
       } else {
-        startCategory(h);
+        if (startCategory) {
+          startCategory(h);
+        }
         let stateHeaderList: List<BoardHeader> = h.states;
         h.states.forEach((stateHeader, index) => {
           const updated: BoardHeader = updatedStates.get(stateHeader.stateIndices.get(0));
           if (updated) {
             stateHeaderList = stateHeaderList.asMutable().set(index, updated);
           }
-          categoryState(updated ? updated : stateHeader);
+          if (categoryState) {
+            categoryState(updated ? updated : stateHeader);
+          }
         });
         if (stateHeaderList !== h.states) {
           const updated: BoardHeader = BoardViewModelUtil.updateBoardHeader(h, mutable => {
             mutable.states = stateHeaderList.asImmutable();
-            finaliseCategory(mutable);
+            if (finaliseCategory) {
+              finaliseCategory(mutable);
+            }
           });
           headersList = headersList.asMutable().set(i, updated);
         }
@@ -398,7 +439,8 @@ function StateHeader(name: string, backlog: boolean, stateIndex: number, wip: nu
     wip: wip,
     totalIssues: 0,
     visibleIssues: 0,
-    visible: visible});
+    visible: visible,
+    helpText: null});
 }
 
 function CategoryHeader(name: string, backlog: boolean, visible: boolean, states: List<BoardHeader>): BoardHeader {
@@ -421,7 +463,8 @@ function CategoryHeader(name: string, backlog: boolean, visible: boolean, states
     wip: wip,
     totalIssues: 0,
     visibleIssues: 0,
-    visible: visible});
+    visible: visible,
+    helpText: null});
 }
 
 function abbreviate(str: string): string {
@@ -1146,7 +1189,8 @@ enum ChangeType {
   TOGGLE_SWIMLANE_SHOW_EMPTY,
   TOGGLE_SWIMLANE_COLLAPSED,
   SWITCH_VIEW_MODE,
-  UPDATE_ISSUE_DETAIL
+  UPDATE_ISSUE_DETAIL,
+  INIT_HELP_TEXTS
 }
 
 function collapsed(userSettingState: UserSettingState, key: string): boolean {

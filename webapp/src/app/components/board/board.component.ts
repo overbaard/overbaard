@@ -81,7 +81,7 @@ export class BoardComponent implements OnInit, OnDestroy {
           this.viewMode = userSettingsValue.viewMode;
           userSettings = userSettingsValue;
           // TODO progress and error handling
-          this._boardService.loadBoardData(userSettingsValue.boardCode, userSettings.showBacklog);
+          this._boardService.loadBoardData(userSettingsValue.boardCode, userSettings.showBacklog, true);
         });
 
 
@@ -163,7 +163,7 @@ export class BoardComponent implements OnInit, OnDestroy {
     // if we have the list with the backlog shown and then simply hide locally without doing a full reload, the rank changes we
     // get from the server will be based off the 'no backlog' indices, while we would have the list including the backlog
     // issues
-    this._boardService.loadBoardData(userSetting.boardCode, userSetting.showBacklog);
+    this._boardService.loadBoardData(userSetting.boardCode, userSetting.showBacklog, false);
   }
 
 

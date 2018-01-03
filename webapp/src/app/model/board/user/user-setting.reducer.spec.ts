@@ -605,7 +605,8 @@ describe('User setting reducer tests', () => {
           visibleIssues: 0,
           visible: true,
           states: List<BoardHeader>(),
-          stateIndices: List<number>([0])
+          stateIndices: List<number>([0]),
+          helpText: null
         };
       }
     })

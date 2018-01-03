@@ -12,7 +12,7 @@ import {UserSettingState} from './user-setting';
 import {AppState} from '../../../app-store';
 import {BoardViewMode} from './board-view-mode';
 import {IssueSummaryLevel, toIssueSummaryLevel} from './issue-summary-level';
-import {IssueDetailState, IssueDetailUtil} from './issue-detail/issue-detail.model';
+import {IssueDetailUtil} from './issue-detail/issue-detail.model';
 
 const CLEAR_SETTINGS = 'CLEAR_SETTINGS';
 

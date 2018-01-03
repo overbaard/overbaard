@@ -32,7 +32,8 @@ const DEFAULT_BOARD_HEADER: BoardHeader = {
   wip: 0,
   visible: false,
   totalIssues: 0,
-  visibleIssues: 0
+  visibleIssues: 0,
+  helpText: null
 }
 
 const DEFAULT_ISSUE_TABLE: IssueTable = {

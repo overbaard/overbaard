@@ -11,4 +11,5 @@ export interface BoardHeader {
   visible: boolean;
   totalIssues: number;
   visibleIssues: number;
+  helpText: string;
 }

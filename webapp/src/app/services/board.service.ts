@@ -12,6 +12,7 @@ import {AppState} from '../app-store';
 import {BoardActions, boardViewIdSelector} from '../model/board/data/board.reducer';
 import {showBacklogSelector} from '../model/board/user/user-setting.reducer';
 import {BoardIssueView} from '../view-model/board/board-issue-view';
+import {HeaderActions} from '../model/board/data/header/header.reducer';
 
 @Injectable()
 export class BoardService {
@@ -27,7 +28,7 @@ export class BoardService {
   }
 
 
-  loadBoardData(boardCode: string, backlog: boolean) {
+  loadBoardData(boardCode: string, backlog: boolean, firstLoad: boolean) {
     // Cancel any background polling
     this.stopPolling();
 
@@ -47,6 +48,23 @@ export class BoardService {
         data => {
           this._store.dispatch(BoardActions.createDeserializeBoard(this._restUrlService.jiraUrl, data));
           this.recreateChangePollerAndStartPolling(boardCode, backlog, false);
+          if (firstLoad) {
+            this.loadStateHelpTexts(boardCode);
+          }
+        }
+      );
+  }
+
+  private loadStateHelpTexts(boardCode: string) {
+    const progress: Progress = this._progressLog.startUserAction();
+    const url = UrlService.OVERBAARD_REST_PREFIX + '/issues/' + boardCode + '/help';
+    const path: string = this._restUrlService.caclulateRestUrl(url);
+    console.log('Loading help texts ' + path);
+    return executeRequest(progress, BoardService._bigTimeout, () => {}, this._http.get(path))
+      .take(1)
+      .subscribe(
+        data => {
+          this._store.dispatch(HeaderActions.createLoadHelpTexts(data));
         }
       );
   }

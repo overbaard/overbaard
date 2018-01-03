@@ -4,12 +4,10 @@ import {
 } from './board-view.common.spec';
 import {HeaderState} from '../../model/board/data/header/header.state';
 import {HeaderActions, headerMetaReducer} from '../../model/board/data/header/header.reducer';
-import {initialHeaderState} from '../../model/board/data/header/header.model';
 import {DeserializeIssueLookupParams} from '../../model/board/data/issue/issue.model';
 import {List} from 'immutable';
 import {BoardHeaders} from './board-headers';
 import {Dictionary} from '../../common/dictionary';
-import {init} from 'protractor/built/launcher';
 import {BoardHeader} from './board-header';
 
 describe('Board headers tests', () => {
@@ -1310,6 +1308,110 @@ describe('Board headers tests', () => {
 
     }
   });
+
+  describe('Help Texts', () => {
+    let original: BoardHeaders;
+    beforeEach(() => {
+      util = createInitialiser();
+      util
+        .observer().take(1).map(board => board.headers)
+        .subscribe(headers => {
+          check(headers.headersList,
+            new HeaderChecker('Backlog').stateIndices(0, 1).counts(2, 2).backlog().invisible()
+              .states(
+                new HeaderChecker('B1').stateIndices(0).counts(1, 1).backlog().invisible(),
+                new HeaderChecker('B2').stateIndices(1).counts(1, 1).backlog().invisible()),
+            new HeaderChecker('H1').stateIndices(2, 3).counts(2, 2)
+              .states(
+                new HeaderChecker('S1').stateIndices(2).counts(1, 1),
+                new HeaderChecker('S2').stateIndices(3).counts(1, 1)),
+            new HeaderChecker('S3').stateIndices(4).counts(1, 1).invisible(),
+            new HeaderChecker('H2').stateIndices(5, 6).counts(3, 3)
+              .states(
+                new HeaderChecker('S4').stateIndices(5).counts(1, 1).invisible(),
+                new HeaderChecker('S5').stateIndices(6).counts(2, 2)),
+            new HeaderChecker('S6').stateIndices(7).counts(1, 1));
+          original = headers;
+        });
+    })
+
+    it ('Empty help texts', () => {
+      util.getBoardStateUpdater().setHelpTexts({}).emit()
+        .observer()
+        .take(1)
+        .map(board => board.headers)
+        .subscribe(headers => {
+          expect(headers).toBe(original);
+        });
+    });
+
+    it ('Initialise help texts', () => {
+      const help: any = {
+        B2: 'B-One',
+        S2: 'Two',
+        S6: 'Six'
+      };
+      util.getBoardStateUpdater().setHelpTexts(help).emit()
+        .observer()
+        .take(1)
+        .map(board => board.headers)
+        .subscribe(headers => {
+          checkAndCompare(headers.headersList, original,
+            new HeaderChecker('Backlog').stateIndices(0, 1).counts(2, 2).backlog().invisible()
+              .states(
+                new HeaderChecker('B1').stateIndices(0).counts(1, 1).backlog().invisible().same(),
+                new HeaderChecker('B2').stateIndices(1).counts(1, 1).help('B-One').backlog().invisible()),
+            new HeaderChecker('H1').stateIndices(2, 3).counts(2, 2)
+              .states(
+                new HeaderChecker('S1').stateIndices(2).counts(1, 1).same(),
+                new HeaderChecker('S2').stateIndices(3).counts(1, 1).help('Two')),
+            new HeaderChecker('S3').stateIndices(4).counts(1, 1).invisible().same(),
+            new HeaderChecker('H2').stateIndices(5, 6).counts(3, 3).same()
+              .states(
+                new HeaderChecker('S4').stateIndices(5).counts(1, 1).invisible().same(),
+                new HeaderChecker('S5').stateIndices(6).counts(2, 2).same()),
+            new HeaderChecker('S6').stateIndices(7).counts(1, 1).help('Six'));
+        });
+    });
+
+    function createInitialiser(): BoardViewObservableUtil {
+      const headerStateFactory: HeaderStateFactory = new TestHeaderStateFactory([
+        {name: 'B1'},
+        {name: 'B2'},
+        {name: 'S1', header: 0},
+        {name: 'S2', header: 0},
+        {name: 'S3'},
+        {name: 'S4', header: 1},
+        {name: 'S5', header: 1},
+        {name: 'S6'}], ['H1', 'H2'], 2);
+
+      return new BoardViewObservableUtil({hidden: '4,5'})
+        .updateBoardState(
+          new BoardStateInitializer('ONE')
+            .headerStateFactory(headerStateFactory)
+            .setRank('ONE', 1, 2, 3, 4, 5, 6, 7, 8, 9)
+            .mapState('ONE', 'B1', '1-A')
+            .mapState('ONE', 'B2', '1-B')
+            .mapState('ONE', 'S1', '1-1')
+            .mapState('ONE', 'S2', '1-2')
+            .mapState('ONE', 'S3', '1-3')
+            .mapState('ONE', 'S4', '1-4')
+            .mapState('ONE', 'S5', '1-5')
+            .mapState('ONE', 'S6', '1-6')
+            .issuesFactory(
+              new SimpleIssueFactory()
+                .addIssue('ONE-1', 0)
+                .addIssue('ONE-2', 1)
+                .addIssue('ONE-3', 2)
+                .addIssue('ONE-4', 3)
+                .addIssue('ONE-5', 4)
+                .addIssue('ONE-6', 5)
+                .addIssue('ONE-7', 6)
+                .addIssue('ONE-8', 6)
+                .addIssue('ONE-9', 7)
+            ));
+    }
+  });
 });
 
 function checkAndCompare(headers: List<BoardHeader>, original: BoardHeaders, ...checkers: HeaderChecker[]) {
@@ -1367,15 +1469,17 @@ class SimpleIssueFactory implements IssuesFactory {
 
   createIssueStateInput(params: DeserializeIssueLookupParams): any {
     const input: any = {};
-    for (let i = 0 ; i < this._issueKeys.length ; i++) {
-      const id = Number(this._issueKeys[i].substr(this._issueKeys[i].indexOf('-') + 1));
-      input[this._issueKeys[i]] = {
-        key: this._issueKeys[i],
-        type: id % 2,
-        priority: id % 2,
-        summary: '-',
-        state: this._issueStates[i]
-      };
+    if (this._issueKeys) {
+      for (let i = 0; i < this._issueKeys.length; i++) {
+        const id = Number(this._issueKeys[i].substr(this._issueKeys[i].indexOf('-') + 1));
+        input[this._issueKeys[i]] = {
+          key: this._issueKeys[i],
+          type: id % 2,
+          priority: id % 2,
+          summary: '-',
+          state: this._issueStates[i]
+        };
+      }
     }
     return input;
   }
@@ -1392,6 +1496,7 @@ class HeaderChecker {
   _visibleIssues = 0;
   _states: HeaderChecker[];
   _same = false;
+  _help: string;
 
   constructor(name: string) {
     this._name = name;
@@ -1446,6 +1551,11 @@ class HeaderChecker {
     return this;
   }
 
+  help(help: string): HeaderChecker {
+    this._help = help;
+    return this;
+  }
+
   check(header: BoardHeader) {
     expect(header.name).toEqual(this._name, header.name);
     expect(header.wip).toEqual(this._wip, header.name);
@@ -1463,6 +1573,11 @@ class HeaderChecker {
     }
     if (this._abbreviated) {
       expect(header.abbreviation).toEqual(this._abbreviated, header.name);
+    }
+    if (this._help) {
+      expect(header.helpText).toEqual(this._help, header.name);
+    } else {
+      expect(header.helpText).toBeFalsy(header.name);
     }
   }
 }

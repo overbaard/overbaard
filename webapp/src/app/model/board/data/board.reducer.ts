@@ -4,7 +4,7 @@ import {IssueTypeActions, issueTypeMetaReducer} from './issue-type/issue-type.re
 import {IssueActions, issueMetaReducer} from './issue/issue.reducer';
 import {AssigneeActions, assigneeMetaReducer} from './assignee/assignee.reducer';
 import {PriorityActions, priorityMetaReducer} from './priority/priority.reducer';
-import {HeaderActions, headerMetaReducer} from './header/header.reducer';
+import {HeaderActions, headerMetaReducer, LOAD_HELP_TEXTS} from './header/header.reducer';
 import {ProjectActions, projectMetaReducer} from './project/project.reducer';
 import {AssigneeState} from './assignee/assignee.model';
 import {DeserializeIssueLookupParams, IssueState} from './issue/issue.model';
@@ -225,6 +225,11 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
         mutable.ranks = rankState;
         mutable.blacklist = blacklistState;
       });
+    }
+    case LOAD_HELP_TEXTS: {
+      return BoardUtil.withMutations(state, mutable => {
+        mutable.headers = headerMetaReducer(mutable.headers, action);
+      })
     }
     default:
       return state;

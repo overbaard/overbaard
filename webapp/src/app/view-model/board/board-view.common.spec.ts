@@ -39,6 +39,7 @@ import {BoardHeader} from './board-header';
 import {UserSettingState} from '../../model/board/user/user-setting';
 import {Action} from '@ngrx/store';
 import {IssueSummaryLevel} from '../../model/board/user/issue-summary-level';
+import {HeaderActions, headerMetaReducer} from '../../model/board/data/header/header.reducer';
 
 export class BoardViewObservableUtil {
   private _service: BoardViewModelHandler = new BoardViewModelHandler();
@@ -208,6 +209,7 @@ export class BoardStateUpdater {
   private _issueChanges: any;
   private _rankChanges: any;
   private _rankDeleted: string[];
+  private _helpTexts: any;
 
   constructor(private _mainUtil: BoardViewObservableUtil) {
   }
@@ -229,18 +231,31 @@ export class BoardStateUpdater {
     return this;
   }
 
+  setHelpTexts(input: any): BoardStateUpdater {
+    expect(this._mainUtil.boardState.viewId).toBeGreaterThan(-1);
+    this._helpTexts = input;
+    return this;
+  }
+
   emit(): BoardViewObservableUtil {
+
     const boardState: BoardState = BoardUtil.withMutations(this._mainUtil.boardState, mutable => {
-      mutable.viewId = mutable.viewId + 1;
-      mutable.issues = issueMetaReducer(
-        this._mainUtil.boardState.issues,
-        IssueActions.createChangeIssuesAction(
-          this._issueChanges ? this._issueChanges : {},
-          getDeserializeIssueLookupParams(this._mainUtil.boardState.headers, this._mainUtil.boardState.projects)));
-      if (this._rankChanges || this._rankDeleted) {
-        mutable.ranks = rankMetaReducer(
-          this._mainUtil.boardState.ranks,
-          RankActions.createRerank(this._rankChanges, this._rankDeleted));
+      if (this._issueChanges || this._rankChanges || this._rankDeleted) {
+        // Don't bump the view id when we add the help texts
+        mutable.viewId = mutable.viewId + 1;
+
+        mutable.issues = issueMetaReducer(
+          this._mainUtil.boardState.issues,
+          IssueActions.createChangeIssuesAction(
+            this._issueChanges ? this._issueChanges : {},
+            getDeserializeIssueLookupParams(this._mainUtil.boardState.headers, this._mainUtil.boardState.projects)));
+        if (this._rankChanges || this._rankDeleted) {
+          mutable.ranks = rankMetaReducer(
+            this._mainUtil.boardState.ranks,
+            RankActions.createRerank(this._rankChanges, this._rankDeleted));
+        }
+      } else if (this._helpTexts) {
+        mutable.headers = headerMetaReducer(mutable.headers, HeaderActions.createLoadHelpTexts(this._helpTexts));
       }
     });
     return this._mainUtil.emitBoardState(boardState);

@@ -94,7 +94,8 @@ describe('Boards Query Parameters Service Tests', () => {
           backlog: 1,
           wip: null,
           categories: null,
-          stateToCategoryMappings: null
+          stateToCategoryMappings: null,
+          helpTexts: null
         };
       });
       boardSubject.next(newBoard);

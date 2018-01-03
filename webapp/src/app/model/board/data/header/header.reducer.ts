@@ -1,10 +1,11 @@
-import {List} from 'immutable';
+import {List, Map} from 'immutable';
 import {HeaderUtil, initialHeaderState} from './header.model';
 import {Action} from '@ngrx/store';
 import {HeaderState} from './header.state';
 
 
 const DESERIALIZE_HEADERS = 'DESERIALIZE_HEADERS';
+export const LOAD_HELP_TEXTS = 'LOAD_HELP_TEXTS';
 
 class DeserializeHeadersAction implements Action {
   readonly type = DESERIALIZE_HEADERS;
@@ -12,9 +13,19 @@ class DeserializeHeadersAction implements Action {
   }
 }
 
+class LoadHelpTextsAction implements Action {
+  type = LOAD_HELP_TEXTS;
+  constructor(public payload: any) {
+  }
+}
+
 export class HeaderActions {
   static createDeserializeHeaders(states: any[], headers: string[], backlog: number, done: number): Action {
     return new DeserializeHeadersAction({states: states, headers: headers, backlog: backlog, done: done});
+  }
+
+  static createLoadHelpTexts(input: any) {
+    return new LoadHelpTextsAction(input);
   }
 }
 
@@ -56,6 +67,12 @@ export function headerMetaReducer(state: HeaderState = initialHeaderState, actio
         }
       });
       return newState;
+    }
+    case LOAD_HELP_TEXTS: {
+      const payload: any = (<LoadHelpTextsAction>action).payload;
+      return HeaderUtil.withMutations(state, (mutable => {
+        mutable.helpTexts = Map<string, string>(payload);
+      }))
     }
   }
   return state;
