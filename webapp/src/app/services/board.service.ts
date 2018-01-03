@@ -76,7 +76,8 @@ export class BoardService {
     // Cancel any background polling
     this.stopPolling();
 
-    const progress: Progress = this._progressLog.startUserAction(`Updated ${taskName} to ${selectedOptionName}`);
+    const progress: Progress =
+      this._progressLog.startUserAction(`Updated '${taskName}' to '${selectedOptionName}' for ${issueKey}`);
 
     const path: string = this._restUrlService.caclulateRestUrl(
       UrlService.OVERBAARD_REST_PREFIX + '/issues/' + boardCode + '/parallel/' + issueKey);
