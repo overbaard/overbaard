@@ -2,7 +2,7 @@ import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, OnIn
 import {AppState} from '../../../app-store';
 import {Store} from '@ngrx/store';
 import {Dictionary} from '../../../common/dictionary';
-import {FormControl, FormGroup} from '@angular/forms';
+import {AbstractControl, FormControl, FormGroup} from '@angular/forms';
 import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/takeUntil';
 import 'rxjs/add/operator/map';
@@ -78,7 +78,7 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
   // Expose the enum to the template
   enumViewMode = BoardViewMode;
 
-  clearingFilter: FilterAttributes;
+  bulkUpdateFilter: FilterAttributes;
 
   constructor(private _store: Store<AppState>) {
   }
@@ -256,19 +256,18 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
   }
 
 
-  onClearFilter(filter: FilterAttributes) {
+  onClearFilter(event: MouseEvent, filter: FilterAttributes) {
     event.preventDefault();
     event.stopPropagation();
     // This gets cleared by processFormValueChanges
-    this.clearingFilter = filter;
+    this.bulkUpdateFilter = filter;
     const set: Set<string> = this.getNonParallelTaskSet(filter);
+    const group: FormGroup = <FormGroup>this.filterForm.controls[filter.key];
     if (set) {
-      const group: FormGroup = <FormGroup>this.filterForm.controls[filter.key];
       set.forEach(k => group.controls[k].setValue(false));
     }
 
     if (filter === PARALLEL_TASK_ATTRIBUTES) {
-      const group: FormGroup = <FormGroup>this.filterForm.controls[filter.key];
       this.userSettings.filters.parallelTask.forEach((ptSet, key) => {
         const taskGroup: FormGroup = <FormGroup>group.controls[key];
         ptSet.forEach(k => taskGroup.controls[k].setValue(false));
@@ -276,15 +275,54 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
     }
   }
 
+  onInvertFilter(filter: FilterAttributes) {
+    this.bulkUpdateFilter = filter;
+    const group: FormGroup = <FormGroup>this.filterForm.controls[filter.key];
+    if (filter !== PARALLEL_TASK_ATTRIBUTES) {
+      this.invertSelection(group);
+    } else {
+      this.userSettings.filters.parallelTask.forEach((ptSet, key) => {
+        const taskGroup: FormGroup = <FormGroup>group.controls[key];
+        this.invertSelection(taskGroup);
+      });
+    }
+  }
+
+  private invertSelection(group: FormGroup) {
+    for (const name of Object.keys(group.controls)) {
+      const control: AbstractControl = group.controls[name];
+      const value: boolean = control.value;
+      control.setValue(!value);
+    }
+  }
+
+  onSelectAllFilter(filter: FilterAttributes) {
+    this.bulkUpdateFilter = filter;
+    const group: FormGroup = <FormGroup>this.filterForm.controls[filter.key];
+    if (filter !== PARALLEL_TASK_ATTRIBUTES) {
+      this.selectAll(group);
+    } else {
+      this.userSettings.filters.parallelTask.forEach((ptSet, key) => {
+        const taskGroup: FormGroup = <FormGroup>group.controls[key];
+        this.selectAll(taskGroup);
+      });
+    }
+  }
+
+  private selectAll(group: FormGroup) {
+    for (const name of Object.keys(group.controls)) {
+      group.controls[name].setValue(true);
+    }
+  }
+
   processFormValueChanges(value: any) {
-    console.log('updated ' + value);
-    // clearingFilter is set by the onClearFilter()
-    const filter: FilterAttributes = this.clearingFilter ? this.clearingFilter : this.filtersToDisplay;
+    // bulkUpdateFilter is set by the onXXXFilter()
+    const filter: FilterAttributes = this.bulkUpdateFilter ? this.bulkUpdateFilter : this.filtersToDisplay;
     const obj: Object = value[filter.key];
     this._store.dispatch(BoardFilterActions.createUpdateFilter(filter, obj));
     this.filterForm.reset(value);
     this.filterTooltips[filter.key] = null;
-    this.clearingFilter = null;
+    this.bulkUpdateFilter = null;
   }
 
   processSwimlaneChange(value: any) {
@@ -400,6 +438,7 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
   onChangeShowParallelTasks(event: MatCheckboxChange) {
     this._store.dispatch(UserSettingActions.createUpdateShowParallelTasks(event.checked));
   }
+
 }
 
 interface FilterFormEntry {

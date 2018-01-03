@@ -78,36 +78,12 @@
                   {{entry.display}}
                 </span>
               </div>
-
-              <!-- 'Toolbar' buttons -->
-              <div *ngIf="filtersToDisplay === entry">
+              <div *ngIf="getSelectionTooltip(entry).length > 0 && filtersToDisplay !== entry">
                 <a
                   mat-icon-button
                   color="accent"
                   class="filter-toolbar-button"
-                  (click)="onClearFilter(entry)"
-                  matTooltip="Invert selection"
-                >
-                  <mat-icon class="filter-toolbar-button">invert_colors</mat-icon>
-                </a>
-              </div>
-              <div *ngIf="filtersToDisplay === entry">
-                <a
-                  mat-icon-button
-                  color="accent"
-                  class="filter-toolbar-button"
-                  (click)="onClearFilter(entry)"
-                  matTooltip="Select all"
-                >
-                  <mat-icon class="filter-toolbar-button">select_all</mat-icon>
-                </a>
-              </div>
-              <div *ngIf="getSelectionTooltip(entry).length > 0 || filtersToDisplay === entry">
-                <a
-                  mat-icon-button
-                  color="accent"
-                  class="filter-toolbar-button"
-                  (click)="onClearFilter(entry)"
+                  (click)="onClearFilter($event, entry)"
                   matTooltip="Clear all"
                 >
                   <mat-icon class="filter-toolbar-button">cancel</mat-icon>
@@ -119,6 +95,45 @@
         </mat-expansion-panel-header>
         <!-- TODO investigate pulling this into a separate component -->
         <div *ngIf="filtersToDisplay === entry">
+
+          <div style="display: flex">
+            <div class="space-filler"></div>
+            <div class="filter-toolbar-button">
+              <a
+                mat-icon-button
+                color="accent"
+                class="filter-toolbar-button"
+                (click)="onInvertFilter(entry)"
+                matTooltip="Invert selection"
+              >
+                <mat-icon class="filter-toolbar-button">invert_colors</mat-icon>
+              </a>
+            </div>
+            <div class="filter-toolbar-padding">
+            <a
+              mat-icon-button
+              color="accent"
+              class="filter-toolbar-button"
+              (click)="onSelectAllFilter(entry)"
+              matTooltip="Select all"
+            >
+              <mat-icon class="filter-toolbar-button">select_all</mat-icon>
+            </a>
+            </div>
+            <div class="filter-toolbar-padding">
+            <a
+              mat-icon-button
+              color="accent"
+              class="filter-toolbar-button"
+              (click)="onClearFilter($event, entry)"
+              matTooltip="Clear all"
+            >
+              <mat-icon class="filter-toolbar-button">cancel</mat-icon>
+            </a>
+            </div>
+            <!-- class="cancel-button" -->
+          </div>
+
           <div [formGroup]="filterForm" #f="ngForm">
             <div formGroupName="{{filtersToDisplay.key}}">
               <div *ngFor="let entry of currentFilterEntries">

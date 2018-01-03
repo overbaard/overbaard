@@ -7,6 +7,9 @@
 .filter-toolbar-button {
   @include sized-icon-button-class(18px, 18px, 18px);
 }
+.filter-toolbar-padding {
+  padding-left: 5px;
+}
 .mat-h4 {
   margin-bottom: 0px;
 }
