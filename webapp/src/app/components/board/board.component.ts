@@ -173,7 +173,7 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   onUpdateParallelTask(event: UpdateParallelTaskEvent) {
     this.userSettings$.take(1).subscribe(us => {
-      this._boardService.setParallelTaskOption(us.boardCode, us.showBacklog, event.issueKey, event.taskIndex, event.selectedOptionIndex);
+      this._boardService.setParallelTaskOption(us.boardCode, us.showBacklog, event.issueKey, event.taskName, event.taskIndex, event.optionName, event.selectedOptionIndex);
     });
   }
 

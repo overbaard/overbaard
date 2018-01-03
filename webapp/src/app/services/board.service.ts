@@ -69,12 +69,14 @@ export class BoardService {
       );
   }
 
-  setParallelTaskOption(boardCode: string, backlog: boolean, issueKey: string, taskIndex: number, selectedOptionIndex: number) {
+  setParallelTaskOption(boardCode: string, backlog: boolean, issueKey: string, taskName: string,
+                        taskIndex: number, selectedOptionName: string, selectedOptionIndex: number) {
+
     // Cancel any background polling
     // Cancel any background polling
     this.stopPolling();
 
-    const progress: Progress = this._progressLog.startUserAction();
+    const progress: Progress = this._progressLog.startUserAction(`Updated ${taskName} to ${selectedOptionName}`);
 
     const path: string = this._restUrlService.caclulateRestUrl(
       UrlService.OVERBAARD_REST_PREFIX + '/issues/' + boardCode + '/parallel/' + issueKey);

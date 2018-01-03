@@ -56,7 +56,9 @@ export class ParallelTaskComponent implements OnInit {
         this.updateParallelTask.emit({
           issueKey: this.issue.key,
           taskIndex: this.taskIndex = this.taskIndex,
-          selectedOptionIndex: index
+          selectedOptionIndex: index,
+          taskName: this.parallelTask.name,
+          optionName: option.name
         });
       }
     });
