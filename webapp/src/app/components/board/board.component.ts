@@ -38,8 +38,6 @@ import {BlacklistDialogComponent} from './blacklist/blacklist-dialog.component';
 })
 export class BoardComponent implements OnInit, OnDestroy {
 
-  // TODO move these into the store?
-  private boardCode: string;
   viewMode: BoardViewMode = BoardViewMode.KANBAN;
 
   board$: Observable<BoardViewModel>;
@@ -59,8 +57,7 @@ export class BoardComponent implements OnInit, OnDestroy {
   blacklist: BlacklistState;
 
 
-  private readonly blacklistMsg = 'There are problems in the configuration of ' + this.boardCode +
-    '. Click the red warning icon for details, and let your administrator know.';
+  private _blacklistMsg:string;
 
   constructor(
     private _elementRef: ElementRef,
@@ -92,6 +89,9 @@ export class BoardComponent implements OnInit, OnDestroy {
           userSettings = userSettingsValue;
           // TODO progress and error handling
           this._boardService.loadBoardData(userSettingsValue.boardCode, userSettings.showBacklog, true);
+
+          this._blacklistMsg = 'There are problems in the configuration of board \'' + userSettingsValue.boardCode +
+            '\'. Click the red warning icon for details, and let your administrator know.';
         });
 
 
@@ -112,7 +112,7 @@ export class BoardComponent implements OnInit, OnDestroy {
         (blacklist: BlacklistState) => {
           if (!shownBlacklstLogMessage) {
             shownBlacklstLogMessage = true;
-            this._store.dispatch(ProgressLogActions.createLogMessage(this.blacklistMsg, true));
+            this._store.dispatch(ProgressLogActions.createLogMessage(this._blacklistMsg, true));
           }
           this.blacklist = blacklist;
         });
@@ -234,7 +234,7 @@ export class BoardComponent implements OnInit, OnDestroy {
       .take(1)
       .subscribe(
         logEntry => {
-          if (logEntry && logEntry.message === this.blacklistMsg) {
+          if (logEntry && logEntry.message === this._blacklistMsg) {
             // We have clicked the show blacklist button, so let's dismiss the error message telling us to view it
 
             // A simple ProgressLogActions.createClearFirstMessage() does not actually dismiss the snackbar message,
