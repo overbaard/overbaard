@@ -220,21 +220,6 @@
       "assignee": 1,
       "type": 0
     }
-  },
-  "blacklist" : {
-    "states": [
-      "No Such State"
-    ],
-    "priorities": [
-      "Critical"
-    ],
-    "issue-types": [
-      "Super Duper Urgent"
-    ],
-    "issues": [
-      "BAD-20",
-      "BAD-999"
-    ]
   }
 
 }

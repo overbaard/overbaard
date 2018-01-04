@@ -40,5 +40,9 @@ export class BlacklistUtil {
       mutate(mutable);
     });
   }
+
+  static hasEntries(s: BlacklistState): boolean {
+    return s.states.size > 0 || s.issueTypes.size > 0 || s.priorities.size > 0 || s.issues.size > 0;
+  }
 }
 

@@ -37,6 +37,8 @@
 
   </mat-drawer-container>
 </div>
+
+<!-- Open/close settings drawer button -->
 <button *ngIf="!settingsOpen"
         mat-fab color="accent"
         (click)="settings.open('mouse'); "
@@ -48,4 +50,12 @@
         (click)="settings.close('mouse');"
         class="settings-icon">
   <mat-icon>clear</mat-icon>
+</button>
+
+<!-- Open blacklist -->
+<button *ngIf="blacklist"
+        mat-fab color="warn"
+        (click)="onClickBlacklist()"
+        class="blacklist-icon">
+  <mat-icon>alarm</mat-icon>
 </button>

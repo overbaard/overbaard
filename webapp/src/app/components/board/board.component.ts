@@ -4,10 +4,11 @@ import {AppHeaderService} from '../../services/app-header.service';
 import {BoardService} from '../../services/board.service';
 import {Store} from '@ngrx/store';
 import {AppState} from '../../app-store';
-import {BoardActions} from '../../model/board/data/board.reducer';
+import {blacklistSelector, BoardActions} from '../../model/board/data/board.reducer';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/skipWhile';
 import 'rxjs/add/operator/takeUntil';
+import 'rxjs/add/operator/filter';
 import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/observable/of';
 import {Subject} from 'rxjs/Subject';
@@ -19,6 +20,8 @@ import {UserSettingState} from '../../model/board/user/user-setting';
 import {BoardViewMode} from '../../model/board/user/board-view-mode';
 import {BoardQueryParamsService} from '../../services/board-query-params.service';
 import {UpdateParallelTaskEvent} from '../../events/update-parallel-task.event';
+import {BlacklistState, BlacklistUtil} from '../../model/board/data/blacklist/blacklist.model';
+import {ProgressLogActions} from '../../model/global/progress-log/progress-log.reducer';
 
 
 @Component({
@@ -47,6 +50,8 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   openingSettings: boolean;
   settingsOpen: boolean;
+
+  blacklist: BlacklistState;
 
   constructor(
     private _elementRef: ElementRef,
@@ -88,6 +93,21 @@ export class BoardComponent implements OnInit, OnDestroy {
       .subscribe(queryString => {
         this.updateLink(queryString);
       });
+
+    let shownBlacklstLogMessage = false;
+    this._store.select(blacklistSelector)
+      .takeUntil(this._destroy$)
+      .filter((blacklist: BlacklistState) => BlacklistUtil.hasEntries(blacklist))
+      .subscribe(
+        (blacklist: BlacklistState) => {
+          if (!shownBlacklstLogMessage) {
+            shownBlacklstLogMessage = true;
+            this._store.dispatch(
+              ProgressLogActions.createLogMessage('There are problems in the configuration. Click the ' +
+                'red warning icon for details, and let your administrator know.', true));
+          }
+          this.blacklist = blacklist;
+        });
   }
 
 
@@ -199,6 +219,10 @@ export class BoardComponent implements OnInit, OnDestroy {
       url = url + '?' + queryString;
       history.replaceState(null, null, url);
     }
+  }
+
+  onClickBlacklist() {
+
   }
 }
 

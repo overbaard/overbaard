@@ -259,5 +259,7 @@ function addAll(result: string[], input: any, ...keys: string[]) {
 
 export const boardSelector = (state: AppState) => state.board;
 const getViewId = (state: BoardState) => state.viewId;
-export const boardViewIdSelector = createSelector(boardSelector, getViewId)
+const getBlacklist = (state: BoardState) => state.blacklist;
+export const boardViewIdSelector = createSelector(boardSelector, getViewId);
+export const blacklistSelector = createSelector(boardSelector, getBlacklist);
 

@@ -34,9 +34,18 @@
   height: 100%;
   overflow: hidden;
 }
-.settings-icon {
+
+.board-icon-base {
   z-index: 999;
   position: absolute;
   bottom: 20px;
+}
+
+.settings-icon {
+  @extend .board-icon-base;
   right: 20px
+}
+.blacklist-icon {
+  @extend .board-icon-base;
+  right: 90px
 }
