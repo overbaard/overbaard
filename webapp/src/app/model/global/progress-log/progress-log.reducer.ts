@@ -9,7 +9,8 @@ const COMPLETE_LOADING = 'COMPLETE_LOADING';
 const LOG_MESSAGE = 'LOG_MESSAGE';
 const CLEAR_FIRST_MESSAGE = 'CLEAR_FIRST_MESSAGE';
 const NOT_LOGGED_IN = 'NOT_LOGGED_IN';
-
+const EXTERNALLY_DISMISS_FIRST_MESSAGE = 'EXTERNALLY_DISMISS_FIRST_MESSAGE';
+const RESET_EXTERNALLY_DISMISS_FIRST_MESSAGE = 'RESET_EXTERNALLY_DISMISS_FIRST_MESSAGE';
 
 export class StartLoadingAction implements Action {
   type = START_LOADING;
@@ -33,6 +34,14 @@ export class NotLoggedInAction implements Action {
   type = NOT_LOGGED_IN;
 }
 
+export class ExternallyDismissFirstMessageAction implements Action {
+  type = EXTERNALLY_DISMISS_FIRST_MESSAGE;
+}
+
+export class ResetExternallyDismissFirstMessageAction implements Action {
+  type = RESET_EXTERNALLY_DISMISS_FIRST_MESSAGE;
+}
+
 export class ProgressLogActions {
 
   static createStartLoading(): Action {
@@ -49,6 +58,14 @@ export class ProgressLogActions {
 
   static createClearFirstMessage() {
     return new ClearFirstMessageAction();
+  }
+
+  static createExternallyDismissFirstMessage() {
+    return new ExternallyDismissFirstMessageAction();
+  }
+
+  static createResetExternallyFirstMessage() {
+    return new ResetExternallyDismissFirstMessageAction();
   }
 
   static createNotLoggedIn() {
@@ -85,6 +102,16 @@ export function progressLogReducer(state: ProgressLogState = initialProgressLogS
         mutable.notLoggedIn = true;
       });
     }
+    case EXTERNALLY_DISMISS_FIRST_MESSAGE: {
+      return ProgressLogUtil.updateProgressLogState(state, mutable => {
+        mutable.externallyDismissFirstMessage = true;
+      });
+    }
+    case RESET_EXTERNALLY_DISMISS_FIRST_MESSAGE: {
+      return ProgressLogUtil.updateProgressLogState(state, mutable => {
+        mutable.externallyDismissFirstMessage = false;
+      });
+    }
   }
   return state;
 }
@@ -95,7 +122,9 @@ const getCurrentMessage = (state: ProgressLogState) => {
   return state.messages.size > 0 ? state.messages.get(0) : null;
 }
 const getNotLoggedIn = (state: ProgressLogState) => state.notLoggedIn;
+const getExternallyDismissFirstMessage = (state: ProgressLogState) => state.externallyDismissFirstMessage;
 export const progressLogLoadingSelector = createSelector(progressLogSelector, getLoading);
 export const progressLogCurrentMessageSelector = createSelector(progressLogSelector, getCurrentMessage);
 export const notLoggedInSelector = createSelector(progressLogSelector, getNotLoggedIn);
+export const externallyDismissFirstMessageSelector = createSelector(progressLogSelector, getExternallyDismissFirstMessage);
 

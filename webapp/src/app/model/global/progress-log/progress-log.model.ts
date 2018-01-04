@@ -7,7 +7,8 @@ import {List} from 'immutable';
 const DEFAULT_STATE: ProgressLogState = {
   loading: 0,
   messages: List<LogEntry>(),
-  notLoggedIn: false
+  notLoggedIn: false,
+  externallyDismissFirstMessage: false
 };
 
 interface ProgressLogStateRecord extends TypedRecord<ProgressLogStateRecord>, ProgressLogState {

@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, ElementRef, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {AppHeaderService} from '../../services/app-header.service';
 import {BoardService} from '../../services/board.service';
@@ -21,9 +21,11 @@ import {BoardViewMode} from '../../model/board/user/board-view-mode';
 import {BoardQueryParamsService} from '../../services/board-query-params.service';
 import {UpdateParallelTaskEvent} from '../../events/update-parallel-task.event';
 import {BlacklistState, BlacklistUtil} from '../../model/board/data/blacklist/blacklist.model';
-import {ProgressLogActions} from '../../model/global/progress-log/progress-log.reducer';
+import {
+  ProgressLogActions,
+  progressLogCurrentMessageSelector
+} from '../../model/global/progress-log/progress-log.reducer';
 import {MatDialog} from '@angular/material';
-import {RankIssueDialogComponent} from './issue/rank-issue-dialog.component';
 import {BlacklistDialogComponent} from './blacklist/blacklist-dialog.component';
 
 
@@ -55,6 +57,10 @@ export class BoardComponent implements OnInit, OnDestroy {
   settingsOpen: boolean;
 
   blacklist: BlacklistState;
+
+
+  private readonly blacklistMsg = 'There are problems in the configuration of ' + this.boardCode +
+    '. Click the red warning icon for details, and let your administrator know.';
 
   constructor(
     private _elementRef: ElementRef,
@@ -106,9 +112,7 @@ export class BoardComponent implements OnInit, OnDestroy {
         (blacklist: BlacklistState) => {
           if (!shownBlacklstLogMessage) {
             shownBlacklstLogMessage = true;
-            this._store.dispatch(
-              ProgressLogActions.createLogMessage('There are problems in the configuration. Click the ' +
-                'red warning icon for details, and let your administrator know.', true));
+            this._store.dispatch(ProgressLogActions.createLogMessage(this.blacklistMsg, true));
           }
           this.blacklist = blacklist;
         });
@@ -226,6 +230,18 @@ export class BoardComponent implements OnInit, OnDestroy {
   }
 
   onClickBlacklist() {
+    this._store.select(progressLogCurrentMessageSelector)
+      .take(1)
+      .subscribe(
+        logEntry => {
+          if (logEntry && logEntry.message === this.blacklistMsg) {
+            // We have clicked the show blacklist button, so let's dismiss the error message telling us to view it
+
+            // A simple ProgressLogActions.createClearFirstMessage() does not actually dismiss the snackbar message,
+            // so do this workaround to be handled by the app component
+            this._store.dispatch(ProgressLogActions.createExternallyDismissFirstMessage());
+          }
+        });
     const dialogRef = this.menuDialog.open(BlacklistDialogComponent, {
       data: {
         blacklist: this.blacklist

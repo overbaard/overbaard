@@ -6,4 +6,6 @@ export interface ProgressLogState {
   loading: number;
   messages: List<LogEntry>;
   notLoggedIn: boolean;
+  // Hook for other components than the app component to dismiss messages in the snackbar
+  externallyDismissFirstMessage;
 }

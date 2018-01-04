@@ -3,6 +3,7 @@ import {AppState} from './app-store';
 import {Store} from '@ngrx/store';
 import {Observable} from 'rxjs/Observable';
 import {
+  externallyDismissFirstMessageSelector,
   notLoggedInSelector,
   ProgressLogActions,
   progressLogCurrentMessageSelector,
@@ -14,6 +15,7 @@ import {VersionService} from './services/version.service';
 import {UrlService} from './services/url.service';
 import {Subject} from 'rxjs/Subject';
 import 'rxjs/add/operator/takeUntil'
+import 'rxjs/add/operator/filter'
 import {LogEntry} from './model/global/progress-log/log-entry';
 import {Router} from '@angular/router';
 
@@ -52,23 +54,14 @@ export class AppComponent implements OnInit, AfterViewInit {
       .select(progressLogCurrentMessageSelector)
       .takeUntil(this.destroy$)
       .subscribe(logEntry => {
-        if (logEntry) {
-          this.openSnackbar(logEntry);
-          const ref: MatSnackBarRef<SimpleSnackBar> = this.openSnackbar(logEntry);
-          ref.afterDismissed().take(1).subscribe(data => {
-            // Clear the message once we've finished displaying it
-            this._store.dispatch(ProgressLogActions.createClearFirstMessage());
-          });
-        }
+        this.handleLogEntry(logEntry);
       });
 
     this._store
       .select(notLoggedInSelector)
       .takeUntil(this.destroy$)
       .subscribe(notLoggedIn => {
-        console.log('----> not logged in: ' + notLoggedIn);
         if (notLoggedIn) {
-          console.log('---> navigating to loging page');
           this._router.navigate(['/login']);
         }
       });
@@ -100,5 +93,36 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   get jiraUrl(): string {
     return this._urlService.jiraUrl;
+  }
+
+  private handleLogEntry(logEntry: LogEntry) {
+    if (logEntry) {
+      this.openSnackbar(logEntry);
+      const ref: MatSnackBarRef<SimpleSnackBar> = this.openSnackbar(logEntry);
+
+      const dismissed: Subject<void> = new Subject<void>();
+      let externallyDismissed = false;
+
+      // Listen for externally dismissed messages
+      this._store.select(externallyDismissFirstMessageSelector)
+        .takeUntil(dismissed)
+        .filter(isDismissed => isDismissed)
+        .subscribe(
+          data => {
+            externallyDismissed = true;
+            this._store.dispatch(ProgressLogActions.createResetExternallyFirstMessage());
+            ref.dismiss();
+          });
+
+      // Listen for clicks on the dismiss button in the snackbar
+      ref.afterDismissed()
+        .take(1)
+        .subscribe(data => {
+        // Clear the message once we've finished displaying it
+          this._store.dispatch(ProgressLogActions.createClearFirstMessage());
+          dismissed.next(null);
+      });
+    }
+
   }
 }
