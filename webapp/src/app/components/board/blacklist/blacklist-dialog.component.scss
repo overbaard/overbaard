@@ -1,0 +1,34 @@
+@import "../../../../styles";
+.dialog-wrapper {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  max-width: 600px;
+}
+.mat-h3 {
+  margin: 0px;
+  color: $primary-colour;
+}
+.mat-h4 {
+  margin: 0px;
+  color: $primary-colour;
+}
+.mat-dialog-content {
+  padding: 0px;
+  margin: 0px;
+}
+ul {
+  margin: 5px;
+}
+.body-wrapper {
+  border: 1px black solid;
+  overflow: scroll;
+  max-height: 300px;
+}
+a {
+  color: rgba(0,0,0,.87);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}

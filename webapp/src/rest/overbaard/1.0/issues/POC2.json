@@ -140,7 +140,7 @@
   },
   "blacklist" : {
     "states": [
-      "No Such State"
+      "No Such State", "Another Missing State"
     ],
     "priorities": [
       "Critical"

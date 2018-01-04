@@ -1,0 +1,49 @@
+<div class="dialog-wrapper">
+  <div class="mat-h3 dialog-header">Blacklist</div>
+  <div class="mat-body-1">
+    Some items have not been configured on the server and the affected issues are not shown on the board since they
+    cannot
+    be mapped. Please contact your system administrator to reconfigure the board.
+  </div>
+  <div class="body-wrapper">
+    <div *ngIf="blacklist.issues.size > 0">
+      <div class="mat-h4">Blacklisted issues</div>
+      <div class="mat-body-1">
+        Due to the below problems, the following issues are not shown on the board:
+        <div style="margin-left: 30px">
+            <span *ngFor="let issue of blacklist.issues; let f = first">
+              <span *ngIf="!f">, </span>
+              <a href="{{issueUrl(issue)}}">{{issue}}</a>
+            </span>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="blacklist.states.size > 0">
+      <div class="mat-h4">States</div>
+      <div class="mat-body-1">
+        The following states from the Jira project are missing in the board's configuration:
+        <ul>
+          <li *ngFor="let state of blacklist.states">{{state}}</li>
+        </ul>
+      </div>
+    </div>
+    <div *ngIf="blacklist.issueTypes.size > 0">
+      <div class="mat-h4">Issue Types</div>
+      <div class="mat-body-1">
+        The following issue types from the Jira project are missing in the board's configuration:
+        <ul>
+          <li *ngFor="let state of blacklist.issueTypes">{{state}}</li>
+        </ul>
+      </div>
+    </div>
+    <div *ngIf="blacklist.priorities.size > 0">
+      <div class="mat-h4">Priorities</div>
+      <div class="mat-body-1">
+        The following priorities from the Jira project are missing in the board's configuration:
+        <ul>
+          <li *ngFor="let state of blacklist.priorities">{{state}}</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

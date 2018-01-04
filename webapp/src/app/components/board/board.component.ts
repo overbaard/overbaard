@@ -22,6 +22,9 @@ import {BoardQueryParamsService} from '../../services/board-query-params.service
 import {UpdateParallelTaskEvent} from '../../events/update-parallel-task.event';
 import {BlacklistState, BlacklistUtil} from '../../model/board/data/blacklist/blacklist.model';
 import {ProgressLogActions} from '../../model/global/progress-log/progress-log.reducer';
+import {MatDialog} from '@angular/material';
+import {RankIssueDialogComponent} from './issue/rank-issue-dialog.component';
+import {BlacklistDialogComponent} from './blacklist/blacklist-dialog.component';
 
 
 @Component({
@@ -60,7 +63,8 @@ export class BoardComponent implements OnInit, OnDestroy {
     private _appHeaderService: AppHeaderService,
     private _store: Store<AppState>,
     private boardViewService: BoardViewModelService,
-    private _queryParamsService: BoardQueryParamsService) {
+    private _queryParamsService: BoardQueryParamsService,
+    private menuDialog: MatDialog) {
 
     this.setWindowSize();
 
@@ -222,7 +226,12 @@ export class BoardComponent implements OnInit, OnDestroy {
   }
 
   onClickBlacklist() {
-
+    const dialogRef = this.menuDialog.open(BlacklistDialogComponent, {
+      data: {
+        blacklist: this.blacklist
+      }
+    });
   }
+
 }
 

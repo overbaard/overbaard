@@ -40,6 +40,7 @@ import {CommentIssueDialogComponent} from './components/board/issue/comment-issu
 import {MatSnackBar} from '@angular/material';
 import {RankIssueDialogComponent} from './components/board/issue/rank-issue-dialog.component';
 import {LoginComponent} from './components/login/login.component';
+import {BlacklistDialogComponent} from './components/board/blacklist/blacklist-dialog.component';
 
 @NgModule({
   declarations: [
@@ -67,13 +68,15 @@ import {LoginComponent} from './components/login/login.component';
     ParallelTaskSelectorComponent,
     MoveIssueDialogComponent,
     CommentIssueDialogComponent,
-    RankIssueDialogComponent
+    RankIssueDialogComponent,
+    BlacklistDialogComponent
   ],
   entryComponents: [
     CommentIssueDialogComponent,
     MoveIssueDialogComponent,
     ParallelTaskSelectorComponent,
-    RankIssueDialogComponent],
+    RankIssueDialogComponent,
+    BlacklistDialogComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
