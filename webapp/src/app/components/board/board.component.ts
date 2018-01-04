@@ -62,11 +62,6 @@ export class BoardComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-
-    // TODO turn on/off progress indicator and log errors
-
-    // Parse the user settings from the query string first
-
     let userSettings: UserSettingState = null;
     this._store.dispatch(UserSettingActions.createInitialiseFromQueryString(this._route.snapshot.queryParams))
     this._store.select(userSettingSelector)
@@ -173,7 +168,8 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   onUpdateParallelTask(event: UpdateParallelTaskEvent) {
     this.userSettings$.take(1).subscribe(us => {
-      this._boardService.setParallelTaskOption(us.boardCode, us.showBacklog, event.issueKey, event.taskName, event.taskIndex, event.optionName, event.selectedOptionIndex);
+      this._boardService.setParallelTaskOption(
+        us.boardCode, us.showBacklog, event.issueKey, event.taskName, event.taskIndex, event.optionName, event.selectedOptionIndex);
     });
   }
 
