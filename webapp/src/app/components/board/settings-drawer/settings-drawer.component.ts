@@ -439,6 +439,9 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
     this._store.dispatch(UserSettingActions.createUpdateShowParallelTasks(event.checked));
   }
 
+  get hasParallelTasks(): boolean {
+    return !!this.filterEntries[PARALLEL_TASK_ATTRIBUTES.key];
+  }
 }
 
 interface FilterFormEntry {

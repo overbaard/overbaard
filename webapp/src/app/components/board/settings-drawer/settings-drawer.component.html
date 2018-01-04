@@ -49,7 +49,7 @@
             <mat-hint>Summary level</mat-hint>
           </mat-slider>
         </div>
-        <div>
+        <div *ngIf="hasParallelTasks">
           <mat-checkbox
             [checked]="userSettings.issueDetail.parallelTasks"
             color="primary"
