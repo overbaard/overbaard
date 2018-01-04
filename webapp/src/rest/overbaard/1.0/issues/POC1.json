@@ -160,7 +160,13 @@
         },
         "ranked" : []
       }
-    }
+    },
+    "linked" : {"US" : {"states" : [
+      "Backlog",
+      "Selected for Development",
+      "In Progress",
+      "Done"
+    ]}}
   },
   "issues" : {
     "FEAT-1" : {
@@ -174,7 +180,12 @@
       "labels": [0, 1],
       "assignee": 1,
       "custom": {"User Custom Field": 0, "Version Custom Field": 1},
-      "parallel-tasks": [0, 1]
+      "parallel-tasks": [0, 1],
+      "linked-issues" : [{
+        "key" : "US-23",
+        "state" : 3,
+        "summary" : "Add listDeliveringMessages and listScheduledMessages to JMS queues"
+      }]
     },
     "FEAT-2" : {
       "key": "FEAT-2",

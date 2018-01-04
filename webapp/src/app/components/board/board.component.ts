@@ -57,7 +57,7 @@ export class BoardComponent implements OnInit, OnDestroy {
   blacklist: BlacklistState;
 
 
-  private _blacklistMsg:string;
+  private _blacklistMsg: string;
 
   constructor(
     private _elementRef: ElementRef,
