@@ -41,6 +41,7 @@ import {MatSnackBar} from '@angular/material';
 import {RankIssueDialogComponent} from './components/board/issue/rank-issue-dialog.component';
 import {LoginComponent} from './components/login/login.component';
 import {BlacklistDialogComponent} from './components/board/blacklist/blacklist-dialog.component';
+import {LinkedIssueComponent} from './components/board/issue/linked-issue.component';
 
 @NgModule({
   declarations: [
@@ -66,6 +67,7 @@ import {BlacklistDialogComponent} from './components/board/blacklist/blacklist-d
     BoardIssueComponent,
     ParallelTaskComponent,
     ParallelTaskSelectorComponent,
+    LinkedIssueComponent,
     MoveIssueDialogComponent,
     CommentIssueDialogComponent,
     RankIssueDialogComponent,

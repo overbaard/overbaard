@@ -42,7 +42,7 @@
             matTooltip="Issue Type: {{issue.type.name}}"></div>
     </div>
     <div
-      *ngIf="showSummary; else noSummary"
+      *ngIf="showSummary; else extraInfo"
       class="summary">
       <div
         *ngIf="showAvatar"
@@ -60,9 +60,9 @@
         {{issue.summary}}
       </div>
 
-      <ng-container *ngTemplateOutlet="noSummary"></ng-container>
+      <ng-container *ngTemplateOutlet="extraInfo"></ng-container>
     </div>
-    <ng-template #noSummary>
+    <ng-template #extraInfo>
       <div *ngIf="issue.selectedParallelTasks && issueDetailState.parallelTasks" class="parallel-tasks-container">
         <!-- Display of the parallel tasks -->
         <app-parallel-task
@@ -71,6 +71,13 @@
           [taskIndex]="i"
           (updateParallelTask)="onUpdateParallelTask($event)"
         ></app-parallel-task>
+      </div>
+      <div *ngIf="hasLinkedIssues"  class="linked-issues-container">
+        <app-linked-issue
+          *ngFor="let li of issue.linkedIssues"
+          [linkedIssue]="li"
+        >
+        </app-linked-issue>
       </div>
     </ng-template>
   </mat-card-content>

@@ -17,7 +17,7 @@
   flex-grow: 1;
 }
 .issue-link {
-  color: rgba(0,0,0,.87);
+  color: $black-text;
   text-decoration: none;
 }
 .issue-link:hover {
@@ -79,10 +79,16 @@ img.avatar {
   max-height: 40px;
   overflow: hidden;
 }
-.parallel-tasks-container {
+.extra-info-base {
   display: flex;
   flex-wrap: wrap;
   width: 100%;
+}
+.parallel-tasks-container {
+  @extend .extra-info-base;
+}
+.linked-issues-container {
+  @extend .extra-info-base;
 }
 .mat-button-ripple {
 }

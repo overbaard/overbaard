@@ -73,6 +73,10 @@ export class BoardIssueComponent implements OnInit, OnChanges {
     return this.issueDetailState.issueSummaryLevel < IssueSummaryLevel.FULL;
   }
 
+  get hasLinkedIssues(): boolean {
+    return this.issue.linkedIssues && this.issue.linkedIssues.size > 0;
+  }
+
   calculateTooltips() {
     if (!this.cardTooltip) {
       let tooltip =

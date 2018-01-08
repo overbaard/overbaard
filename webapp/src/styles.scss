@@ -29,6 +29,7 @@ Components wanting this padding should introduce it again
 $primary-colour: #3F51B5!important;
 $accent-colour: #FF4081!important;
 $white-text: #FFF!important;
+$black-text: rgba(0,0,0,.87)!important;
 .primary-color {
   color: $primary-colour;
 }

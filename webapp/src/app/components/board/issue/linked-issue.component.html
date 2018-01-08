@@ -1,0 +1,10 @@
+<div
+  class="linked-issue-entry"
+  matTooltip="{{tooltip}}"
+  [matTooltipClass]="'card-tooltip'"
+  [ngStyle]="{'border-color': linkedIssue.colour}"
+  (click)="onOpenDialog($event)"
+  ><a
+    href="{{url}}"
+    target="_blank">{{linkedIssue.key}}</a>
+</div>
