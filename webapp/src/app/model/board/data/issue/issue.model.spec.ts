@@ -17,7 +17,7 @@ import {getTestAssigneeState} from '../assignee/assignee.reducer.spec';
 import {getTestPriorityState} from '../priority/priority.reducer.spec';
 import {getTestIssueTypeState} from '../issue-type/issue-type.reducer.spec';
 import {BoardIssue} from './board-issue';
-import {Issue} from './issue';
+import {LinkedIssue} from './linked-issue';
 
 describe('Issue unit tests', () => {
 
@@ -49,6 +49,7 @@ describe('Issue unit tests', () => {
       .setFixVersions(fixVersions)
       .setCustomFields(customFields)
       .setBoardProjects(projectState.boardProjects)
+      .setLinkedProjects(projectState.linkedProjects)
       .setBoardStates(List<string>(['Board1', 'Board2', 'Board3', 'Board4']))
       .setParallelTasks(projectState.parallelTasks);
 
@@ -134,12 +135,14 @@ describe('Issue unit tests', () => {
     it('Linked issues', () => {
       input['linked-issues'] = [
         {
-          key : 'LNK-1',
+          key : 'L1-1',
           summary : 'Linked 1',
+          state: 3
         },
         {
-          key : 'LNK-2',
+          key : 'L2-2',
           summary : 'Linked 2',
+          state: 0
         }];
 
       const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
@@ -148,8 +151,8 @@ describe('Issue unit tests', () => {
         lookupParams.priorities.get('Blocker'),
         lookupParams.assignees.get('bob'), 'Issue summary', 4)
         .key('P2-1')
-        .addLinkedIssue('LNK-1', 'Linked 1')
-        .addLinkedIssue('LNK-2', 'Linked 2')
+        .addLinkedIssue('L1-1', 'Linked 1', 3, 'L1-4')
+        .addLinkedIssue('L2-2', 'Linked 2', 0, 'L2-1')
         .check();
     });
 
@@ -637,11 +640,11 @@ export class IssueChecker {
     return this;
   }
 
-  addLinkedIssue(key: string, summary: string): IssueChecker {
+  addLinkedIssue(key: string, summary: string, state: number, stateName: string): IssueChecker {
     if (!this._linkedIssues) {
       this._linkedIssues = new Array<LinkedIssueChecker>();
     }
-    this._linkedIssues.push(new LinkedIssueChecker(key, summary));
+    this._linkedIssues.push(new LinkedIssueChecker(key, summary, state, stateName));
     return this;
   }
   components(...components: string[]): IssueChecker {
@@ -744,8 +747,6 @@ export class IssueChecker {
     } else {
       expect(this._issue.selectedParallelTasks).not.toEqual(jasmine.anything());
     }
-
-    // checkIssueConvenienceMethods(this._issue);
   }
 
   private checkMultiSelectStringFieldValues(issueValues: string[], keys: string[]) {
@@ -759,18 +760,15 @@ export class IssueChecker {
 
 
 class LinkedIssueChecker {
-  private _key: string;
-  private _summary: string;
-  // state: string;
-
-  constructor(key: string, summary: string) {
-    this._key = key;
-    this._summary = summary;
+  constructor(private _key: string, private _summary: string, private _state: number, private _stateName: string) {
   }
 
-  check(issue: Issue) {
+  check(issue: LinkedIssue) {
     expect(issue.key).toEqual(this._key);
     expect(issue.summary).toEqual(this._summary);
+    expect(issue.state).toEqual(this._state);
+    expect(issue.stateName).toEqual(this._stateName);
+    expect(issue.colour).toBeTruthy();
   }
 }
 

@@ -89,7 +89,13 @@ export function getTestBoardsInput(): any {
           components: [1],
           labels: [0, 1],
           custom: {'Custom-1': 0, 'Custom-2': 1},
-          'parallel-tasks': [0]
+          'parallel-tasks': [0],
+          'linked-issues': [
+            {
+              key : 'L1-1',
+              summary : 'Linked 1',
+              state: 1
+            }]
         },
         'P1-2': {
           key: 'P1-2',
@@ -176,6 +182,7 @@ describe('Board reducer tests', () => {
         .labels('L-10', 'L-20')
         .customField('Custom-1', 'c1-A', 'First C1')
         .customField('Custom-2', 'c2-B', 'Second C2')
+        .addLinkedIssue('L1-1', 'Linked 1', 1, 'L1-2')
         .selectedParallelTaskOptions(0)
         .check();
       const issue2 = issues.get('P1-2');

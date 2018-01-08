@@ -141,6 +141,7 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
         .setFixVersions(fixVersionState.versions)
         .setCustomFields(customFieldState.fields)
         .setBoardProjects(projectState.boardProjects)
+        .setLinkedProjects(projectState.linkedProjects)
         .setBoardStates(headerState.states)
         .setParallelTasks(projectState.parallelTasks);
 
@@ -203,6 +204,7 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
         .setFixVersions(fixVersionState.versions)
         .setCustomFields(customFieldState.fields)
         .setBoardProjects(state.projects.boardProjects)
+        .setLinkedProjects(state.projects.linkedProjects)
         .setBoardStates(state.headers.states)
         .setParallelTasks(state.projects.parallelTasks);
 

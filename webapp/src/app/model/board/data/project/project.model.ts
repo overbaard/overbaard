@@ -2,6 +2,7 @@ import {List, Map, OrderedMap} from 'immutable';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {HeaderState} from '../header/header.state';
 import {CustomFieldState} from '../custom-field/custom-field.model';
+import {ColourTable} from '../../../../common/colour-table';
 
 export interface ProjectState {
   owner: string;
@@ -112,7 +113,7 @@ export class ProjectUtil {
 
   static parallelTaskFromJs(input: any): ParallelTask {
     const optionsInput: string[] = input['options'];
-    const colours: string[] = this.calculateColourTable(optionsInput.length);
+    const colours: string[] = ColourTable.INSTANCE.getColourTable(optionsInput.length);
 
     const options: List<ParallelTaskOption> = List<ParallelTaskOption>().withMutations(mutable => {
       for (let i = 0 ; i < optionsInput.length ; i++) {
@@ -145,62 +146,5 @@ export class ProjectUtil {
     });
 
     return ownToBoard;
-  }
-
-  private static calculateColourTable(length: number): string[] {
-    const odd: boolean = length % 2 === 1;
-    let len: number = length;
-    if (!odd) {
-      // Insert a fake half-way element to simplify the calculations
-      len = length + 1;
-    }
-    const max = 255;
-    const halfLength: number = Math.floor(len / 2);
-
-    const increment: number = max / 2 / halfLength;
-
-    const table: string[] = new Array(length);
-    let insertIndex = 0;
-
-    for (let i = 0; i < len; i++) {
-      let red = 0;
-      let green = 0;
-      if (i === halfLength) {
-        red = max;
-        green = max;
-        if (!odd) {
-          // Skip this fake element
-          continue;
-        }
-      } else if (i < halfLength) {
-        red = max;
-        green = i === 0 ? 0 : Math.round(max / 2 + increment * i);
-      } else {
-        // The yellow to green part of the scale is a bit too shiny, so reduce the brightness
-        // while keeping the red to green ratio
-        const adjustment: number = 4 / 5;
-        if (i === len - 1) {
-          red = 0;
-          green = 220;
-        } else {
-          red = Math.round((max - increment * (i - halfLength)));
-          green = Math.round(max * adjustment);
-        }
-      }
-
-      const colourString: string = '#' + this.toHex(red) + this.toHex(green) + '00';
-      table[insertIndex] = colourString;
-      // console.log(insertIndex + " " + colourString + " " + red + " " + green);
-      insertIndex++;
-    }
-    return table;
-  }
-
-  private static toHex(i: number): string {
-    let s: string = i.toString(16);
-    if (s.length === 1) {
-      s = '0' + s;
-    }
-    return s;
   }
 }

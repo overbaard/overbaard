@@ -10,6 +10,7 @@ import {Issue} from '../../model/board/data/issue/issue';
 import {AllFilters} from './filter.util';
 import {NONE_FILTER} from '../../model/board/user/board-filter/board-filter.constants';
 import {ParallelTask, ProjectState} from '../../model/board/data/project/project.model';
+import {LinkedIssue} from '../../model/board/data/issue/linked-issue';
 
 describe('Apply filter tests', () => {
 
@@ -322,7 +323,7 @@ describe('Apply filter tests', () => {
       customFields: Map<string, CustomField>(),
       parallelTasks: null,
       selectedParallelTasks: null,
-      linkedIssues: List<Issue>(),
+      linkedIssues: List<LinkedIssue>(),
       ownState: -1,
       visible: true,
       projectColour: 'red',

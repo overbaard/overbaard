@@ -4,7 +4,7 @@ import {BoardIssue} from '../../model/board/data/issue/board-issue';
 import {BoardIssueView} from './board-issue-view';
 import {NO_ASSIGNEE} from '../../model/board/data/assignee/assignee.model';
 import {CustomField} from '../../model/board/data/custom-field/custom-field.model';
-import {Issue} from '../../model/board/data/issue/issue';
+import {LinkedIssue} from '../../model/board/data/issue/linked-issue';
 
 const DEFAULT_STATE: BoardIssueView = {
   // Fields from core issue
@@ -20,7 +20,7 @@ const DEFAULT_STATE: BoardIssueView = {
   customFields: Map<string, CustomField>(),
   parallelTasks: null,
   selectedParallelTasks: null,
-  linkedIssues: List<Issue>(),
+  linkedIssues: List<LinkedIssue>(),
   ownState: -1,
   visible: true,
   projectColour: 'red',

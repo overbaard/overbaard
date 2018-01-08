@@ -4,11 +4,13 @@ import {Priority} from '../priority/priority.model';
 import {IssueType} from '../issue-type/issue-type.model';
 import {fromJS, List, Map, OrderedMap, OrderedSet} from 'immutable';
 import {CustomField} from '../custom-field/custom-field.model';
-import {BoardProject, ParallelTask, ParallelTaskOption} from '../project/project.model';
+import {BoardProject, LinkedProject, ParallelTask, ParallelTaskOption} from '../project/project.model';
 import {cloneObject} from '../../../../common/object-util';
 import {BoardIssue} from './board-issue';
 import {Issue} from './issue';
 import {BlacklistState, BlacklistStateRecord} from '../blacklist/blacklist.model';
+import {LinkedIssue} from './linked-issue';
+import {ColourTable} from '../../../../common/colour-table';
 
 export interface IssueState {
   issues: Map<string, BoardIssue>;
@@ -43,13 +45,16 @@ const DEFAULT_ISSUE: BoardIssue = {
   customFields: Map<string, CustomField>(),
   parallelTasks: null,
   selectedParallelTasks: null,
-  linkedIssues: List<Issue>(),
+  linkedIssues: List<LinkedIssue>(),
   ownState: -1
 };
 
-const DEFAULT_LINKED_ISSUE: Issue = {
+const DEFAULT_LINKED_ISSUE: LinkedIssue = {
   key: null,
-  summary: null
+  summary: null,
+  state: null,
+  stateName: null,
+  colour: null
 };
 
 const DEFAULT_ISSUE_CHANGE_INFO: IssueChangeInfo = {
@@ -61,7 +66,7 @@ const DEFAULT_ISSUE_CHANGE_INFO: IssueChangeInfo = {
 interface BoardIssueRecord extends TypedRecord<BoardIssueRecord>, BoardIssue {
 }
 
-interface LinkedIssueRecord extends TypedRecord<LinkedIssueRecord>, Issue {
+interface LinkedIssueRecord extends TypedRecord<LinkedIssueRecord>, LinkedIssue {
 }
 
 interface IssueStateRecord extends TypedRecord<IssueStateRecord>, IssueState {
@@ -71,7 +76,7 @@ interface IssueChangeInfoRecord extends TypedRecord<IssueChangeInfoRecord>, Issu
 }
 
 const ISSUE_FACTORY = makeTypedFactory<BoardIssue, BoardIssueRecord>(DEFAULT_ISSUE);
-const LINKED_ISSUE_FACTORY = makeTypedFactory<Issue, LinkedIssueRecord>(DEFAULT_LINKED_ISSUE);
+const LINKED_ISSUE_FACTORY = makeTypedFactory<LinkedIssue, LinkedIssueRecord>(DEFAULT_LINKED_ISSUE);
 const STATE_FACTORY = makeTypedFactory<IssueState, IssueStateRecord>(DEFAULT_STATE);
 const ISSUE_CHANGE_INFO_FACTORY = makeTypedFactory<IssueChangeInfo, IssueChangeInfoRecord>(DEFAULT_ISSUE_CHANGE_INFO);
 export const initialIssueState: IssueState = STATE_FACTORY(DEFAULT_STATE);
@@ -95,6 +100,7 @@ export class DeserializeIssueLookupParams {
   private _customFieldsListMap: OrderedMap<string, List<CustomField>>;
   private _parallelTasks: Map<string, List<ParallelTask>> = Map<string, List<ParallelTask>>();
   private _boardProjects: Map<string, BoardProject> = Map<string, BoardProject>();
+  private _linkedProjects: Map<string, LinkedProject> = Map<string, LinkedProject>();
   private _boardStates: List<string>;
 
   private _ownStateNameToOwnIndexByProject: Map<string, Map<string, number>>;
@@ -144,6 +150,11 @@ export class DeserializeIssueLookupParams {
     return this;
   }
 
+  setLinkedProjects(value: Map<string, LinkedProject>): DeserializeIssueLookupParams {
+    this._linkedProjects = value;
+    return this;
+  }
+
   setBoardStates(value: List<string>): DeserializeIssueLookupParams {
     this._boardStates = value;
     return this;
@@ -173,7 +184,6 @@ export class DeserializeIssueLookupParams {
 
   get priorities(): OrderedMap<string, Priority> {
     return this._priorities;
-
   }
 
   get prioritiesList(): List<Priority> {
@@ -181,6 +191,10 @@ export class DeserializeIssueLookupParams {
       this._prioritiesList = this._priorities.toList();
     }
     return this._prioritiesList;
+  }
+
+  get linkedProjects(): Map<string, LinkedProject> {
+    return this._linkedProjects;
   }
 
   get components(): List<string> {
@@ -303,7 +317,13 @@ export class IssueUtil {
         const tmp: List<any> = value.toList();
         return tmp.withMutations(mutable => {
           tmp.forEach((li, i) => {
-            mutable.set(i, LINKED_ISSUE_FACTORY(<any>li));
+            const data: LinkedIssue = cloneObject(li);
+            const projCode: string = IssueUtil.productCodeFromKey(data['key']);
+            const project: LinkedProject = params.linkedProjects.get(projCode);
+            const stateIndex: number = data['state'];
+            data.colour = ColourTable.INSTANCE.getColourTable(project.states.size)[stateIndex];
+            data.stateName = project.states.get(stateIndex);
+            mutable.set(i, LINKED_ISSUE_FACTORY(<any>data));
           });
         });
       }

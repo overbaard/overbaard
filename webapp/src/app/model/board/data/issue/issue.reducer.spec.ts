@@ -13,6 +13,9 @@ import {getTestFixVersionState} from '../fix-version/fix-version.reducer.spec';
 import {cloneObject} from '../../../../common/object-util';
 import {BoardIssue} from './board-issue';
 import {Dictionary} from '../../../../common/dictionary';
+import {getTestProjectsInput} from '../project/project.reducer.spec';
+import {ProjectActions, projectMetaReducer} from '../project/project.reducer';
+import {initialProjectState, ProjectState} from '../project/project.model';
 
 function getTestIssuesInput() {
   return cloneObject({
@@ -25,8 +28,9 @@ function getTestIssuesInput() {
       state: 0,
       'linked-issues' : [
         {
-          key : 'LNK-1',
+          key : 'L1-1',
           summary : 'Linked 1',
+          state: 2
         }]
     },
     'ISSUE-2': {
@@ -61,12 +65,18 @@ describe('Issue reducer tests', () => {
   let lookupParams: DeserializeIssueLookupParams;
   beforeEach(async(() => {
 
+    const projectState: ProjectState =
+      projectMetaReducer(
+        initialProjectState,
+        ProjectActions.createDeserializeProjects(getTestProjectsInput()));
+
     lookupParams = new DeserializeIssueLookupParams()
       .setAssignees(getTestAssigneeState().assignees)
       .setPriorities(getTestPriorityState().priorities)
       .setIssueTypes(getTestIssueTypeState().types)
       .setComponents(getTestComponentState().components)
       .setLabels(getTestLabelState().labels)
+      .setLinkedProjects(projectState.linkedProjects)
       .setFixVersions(getTestFixVersionState().versions);
 
     issueState = issueMetaReducer(
@@ -82,7 +92,7 @@ describe('Issue reducer tests', () => {
       new IssueChecker(issueArray[0],
         lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Blocker'), lookupParams.assignees.get('bob'), 'One', 0)
         .key('ISSUE-1')
-        .addLinkedIssue('LNK-1', 'Linked 1')
+        .addLinkedIssue('L1-1', 'Linked 1', 2, 'L1-3')
         .check();
       new IssueChecker(issueArray[1],
         lookupParams.issueTypes.get('bug'), lookupParams.priorities.get('Major'), lookupParams.assignees.get('kabir'), 'Two', 1)
@@ -181,7 +191,7 @@ describe('Issue reducer tests', () => {
       new IssueChecker(issueArray[0],
         lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Blocker'), lookupParams.assignees.get('bob'), 'One', 0)
         .key('ISSUE-1')
-        .addLinkedIssue('LNK-1', 'Linked 1')
+        .addLinkedIssue('L1-1', 'Linked 1', 2, 'L1-3')
         .check();
       new IssueChecker(issueArray[1],
         lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Blocker'), lookupParams.assignees.get('kabir'), 'Two', 1)
@@ -227,7 +237,7 @@ describe('Issue reducer tests', () => {
       new IssueChecker(issueArray[0],
         lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Blocker'), lookupParams.assignees.get('bob'), 'One', 0)
         .key('ISSUE-1')
-        .addLinkedIssue('LNK-1', 'Linked 1')
+        .addLinkedIssue('L1-1', 'Linked 1', 2, 'L1-3')
         .check();
       new IssueChecker(issueArray[1],
         lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Blocker'), lookupParams.assignees.get('kabir'), 'Two', 1)
