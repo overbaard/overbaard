@@ -72,7 +72,7 @@
           (updateParallelTask)="onUpdateParallelTask($event)"
         ></app-parallel-task>
       </div>
-      <div *ngIf="hasLinkedIssues"  class="linked-issues-container">
+      <div *ngIf="hasLinkedIssues && issueDetailState.linkedIssues"  class="linked-issues-container">
         <app-linked-issue
           *ngFor="let li of issue.linkedIssues"
           [linkedIssue]="li"

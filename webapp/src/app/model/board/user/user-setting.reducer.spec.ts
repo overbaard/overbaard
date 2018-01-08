@@ -140,7 +140,17 @@ describe('User setting reducer tests', () => {
       checker.parallelTasks = true;
       checker.check(state);
     });
+    it ('Update show linked issues', () => {
+      state = userSettingReducer(state, UserSettingActions.createUpdateShowLinkedIssues(false));
+      const checker: SettingChecker = new SettingChecker();
+      checker.boardCode = 'TEST';
+      checker.linkedIssues = false;
+      checker.check(state);
 
+      state = userSettingReducer(state, UserSettingActions.createUpdateShowLinkedIssues(true));
+      checker.linkedIssues = true;
+      checker.check(state);
+    })
     it ('Update swimlane', () => {
       state = userSettingReducer(state, UserSettingActions.createUpdateSwimlane('project'));
       const checker: SettingChecker = new SettingChecker();
@@ -627,6 +637,7 @@ class SettingChecker {
   collapsedSwimlanes: any;
   issueSummaryLevel: IssueSummaryLevel = IssueSummaryLevel.FULL;
   parallelTasks = true;
+  linkedIssues = true;
 
   constructor() {
     for (const key of Object.keys(this.filterChecker)) {
@@ -663,5 +674,6 @@ class SettingChecker {
     }
     expect(state.issueDetail.issueSummaryLevel).toBe(this.issueSummaryLevel);
     expect(state.issueDetail.parallelTasks).toBe(this.parallelTasks);
+    expect(state.issueDetail.linkedIssues).toBe(this.linkedIssues);
   }
 }

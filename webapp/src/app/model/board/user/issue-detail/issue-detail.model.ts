@@ -1,15 +1,16 @@
 import {IssueSummaryLevel} from '../issue-summary-level';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
-import {UserSettingState} from '../user-setting';
 
 export interface IssueDetailState {
   issueSummaryLevel: IssueSummaryLevel;
   parallelTasks: boolean;
+  linkedIssues: boolean;
 }
 
 const DEFAULT_ISSUE_DETAIL_STATE: IssueDetailState = {
   issueSummaryLevel: IssueSummaryLevel.FULL,
-  parallelTasks: true
+  parallelTasks: true,
+  linkedIssues: true
 }
 
 interface IssueDetailStateRecord extends TypedRecord<IssueDetailStateRecord>, IssueDetailState {

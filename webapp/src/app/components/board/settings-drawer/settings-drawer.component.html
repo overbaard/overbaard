@@ -55,6 +55,12 @@
             color="primary"
             (change)="onChangeShowParallelTasks($event)">Parallel Tasks</mat-checkbox>
         </div>
+        <div *ngIf="hasLinkedIssues">
+          <mat-checkbox
+            [checked]="userSettings.issueDetail.linkedIssues"
+            color="primary"
+            (change)="onChangeShowLinkedIssues($event)">Linked Issues</mat-checkbox>
+        </div>
       </mat-card-content>
     </mat-accordion>
   </mat-card>

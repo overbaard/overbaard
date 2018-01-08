@@ -24,6 +24,7 @@ const TOGGLE_COLLAPSED_SWIMLANE = 'TOGGLE_COLLAPSED_SWIMLANE';
 const SWITCH_BOARD_VIEW = 'SWITCH_BOARD_VIEW';
 const UPDATE_ISSUE_DETAIL_LEVEL = 'UPDATE_ISSUE_DETAIL_LEVEL';
 const UPDATE_SHOW_PARALLEL_TASKS = 'UPDATE_SHOW_PARALLEL_TASKS';
+const UPDATE_SHOW_LINKED_ISSUES = 'UPDATE_SHOW_LINKED_ISSUES';
 
 class ClearSettingsAction implements Action {
   readonly type = CLEAR_SETTINGS;
@@ -77,6 +78,12 @@ class UpdateShowParallelTasksAction {
   }
 }
 
+class UpdateShowLinkedIssuesAction {
+  readonly type = UPDATE_SHOW_LINKED_ISSUES;
+  constructor(readonly payload: boolean) {
+  }
+}
+
 export class UserSettingActions {
   static createClearSettings() {
     return new ClearSettingsAction();
@@ -116,6 +123,10 @@ export class UserSettingActions {
 
   static createUpdateShowParallelTasks(show: boolean): Action {
     return new UpdateShowParallelTasksAction(show);
+  }
+
+  static createUpdateShowLinkedIssues(show: boolean) {
+    return new UpdateShowLinkedIssuesAction(show);
   }
 }
 
@@ -233,6 +244,14 @@ export function userSettingReducer(state: UserSettingState = initialUserSettingS
       return UserSettingUtil.updateUserSettingState(state, settingState => {
         settingState.issueDetail = IssueDetailUtil.updateIssueDetailState(settingState.issueDetail, issueDetail => {
           issueDetail.parallelTasks = show;
+        });
+      });
+    }
+    case UPDATE_SHOW_LINKED_ISSUES: {
+      const show: boolean = (<UpdateShowLinkedIssuesAction>action).payload;
+      return UserSettingUtil.updateUserSettingState(state, settingState => {
+        settingState.issueDetail = IssueDetailUtil.updateIssueDetailState(settingState.issueDetail, issueDetail => {
+          issueDetail.linkedIssues = show;
         });
       });
     }

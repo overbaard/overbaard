@@ -9,7 +9,10 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/observable/of';
 import {Observable} from 'rxjs/Observable';
-import {boardProjectsSelector, parallelTasksSelector} from '../../../model/board/data/project/project.reducer';
+import {
+  boardProjectsSelector, linkedProjectsSelector,
+  parallelTasksSelector
+} from '../../../model/board/data/project/project.reducer';
 import {BoardFilterState} from '../../../model/board/user/board-filter/board-filter.model';
 import {List, OrderedMap, Set} from 'immutable';
 import {issuesTypesSelector} from '../../../model/board/data/issue-type/issue-type.reducer';
@@ -80,6 +83,8 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
 
   bulkUpdateFilter: FilterAttributes;
 
+  hasLinkedIssues: boolean;
+
   constructor(private _store: Store<AppState>) {
   }
 
@@ -139,7 +144,13 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
       .filter(fa => fa.swimlaneOption)
       .map(fa => FilterFormEntry(fa.key, fa.display));
 
-
+    this._store.select(linkedProjectsSelector)
+      .take(1)
+      .subscribe(
+        linkedProjects => {
+          this.hasLinkedIssues = linkedProjects && linkedProjects.size > 0;
+        }
+      )
   }
 
   ngOnDestroy() {
@@ -439,9 +450,14 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
     this._store.dispatch(UserSettingActions.createUpdateShowParallelTasks(event.checked));
   }
 
+  onChangeShowLinkedIssues(event: MatCheckboxChange) {
+      this._store.dispatch(UserSettingActions.createUpdateShowLinkedIssues(event.checked));
+  }
+
   get hasParallelTasks(): boolean {
     return !!this.filterEntries[PARALLEL_TASK_ATTRIBUTES.key];
   }
+
 }
 
 interface FilterFormEntry {
