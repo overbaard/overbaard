@@ -46,6 +46,7 @@ public class RawSqlLoader {
     }
 
     public ModelNode executeQuery(String sql) {
+        // This should never be enabled, it is for debugging only
         if (true) {
             throw new OverbaardValidationException("Db Explorer disabled");
         }
