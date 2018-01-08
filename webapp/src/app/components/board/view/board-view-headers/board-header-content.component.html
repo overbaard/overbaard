@@ -8,7 +8,7 @@
   [matTooltipShowDelay]="800"
 >
   <div *ngIf="header.visible">
-    <div>{{header.name}}</div>
+    <div class="nowrap-hidden">{{header.name}}</div>
     <div class="mat-caption" [class.exceeded-wip]="exceededWip">
       {{header.visibleIssues}}/{{header.totalIssues}}
     </div>

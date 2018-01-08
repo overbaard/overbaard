@@ -72,6 +72,11 @@ $black-text: rgba(0,0,0,.87)!important;
   font-size: 12px;
 }
 
+.nowrap-hidden {
+  white-space: nowrap ;
+  overflow: hidden
+}
+
 @mixin sized-icon-button-class($size, $font-size, $line-height) {
   min-width: $size;
   max-width: $size;
