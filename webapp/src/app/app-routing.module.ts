@@ -5,6 +5,7 @@ import {BoardComponent} from './components/board/board.component';
 import {ConfigurationComponent} from './components/config/configuration.component';
 import {LoginComponent} from './components/login/login.component';
 import {DbExplorerComponent} from './components/db-explorer/db-explorer.component';
+import {AccessLogViewComponent} from './components/access-log/access-log.component';
 
 const routes: Routes = [
   {
@@ -21,11 +22,13 @@ const routes: Routes = [
   },
   {
     path: 'login', component: LoginComponent
-  }/*,
-  // THis should never be enabled - it is for debugging only
+  },
   {
     path: 'db-explorer', component: DbExplorerComponent
-  }*/
+  },
+  {
+    path: 'access-log', component: AccessLogViewComponent
+  }
 ];
 
 @NgModule({

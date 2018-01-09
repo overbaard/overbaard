@@ -213,7 +213,7 @@ public class RestEndpoint {
     @POST
     @Path("db-explorer")
     public Response executeSql(@Context HttpServletRequest req, String queryJson) {
-        ApplicationUser user = getUser();
+            ApplicationUser user = getUser();
 
         //Some lockdown of urls and users
         boolean valid = false;

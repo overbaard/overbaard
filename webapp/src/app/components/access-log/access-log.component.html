@@ -1,0 +1,58 @@
+<!--
+  ~ Copyright 2016 Red Hat, Inc.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<div class="component-header">
+  <div class="mat-h1">Access</div>
+</div>
+<div *ngIf="accessData" class="component-body">
+  <div class="mat-h2">Summary</div>
+  <div>
+    <div>There were {{accessData.accesses.size}} accesses
+        <span *ngIf="accessData.accesses.size > 0">
+          between {{accessData.firstTime | date}} and {{accessData.lastTime | date}}</span>.
+    </div>
+    <div>
+        These are the number of accesses per user:
+        <table>
+            <tr>
+                <td><b>User</b></td>
+                <td><b>Accesses</b></td>
+            </tr>
+            <tr *ngFor="let entry of accessData.summaries">
+                <td>{{entry.user.name}} ({{entry.user.key}})</td>
+                <td>{{entry.count}}</td>
+            </tr>
+        </table>
+    </div>
+  </div>
+  <div class="mat-h2">Details</div>
+    <table>
+        <tr>
+            <td><b>#</b></td>
+            <td><b>User</b></td>
+            <td><b>Board</b></td>
+            <td><b>Date</b></td>
+            <td><b>Agent</b></td>
+        </tr>
+        <tr *ngFor="let entry of accessData.accesses; let i = index">
+            <td>{{i + 1}}</td>
+            <td>{{entry.user.name}} ({{entry.user.key}})</td>
+            <td>{{entry.board}}</td>
+            <td>{{entry.time | date:'shortDate'}} {{entry.time | date:'shortTime'}}</td>
+            <td>{{entry.agent}}</td>
+        </tr>
+    </table>
+</div>

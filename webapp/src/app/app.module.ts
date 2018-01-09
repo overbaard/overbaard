@@ -43,6 +43,7 @@ import {LoginComponent} from './components/login/login.component';
 import {BlacklistDialogComponent} from './components/board/blacklist/blacklist-dialog.component';
 import {LinkedIssueComponent} from './components/board/issue/linked-issue.component';
 import {DbExplorerComponent} from './components/db-explorer/db-explorer.component';
+import {AccessLogViewComponent} from './components/access-log/access-log.component';
 
 @NgModule({
   declarations: [
@@ -73,7 +74,8 @@ import {DbExplorerComponent} from './components/db-explorer/db-explorer.componen
     CommentIssueDialogComponent,
     RankIssueDialogComponent,
     BlacklistDialogComponent,
-    DbExplorerComponent
+    DbExplorerComponent,
+    AccessLogViewComponent
   ],
   entryComponents: [
     CommentIssueDialogComponent,

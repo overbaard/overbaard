@@ -44,14 +44,12 @@ export class DbExplorerComponent {
           this.result$.next(data);
         },
         (err: HttpErrorResponse) => {
-          console.log(err);
           let msg = null;
           if (err instanceof Error) {
             msg = (<Error>err).message;
           } else {
             msg = err.error.message;
           }
-          console.log(msg);
           this.error$.next(msg);
           this.result$.next(null);
         }

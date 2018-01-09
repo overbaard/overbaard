@@ -78,7 +78,7 @@ public class UserAccessManagerImpl implements UserAccessManager {
             }
         });
 
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm Z");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd\'T\'HH:mmZ");
 
         ModelNode list = new ModelNode();
         list.setEmptyList();
