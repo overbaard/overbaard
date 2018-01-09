@@ -294,7 +294,7 @@ class ChangePoller {
     private readonly _restUrlService: UrlService,
     private readonly _http: HttpClient,
     private _progressLog: ProgressLogService,
-    private readonly _showProgress: boolean) {
+    private _showProgress: boolean) {
 
     this._pollParameters$ = Observable.combineLatest(
       this._store.select(boardViewIdSelector),
@@ -366,6 +366,11 @@ class ChangePoller {
       let url: string = UrlService.OVERBAARD_REST_PREFIX + '/issues/' + params.boardCode + '/updates/' + params.viewId;
       if (params.showBacklog) {
         url += '?backlog=' + true;
+      }
+      const showProgress: boolean = this._showProgress;
+      if (showProgress) {
+        // Reset showProgress to false now that we've done the first request
+        this._showProgress = false;
       }
 
       const progress: Progress = this._progressLog.startAction(this._showProgress);
