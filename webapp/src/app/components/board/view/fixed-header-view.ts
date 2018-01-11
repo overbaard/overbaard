@@ -27,7 +27,7 @@ export class FixedHeaderView implements OnChanges {
   boardBodyHeight = '200px';
 
   onScrollLeft(leftOffset: number) {
-    console.log('--- parent ' + leftOffset * -1);
+    // console.log('--- parent scroll ' + leftOffset * -1);
     if (this.boardLeftOffset !== leftOffset) {
       this.boardLeftOffset = leftOffset;
     }
