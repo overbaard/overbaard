@@ -10,8 +10,9 @@
   <app-kanban-normal-view
     *ngIf="!board.issueTable.swimlaneInfo"
     [board]="board"
-    (scroll)="onScrollBoardX($event)"
     (updateParallelTask)="onUpdateParallelTask($event)"
+    scroll-listener
+    (scrollLeft)="onScrollLeft($event)"
   ></app-kanban-normal-view>
   <app-kanban-swimlane-view
     *ngIf="board.issueTable.swimlaneInfo"

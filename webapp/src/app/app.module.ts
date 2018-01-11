@@ -44,6 +44,7 @@ import {BlacklistDialogComponent} from './components/board/blacklist/blacklist-d
 import {LinkedIssueComponent} from './components/board/issue/linked-issue.component';
 import {DbExplorerComponent} from './components/db-explorer/db-explorer.component';
 import {AccessLogViewComponent} from './components/access-log/access-log.component';
+import {ScrollListenerDirective} from './directives/scroll-listener.directive';
 
 @NgModule({
   declarations: [
@@ -75,7 +76,8 @@ import {AccessLogViewComponent} from './components/access-log/access-log.compone
     RankIssueDialogComponent,
     BlacklistDialogComponent,
     DbExplorerComponent,
-    AccessLogViewComponent
+    AccessLogViewComponent,
+    ScrollListenerDirective
   ],
   entryComponents: [
     CommentIssueDialogComponent,

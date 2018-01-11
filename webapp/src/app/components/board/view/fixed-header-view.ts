@@ -26,6 +26,13 @@ export class FixedHeaderView implements OnChanges {
   // Initialise to the same value as in the CSS. This will be calculated by ngOnChanges
   boardBodyHeight = '200px';
 
+  onScrollLeft(leftOffset: number) {
+    console.log('--- parent ' + leftOffset * -1);
+    if (this.boardLeftOffset !== leftOffset) {
+      this.boardLeftOffset = leftOffset;
+    }
+  }
+
   onScrollBoardX(event: Event) {
     const boardLeftOffset: number = event.target['scrollLeft'] * -1
     if (this.boardLeftOffset !== boardLeftOffset) {
