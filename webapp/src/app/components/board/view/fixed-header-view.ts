@@ -33,13 +33,6 @@ export class FixedHeaderView implements OnChanges {
     }
   }
 
-  onScrollBoardX(event: Event) {
-    const boardLeftOffset: number = event.target['scrollLeft'] * -1
-    if (this.boardLeftOffset !== boardLeftOffset) {
-      this.boardLeftOffset = boardLeftOffset;
-    }
-  }
-
   ngOnChanges(changes: SimpleChanges): void {
     const heightChange: SimpleChange = changes['windowHeight'];
     if (heightChange) {

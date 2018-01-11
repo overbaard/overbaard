@@ -143,7 +143,7 @@
               "Merged"]
           }
         ],
-        "ranked": ["FEAT-1", "FEAT-2", "FEAT-3", "FEAT-4", "FEAT-5", "FEAT-6"]
+        "ranked": ["FEAT-1", "FEAT-2", "FEAT-3", "FEAT-4", "FEAT-5", "FEAT-6", "FEAT-7", "FEAT-8", "FEAT-9"]
       },
       "BUG" : {
         "colour" : "#CA6746",
@@ -267,12 +267,36 @@
       "type": 0
     },
     "FEAT-6" : {
-      "key": "FEAT-5",
+      "key": "FEAT-6",
       "state": 7,
       "summary": "Issue number 6",
       "priority": 2,
       "assignee": 1,
       "type": 0
+    },
+    "FEAT-7" : {
+      "key": "FEAT-7",
+      "state": 10,
+      "summary": "Issue number 7",
+      "priority": 2,
+      "assignee": 1,
+      "type": 3
+    },
+    "FEAT-8" : {
+      "key": "FEAT-8",
+      "state": 13,
+      "summary": "Issue number 8",
+      "priority": 2,
+      "assignee": 1,
+      "type": 3
+    },
+    "FEAT-9" : {
+      "key": "FEAT-9",
+      "state": 13,
+      "summary": "Issue number 9",
+      "priority": 2,
+      "assignee": 1,
+      "type": 3
     }
   }
 

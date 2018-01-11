@@ -2,6 +2,7 @@ import {Directive, ElementRef, EventEmitter, HostListener, Output} from '@angula
 import {Subject} from 'rxjs/Subject';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/throttleTime';
+import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
 
 
@@ -18,9 +19,11 @@ export class ScrollListenerDirective {
     console.log('SCROLL DIRECTIVE!!!!');
 
     this.scrollSubject
+      .asObservable()
     // TODO Throttling etc.
       // .distinctUntilChanged((a, b) => a === b) DOES NOT WORK
-      .throttleTime(40)
+      // .throttleTime(40)
+      .debounceTime(20)
       .subscribe(
       scroll => {
         console.log('Subject:  ' + scroll);
