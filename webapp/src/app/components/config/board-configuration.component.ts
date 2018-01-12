@@ -3,12 +3,8 @@ import {
   SimpleChanges
 } from '@angular/core';
 import {BoardsService} from '../../services/boards.service';
-import {AppHeaderService} from '../../services/app-header.service';
-import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/take';
-import {OrderedMap} from 'immutable';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {Subject} from 'rxjs/Subject';
 
 @Component({
   selector: 'app-board-configuration',
@@ -78,7 +74,7 @@ export class BoardConfigurationComponent implements OnInit, OnChanges {
     return JSON.stringify(data, null, 2);
   }
 
-  private clearJsonErrors() {
+  clearJsonErrors() {
     this.clearJsonError.emit(null);
   }
 

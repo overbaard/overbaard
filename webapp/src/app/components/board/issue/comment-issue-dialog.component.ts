@@ -47,7 +47,7 @@ export class CommentIssueDialogComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  onSave(event: MouseEvent) {
+  onSave() {
     this._store.select(userSettingSelector)
       .take(1)
       .subscribe(userSetting => {

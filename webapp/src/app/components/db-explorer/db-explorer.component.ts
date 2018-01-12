@@ -14,9 +14,9 @@ import {BehaviorSubject} from 'rxjs/BehaviorSubject';
     templateUrl: './db-explorer.component.html'
 })
 export class DbExplorerComponent {
-  private sqlForm: FormGroup;
-  private error$: Subject<string> = new BehaviorSubject<string>(null);
-  private result$: Subject<any> = new BehaviorSubject<any>(null);
+  sqlForm: FormGroup;
+  error$: Subject<string> = new BehaviorSubject<string>(null);
+  result$: Subject<any> = new BehaviorSubject<any>(null);
 
   constructor(appHeaderService: AppHeaderService, private _urlService: UrlService, private _httpClient: HttpClient) {
     appHeaderService.setTitle('DB Explorer');

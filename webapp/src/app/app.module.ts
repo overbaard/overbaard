@@ -5,7 +5,7 @@ import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {APP_BASE_HREF, HashLocationStrategy, LocationStrategy} from '@angular/common';
 import {StoreModule} from '@ngrx/store';
-import {initialAppState, metaReducers, reducers} from './app-store';
+import {AppState, initialAppState, metaReducers, reducers} from './app-store';
 import {StoreDevtoolsModule} from '@ngrx/store-devtools';
 import {environment} from '../environments/environment';
 import {BoardsComponent} from './components/boards/boards.component';
@@ -45,6 +45,11 @@ import {LinkedIssueComponent} from './components/board/issue/linked-issue.compon
 import {DbExplorerComponent} from './components/db-explorer/db-explorer.component';
 import {AccessLogViewComponent} from './components/access-log/access-log.component';
 import {ScrollListenerDirective} from './directives/scroll-listener.directive';
+
+const appState: AppState = initialAppState;
+export function getInitialAppState(): AppState {
+  return appState;
+}
 
 @NgModule({
   declarations: [
@@ -93,7 +98,7 @@ import {ScrollListenerDirective} from './directives/scroll-listener.directive';
     MaterialModule,
     ReactiveFormsModule,
     AppRoutingModule,
-    StoreModule.forRoot(reducers, {initialState: initialAppState, metaReducers: metaReducers}),
+    StoreModule.forRoot(reducers, {initialState: getInitialAppState, metaReducers: metaReducers}),
     !environment.production ? StoreDevtoolsModule.instrument({ maxAge: 50 }) : []
   ],
   providers: [
@@ -104,6 +109,7 @@ import {ScrollListenerDirective} from './directives/scroll-listener.directive';
     UrlService,
     VersionService
   ],
+
 
   bootstrap: [AppComponent]
 })
