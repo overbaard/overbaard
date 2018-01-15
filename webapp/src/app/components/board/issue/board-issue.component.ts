@@ -21,6 +21,7 @@ import {CommentIssueDialogComponent} from './comment-issue-dialog.component';
 import {BoardService} from '../../../services/board.service';
 import {RankIssueDialogComponent} from './rank-issue-dialog.component';
 import {BoardViewMode} from '../../../model/board/user/board-view-mode';
+import {ParallelTaskOption} from '../../../model/board/data/project/project.model';
 
 @Component({
   selector: 'app-board-issue',
@@ -82,6 +83,7 @@ export class BoardIssueComponent implements OnInit, OnChanges {
       let tooltip =
         `${this.issue.key}
 
+        Project State: ${this.issue.ownStateName}
         Assignee: ${this.issue.assignee.name}
         Priority: ${this.issue.priority.name}
         Type: ${this.issue.type.name}
@@ -98,7 +100,16 @@ export class BoardIssueComponent implements OnInit, OnChanges {
         });
       }
 
-      // TODO Parallel tasks
+      if (this.issue.parallelTasks) {
+        tooltip += '\n';
+        this.issue.parallelTasks.forEach((pt, i) => {
+          const selectedIndex: number = this.issue.selectedParallelTasks.get(i);
+          const option: ParallelTaskOption = pt.options.get(selectedIndex);
+          tooltip +=
+            `${pt.name}: ${option.name}
+            `;
+        });
+      }
 
       this.cardTooltip = tooltip;
     }

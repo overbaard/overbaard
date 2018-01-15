@@ -18,7 +18,7 @@ import {
 } from '../../model/board/user/board-filter/board-filter.constants';
 import {CustomField} from '../../model/board/data/custom-field/custom-field.model';
 import {NO_ASSIGNEE} from '../../model/board/data/assignee/assignee.model';
-import {BoardProject, ProjectUtil} from '../../model/board/data/project/project.model';
+import {BoardProject, ProjectState, ProjectUtil} from '../../model/board/data/project/project.model';
 import {BoardIssue} from '../../model/board/data/issue/board-issue';
 import {BoardIssueViewUtil} from './board-issue-view.model';
 import {IssueChange} from '../../model/board/data/issue/issue.model';
@@ -36,6 +36,7 @@ import {userSettingSelector} from '../../model/board/user/user-setting.reducer';
 import {RankViewEntry} from './rank-view-entry';
 import {BoardViewMode} from '../../model/board/user/board-view-mode';
 import {IssueDetailState} from '../../model/board/user/issue-detail/issue-detail.model';
+import {Dictionary} from '../../common/dictionary';
 
 @Injectable()
 export class BoardViewModelService {
@@ -494,6 +495,10 @@ class IssueTableBuilder {
   private _rankView: List<RankViewEntry>;
   private _table: List<List<string>>;
 
+
+  // Just a throwaway lookup so don't bother making this immutable
+  private _ownStateNames: Dictionary<string[]> = {};
+
   constructor(
     private readonly _changeType: ChangeType,
     private readonly _oldIssueTableState: IssueTable,
@@ -564,7 +569,8 @@ class IssueTableBuilder {
 
   private createIssueView(issue: BoardIssue, visible: boolean): BoardIssueView {
     const colour: string = this._currentBoardState.projects.boardProjects.get(issue.projectCode).colour;
-    return BoardIssueViewUtil.createBoardIssue(issue, this._currentBoardState.jiraUrl, colour, visible);
+    const ownStateName: string = this.getOwnStateName(issue);
+    return BoardIssueViewUtil.createBoardIssue(issue, this._currentBoardState.jiraUrl, colour, ownStateName, visible);
   }
 
   private filterIssues(issues: Map<string, BoardIssueView>): Map<string, BoardIssueView> {
@@ -729,6 +735,22 @@ class IssueTableBuilder {
     return swimlaneBuilder;
   }
 
+  private getOwnStateName(issue: BoardIssue): string {
+    let ownStateNames: string[] = this._ownStateNames[issue.projectCode];
+    if (!ownStateNames) {
+      const boardProject: BoardProject = this._currentBoardState.projects.boardProjects.get(issue.projectCode);
+      const boardStates: List<string> = this._currentBoardState.headers.states;
+      ownStateNames = [];
+      boardStates.forEach((boardState) => {
+        const ownState: string = boardProject.boardStateNameToOwnStateName.get(boardState);
+        if (ownState) {
+          ownStateNames.push(ownState);
+        }
+      });
+      this._ownStateNames[issue.projectCode] = ownStateNames;
+    }
+    return ownStateNames[issue.ownState];
+  }
 }
 
 class SwimlaneInfoBuilder {

@@ -8,6 +8,7 @@ export interface BoardIssueView extends BoardIssue {
   projectColour: string;
   visible: boolean;
   issueUrl: string;
+  ownStateName: string;
 }
 
 
