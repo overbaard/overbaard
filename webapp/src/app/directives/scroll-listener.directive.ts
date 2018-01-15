@@ -20,8 +20,7 @@ export class ScrollListenerDirective implements OnInit, OnDestroy{
   private destroy$: Subject<void> = new Subject<void>();
 
   constructor(private _ref: ElementRef) {
-    console.log('SCROLL DIRECTIVE!!!!');
-    }
+  }
 
   ngOnInit(): void {
     this.scrollSubject$
