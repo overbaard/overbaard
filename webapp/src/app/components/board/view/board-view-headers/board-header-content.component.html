@@ -7,7 +7,7 @@
   [matTooltipClass]="'card-tooltip'"
   [matTooltipShowDelay]="800"
 >
-  <div *ngIf="header.visible">
+  <div *ngIf="header.visible" class="padded-sizes">
     <div class="nowrap-hidden">{{header.name}}</div>
     <div class="mat-caption" [class.exceeded-wip]="exceededWip">
       {{header.visibleIssues}}/{{header.totalIssues}}

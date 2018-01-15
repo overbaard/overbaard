@@ -33,6 +33,10 @@
   min-width: $visible-header-width;
   max-width: $visible-header-width;
 }
+.padded-sizes {
+  padding-left: 3px;
+  padding-right: 3px;
+}
 .invisible {
   min-width: $invisible-header-width;
   max-width: $invisible-header-width;
