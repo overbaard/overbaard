@@ -6,6 +6,7 @@ import {ConfigurationComponent} from './components/config/configuration.componen
 import {LoginComponent} from './components/login/login.component';
 import {DbExplorerComponent} from './components/db-explorer/db-explorer.component';
 import {AccessLogViewComponent} from './components/access-log/access-log.component';
+import {FontMeasureComponent} from './components/font-measure/font-measure.component';
 
 const routes: Routes = [
   {
@@ -28,6 +29,9 @@ const routes: Routes = [
   },
   {
     path: 'access-log', component: AccessLogViewComponent
+  },
+  {
+    path: 'font-measure', component: FontMeasureComponent
   }
 ];
 

@@ -18,7 +18,7 @@ import {
 } from '../../model/board/user/board-filter/board-filter.constants';
 import {CustomField} from '../../model/board/data/custom-field/custom-field.model';
 import {NO_ASSIGNEE} from '../../model/board/data/assignee/assignee.model';
-import {BoardProject, ProjectState, ProjectUtil} from '../../model/board/data/project/project.model';
+import {BoardProject, ProjectUtil} from '../../model/board/data/project/project.model';
 import {BoardIssue} from '../../model/board/data/issue/board-issue';
 import {BoardIssueViewUtil} from './board-issue-view.model';
 import {IssueChange} from '../../model/board/data/issue/issue.model';
