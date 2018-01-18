@@ -6,10 +6,22 @@ import 'rxjs/add/operator/take';
 import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/operator/catch';
 import {List} from 'immutable';
+import {FontSizeTableService} from '../../services/font-size-table.service';
 
 @Component({
   selector: 'app-font-measure',
   template: `
+    <!-- Do space separately -->
+    <div
+      #characterHolder>
+      <div
+        *ngFor="let setting of settings"
+        [ngClass]="setting.cssClass ? setting.cssClass : ''"
+        [ngStyle]="setting.style ? setting.style : {}">
+        <span class="class">&nbsp;</span>
+      </div>
+    </div>
+    <!-- Do the other characters -->
     <div
       *ngFor="let character of characters"
       #characterHolder>
@@ -19,8 +31,6 @@ import {List} from 'immutable';
         [ngStyle]="setting.style ? setting.style : {}">
         <span class="class">{{character}}</span>
       </div>
-
-
     </div>
   `,
   styles: [],
@@ -28,6 +38,7 @@ import {List} from 'immutable';
 })
 export class FontMeasureComponent implements OnInit, AfterViewInit {
 
+  settingNames: List<string> = List<string>(['issue-summary', 'extra-item']);
   settings: List<Setting> =
     List<Setting>([Setting.fromClass('mat-caption'), Setting.fromStyle({'font-size': '24px'})]);
   characters: string[] = [];
@@ -35,17 +46,27 @@ export class FontMeasureComponent implements OnInit, AfterViewInit {
   @ViewChildren('characterHolder')
   characterHolders: QueryList<ElementRef>;
 
+  constructor(private _fontSizeTable: FontSizeTableService) {
+  }
 
   ngOnInit(): void {
     const characters: string[] = [];
     for (let i = 33 ; i < 255 ; i++) {
       characters.push(String.fromCharCode(i));
     }
+
     for (const char of characters) {
       let arr: string = char;
-      for (let i = 0 ; i < 6 ; i++) {
+      let arr4: string;
+
+      for (let i = 0 ; i < 5 ; i++) {
         arr += arr;
+        if (i === 1) {
+          arr4 = arr;
+        }
       }
+      const arr32: string = arr;
+      arr = arr32 + arr32 + arr32 + arr4;
       this.characters.push(arr);
       console.log(arr.length);
     }
@@ -53,6 +74,8 @@ export class FontMeasureComponent implements OnInit, AfterViewInit {
 
 
   ngAfterViewInit(): void {
+    this._fontSizeTable.startModification();
+
     const elements: ElementRef[] = this.characterHolders.toArray();
     for (const element of elements) {
       const childDivs: NodeListOf<HTMLElement> = element.nativeElement.querySelectorAll('div');
@@ -65,9 +88,13 @@ export class FontMeasureComponent implements OnInit, AfterViewInit {
           character = text.charAt(0);
         }
 
-        console.log(`${character} - (${this.settings.get(i)}): + ${span.offsetWidth / text.length}`);
+        const width: number = span.offsetWidth / text.length;
+        this._fontSizeTable.addItem(this.settingNames.get(i), character, width);
+        console.log(this._fontSizeTable);
       }
     }
+
+    this._fontSizeTable.completeModification();
   }
 }
 

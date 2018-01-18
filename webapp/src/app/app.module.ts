@@ -47,6 +47,7 @@ import {ScrollListenerDirective} from './directives/scroll-listener.directive';
 import {FilterFormEntryPipe} from './pipes/filter-entry.pipe';
 import {KeyToIssueFilteredPipe} from './pipes/key-to-issue-filtered.pipe';
 import {FontMeasureComponent} from './components/font-measure/font-measure.component';
+import {FontSizeTableService} from './services/font-size-table.service';
 
 const appState: AppState = initialAppState;
 export function getInitialAppState(): AppState {
@@ -110,6 +111,7 @@ export function getInitialAppState(): AppState {
     {provide: APP_BASE_HREF, useValue: '/'},
     {provide: LocationStrategy, useClass: HashLocationStrategy},
     AppHeaderService,
+    FontSizeTableService,
     ProgressLogService,
     UrlService,
     VersionService
