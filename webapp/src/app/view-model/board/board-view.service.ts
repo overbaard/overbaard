@@ -37,12 +37,13 @@ import {RankViewEntry} from './rank-view-entry';
 import {BoardViewMode} from '../../model/board/user/board-view-mode';
 import {IssueDetailState} from '../../model/board/user/issue-detail/issue-detail.model';
 import {Dictionary} from '../../common/dictionary';
+import {FontSizeTableService} from '../../services/font-size-table.service';
 
 @Injectable()
 export class BoardViewModelService {
   private _boardViewModelHandler: BoardViewModelHandler = new BoardViewModelHandler();
 
-  constructor(private _store: Store<AppState>) {
+  constructor(private _store: Store<AppState>, private _fontSizeTable: FontSizeTableService) {
   }
 
   getBoardViewModel(): Observable<BoardViewModel> {
@@ -571,6 +572,12 @@ class IssueTableBuilder {
     const colour: string = this._currentBoardState.projects.boardProjects.get(issue.projectCode).colour;
     const ownStateName: string = this.getOwnStateName(issue);
     return BoardIssueViewUtil.createBoardIssue(issue, this._currentBoardState.jiraUrl, colour, ownStateName, visible);
+  }
+
+  private calculateIssueSummaryLines(): number {
+
+
+    return 0;
   }
 
   private filterIssues(issues: Map<string, BoardIssueView>): Map<string, BoardIssueView> {

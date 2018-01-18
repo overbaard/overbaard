@@ -7,6 +7,7 @@ import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/operator/catch';
 import {List} from 'immutable';
 import {FontSizeTableService} from '../../services/font-size-table.service';
+import {ISSUE_SUMMARY_NAME} from '../../view-model/board/issue-size-calculator';
 
 @Component({
   selector: 'app-font-measure',
@@ -38,7 +39,7 @@ import {FontSizeTableService} from '../../services/font-size-table.service';
 })
 export class FontMeasureComponent implements OnInit, AfterViewInit {
 
-  settingNames: List<string> = List<string>(['issue-summary', 'extra-item']);
+  settingNames: List<string> = List<string>([ISSUE_SUMMARY_NAME, 'extra-item']);
   settings: List<Setting> =
     List<Setting>([Setting.fromClass('mat-caption'), Setting.fromStyle({'font-size': '24px'})]);
   characters: string[] = [];
