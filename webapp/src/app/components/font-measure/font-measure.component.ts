@@ -19,7 +19,7 @@ import {ISSUE_SUMMARY_NAME} from '../../view-model/board/issue-size-calculator';
         *ngFor="let setting of settings"
         [ngClass]="setting.cssClass ? setting.cssClass : ''"
         [ngStyle]="setting.style ? setting.style : {}">
-        <span class="class">&nbsp;</span>
+        <span class="class"><span *ngFor="let i of hundredSpaces">&nbsp;</span></span>
       </div>
     </div>
     <!-- Do the other characters -->
@@ -46,6 +46,7 @@ export class FontMeasureComponent implements OnInit, AfterViewInit {
 
   @ViewChildren('characterHolder')
   characterHolders: QueryList<ElementRef>;
+  hundredSpaces: number[] = new Array<number>(100);
 
   constructor(private _fontSizeTable: FontSizeTableService) {
   }
@@ -69,7 +70,6 @@ export class FontMeasureComponent implements OnInit, AfterViewInit {
       const arr32: string = arr;
       arr = arr32 + arr32 + arr32 + arr4;
       this.characters.push(arr);
-      console.log(arr.length);
     }
   }
 
@@ -91,11 +91,12 @@ export class FontMeasureComponent implements OnInit, AfterViewInit {
 
         const width: number = span.offsetWidth / text.length;
         this._fontSizeTable.addItem(this.settingNames.get(i), character, width);
-        console.log(this._fontSizeTable);
       }
     }
 
     this._fontSizeTable.completeModification();
+    console.log(this._fontSizeTable);
+    console.log('====> ' + this._fontSizeTable.getTable(ISSUE_SUMMARY_NAME)[' ']);
   }
 }
 
