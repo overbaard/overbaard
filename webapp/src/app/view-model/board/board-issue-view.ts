@@ -9,7 +9,7 @@ export interface BoardIssueView extends BoardIssue {
   visible: boolean;
   issueUrl: string;
   ownStateName: string;
-  totalHeight: number;
+  calculatedTotalHeight: number;
 }
 
 

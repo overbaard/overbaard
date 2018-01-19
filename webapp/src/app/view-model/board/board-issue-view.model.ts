@@ -26,7 +26,7 @@ const DEFAULT_STATE: BoardIssueView = {
   projectColour: 'red',
   issueUrl: null,
   ownStateName: null,
-  totalHeight: 0
+  calculatedTotalHeight: 0
 };
 
 interface BoardIssueViewRecord extends TypedRecord<BoardIssueViewRecord>, BoardIssueView {
@@ -36,7 +36,9 @@ const ISSUE_FACTORY = makeTypedFactory<BoardIssueView, BoardIssueViewRecord>(DEF
 
 export class BoardIssueViewUtil {
 
-  static createBoardIssue(issue: BoardIssue, jiraUrl: string, projectColour: string, ownStateName: string, visible: boolean, totalHeight: number): BoardIssueViewRecord {
+  static createBoardIssue(
+    issue: BoardIssue, jiraUrl: string, projectColour: string, ownStateName: string,
+    visible: boolean, totalHeight: number): BoardIssueViewRecord {
     const issueUrl = `${jiraUrl}browse/${issue.key}`;
     return ISSUE_FACTORY({
       key: issue.key,
@@ -57,7 +59,7 @@ export class BoardIssueViewUtil {
       projectColour: projectColour,
       issueUrl: issueUrl,
       ownStateName: ownStateName,
-      totalHeight: totalHeight
+      calculatedTotalHeight: totalHeight
     });
   }
 

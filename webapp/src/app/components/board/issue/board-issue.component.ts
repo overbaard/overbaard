@@ -1,13 +1,14 @@
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
-  Component,
+  Component, ElementRef,
   EventEmitter,
   Input,
   OnChanges,
   OnInit,
   Output,
   SimpleChange,
-  SimpleChanges
+  SimpleChanges, ViewChild
 } from '@angular/core';
 import {BoardIssueView} from '../../../view-model/board/board-issue-view';
 import {Assignee, NO_ASSIGNEE} from '../../../model/board/data/assignee/assignee.model';
@@ -30,7 +31,7 @@ import {LinkedIssue} from '../../../model/board/data/issue/linked-issue';
   styleUrls: ['./board-issue.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class BoardIssueComponent implements OnInit, OnChanges {
+export class BoardIssueComponent implements OnInit, OnChanges, AfterViewInit {
 
   readonly noAssignee: Assignee = NO_ASSIGNEE;
 
@@ -45,6 +46,9 @@ export class BoardIssueComponent implements OnInit, OnChanges {
 
   @Input()
   viewMode: BoardViewMode = BoardViewMode.KANBAN;
+
+  @ViewChild('mat-card')
+  cardRef: ElementRef;
 
   cardTooltip: string;
 
@@ -61,6 +65,12 @@ export class BoardIssueComponent implements OnInit, OnChanges {
     if (issue && issue.currentValue !== issue.previousValue) {
       this.cardTooltip = null;
     }
+  }
+
+  ngAfterViewInit(): void {
+    const calculatedHeight: number = this.issue.calculatedTotalHeight;
+    //cons
+    console.log(`${this.issue.key} ${calculatedHeight}`);
   }
 
   get showSummary(): boolean {

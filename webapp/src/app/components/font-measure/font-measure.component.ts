@@ -7,7 +7,7 @@ import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/operator/catch';
 import {List} from 'immutable';
 import {FontSizeTableService} from '../../services/font-size-table.service';
-import {ISSUE_SUMMARY_NAME} from '../../view-model/board/issue-height-calculator';
+import {EXTRA_ITEM, ISSUE_SUMMARY_NAME} from '../../view-model/board/issue-height-calculator';
 import {Dictionary} from '../../common/dictionary';
 
 @Component({
@@ -40,7 +40,9 @@ import {Dictionary} from '../../common/dictionary';
 })
 export class FontMeasureComponent implements OnInit, AfterViewInit {
 
-  settingNames: List<string> = List<string>([ISSUE_SUMMARY_NAME, 'extra-item']);
+  settingNames: List<string> = List<string>([
+    ISSUE_SUMMARY_NAME,   // In the 'settings' list, the class that is used to display the issue summary
+    EXTRA_ITEM]);         // In the 'settings' list, the style that is used to display linked issues and parallel tasks
   settings: List<Setting> =
     List<Setting>([Setting.fromClass('mat-caption'), Setting.fromStyle({'font-size': '24px'})]);
   characters: string[] = [];

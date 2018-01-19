@@ -4,8 +4,10 @@ import {IssueSummaryLevel} from '../../model/board/user/issue-summary-level';
 import {Dictionary} from '../../common/dictionary';
 import {IssueDetailState} from '../../model/board/user/issue-detail/issue-detail.model';
 import {UserSettingState} from '../../model/board/user/user-setting';
+import {List} from 'immutable';
 
 export const ISSUE_SUMMARY_NAME = 'issue-summary';
+export const EXTRA_ITEM = 'extra-item';
 
 export class IssueHeightCalculator {
 
@@ -14,7 +16,8 @@ export class IssueHeightCalculator {
   private static readonly ISSUE_SUMMARY_AVATAR_LINES = 2;
   private static readonly ISSUE_SUMMARY_LINE_HEIGHT = 20;
 
-
+  private static readonly LINKED_ISSUE_HEIGHT = 19;
+  private static readonly PARALLEL_TASK_HEIGHT = 19;
 
   private _issueDetail: IssueDetailState;
   private _summaryCalcConfig: SummaryCalulationConfig;
@@ -25,17 +28,16 @@ export class IssueHeightCalculator {
   }
 
   calculateHeight(): number {
-    const summaryLines: number = this.calculateSummaryLines();
+    let issueHeight =
+      3 + 3 +       // card top and bottom padding
+      10 +          // card bottom margin
+      24 +          // card title height
+      4;            // Height of div containing colours for project, issue type and priority
 
-    let summaryHeight: number = IssueHeightCalculator.ISSUE_SUMMARY_LINE_HEIGHT * summaryLines;
-
-    summaryHeight = summaryHeight +
-      3 + 3 +       // top and bottom padding
-      10 +          // bottom margin
-      24 +          // title height
-      4;           // Height of div containing colours for project, issue type and priority
-
-    return summaryHeight;
+    issueHeight += this.calculateSummaryHeight();
+    issueHeight += this.calculateLinkedIssueLines() * IssueHeightCalculator.LINKED_ISSUE_HEIGHT;
+    issueHeight += this.calculateParallelTaskLines() * IssueHeightCalculator.PARALLEL_TASK_HEIGHT;
+    return issueHeight;
   }
 
   private calculateSummaryHeight(): number {
@@ -43,7 +45,10 @@ export class IssueHeightCalculator {
       // HEADER_ONLY has zero lines
       return 0;
     }
-    const lines = this.calculateSummaryLines()
+    let lines = this.calculateSummaryLines()
+    if (lines < this._summaryCalcConfig.minLines) {
+      lines = this._summaryCalcConfig.minLines;
+    }
     return lines * IssueHeightCalculator.ISSUE_SUMMARY_LINE_HEIGHT;
   }
 
@@ -52,8 +57,7 @@ export class IssueHeightCalculator {
     const splitter: WordAndWidthSplitter = this.splitWordsAndGetSizes(sizeLookup);
 
     const lineFitter: LineFitter = this.fitWordsToLines(sizeLookup, splitter.words, splitter.wordWidths);
-
-    return 0;
+    return lineFitter.lines;
   }
 
   private splitWordsAndGetSizes(sizeLookup: Dictionary<number>): WordAndWidthSplitter {
@@ -80,6 +84,45 @@ export class IssueHeightCalculator {
         return IssueHeightCalculator.ISSUE_SUMMARY_WIDTH;
       }
     );
+  }
+
+  private calculateParallelTaskLines(): number {
+    const extraWidth = 3; // 3px right margin
+    return this.calculateExtraInfoLines(
+      this._issueDetail.parallelTasks, extraWidth, this._boardIssue.parallelTasks, pt => pt.display);
+  }
+
+
+  private calculateLinkedIssueLines(): number {
+    const extraWidth = 5; // 5px right margin
+    return this.calculateExtraInfoLines(
+      this._issueDetail.linkedIssues, extraWidth, this._boardIssue.linkedIssues, li => li.key);
+  }
+
+  private calculateExtraInfoLines<T>(detailSetting: boolean, extraWidth: number,
+                                     list: List<T>, textGetter: (t: T) => string): number {
+
+    if (!detailSetting || !list || list.size === 0) {
+      return 0;
+    }
+
+    const lookup: Dictionary<number> = this._fontSizeTable.getTable(EXTRA_ITEM);
+    let lines = 1;
+    let currentWidth = 0;
+    list.forEach(infoItem => {
+      const word: string = textGetter(infoItem);
+      let wordSize = 0;
+      for (let ci = 0 ; ci < word.length ; ci++) {
+        wordSize += lookup[word.charAt(ci)];
+      }
+      wordSize += extraWidth;
+      if (currentWidth + wordSize > IssueHeightCalculator.ISSUE_SUMMARY_WIDTH) {
+        lines++;
+        currentWidth = 0;
+      }
+      currentWidth += wordSize;
+    });
+    return lines;
   }
 }
 
@@ -211,16 +254,17 @@ export class WordAndWidthSplitter {
 
 interface SummaryCalulationConfig {
   maxLines: number;
+  minLines: number;
   trimFirstTwoLines: boolean;
 }
 
 function SummaryCalculationConfig(summaryLevel: IssueSummaryLevel): SummaryCalulationConfig {
   switch (summaryLevel) {
     case IssueSummaryLevel.SHORT_SUMMARY_NO_AVATAR:
-      return {maxLines: 2, trimFirstTwoLines: false};
+      return {maxLines: 2, minLines: 1, trimFirstTwoLines: false};
     case IssueSummaryLevel.SHORT_SUMMARY:
-      return {maxLines: 2, trimFirstTwoLines: true};
+      return {maxLines: 2, minLines: 2, trimFirstTwoLines: true};
     case IssueSummaryLevel.FULL:
-      return {maxLines: 0, trimFirstTwoLines: true};
+      return {maxLines: 0, minLines: 2, trimFirstTwoLines: true};
   }
 }
