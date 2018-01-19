@@ -8,6 +8,7 @@ import 'rxjs/add/operator/catch';
 import {List} from 'immutable';
 import {FontSizeTableService} from '../../services/font-size-table.service';
 import {ISSUE_SUMMARY_NAME} from '../../view-model/board/issue-size-calculator';
+import {Dictionary} from '../../common/dictionary';
 
 @Component({
   selector: 'app-font-measure',
@@ -78,6 +79,7 @@ export class FontMeasureComponent implements OnInit, AfterViewInit {
     this._fontSizeTable.startModification();
 
     const elements: ElementRef[] = this.characterHolders.toArray();
+    let isSpace = true; // The first is a space, and is displayed a bit differently from the rest
     for (const element of elements) {
       const childDivs: NodeListOf<HTMLElement> = element.nativeElement.querySelectorAll('div');
       let character: string;
@@ -86,7 +88,12 @@ export class FontMeasureComponent implements OnInit, AfterViewInit {
         const span: HTMLElement = divEl.querySelector('span');
         const text: string = span.textContent;
         if (i === 0) {
-          character = text.charAt(0);
+          if (isSpace) {
+            character = ' '; // What is returned is actually '" "', which doesn't work in the lookup
+            isSpace = false;
+          } else {
+            character = text.charAt(0);
+          }
         }
 
         const width: number = span.offsetWidth / text.length;
@@ -95,8 +102,6 @@ export class FontMeasureComponent implements OnInit, AfterViewInit {
     }
 
     this._fontSizeTable.completeModification();
-    console.log(this._fontSizeTable);
-    console.log('====> ' + this._fontSizeTable.getTable(ISSUE_SUMMARY_NAME)[' ']);
   }
 }
 
