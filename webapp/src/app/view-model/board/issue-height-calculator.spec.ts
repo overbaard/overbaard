@@ -1,4 +1,4 @@
-import {IssueHeightCalculator, LineFitter, WordAndWidthSplitter} from './issue-height-calculator';
+import {IssueHeightCalculator, LineFitter, LineOverflowFitter, WordAndWidthSplitter} from './issue-height-calculator';
 
 describe('Issue Size Calculator Tests', () => {
   describe('Splitting and word counts', () => {
@@ -69,6 +69,41 @@ describe('Issue Size Calculator Tests', () => {
         expect(fitter.summary).toBeFalsy();
       });
 
+      describe('Overflow Fitter', () => {
+        it ('One Break from start of line', () => {
+          const fitter: LineOverflowFitter =
+            new LineOverflowFitter('abcde', 1, 0, character => 1, line => 4);
+          fitter.fitToLine();
+          expect(fitter.currentLine).toBe(2);
+          expect(fitter.word).toBe('abcd e');
+          expect(fitter.currentLineIndex).toBe(1);
+        });
+        it ('One Break from middle of line', () => {
+          const fitter: LineOverflowFitter =
+            new LineOverflowFitter('abcde', 1, 2, character => 1, line => 4);
+          fitter.fitToLine();
+          expect(fitter.currentLine).toBe(2);
+          expect(fitter.word).toBe('ab cde');
+          expect(fitter.currentLineIndex).toBe(3);
+        });
+        it ('Two Breaks from start of line', () => {
+          const fitter: LineOverflowFitter =
+            new LineOverflowFitter('abcdefghijkl', 1, 0, character => 1, line => 4);
+          fitter.fitToLine();
+          expect(fitter.currentLine).toBe(3);
+          expect(fitter.word).toBe('abcd efgh ijkl');
+          expect(fitter.currentLineIndex).toBe(4);
+        });
+        it ('Four Breaks from middle of line', () => {
+          const fitter: LineOverflowFitter =
+            new LineOverflowFitter('abcdefghijklmno', 2, 3, character => 1, line => 4);
+          fitter.fitToLine();
+          expect(fitter.currentLine).toBe(6;
+          expect(fitter.word).toBe('a bcde fghi jklm no');
+          expect(fitter.currentLineIndex).toBe(2);
+        });
+      });
+
       describe('Long overflowing word', () => {
         it('2 line word', () => {
           let fitter: LineFitter = createFitter(
@@ -96,6 +131,19 @@ describe('Issue Size Calculator Tests', () => {
             ['abcd', 'efghij'], 5, 0);
           expect(fitter.lines).toBe(3);
           expect(fitter.summary).toBe('abcd efghi j');
+
+          fitter = createFitter(
+            ['a', 'b', 'cd', 'ef', 'ghijkl'], 5, 0);
+          expect(fitter.lines).toBe(4);
+          expect(fitter.summary).toBe('a b cd ef ghijk l');
+
+        });
+        it('Current', () => {
+          const fitter: LineFitter = createFitter(
+            ['a', 'b', 'cd', 'efghij', 'kl'], 5, 0);
+          expect(fitter.lines).toBe(4);
+          expect(fitter.summary).toBe('a b cd ef ghij kl');
+
         });
 
         it('3 line word', () => {

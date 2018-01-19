@@ -204,6 +204,13 @@ export class LineFitter {
         // on the next. In the summary text, we introduce a space to allow the line break
         let word: string = this._words[wi];
         test = currentLineIndex === 0 ? currentLineIndex : currentLineIndex + this._spaceWidth;
+        if (test > currentLineMaxWidth) {
+          currentLineIndex = 0;
+          currentLine++;
+        }
+        const overflowFitter: LineOverflowFitter =
+          new LineOverflowFitter(word, currentLine, currentLineIndex, this._charWidthLookup, this._getLineWidth);
+        overflowFitter.fitToLine();
         for (let ci = 0 ; ci < word.length ; ci++) {
           const charWidth = this._charWidthLookup(word.charAt(ci));
           if (test + charWidth <= currentLineMaxWidth) {
@@ -211,7 +218,7 @@ export class LineFitter {
           } else {
             if (ci === 0) {
             } else {
-              word = this.insertSpace(word, ci);
+              word = insertSpace(word, ci);
               this._words[wi] = word;
               this._updatedSummary = true;
               ci ++;
@@ -236,13 +243,6 @@ export class LineFitter {
     }
   }
 
-  private insertSpace(word: string, index: number): string {
-    let copy: string = word.slice(0, index);
-    copy += ' ';
-    copy += word.slice(index);
-    return copy;
-  }
-
   get lines(): number {
     return this._lines;
   }
@@ -251,6 +251,51 @@ export class LineFitter {
     return this._summary;
   }
 }
+
+/**
+ * Used to fit words that are longer than a line
+ */
+export class LineOverflowFitter {
+
+  constructor(
+    private _word: string,
+    private _currentLine: number,
+    private _currentLineIndex: number,
+    private _charWidthLookup: (character: string) => number,
+    private _getLineWidth: (line: number) => number) {
+  }
+
+  get word(): string {
+    return this._word;
+  }
+
+  get currentLine(): number {
+    return this._currentLine;
+  }
+
+  get currentLineIndex(): number {
+    return this._currentLineIndex;
+  }
+
+  fitToLine() {
+    let currentLineMaxWidth: number = this._getLineWidth(this._currentLine);
+
+    for (let ci = 0 ; ci < this._word.length ; ci++) {
+      const char: string = this._word[ci];
+      const charWidth: number = this._charWidthLookup(char);
+      const test: number = this._currentLineIndex + charWidth;
+      if (test <= currentLineMaxWidth) {
+        this._currentLineIndex = test;
+      } else {
+        this._word = insertSpace(this._word, ci);
+        this._currentLine++;
+        this._currentLineIndex = 0;
+        currentLineMaxWidth = this._getLineWidth(this._currentLine);
+      }
+    }
+  }
+}
+
 
 /**
  * Breaks a string into its individual words, and calculates the sizes of each word from
@@ -319,4 +364,11 @@ function SummaryCalculationConfig(summaryLevel: IssueSummaryLevel): SummaryCalul
     case IssueSummaryLevel.FULL:
       return {maxLines: 0, minLines: 2, trimFirstTwoLines: true};
   }
+}
+
+function insertSpace(word: string, index: number): string {
+  let copy: string = word.slice(0, index);
+  copy += ' ';
+  copy += word.slice(index);
+  return copy;
 }
