@@ -579,18 +579,18 @@ class IssueTableBuilder {
   private createIssueView(issue: BoardIssue, visible: boolean): BoardIssueView {
     const colour: string = this._currentBoardState.projects.boardProjects.get(issue.projectCode).colour;
     const ownStateName: string = this.getOwnStateName(issue);
-    const height: number = this.calculateHeight(issue);
-    return BoardIssueViewUtil.createBoardIssue(issue, this._currentBoardState.jiraUrl, colour, ownStateName, visible, height);
-  }
 
-  private calculateHeight(issue: BoardIssue): number {
-    if (!this._fontSizeTable) {
-      // We're running in a unit test, just return 1
-      return 1;
+    // Some unit tests will not have the font size table
+    let height = 0;
+    let updatedSummary: string = issue.summary;
+    if (this._fontSizeTable) {
+      const heightCalculator: IssueHeightCalculator =
+        IssueHeightCalculator.create(issue, this._fontSizeTable, this._currentUserSettingState);
+      height = heightCalculator.calculatedHeight;
+      updatedSummary = heightCalculator.updatedSummary;
     }
-    const heightCalculator: IssueHeightCalculator =
-      new IssueHeightCalculator(issue, this._fontSizeTable, this._currentUserSettingState);
-    return heightCalculator.calculateHeight();
+    return BoardIssueViewUtil.createBoardIssue(
+      issue, this._currentBoardState.jiraUrl, colour, ownStateName, visible, updatedSummary, height);
   }
 
 

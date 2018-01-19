@@ -38,12 +38,12 @@ export class BoardIssueViewUtil {
 
   static createBoardIssue(
     issue: BoardIssue, jiraUrl: string, projectColour: string, ownStateName: string,
-    visible: boolean, totalHeight: number): BoardIssueViewRecord {
+    visible: boolean, summary: string, totalHeight: number): BoardIssueViewRecord {
     const issueUrl = `${jiraUrl}browse/${issue.key}`;
     return ISSUE_FACTORY({
       key: issue.key,
       projectCode: issue.projectCode,
-      summary: issue.summary,
+      summary: summary,
       assignee: issue.assignee,
       priority: issue.priority,
       type: issue.type,

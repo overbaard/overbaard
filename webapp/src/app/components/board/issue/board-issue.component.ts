@@ -47,15 +47,13 @@ export class BoardIssueComponent implements OnInit, OnChanges, AfterViewInit {
   @Input()
   viewMode: BoardViewMode = BoardViewMode.KANBAN;
 
-  @ViewChild('mat-card')
-  cardRef: ElementRef;
 
   cardTooltip: string;
 
   viewModeEnum = BoardViewMode;
 
 
-  constructor(public menuDialog: MatDialog, private _boardService: BoardService) { }
+  constructor(public menuDialog: MatDialog, private _boardService: BoardService, private _elementRef: ElementRef) { }
 
   ngOnInit() {
   }
@@ -68,9 +66,14 @@ export class BoardIssueComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    // Debug code only
     const calculatedHeight: number = this.issue.calculatedTotalHeight;
-    //cons
-    console.log(`${this.issue.key} ${calculatedHeight}`);
+    const card: HTMLElement = this._elementRef.nativeElement.querySelector('mat-card');
+    const margin = 10; // We need to add the margin ourselves
+    const actualHeight: number = card.offsetHeight + margin;
+    if (actualHeight !== calculatedHeight) {
+      console.error(`${this.issue.key} ${calculatedHeight} ${actualHeight}`);
+    }
   }
 
   get showSummary(): boolean {

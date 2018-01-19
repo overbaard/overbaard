@@ -22,12 +22,30 @@ export class IssueHeightCalculator {
   private _issueDetail: IssueDetailState;
   private _summaryCalcConfig: SummaryCalulationConfig;
 
-  constructor(private _boardIssue: BoardIssue, private _fontSizeTable: FontSizeTableService, userSettingState: UserSettingState) {
+  private _calculatedHeight: number;
+  private _updatedSummary: string;
+
+  private constructor(private _boardIssue: BoardIssue, private _fontSizeTable: FontSizeTableService, userSettingState: UserSettingState) {
     this._issueDetail = userSettingState.issueDetail;
     this._summaryCalcConfig = SummaryCalculationConfig(this._issueDetail.issueSummaryLevel);
   }
 
-  calculateHeight(): number {
+  /* tslint:disable:member-ordering */
+  static create(boardIssue: BoardIssue, fontSizeTable: FontSizeTableService, userSettingState: UserSettingState): IssueHeightCalculator {
+    const calc: IssueHeightCalculator = new IssueHeightCalculator(boardIssue, fontSizeTable, userSettingState);
+    calc.calculateHeight();
+    return calc;
+  }
+
+  get calculatedHeight(): number {
+    return this._calculatedHeight;
+  }
+
+  get updatedSummary(): string {
+    return this._updatedSummary;
+  }
+
+  calculateHeight(): void {
     let issueHeight =
       3 + 3 +       // card top and bottom padding
       10 +          // card bottom margin
@@ -37,7 +55,7 @@ export class IssueHeightCalculator {
     issueHeight += this.calculateSummaryHeight();
     issueHeight += this.calculateLinkedIssueLines() * IssueHeightCalculator.LINKED_ISSUE_HEIGHT;
     issueHeight += this.calculateParallelTaskLines() * IssueHeightCalculator.PARALLEL_TASK_HEIGHT;
-    return issueHeight;
+    this._calculatedHeight = issueHeight;
   }
 
   private calculateSummaryHeight(): number {
@@ -57,6 +75,7 @@ export class IssueHeightCalculator {
     const splitter: WordAndWidthSplitter = this.splitWordsAndGetSizes(sizeLookup);
 
     const lineFitter: LineFitter = this.fitWordsToLines(sizeLookup, splitter.words, splitter.wordWidths);
+    this._updatedSummary = lineFitter.summary;
     return lineFitter.lines;
   }
 
@@ -175,28 +194,61 @@ export class LineFitter {
         continue;
       }
 
-      // TODO some corner cases if it is say a long word on line 2, which would fit on line 3
       if (nextWordWidth <= this._getLineWidth(currentLine + 1)) {
-        // The word fits on the next line
+        // The word all fits on the next line, so put it there
         currentLine++;
         currentLineMaxWidth = this._getLineWidth(currentLine);
         currentLineIndex = nextWordWidth;
       } else {
-        // TODO work this out
-/*
-        // It is a long word spanning more than one line
-        const word: string = this._words[wi];
-        test = currentLineIndex + this._spaceWidth;
+        // It is a long word spanning more than one line. Put what we can on the current line, and the rest
+        // on the next. In the summary text, we introduce a space to allow the line break
+        let word: string = this._words[wi];
+        test = currentLineIndex === 0 ? currentLineIndex : currentLineIndex + this._spaceWidth;
         for (let ci = 0 ; ci < word.length ; ci++) {
+          const charWidth = this._charWidthLookup(word.charAt(ci));
+          if (test + charWidth <= currentLineMaxWidth) {
+            test += charWidth;
+          } else {
+            if (ci === 0) {
+            } else {
+              word = this.insertSpace(word, ci);
+              this._words[wi] = word;
+              this._updatedSummary = true;
+              ci ++;
+            }
+
+            currentLine++;
+            currentLineMaxWidth = this._getLineWidth(currentLine);
+            test = currentLineIndex = charWidth;
+          }
         }
-*/
       }
     }
     this._lines = currentLine + 1;
+    if (this._updatedSummary) {
+      this._summary = '';
+      for (let i = 0 ; i < this._words.length ; i++) {
+        if (i > 0) {
+          this._summary += ' ';
+        }
+        this._summary += this._words[i];
+      }
+    }
+  }
+
+  private insertSpace(word: string, index: number): string {
+    let copy: string = word.slice(0, index);
+    copy += ' ';
+    copy += word.slice(index);
+    return copy;
   }
 
   get lines(): number {
     return this._lines;
+  }
+
+  get summary(): string {
+    return this._summary;
   }
 }
 
