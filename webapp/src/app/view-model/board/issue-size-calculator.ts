@@ -13,9 +13,11 @@ export class IssueSizeCalculator {
   private static readonly ISSUE_SUMMARY_LINE_HEIGHT = 20;
 
 
-  constructor(private _boardIssue: BoardIssue, private _fontSizeTable: FontSizeTableService, private _userSettingState) {
-  }
+  private _summaryCalcConfig: SummaryCalulationConfig;
 
+  constructor(private _boardIssue: BoardIssue, private _fontSizeTable: FontSizeTableService, private _userSettingState) {
+    this._summaryCalcConfig = SummaryCalculationConfig(this._userSettingState.issueSummaryLevel);
+  }
 
   calculateHeight(): number {
     const summaryLines: number = this.calculateSummaryLines();
@@ -25,25 +27,19 @@ export class IssueSizeCalculator {
 
   private calculateSummaryHeight(): number {
     const issueSummaryLevel: IssueSummaryLevel = this._userSettingState.issueSummaryLevel;
-    let lines = 0;
-    if (issueSummaryLevel === IssueSummaryLevel.SHORT_SUMMARY || issueSummaryLevel === IssueSummaryLevel.SHORT_SUMMARY_NO_AVATAR) {
-      lines = 2;
-    } else {
-      lines = this.calculateSummaryLines();
+    if (this._userSettingState.issueSummaryLevel === IssueSummaryLevel.HEADER_ONLY) {
+      // HEADER_ONLY has zero lines
+      return 0;
     }
+    const lines = this.calculateSummaryLines()
     return lines * IssueSizeCalculator.ISSUE_SUMMARY_LINE_HEIGHT;
   }
 
   private calculateSummaryLines(): number {
     const sizeLookup: Dictionary<number> = this._fontSizeTable.getTable(ISSUE_SUMMARY_NAME);
-    const wordAndWidths: WordAndWidthSplitter = this.splitWordsAndGetSizes(sizeLookup);
+    const splitter: WordAndWidthSplitter = this.splitWordsAndGetSizes(sizeLookup);
 
-    const lineFitter: LineFitter = new LineFitter(
-      wordAndWidths.words,
-      wordAndWidths.wordWidths,
-      character => sizeLookup[character],
-      line => line > 2 ?
-        IssueSizeCalculator.ISSUE_SUMMARY_WIDTH : IssueSizeCalculator.ISSUE_SUMMARY_WIDTH - IssueSizeCalculator.AVATAR_WIDTH);
+    const lineFitter: LineFitter = this.fitWordsToLines(sizeLookup, splitter.words, splitter.wordWidths);
 
     return 0;
   }
@@ -60,22 +56,51 @@ export class IssueSizeCalculator {
 
         }));
   }
+
+  private fitWordsToLines(sizeLookup: Dictionary<number>, words: string[], wordWidths: number[]): LineFitter {
+    return LineFitter.create(
+      this._boardIssue.summary, words, wordWidths, this._summaryCalcConfig.maxLines,
+      character => sizeLookup[character],
+      line => {
+        if (this._summaryCalcConfig.trimFirstTwoLines && line < 2) {
+          return IssueSizeCalculator.ISSUE_SUMMARY_WIDTH - IssueSizeCalculator.AVATAR_WIDTH;
+        }
+        return IssueSizeCalculator.ISSUE_SUMMARY_WIDTH;
+      }
+    );
+  }
 }
-
-
 
 export class LineFitter {
   private _spaceWidth: number;
-  constructor(
+
+  private _lines: number;
+
+  private constructor(
+    private _summary: string,
     private _words: string[],
     private _wordWidths: number[],
+    private _maxLines: number,
     private _charWidthLookup: (character: string) => number,
     private _getLineWidth: (line: number) => number) {
     this._spaceWidth = _charWidthLookup(' ');
   }
 
-  countLines(): number {
-    let currentLine = 1;
+  /* tslint:disable:member-ordering */
+  static create(
+    summary: string,
+    words: string[],
+    wordWidths: number[],
+    maxLines: number,
+    charWidthLookup: (character: string) => number,
+    getLineWidth: (line: number) => number): LineFitter {
+    const fitter: LineFitter = new LineFitter(summary, words, wordWidths, maxLines, charWidthLookup, getLineWidth);
+    fitter.countLines();
+    return fitter;
+  }
+
+  private countLines(): void {
+    let currentLine = 0;
     let currentLineMaxWidth = this._getLineWidth(currentLine);
     let currentLineIndex = 0;
 
@@ -102,10 +127,18 @@ export class LineFitter {
         currentLineIndex = nextWordWidth;
       }
     }
-    return currentLine;
+    this._lines = currentLine + 1;
+  }
+
+  get lines(): number {
+    return this._lines;
   }
 }
 
+/**
+ * Breaks a string into its individual words, and calculates the sizes of each word from
+ * a font size lookup table.
+ */
 export class WordAndWidthSplitter {
   private _words: string[] = [];
   private _wordWidths: number[] = [];
@@ -151,5 +184,21 @@ export class WordAndWidthSplitter {
 
   get wordWidths(): number[] {
     return this._wordWidths;
+  }
+}
+
+interface SummaryCalulationConfig {
+  maxLines: number;
+  trimFirstTwoLines: boolean;
+}
+
+function SummaryCalculationConfig(summaryLevel: IssueSummaryLevel): SummaryCalulationConfig {
+  switch (summaryLevel) {
+    case IssueSummaryLevel.SHORT_SUMMARY_NO_AVATAR:
+      return {maxLines: 2, trimFirstTwoLines: false};
+    case IssueSummaryLevel.SHORT_SUMMARY:
+      return {maxLines: 2, trimFirstTwoLines: true};
+    case IssueSummaryLevel.FULL:
+      return {maxLines: 0, trimFirstTwoLines: true};
   }
 }
