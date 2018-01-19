@@ -60,9 +60,22 @@ describe('Issue Size Calculator Tests', () => {
 
     });
 
+    it('Long overflowing word', () => {
+      // Deal with this corner case later
+      /*let fitter: LineFitter = createFitter(
+        ['abddef'], 5);
+      expect(fitter.countLines()).toBe(2);
+
+      fitter = createFitter(
+        ['abc', 'defghi'], 5);
+      expect(fitter.countLines()).toBe(2);
+
+      // TODO - more*/
+    });
+
     function createFitter(words: string[], lineWidth: number): LineFitter {
       const wordWidths: number[] = words.map(word => word.length);
-      return new LineFitter(words, wordWidths, 1, line =>  lineWidth);
+      return new LineFitter(words, wordWidths, character => 1, line =>  lineWidth);
     }
   });
 })

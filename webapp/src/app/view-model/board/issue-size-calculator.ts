@@ -1,6 +1,7 @@
 import {BoardIssue} from '../../model/board/data/issue/board-issue';
 import {FontSizeTableService} from '../../services/font-size-table.service';
 import {IssueSummaryLevel} from '../../model/board/user/issue-summary-level';
+import {Dictionary} from '../../common/dictionary';
 
 export const ISSUE_SUMMARY_NAME = 'issue-summary';
 
@@ -34,14 +35,20 @@ export class IssueSizeCalculator {
   }
 
   private calculateSummaryLines(): number {
-    const wordAndWidths: WordAndWidthSplitter = this.splitWordsAndGetSizes();
+    const sizeLookup: Dictionary<number> = this._fontSizeTable.getTable(ISSUE_SUMMARY_NAME);
+    const wordAndWidths: WordAndWidthSplitter = this.splitWordsAndGetSizes(sizeLookup);
 
+    const lineFitter: LineFitter = new LineFitter(
+      wordAndWidths.words,
+      wordAndWidths.wordWidths,
+      character => sizeLookup[character],
+      line => line > 2 ?
+        IssueSizeCalculator.ISSUE_SUMMARY_WIDTH : IssueSizeCalculator.ISSUE_SUMMARY_WIDTH - IssueSizeCalculator.AVATAR_WIDTH);
 
     return 0;
   }
 
-  private splitWordsAndGetSizes(): WordAndWidthSplitter {
-    const sizeLookup = this._fontSizeTable.getTable(ISSUE_SUMMARY_NAME);
+  private splitWordsAndGetSizes(sizeLookup: Dictionary<number>): WordAndWidthSplitter {
     return WordAndWidthSplitter.create(
         this._boardIssue.summary,
         (character => {
@@ -55,12 +62,16 @@ export class IssueSizeCalculator {
   }
 }
 
+
+
 export class LineFitter {
+  private _spaceWidth: number;
   constructor(
     private _words: string[],
     private _wordWidths: number[],
-    private spaceWidth: number,
+    private _charWidthLookup: (character: string) => number,
     private _getLineWidth: (line: number) => number) {
+    this._spaceWidth = _charWidthLookup(' ');
   }
 
   countLines(): number {
@@ -72,7 +83,7 @@ export class LineFitter {
       let test = currentLineIndex;
       const nextWordWidth = this._wordWidths[wi];
       if (currentLineIndex > 0) {
-        test += this.spaceWidth;
+        test += this._spaceWidth;
       }
 
       test += nextWordWidth;
@@ -84,6 +95,7 @@ export class LineFitter {
 
       if (nextWordWidth > this._getLineWidth(currentLine + 1)) {
         // TODO split it
+
       } else {
         currentLine++;
         currentLineMaxWidth = this._getLineWidth(currentLine);
