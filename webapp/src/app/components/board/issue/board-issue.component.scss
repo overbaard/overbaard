@@ -72,8 +72,10 @@ img.avatar {
   line-height: 32px;
 }
 .summary {
-  min-height: 34px;
   word-wrap:break-word;
+}
+.avatar-summary {
+  min-height: 40px;
 }
 .short-summary {
   max-height: 40px;
