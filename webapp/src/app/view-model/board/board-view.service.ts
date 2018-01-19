@@ -38,12 +38,14 @@ import {BoardViewMode} from '../../model/board/user/board-view-mode';
 import {IssueDetailState} from '../../model/board/user/issue-detail/issue-detail.model';
 import {Dictionary} from '../../common/dictionary';
 import {FontSizeTableService} from '../../services/font-size-table.service';
+import {IssueHeightCalculator} from './issue-height-calculator';
 
 @Injectable()
 export class BoardViewModelService {
-  private _boardViewModelHandler: BoardViewModelHandler = new BoardViewModelHandler();
+  private readonly _boardViewModelHandler: BoardViewModelHandler;
 
   constructor(private _store: Store<AppState>, private _fontSizeTable: FontSizeTableService) {
+    this._boardViewModelHandler = new BoardViewModelHandler(this._fontSizeTable);
   }
 
   getBoardViewModel(): Observable<BoardViewModel> {
@@ -63,6 +65,9 @@ export class BoardViewModelHandler {
 
   private _lastBoardView: BoardViewModel = initialBoardViewModel;
   private _forcedRefresh = false;
+
+  constructor(private readonly _fontSizeTable: FontSizeTableService) {
+  }
 
   getBoardViewModel(boardState$: Observable<BoardState>,
                     userSettingState$: Observable<UserSettingState>): Observable<BoardViewModel> {
@@ -111,7 +116,7 @@ export class BoardViewModelHandler {
 
       let boardView: BoardViewModel = this._lastBoardView;
       if (changeType != null) {
-        boardView = new BoardViewBuilder(changeType, this._lastBoardView,
+        boardView = new BoardViewBuilder(this._fontSizeTable, changeType, this._lastBoardView,
           this._lastBoardState, boardState, this._lastUserSettingState, userSettingState)
           .build();
       }
@@ -126,6 +131,7 @@ export class BoardViewModelHandler {
 
 class BoardViewBuilder {
   constructor(
+    private readonly _fontSizeTable: FontSizeTableService,
     private readonly _changeType: ChangeType,
     private readonly _oldBoardView: BoardViewModel,
     private readonly _oldBoardState: BoardState,
@@ -143,6 +149,7 @@ class BoardViewBuilder {
 
     const issueTableBuilder: IssueTableBuilder =
       new IssueTableBuilder(
+        this._fontSizeTable,
         this._changeType, this._oldBoardView.issueTable, this._currentBoardState,
         this._lastUserSettingState, this._currentUserSettingState);
     const issueTable: IssueTable = issueTableBuilder.build();
@@ -501,6 +508,7 @@ class IssueTableBuilder {
   private _ownStateNames: Dictionary<string[]> = {};
 
   constructor(
+    private readonly _fontSizeTable: FontSizeTableService,
     private readonly _changeType: ChangeType,
     private readonly _oldIssueTableState: IssueTable,
     private readonly _currentBoardState: BoardState,
@@ -571,14 +579,20 @@ class IssueTableBuilder {
   private createIssueView(issue: BoardIssue, visible: boolean): BoardIssueView {
     const colour: string = this._currentBoardState.projects.boardProjects.get(issue.projectCode).colour;
     const ownStateName: string = this.getOwnStateName(issue);
-    return BoardIssueViewUtil.createBoardIssue(issue, this._currentBoardState.jiraUrl, colour, ownStateName, visible);
+    const height: number = this.calculateHeight(issue);
+    return BoardIssueViewUtil.createBoardIssue(issue, this._currentBoardState.jiraUrl, colour, ownStateName, visible, height);
   }
 
-  private calculateIssueSummaryLines(): number {
-
-
-    return 0;
+  private calculateHeight(issue: BoardIssue): number {
+    if (!this._fontSizeTable) {
+      // We're running in a unit test, just return 1
+      return 1;
+    }
+    const heightCalculator: IssueHeightCalculator =
+      new IssueHeightCalculator(issue, this._fontSizeTable, this._currentUserSettingState);
+    return heightCalculator.calculateHeight();
   }
+
 
   private filterIssues(issues: Map<string, BoardIssueView>): Map<string, BoardIssueView> {
     switch (this._changeType) {

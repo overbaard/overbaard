@@ -1,4 +1,4 @@
-import {IssueSizeCalculator, LineFitter, WordAndWidthSplitter} from './issue-size-calculator';
+import {IssueHeightCalculator, LineFitter, WordAndWidthSplitter} from './issue-height-calculator';
 
 describe('Issue Size Calculator Tests', () => {
   describe('Splitting and word counts', () => {

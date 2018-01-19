@@ -42,7 +42,7 @@ import {IssueSummaryLevel} from '../../model/board/user/issue-summary-level';
 import {HeaderActions, headerMetaReducer} from '../../model/board/data/header/header.reducer';
 
 export class BoardViewObservableUtil {
-  private _service: BoardViewModelHandler = new BoardViewModelHandler();
+  private _service: BoardViewModelHandler = new BoardViewModelHandler(null);
   private _userSettingState: UserSettingState = initialUserSettingState;
   private _userSettingSubject$: BehaviorSubject<UserSettingState> = new BehaviorSubject(initialUserSettingState);
   private _boardState: BoardState = initialBoardState;

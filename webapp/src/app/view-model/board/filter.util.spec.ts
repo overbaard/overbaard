@@ -349,7 +349,8 @@ describe('Apply filter tests', () => {
       visible: true,
       projectColour: 'red',
       issueUrl: null,
-      ownStateName: null
+      ownStateName: null,
+      totalHeight: 0
     }
   }
 });

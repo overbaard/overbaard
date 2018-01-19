@@ -7,7 +7,7 @@ import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/operator/catch';
 import {List} from 'immutable';
 import {FontSizeTableService} from '../../services/font-size-table.service';
-import {ISSUE_SUMMARY_NAME} from '../../view-model/board/issue-size-calculator';
+import {ISSUE_SUMMARY_NAME} from '../../view-model/board/issue-height-calculator';
 import {Dictionary} from '../../common/dictionary';
 
 @Component({

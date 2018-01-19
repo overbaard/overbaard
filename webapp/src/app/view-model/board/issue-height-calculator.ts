@@ -2,10 +2,12 @@ import {BoardIssue} from '../../model/board/data/issue/board-issue';
 import {FontSizeTableService} from '../../services/font-size-table.service';
 import {IssueSummaryLevel} from '../../model/board/user/issue-summary-level';
 import {Dictionary} from '../../common/dictionary';
+import {IssueDetailState} from '../../model/board/user/issue-detail/issue-detail.model';
+import {UserSettingState} from '../../model/board/user/user-setting';
 
 export const ISSUE_SUMMARY_NAME = 'issue-summary';
 
-export class IssueSizeCalculator {
+export class IssueHeightCalculator {
 
   private static readonly ISSUE_SUMMARY_WIDTH = 186;
   private static readonly AVATAR_WIDTH = 32;
@@ -13,26 +15,36 @@ export class IssueSizeCalculator {
   private static readonly ISSUE_SUMMARY_LINE_HEIGHT = 20;
 
 
+
+  private _issueDetail: IssueDetailState;
   private _summaryCalcConfig: SummaryCalulationConfig;
 
-  constructor(private _boardIssue: BoardIssue, private _fontSizeTable: FontSizeTableService, private _userSettingState) {
-    this._summaryCalcConfig = SummaryCalculationConfig(this._userSettingState.issueSummaryLevel);
+  constructor(private _boardIssue: BoardIssue, private _fontSizeTable: FontSizeTableService, userSettingState: UserSettingState) {
+    this._issueDetail = userSettingState.issueDetail;
+    this._summaryCalcConfig = SummaryCalculationConfig(this._issueDetail.issueSummaryLevel);
   }
 
   calculateHeight(): number {
     const summaryLines: number = this.calculateSummaryLines();
 
-    return 0;
+    let summaryHeight: number = IssueHeightCalculator.ISSUE_SUMMARY_LINE_HEIGHT * summaryLines;
+
+    summaryHeight = summaryHeight +
+      3 + 3 +       // top and bottom padding
+      10 +          // bottom margin
+      24 +          // title height
+      4;           // Height of div containing colours for project, issue type and priority
+
+    return summaryHeight;
   }
 
   private calculateSummaryHeight(): number {
-    const issueSummaryLevel: IssueSummaryLevel = this._userSettingState.issueSummaryLevel;
-    if (this._userSettingState.issueSummaryLevel === IssueSummaryLevel.HEADER_ONLY) {
+    if (this._issueDetail.issueSummaryLevel === IssueSummaryLevel.HEADER_ONLY) {
       // HEADER_ONLY has zero lines
       return 0;
     }
     const lines = this.calculateSummaryLines()
-    return lines * IssueSizeCalculator.ISSUE_SUMMARY_LINE_HEIGHT;
+    return lines * IssueHeightCalculator.ISSUE_SUMMARY_LINE_HEIGHT;
   }
 
   private calculateSummaryLines(): number {
@@ -62,10 +74,10 @@ export class IssueSizeCalculator {
       this._boardIssue.summary, words, wordWidths, this._summaryCalcConfig.maxLines,
       character => sizeLookup[character],
       line => {
-        if (this._summaryCalcConfig.trimFirstTwoLines && line < 2) {
-          return IssueSizeCalculator.ISSUE_SUMMARY_WIDTH - IssueSizeCalculator.AVATAR_WIDTH;
+        if (this._summaryCalcConfig.trimFirstTwoLines && line < IssueHeightCalculator.ISSUE_SUMMARY_AVATAR_LINES) {
+          return IssueHeightCalculator.ISSUE_SUMMARY_WIDTH - IssueHeightCalculator.AVATAR_WIDTH;
         }
-        return IssueSizeCalculator.ISSUE_SUMMARY_WIDTH;
+        return IssueHeightCalculator.ISSUE_SUMMARY_WIDTH;
       }
     );
   }
@@ -75,6 +87,8 @@ export class LineFitter {
   private _spaceWidth: number;
 
   private _lines: number;
+
+  private _updatedSummary = false;
 
   private constructor(
     private _summary: string,
@@ -118,13 +132,21 @@ export class LineFitter {
         continue;
       }
 
-      if (nextWordWidth > this._getLineWidth(currentLine + 1)) {
-        // TODO split it
-
-      } else {
+      // TODO some corner cases if it is say a long word on line 2, which would fit on line 3
+      if (nextWordWidth <= this._getLineWidth(currentLine + 1)) {
+        // The word fits on the next line
         currentLine++;
         currentLineMaxWidth = this._getLineWidth(currentLine);
         currentLineIndex = nextWordWidth;
+      } else {
+        // TODO work this out
+/*
+        // It is a long word spanning more than one line
+        const word: string = this._words[wi];
+        test = currentLineIndex + this._spaceWidth;
+        for (let ci = 0 ; ci < word.length ; ci++) {
+        }
+*/
       }
     }
     this._lines = currentLine + 1;
