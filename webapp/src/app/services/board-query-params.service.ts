@@ -59,6 +59,9 @@ export class BoardQueryParamsHandler {
           if (!userSettingState.issueDetail.parallelTasks) {
             params.push('vpt=false');
           }
+          if (!userSettingState.issueDetail.linkedIssues) {
+            params.push('vli=false');
+          }
           if (userSettingState.swimlane) {
             params.push(`swimlane=${encodeURIComponent(userSettingState.swimlane)}`);
             if (userSettingState.swimlaneShowEmpty) {

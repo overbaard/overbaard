@@ -151,6 +151,7 @@ export function userSettingReducer(state: UserSettingState = initialUserSettingS
               issueDetail.issueSummaryLevel = toIssueSummaryLevel(Number(params['isl']));
             }
             issueDetail.parallelTasks = !(params['vpt'] === 'false');
+            issueDetail.linkedIssues = !(params['vli'] === 'false');
           });
         mutable.swimlane = params['swimlane'];
         if (mutable.swimlane) {

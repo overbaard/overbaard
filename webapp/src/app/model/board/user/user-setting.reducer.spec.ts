@@ -31,7 +31,8 @@ describe('User setting reducer tests', () => {
         project: 'P1',
         swimlane: 'assignee',
         'isl': '0',
-        'vpt': 'true'
+        'vpt': 'true',
+        'vli': 'true'
       };
       const state: UserSettingState = userSettingReducer(
         initialUserSettingState,
@@ -54,7 +55,8 @@ describe('User setting reducer tests', () => {
         visible: '1,5,7',
         'visible-sl': 'a,b,c',
         'isl': '1',
-        'vpt': 'false'
+        'vpt': 'false',
+        'vli': 'false'
       };
       const state: UserSettingState = userSettingReducer(
         initialUserSettingState,
@@ -70,6 +72,7 @@ describe('User setting reducer tests', () => {
       settingChecker.defaultSwimlaneCollapsed = true;
       settingChecker.issueSummaryLevel = IssueSummaryLevel.SHORT_SUMMARY_NO_AVATAR;
       settingChecker.parallelTasks = false;
+      settingChecker.linkedIssues = false;
       settingChecker.check(state)
     });
     it ('With Querystring, bl=true and hidden columns', () => {
