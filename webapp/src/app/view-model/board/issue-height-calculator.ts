@@ -146,23 +146,7 @@ export class IssueHeightCalculator {
 }
 
 export class LineFitter {
-  private _spaceWidth: number;
 
-  private _lines: number;
-
-  private _updatedSummary = false;
-
-  private constructor(
-    private _summary: string,
-    private _words: string[],
-    private _wordWidths: number[],
-    private _maxLines: number,
-    private _charWidthLookup: (character: string) => number,
-    private _getLineWidth: (line: number) => number) {
-    this._spaceWidth = _charWidthLookup(' ');
-  }
-
-  /* tslint:disable:member-ordering */
   static create(
     summary: string,
     words: string[],
@@ -175,22 +159,36 @@ export class LineFitter {
     return fitter;
   }
 
+  private _spaceWidth: number;
+  private _lines: number;
+
+  private constructor(
+    private _summary: string,
+    private _words: string[],
+    private _wordWidths: number[],
+    private _maxLines: number,
+    private _charWidthLookup: (character: string) => number,
+    private _getLineWidth: (line: number) => number) {
+    this._spaceWidth = _charWidthLookup(' ');
+  }
+
   private countLines(): void {
     let currentLine = 0;
     let currentLineMaxWidth = this._getLineWidth(currentLine);
-    let currentLineIndex = 0;
+    let currentLineWidth = 0;
+    let updatedSummary = false;
 
     for (let wi = 0 ; wi < this._words.length ; wi++) {
-      let test = currentLineIndex;
+      let test = currentLineWidth;
       const nextWordWidth = this._wordWidths[wi];
-      if (currentLineIndex > 0) {
+      if (currentLineWidth > 0) {
         test += this._spaceWidth;
       }
 
       test += nextWordWidth;
       if (test <= currentLineMaxWidth) {
         // It fits, continue with everything
-        currentLineIndex = test;
+        currentLineWidth = test;
         continue;
       }
 
@@ -198,41 +196,28 @@ export class LineFitter {
         // The word all fits on the next line, so put it there
         currentLine++;
         currentLineMaxWidth = this._getLineWidth(currentLine);
-        currentLineIndex = nextWordWidth;
+        currentLineWidth = nextWordWidth;
       } else {
         // It is a long word spanning more than one line. Put what we can on the current line, and the rest
         // on the next. In the summary text, we introduce a space to allow the line break
-        let word: string = this._words[wi];
-        test = currentLineIndex === 0 ? currentLineIndex : currentLineIndex + this._spaceWidth;
+        test = currentLineWidth === 0 ? currentLineWidth : currentLineWidth + this._spaceWidth;
         if (test > currentLineMaxWidth) {
-          currentLineIndex = 0;
+          currentLineWidth = 0;
           currentLine++;
+        } else {
+          currentLineWidth = test;
         }
         const overflowFitter: LineOverflowFitter =
-          new LineOverflowFitter(word, currentLine, currentLineIndex, this._charWidthLookup, this._getLineWidth);
-        overflowFitter.fitToLine();
-        for (let ci = 0 ; ci < word.length ; ci++) {
-          const charWidth = this._charWidthLookup(word.charAt(ci));
-          if (test + charWidth <= currentLineMaxWidth) {
-            test += charWidth;
-          } else {
-            if (ci === 0) {
-            } else {
-              word = insertSpace(word, ci);
-              this._words[wi] = word;
-              this._updatedSummary = true;
-              ci ++;
-            }
-
-            currentLine++;
-            currentLineMaxWidth = this._getLineWidth(currentLine);
-            test = currentLineIndex = charWidth;
-          }
-        }
+          LineOverflowFitter.create(this._words[wi], currentLine, currentLineWidth, this._charWidthLookup, this._getLineWidth);
+        currentLine = overflowFitter.currentLine;
+        currentLineWidth = overflowFitter.currentLineWidth;
+        currentLineMaxWidth = this._getLineWidth(currentLine);
+        this._words[wi] = overflowFitter.word;
+        updatedSummary = true;
       }
     }
     this._lines = currentLine + 1;
-    if (this._updatedSummary) {
+    if (updatedSummary) {
       this._summary = '';
       for (let i = 0 ; i < this._words.length ; i++) {
         if (i > 0) {
@@ -257,10 +242,22 @@ export class LineFitter {
  */
 export class LineOverflowFitter {
 
-  constructor(
+  static create(
+    word: string,
+    currentLine: number,
+    currentLineWidth: number,
+    charWidthLookup: (character: string) => number,
+    getLineWidth: (line: number) => number): LineOverflowFitter {
+    const fitter: LineOverflowFitter =
+      new LineOverflowFitter(word, currentLine, currentLineWidth, charWidthLookup, getLineWidth);
+    fitter.fitToLine();
+    return fitter;
+  }
+
+  private constructor(
     private _word: string,
     private _currentLine: number,
-    private _currentLineIndex: number,
+    private _currentLineWidth: number,
     private _charWidthLookup: (character: string) => number,
     private _getLineWidth: (line: number) => number) {
   }
@@ -273,23 +270,23 @@ export class LineOverflowFitter {
     return this._currentLine;
   }
 
-  get currentLineIndex(): number {
-    return this._currentLineIndex;
+  get currentLineWidth(): number {
+    return this._currentLineWidth;
   }
 
-  fitToLine() {
+  private fitToLine() {
     let currentLineMaxWidth: number = this._getLineWidth(this._currentLine);
 
     for (let ci = 0 ; ci < this._word.length ; ci++) {
       const char: string = this._word[ci];
       const charWidth: number = this._charWidthLookup(char);
-      const test: number = this._currentLineIndex + charWidth;
+      const test: number = this._currentLineWidth + charWidth;
       if (test <= currentLineMaxWidth) {
-        this._currentLineIndex = test;
+        this._currentLineWidth = test;
       } else {
         this._word = insertSpace(this._word, ci);
         this._currentLine++;
-        this._currentLineIndex = 0;
+        this._currentLineWidth = 0;
         currentLineMaxWidth = this._getLineWidth(this._currentLine);
       }
     }
@@ -302,16 +299,17 @@ export class LineOverflowFitter {
  * a font size lookup table.
  */
 export class WordAndWidthSplitter {
-  private _words: string[] = [];
-  private _wordWidths: number[] = [];
-  private constructor(private _summary: string, private _lookup: (character: string) => number) {
-  }
 
-  /* tslint:disable:member-ordering */
   static create(summary: string, lookup: (character: string) => number): WordAndWidthSplitter {
     const splitter: WordAndWidthSplitter = new WordAndWidthSplitter(summary, lookup);
     splitter.createWordList();
     return splitter;
+  }
+
+  private _words: string[] = [];
+  private _wordWidths: number[] = [];
+
+  private constructor(private _summary: string, private _lookup: (character: string) => number) {
   }
 
   private createWordList() {

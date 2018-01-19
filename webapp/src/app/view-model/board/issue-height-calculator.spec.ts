@@ -72,35 +72,31 @@ describe('Issue Size Calculator Tests', () => {
       describe('Overflow Fitter', () => {
         it ('One Break from start of line', () => {
           const fitter: LineOverflowFitter =
-            new LineOverflowFitter('abcde', 1, 0, character => 1, line => 4);
-          fitter.fitToLine();
+            LineOverflowFitter.create('abcde', 1, 0, character => 1, line => 4);
           expect(fitter.currentLine).toBe(2);
           expect(fitter.word).toBe('abcd e');
-          expect(fitter.currentLineIndex).toBe(1);
+          expect(fitter.currentLineWidth).toBe(1);
         });
         it ('One Break from middle of line', () => {
           const fitter: LineOverflowFitter =
-            new LineOverflowFitter('abcde', 1, 2, character => 1, line => 4);
-          fitter.fitToLine();
+            LineOverflowFitter.create('abcde', 1, 2, character => 1, line => 4);
           expect(fitter.currentLine).toBe(2);
           expect(fitter.word).toBe('ab cde');
-          expect(fitter.currentLineIndex).toBe(3);
+          expect(fitter.currentLineWidth).toBe(3);
         });
         it ('Two Breaks from start of line', () => {
           const fitter: LineOverflowFitter =
-            new LineOverflowFitter('abcdefghijkl', 1, 0, character => 1, line => 4);
-          fitter.fitToLine();
+            LineOverflowFitter.create('abcdefghijkl', 1, 0, character => 1, line => 4);
           expect(fitter.currentLine).toBe(3);
           expect(fitter.word).toBe('abcd efgh ijkl');
-          expect(fitter.currentLineIndex).toBe(4);
+          expect(fitter.currentLineWidth).toBe(4);
         });
         it ('Four Breaks from middle of line', () => {
           const fitter: LineOverflowFitter =
-            new LineOverflowFitter('abcdefghijklmno', 2, 3, character => 1, line => 4);
-          fitter.fitToLine();
-          expect(fitter.currentLine).toBe(6;
+            LineOverflowFitter.create('abcdefghijklmno', 2, 3, character => 1, line => 4);
+          expect(fitter.currentLine).toBe(6);
           expect(fitter.word).toBe('a bcde fghi jklm no');
-          expect(fitter.currentLineIndex).toBe(2);
+          expect(fitter.currentLineWidth).toBe(2);
         });
       });
 
