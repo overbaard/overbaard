@@ -67,6 +67,9 @@ export class IssueHeightCalculator {
     if (lines < this._summaryCalcConfig.minLines) {
       lines = this._summaryCalcConfig.minLines;
     }
+    if (lines > this._summaryCalcConfig.maxLines && this._summaryCalcConfig.maxLines >= 0) {
+      lines = this._summaryCalcConfig.maxLines;
+    }
     return lines * IssueHeightCalculator.ISSUE_SUMMARY_LINE_HEIGHT;
   }
 
@@ -365,7 +368,7 @@ function SummaryCalculationConfig(summaryLevel: IssueSummaryLevel): SummaryCalul
     case IssueSummaryLevel.SHORT_SUMMARY:
       return {maxLines: 2, minLines: 2, trimFirstTwoLines: true};
     case IssueSummaryLevel.FULL:
-      return {maxLines: 0, minLines: 2, trimFirstTwoLines: true};
+      return {maxLines: -1, minLines: 2, trimFirstTwoLines: true};
   }
 }
 
