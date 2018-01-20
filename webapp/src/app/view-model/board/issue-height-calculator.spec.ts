@@ -84,6 +84,20 @@ describe('Issue Size Calculator Tests', () => {
           expect(fitter.word).toBe('ab cde');
           expect(fitter.currentLineWidth).toBe(3);
         });
+        it ('One Break from middle of line (2)', () => {
+          const fitter: LineOverflowFitter =
+            LineOverflowFitter.create('abcde', 1, 3, character => 1, line => 4);
+          expect(fitter.currentLine).toBe(2);
+          expect(fitter.word).toBe('a bcde');
+          expect(fitter.currentLineWidth).toBe(4);
+        });
+        it ('One Break from end of line', () => {
+          const fitter: LineOverflowFitter =
+            LineOverflowFitter.create('abcde', 1, 4, character => 1, line => 4);
+          expect(fitter.currentLine).toBe(3);
+          expect(fitter.word).toBe('abcd e');
+          expect(fitter.currentLineWidth).toBe(1);
+        });
         it ('Two Breaks from start of line', () => {
           const fitter: LineOverflowFitter =
             LineOverflowFitter.create('abcdefghijkl', 1, 0, character => 1, line => 4);

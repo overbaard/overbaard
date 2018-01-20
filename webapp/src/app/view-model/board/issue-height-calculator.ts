@@ -284,10 +284,15 @@ export class LineOverflowFitter {
       if (test <= currentLineMaxWidth) {
         this._currentLineWidth = test;
       } else {
-        this._word = insertSpace(this._word, ci);
         this._currentLine++;
-        this._currentLineWidth = 0;
         currentLineMaxWidth = this._getLineWidth(this._currentLine);
+        if (ci > 0) {
+          this._word = insertSpace(this._word, ci);
+          // Skip the space
+          this._currentLineWidth = 0;
+        } else {
+          this._currentLineWidth = charWidth;
+        }
       }
     }
   }
