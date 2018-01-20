@@ -44,7 +44,7 @@ export class FontMeasureComponent implements OnInit, AfterViewInit {
     ISSUE_SUMMARY_NAME,   // In the 'settings' list, the class that is used to display the issue summary
     EXTRA_ITEM]);         // In the 'settings' list, the style that is used to display linked issues and parallel tasks
   settings: List<Setting> =
-    List<Setting>([Setting.fromClass('mat-caption'), Setting.fromStyle({'font-size': '24px'})]);
+    List<Setting>([Setting.fromClass('mat-caption'), Setting.fromStyle({'font-size': '14px'})]);
   characters: string[] = [];
 
   @ViewChildren('characterHolder')
