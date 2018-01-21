@@ -59,7 +59,7 @@
       <div class="mat-caption"
            [class.short-summary]="shortSummary"
            [class.avatar-summary]="showAvatar">
-        {{issue.summary}}
+        <div *ngFor="let line of issue.summaryLines">{{line}}</div>
       </div>
 
       <ng-container *ngTemplateOutlet="extraInfo"></ng-container>

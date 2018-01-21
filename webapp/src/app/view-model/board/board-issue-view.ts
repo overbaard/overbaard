@@ -1,4 +1,5 @@
 import {BoardIssue} from '../../model/board/data/issue/board-issue';
+import {List} from 'immutable';
 
 /**
  * Board issue with extra state calculated in the view model
@@ -10,6 +11,7 @@ export interface BoardIssueView extends BoardIssue {
   issueUrl: string;
   ownStateName: string;
   calculatedTotalHeight: number;
+  summaryLines: List<string>;
 }
 
 

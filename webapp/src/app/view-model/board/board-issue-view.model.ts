@@ -26,7 +26,8 @@ const DEFAULT_STATE: BoardIssueView = {
   projectColour: 'red',
   issueUrl: null,
   ownStateName: null,
-  calculatedTotalHeight: 0
+  calculatedTotalHeight: 0,
+  summaryLines: null
 };
 
 interface BoardIssueViewRecord extends TypedRecord<BoardIssueViewRecord>, BoardIssueView {
@@ -38,12 +39,12 @@ export class BoardIssueViewUtil {
 
   static createBoardIssue(
     issue: BoardIssue, jiraUrl: string, projectColour: string, ownStateName: string,
-    visible: boolean, summary: string, totalHeight: number): BoardIssueViewRecord {
+    visible: boolean, summaryLines: List<string>, totalHeight: number): BoardIssueViewRecord {
     const issueUrl = `${jiraUrl}browse/${issue.key}`;
     return ISSUE_FACTORY({
       key: issue.key,
       projectCode: issue.projectCode,
-      summary: summary,
+      summary: issue.summary,
       assignee: issue.assignee,
       priority: issue.priority,
       type: issue.type,
@@ -59,7 +60,8 @@ export class BoardIssueViewUtil {
       projectColour: projectColour,
       issueUrl: issueUrl,
       ownStateName: ownStateName,
-      calculatedTotalHeight: totalHeight
+      calculatedTotalHeight: totalHeight,
+      summaryLines: summaryLines
     });
   }
 

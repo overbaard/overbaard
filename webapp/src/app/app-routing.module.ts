@@ -7,6 +7,7 @@ import {LoginComponent} from './components/login/login.component';
 import {DbExplorerComponent} from './components/db-explorer/db-explorer.component';
 import {AccessLogViewComponent} from './components/access-log/access-log.component';
 import {FontMeasureComponent} from './components/font-measure/font-measure.component';
+import {FontMeasureTableComponent} from './components/font-measure/font-measure-table.component';
 
 const routes: Routes = [
   {
@@ -32,6 +33,9 @@ const routes: Routes = [
   },
   {
     path: 'font-measure', component: FontMeasureComponent
+  },
+  {
+    path: 'font-measure-table', component: FontMeasureTableComponent
   }
 ];
 

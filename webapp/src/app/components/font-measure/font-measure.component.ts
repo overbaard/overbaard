@@ -9,6 +9,7 @@ import {List} from 'immutable';
 import {FontSizeTableService} from '../../services/font-size-table.service';
 import {EXTRA_ITEM, ISSUE_SUMMARY_NAME} from '../../view-model/board/issue-height-calculator';
 import {Dictionary} from '../../common/dictionary';
+import {SAME_CHAR_WIDTH_LOOKUP_TABLE} from './lookup-table';
 
 @Component({
   selector: 'app-font-measure',
@@ -17,21 +18,21 @@ import {Dictionary} from '../../common/dictionary';
     <div
       #characterHolder>
       <div
-        *ngFor="let setting of settings"
-        [ngClass]="setting.cssClass ? setting.cssClass : ''"
-        [ngStyle]="setting.style ? setting.style : {}">
-        <span class="class"><span *ngFor="let i of hundredSpaces">&nbsp;</span></span>
+        *ngFor=\"let setting of settings\"
+        [ngClass]=\"setting.cssClass ? setting.cssClass : ''\"
+        [ngStyle]=\"setting.style ? setting.style : {}\">
+        <span class=\"class\"><span *ngFor=\"let i of hundredSpaces\">&nbsp;</span></span>
       </div>
     </div>
     <!-- Do the other characters -->
     <div
-      *ngFor="let character of characters"
+      *ngFor=\"let character of characters\"
       #characterHolder>
       <div
-        *ngFor="let setting of settings"
-        [ngClass]="setting.cssClass ? setting.cssClass : ''"
-        [ngStyle]="setting.style ? setting.style : {}">
-        <span class="class">{{character}}</span>
+        *ngFor=\"let setting of settings\"
+        [ngClass]=\"setting.cssClass ? setting.cssClass : ''\"
+        [ngStyle]=\"setting.style ? setting.style : {}\">
+        <span class=\"class\">{{character}}</span>
       </div>
     </div>
   `,
@@ -47,6 +48,9 @@ export class FontMeasureComponent implements OnInit, AfterViewInit {
     List<Setting>([Setting.fromClass('mat-caption'), Setting.fromStyle({'font-size': '14px'})]);
   characters: string[] = [];
 
+  // Generated using FontMeasureTable
+  private _sameCharLookupTable: Dictionary<string> = SAME_CHAR_WIDTH_LOOKUP_TABLE;
+
   @ViewChildren('characterHolder')
   characterHolders: QueryList<ElementRef>;
   hundredSpaces: number[] = new Array<number>(100);
@@ -56,8 +60,8 @@ export class FontMeasureComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     const characters: string[] = [];
-    for (let i = 33 ; i < 255 ; i++) {
-      characters.push(String.fromCharCode(i));
+    for (const character of Object.keys(this._sameCharLookupTable)) {
+      characters.push(character);
     }
 
     for (const char of characters) {
@@ -78,7 +82,10 @@ export class FontMeasureComponent implements OnInit, AfterViewInit {
 
 
   ngAfterViewInit(): void {
+    console.log('Starting font calculation');
     this._fontSizeTable.startModification();
+
+    this._fontSizeTable.setSameCharTable(this._sameCharLookupTable);
 
     const elements: ElementRef[] = this.characterHolders.toArray();
     let isSpace = true; // The first is a space, and is displayed a bit differently from the rest
@@ -91,7 +98,7 @@ export class FontMeasureComponent implements OnInit, AfterViewInit {
         const text: string = span.textContent;
         if (i === 0) {
           if (isSpace) {
-            character = ' '; // What is returned is actually '" "', which doesn't work in the lookup
+            character = ' '; // What is returned is actually '\" \"', which doesn't work in the lookup
             isSpace = false;
           } else {
             character = text.charAt(0);
@@ -104,6 +111,7 @@ export class FontMeasureComponent implements OnInit, AfterViewInit {
     }
 
     this._fontSizeTable.completeModification();
+    console.log(this._fontSizeTable);
   }
 }
 

@@ -582,15 +582,15 @@ class IssueTableBuilder {
 
     // Some unit tests will not have the font size table
     let height = 0;
-    let updatedSummary: string = issue.summary;
+    let summaryLines: List<string>;
     if (this._fontSizeTable) {
       const heightCalculator: IssueHeightCalculator =
         IssueHeightCalculator.create(issue, this._fontSizeTable, this._currentUserSettingState);
       height = heightCalculator.calculatedHeight;
-      updatedSummary = heightCalculator.updatedSummary;
+      summaryLines = List<string>(heightCalculator.summaryLines);
     }
     return BoardIssueViewUtil.createBoardIssue(
-      issue, this._currentBoardState.jiraUrl, colour, ownStateName, visible, updatedSummary, height);
+      issue, this._currentBoardState.jiraUrl, colour, ownStateName, visible, summaryLines, height);
   }
 
 

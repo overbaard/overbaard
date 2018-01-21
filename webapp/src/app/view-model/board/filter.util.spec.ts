@@ -350,7 +350,8 @@ describe('Apply filter tests', () => {
       projectColour: 'red',
       issueUrl: null,
       ownStateName: null,
-      calculatedTotalHeight: 0
+      calculatedTotalHeight: 0,
+      summaryLines: List<string>()
     }
   }
 });

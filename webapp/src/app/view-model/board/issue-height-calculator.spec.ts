@@ -1,4 +1,4 @@
-import {IssueHeightCalculator, LineFitter, LineOverflowFitter, WordAndWidthSplitter} from './issue-height-calculator';
+import {IssueHeightCalculator, LineFitter, WordAndWidthSplitter} from './issue-height-calculator';
 
 describe('Issue Size Calculator Tests', () => {
   describe('Splitting and word counts', () => {
@@ -23,174 +23,103 @@ describe('Issue Size Calculator Tests', () => {
       it ('One line', () => {
         let fitter: LineFitter = createFitter(
           ['abc', 'de'], 7, 0);
-        expect(fitter.lines).toBe(1);
-        expect(fitter.summary).toBeFalsy();
+        expect(fitter.summaryLines).toEqual(['abc de']);
 
         fitter = createFitter(
           ['abc', 'def'], 7, 0);
-        expect(fitter.lines).toBe(1);
-        expect(fitter.summary).toBeFalsy();
+        expect(fitter.summaryLines).toEqual(['abc def']);
 
         fitter = createFitter(
           ['abc', 'de', 'i'], 8, 0);
-        expect(fitter.lines).toBe(1);
-        expect(fitter.summary).toBeFalsy();
+        expect(fitter.summaryLines).toEqual(['abc de i']);
       });
 
       it ('Normal line break', () => {
         let fitter: LineFitter = createFitter(
           ['abc', 'def', 'ijkl'], 8, 0);
-        expect(fitter.lines).toBe(2);
-        expect(fitter.summary).toBeFalsy();
+        expect(fitter.summaryLines).toEqual(['abc def', 'ijkl']);
 
         fitter = createFitter(
           ['abc', 'def', 'ij'], 8, 0);
-        expect(fitter.lines).toBe(2);
-        expect(fitter.summary).toBeFalsy();
+        expect(fitter.summaryLines).toEqual(['abc def', 'ij']);
 
         fitter = createFitter(
-          ['abc', 'def', 'ijkl', 'mno'], 8, 0);
-        expect(fitter.lines).toBe(2);
-        expect(fitter.summary).toBeFalsy();
+          ['abc', 'defg', 'ijkl', 'mno'], 8, 0);
+        expect(fitter.summaryLines).toEqual(['abc defg', 'ijkl mno']);
 
         fitter = createFitter(
           ['abc', 'def', 'ijkl', 'mnop'], 8, 0);
-        expect(fitter.lines).toBe(3);
-        expect(fitter.summary).toBeFalsy();
+        expect(fitter.summaryLines).toEqual(['abc def', 'ijkl', 'mnop']);
 
         fitter = createFitter(
-          ['abc', 'def', 'ijkl', 'mnop', 'qrs'], 8, 0);
-        expect(fitter.lines).toBe(3);
-        expect(fitter.summary).toBeFalsy();
+          ['abc', 'defg', 'ijkl', 'mnop', 'qrs'], 8, 0);
+        expect(fitter.summaryLines).toEqual(['abc defg', 'ijkl', 'mnop qrs']);
 
         fitter = createFitter(
           ['abc', 'def', 'ijkl', 'mnop', 'qrst'], 8, 0);
-        expect(fitter.lines).toBe(4);
-        expect(fitter.summary).toBeFalsy();
-      });
-
-      describe('Overflow Fitter', () => {
-        it ('One Break from start of line', () => {
-          const fitter: LineOverflowFitter =
-            LineOverflowFitter.create('abcde', 1, 0, character => 1, line => 4);
-          expect(fitter.currentLine).toBe(2);
-          expect(fitter.word).toBe('abcd e');
-          expect(fitter.currentLineWidth).toBe(1);
-        });
-        it ('One Break from middle of line', () => {
-          const fitter: LineOverflowFitter =
-            LineOverflowFitter.create('abcde', 1, 2, character => 1, line => 4);
-          expect(fitter.currentLine).toBe(2);
-          expect(fitter.word).toBe('ab cde');
-          expect(fitter.currentLineWidth).toBe(3);
-        });
-        it ('One Break from middle of line (2)', () => {
-          const fitter: LineOverflowFitter =
-            LineOverflowFitter.create('abcde', 1, 3, character => 1, line => 4);
-          expect(fitter.currentLine).toBe(2);
-          expect(fitter.word).toBe('a bcde');
-          expect(fitter.currentLineWidth).toBe(4);
-        });
-        it ('One Break from end of line', () => {
-          const fitter: LineOverflowFitter =
-            LineOverflowFitter.create('abcde', 1, 4, character => 1, line => 4);
-          expect(fitter.currentLine).toBe(3);
-          expect(fitter.word).toBe('abcd e');
-          expect(fitter.currentLineWidth).toBe(1);
-        });
-        it ('Two Breaks from start of line', () => {
-          const fitter: LineOverflowFitter =
-            LineOverflowFitter.create('abcdefghijkl', 1, 0, character => 1, line => 4);
-          expect(fitter.currentLine).toBe(3);
-          expect(fitter.word).toBe('abcd efgh ijkl');
-          expect(fitter.currentLineWidth).toBe(4);
-        });
-        it ('Four Breaks from middle of line', () => {
-          const fitter: LineOverflowFitter =
-            LineOverflowFitter.create('abcdefghijklmno', 2, 3, character => 1, line => 4);
-          expect(fitter.currentLine).toBe(6);
-          expect(fitter.word).toBe('a bcde fghi jklm no');
-          expect(fitter.currentLineWidth).toBe(2);
-        });
+        expect(fitter.summaryLines).toEqual(['abc def', 'ijkl', 'mnop', 'qrst']);
       });
 
       describe('Long overflowing word', () => {
         it('2 line word', () => {
           let fitter: LineFitter = createFitter(
             ['abcdef'], 5, 0);
-          expect(fitter.lines).toBe(2);
-          expect(fitter.summary).toBe('abcde f');
+          expect(fitter.summaryLines).toEqual(['abcde', 'f']);
 
           fitter = createFitter(
             ['a', 'bcdefgh'], 5, 0);
-          expect(fitter.lines).toBe(2);
-          expect(fitter.summary).toBe('a bcd efgh');
+          expect(fitter.summaryLines).toEqual(['a bcd', 'efgh']);
 
           fitter = createFitter(
             ['ab', 'cdefgh'], 5, 0);
-          expect(fitter.lines).toBe(2);
-          expect(fitter.summary).toBe('ab cd efgh');
+          expect(fitter.summaryLines).toEqual(['ab cd', 'efgh']);
 
 
           fitter = createFitter(
             ['abc', 'defghi'], 5, 0);
-          expect(fitter.lines).toBe(2);
-          expect(fitter.summary).toBe('abc d efghi');
+          expect(fitter.summaryLines).toEqual(['abc d', 'efghi']);
 
           fitter = createFitter(
             ['abcd', 'efghij'], 5, 0);
-          expect(fitter.lines).toBe(3);
-          expect(fitter.summary).toBe('abcd efghi j');
+          expect(fitter.summaryLines).toEqual(['abcd ', 'efghi', 'j']);
 
           fitter = createFitter(
             ['a', 'b', 'cd', 'ef', 'ghijkl'], 5, 0);
-          expect(fitter.lines).toBe(4);
-          expect(fitter.summary).toBe('a b cd ef ghijk l');
+          expect(fitter.summaryLines).toEqual(['a b', 'cd ef', 'ghijk', 'l']);
 
-        });
-        it('Current', () => {
-          const fitter: LineFitter = createFitter(
+          fitter = createFitter(
             ['a', 'b', 'cd', 'efghij', 'kl'], 5, 0);
-          expect(fitter.lines).toBe(4);
-          expect(fitter.summary).toBe('a b cd ef ghij kl');
+          expect(fitter.summaryLines).toEqual(['a b', 'cd ef', 'ghij', 'kl']);
 
         });
-
         it('3 line word', () => {
           let fitter: LineFitter = createFitter(
             ['abcdefghijklmno'], 5, 0);
-          expect(fitter.lines).toBe(3);
-          expect(fitter.summary).toBe('abcde fghij klmno');
-
+          expect(fitter.summaryLines).toEqual(['abcde', 'fghij', 'klmno']);
           fitter = createFitter(
             ['a', 'bcdefghijklmno'], 5, 0);
-          expect(fitter.lines).toBe(4);
-          expect(fitter.summary).toBe('a bcd efghi jklmn o');
+          expect(fitter.summaryLines).toEqual(['a bcd', 'efghi', 'jklmn', 'o']);
 
           fitter = createFitter(
             ['abcd', 'efghijklmno'], 5, 0);
-          expect(fitter.lines).toBe(4);
-          expect(fitter.summary).toBe('abcd efghi jklmn o');
+          expect(fitter.summaryLines).toEqual(['abcd ', 'efghi', 'jklmn', 'o']);
         });
 
         it ('Mixed short and long words', () => {
           let fitter: LineFitter = createFitter(
             ['a', 'bcde', 'f', 'ghijk', 'l'], 4, 0);
-          expect(fitter.lines).toBe(4);
-          expect(fitter.summary).toBe('a bcde f gh ijk l');
+          expect(fitter.summaryLines).toEqual(['a', 'bcde', 'f gh', 'ijk', 'l']);
 
           fitter = createFitter(
-            ['ab', 'cdefg', 'hi', 'jklmn', 'pq', 'rstuvwxyz'], 4, 0);
-          expect(fitter.lines).toBe(7);
-          expect(fitter.summary).toBe('ab c defg hi j klmn pq r stuv wxyz');
-        })
+            ['ab', 'cdefgh', 'i', 'jklmn', 'pq', 'rstuvwxyz'], 4, 0);
+          expect(fitter.summaryLines).toEqual(['ab c', 'defg', 'h i ', 'jklm', 'n pq', 'rstu', 'vwxy', 'z']);
+        });
       });
-
     });
 
     function createFitter(words: string[], lineWidth: number, maxLines: number): LineFitter {
       const wordWidths: number[] = words.map(word => word.length);
-      return LineFitter.create(null, words, wordWidths, maxLines, character => 1, line =>  lineWidth);
+      return LineFitter.create(words, wordWidths, maxLines, character => 1, line =>  lineWidth);
     }
   });
 })

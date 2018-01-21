@@ -48,6 +48,7 @@ import {FilterFormEntryPipe} from './pipes/filter-entry.pipe';
 import {KeyToIssueFilteredPipe} from './pipes/key-to-issue-filtered.pipe';
 import {FontMeasureComponent} from './components/font-measure/font-measure.component';
 import {FontSizeTableService} from './services/font-size-table.service';
+import {FontMeasureTableComponent} from './components/font-measure/font-measure-table.component';
 
 const appState: AppState = initialAppState;
 export function getInitialAppState(): AppState {
@@ -88,7 +89,8 @@ export function getInitialAppState(): AppState {
     ScrollListenerDirective,
     FilterFormEntryPipe,
     KeyToIssueFilteredPipe,
-    FontMeasureComponent
+    FontMeasureComponent,
+    FontMeasureTableComponent
   ],
   entryComponents: [
     CommentIssueDialogComponent,
