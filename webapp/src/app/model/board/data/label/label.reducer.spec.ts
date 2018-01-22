@@ -12,7 +12,7 @@ export function getTestLabelState(): LabelState {
 }
 
 describe('Label reducer tests', () => {
-  it ('Deserialize', () => {
+  describe('Deserialize', () => {
     it('Initial state', () => {
       const state: LabelState = getTestLabelState();
       expect(state.labels.toArray()).toEqual(['L-10', 'L-20', 'L-30']);
@@ -26,7 +26,7 @@ describe('Label reducer tests', () => {
     });
   });
 
-  it ('Changes', () => {
+  describe ('Changes', () => {
     it ('Add labels', () => {
       const state: LabelState = getTestLabelState();
       const newState: LabelState =

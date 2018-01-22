@@ -31,7 +31,7 @@ describe('Assignee reducer tests', () => {
     assigneeState = getTestAssigneeState();
   }));
 
-  it('Deserialize', () => {
+  describe('Deserialize', () => {
     it('Initial state', () => {
       expect(assigneeState.assignees.size).toEqual(2);
       const keys: string[] = assigneeState.assignees.keySeq().toArray();
@@ -51,7 +51,7 @@ describe('Assignee reducer tests', () => {
     });
   });
 
-  it( 'Changes', () => {
+  describe( 'Changes', () => {
     it('Add new assignees', () => {
       assigneeState = assigneeMetaReducer(assigneeState, AssigneeActions.createAddAssignees([{
         key: 'z-fun',
