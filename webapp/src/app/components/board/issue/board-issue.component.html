@@ -56,8 +56,7 @@
           *ngIf="!issue.assignee.avatar"
           class="avatar-icon">person_outline</mat-icon>
       </div>
-      <div class="mat-caption"
-           style="white-space: nowrap"
+      <div class="mat-caption calculated-width-font"
            [class.short-summary]="shortSummary"
            [class.avatar-summary]="showAvatar">
         <div *ngFor="let line of issue.summaryLines">{{line}}</div>

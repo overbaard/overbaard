@@ -77,6 +77,13 @@ $black-text: rgba(0,0,0,.87)!important;
   overflow: hidden
 }
 
+.calculated-width-font {
+  /** Used for divs where we need to calculate the width */
+  font-kerning: none;
+  font-variant-ligatures: none;
+  text-rendering: optimizeSpeed;
+}
+
 @mixin sized-icon-button-class($size, $font-size, $line-height) {
   min-width: $size;
   max-width: $size;

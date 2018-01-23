@@ -72,11 +72,7 @@ img.avatar {
   line-height: 32px;
 }
 .summary {
-  /*
-    For the rare cases where we underestimated the width of the issue summary lines, force the browser to not wrap these,
-    so that the line counts are reliable for the height measurements.
-   */
-  word-wrap:break-word;
+  white-space: nowrap;
 }
 .avatar-summary {
   min-height: 40px;
