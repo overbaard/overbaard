@@ -1,83 +1,40 @@
-import {
-  AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, OnInit, QueryList,
-  ViewChildren
-} from '@angular/core';
+import {AfterViewInit, ChangeDetectionStrategy, Component, OnInit, ViewChild} from '@angular/core';
 import 'rxjs/add/operator/take';
 import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/operator/catch';
-import {List} from 'immutable';
-import {FontSizeTableService} from '../../services/font-size-table.service';
-import {EXTRA_ITEM, ISSUE_SUMMARY_NAME} from '../../view-model/board/issue-height-calculator';
+import {FontSizeTable, FontSizeTableService} from '../../services/font-size-table.service';
 import {Dictionary} from '../../common/dictionary';
 import {SAME_CHAR_WIDTH_LOOKUP_TABLE} from './lookup-table';
 
 @Component({
   selector: 'app-font-measure',
   template: `
-    <!-- Do space separately -->
-    <div
-      #characterHolder>
-      <div
-        *ngFor=\"let setting of settings\"
-        [ngClass]=\"setting.cssClass ? setting.cssClass : ''\"
-        [ngStyle]=\"setting.style ? setting.style : {}\">
-        <span class=\"class\"><span *ngFor=\"let i of hundredSpaces\">&nbsp;</span></span>
-      </div>
-    </div>
-    <!-- Do the other characters -->
-    <div
-      *ngFor=\"let character of characters\"
-      #characterHolder>
-      <div
-        *ngFor=\"let setting of settings\"
-        [ngClass]=\"setting.cssClass ? setting.cssClass : ''\"
-        [ngStyle]=\"setting.style ? setting.style : {}\">
-        <span class=\"class\">{{character}}</span>
-      </div>
-    </div>
+    <canvas #myCanvas width="0" height="0"></canvas>
+    <div *ngFor="let test of testStrings" [ngStyle]="testStyle"><span>{{test}}</span></div>
   `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FontMeasureComponent implements OnInit, AfterViewInit {
 
-  settingNames: List<string> = List<string>([
-    ISSUE_SUMMARY_NAME,   // In the 'settings' list, the class that is used to display the issue summary
-    EXTRA_ITEM]);         // In the 'settings' list, the style that is used to display linked issues and parallel tasks
-  settings: List<Setting> =
-    List<Setting>([Setting.fromClass('mat-caption'), Setting.fromStyle({'font-size': '14px'})]);
-  characters: string[] = [];
+  @ViewChild('myCanvas') myCanvas;
+
+  // To play with font measurements, add strings and the size (px) here. If you want a different size from
+  // 12 and 14, you need to call createTableForFontSize() with the desired size in ngAfterViewInit.
+  // Then open http://localhost:4200/#/font-measure to see the console output and compare it with the real measurements
+  // done by the browser.
+  readonly testStrings: string[] = []; // e.g. ['string 1', 'string 2']
+  readonly testTextSize = 12;
+  readonly testStyle: any  = {'font-size': `${this.testTextSize}px`}
 
   // Generated using FontMeasureTable
   private _sameCharLookupTable: Dictionary<string> = SAME_CHAR_WIDTH_LOOKUP_TABLE;
 
-  @ViewChildren('characterHolder')
-  characterHolders: QueryList<ElementRef>;
-  hundredSpaces: number[] = new Array<number>(100);
 
   constructor(private _fontSizeTable: FontSizeTableService) {
   }
 
   ngOnInit(): void {
-    const characters: string[] = [];
-    for (const character of Object.keys(this._sameCharLookupTable)) {
-      characters.push(character);
-    }
-
-    for (const char of characters) {
-      let arr: string = char;
-      let arr4: string;
-
-      for (let i = 0 ; i < 5 ; i++) {
-        arr += arr;
-        if (i === 1) {
-          arr4 = arr;
-        }
-      }
-      const arr32: string = arr;
-      arr = arr32 + arr32 + arr32 + arr4;
-      this.characters.push(arr);
-    }
   }
 
 
@@ -87,51 +44,44 @@ export class FontMeasureComponent implements OnInit, AfterViewInit {
 
     this._fontSizeTable.setSameCharTable(this._sameCharLookupTable);
 
-    const elements: ElementRef[] = this.characterHolders.toArray();
-    let isSpace = true; // The first is a space, and is displayed a bit differently from the rest
-    for (const element of elements) {
-      const childDivs: NodeListOf<HTMLElement> = element.nativeElement.querySelectorAll('div');
-      let character: string;
-      for (let i = 0 ; i < childDivs.length ; i++) {
-        const divEl: HTMLElement = childDivs.item(i);
-        const span: HTMLElement = divEl.querySelector('span');
-        const text: string = span.textContent;
-        if (i === 0) {
-          if (isSpace) {
-            character = ' '; // What is returned is actually '\" \"', which doesn't work in the lookup
-            isSpace = false;
-          } else {
-            character = text.charAt(0);
-          }
-        }
-
-        const width: number = span.offsetWidth / text.length;
-        this._fontSizeTable.addItem(this.settingNames.get(i), character, width);
-      }
-    }
+    this.createTableForFontSize(12);
+    this.createTableForFontSize(14);
 
     this._fontSizeTable.completeModification();
-    console.log(this._fontSizeTable);
-  }
-}
 
-export class Setting {
-  static fromClass(cssClass: string) {
-    return new Setting(cssClass, null);
+    // Leave this in, this will only happen an effect if this.testText has some entries
+    this.checkTestStrings(this._fontSizeTable.getTable(this.testTextSize + 'px'));
+
+    console.log('Font calculation done');
   }
 
-  static fromStyle(style: any) {
-    return new Setting(null, style);
+  private checkTestStrings(widths: any) {
+    for (const test of this.testStrings) {
+      this.measureItem(test);
+    }
   }
 
-  constructor(public cssClass: string, public style: any) {
+  private measureItem(s: string) {
+    const table: FontSizeTable = this._fontSizeTable.getTable(this.testTextSize + 'px');
+    let size = 0;
+    for (let i = 0 ; i < s.length ; i++) {
+      const char: string = s.charAt(i);
+      const charSize: number = table.getWidth(char);
+      // console.log(`'${char}': ${charSize}`);
+      size += charSize;
+    }
+    console.log(`size of '${s}': ${size}`);
   }
 
-  toString(): string {
-    if (this.cssClass) {
-      return `class=${this.cssClass}`;
-    } else {
-      return JSON.stringify(this.style);
+  private createTableForFontSize(size: number) {
+    const canvas: HTMLCanvasElement = this.myCanvas.nativeElement;
+    const context: CanvasRenderingContext2D = canvas.getContext('2d');
+    context.font = `${size}px Roboto`;
+
+    for (const char of Object.keys(this._sameCharLookupTable)) {
+      const metrics: TextMetrics = context.measureText(char);
+      const width: number = metrics.width;
+      this._fontSizeTable.addItem(`${size}px`, char, width);
     }
   }
 }

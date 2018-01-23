@@ -5,9 +5,6 @@ import {IssueDetailState} from '../../model/board/user/issue-detail/issue-detail
 import {UserSettingState} from '../../model/board/user/user-setting';
 import {List} from 'immutable';
 
-export const ISSUE_SUMMARY_NAME = 'issue-summary';
-export const EXTRA_ITEM = 'extra-item';
-
 export class IssueHeightCalculator {
 
   private static readonly ISSUE_SUMMARY_WIDTH = 186;
@@ -74,7 +71,7 @@ export class IssueHeightCalculator {
   }
 
   private calculateSummaryLines() {
-    const sizeLookup: FontSizeTable = this._fontSizeTable.getTable(ISSUE_SUMMARY_NAME);
+    const sizeLookup: FontSizeTable = this._fontSizeTable.getTable('12px');
     const splitter: WordAndWidthSplitter = this.splitWordsAndGetSizes(sizeLookup);
 
     const lineFitter: LineFitter = this.fitWordsToLines(sizeLookup, splitter.words, splitter.wordWidths);
@@ -127,7 +124,7 @@ export class IssueHeightCalculator {
       return 0;
     }
 
-    const lookup: FontSizeTable = this._fontSizeTable.getTable(EXTRA_ITEM);
+    const lookup: FontSizeTable = this._fontSizeTable.getTable('14px');
     let lines = 1;
     let currentWidth = 0;
     list.forEach(infoItem => {

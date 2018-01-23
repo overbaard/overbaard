@@ -1,13 +1,7 @@
-import {
-  AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, OnInit, QueryList,
-  ViewChildren
-} from '@angular/core';
+import {AfterViewInit, ChangeDetectionStrategy, Component, OnInit, ViewChild} from '@angular/core';
 import 'rxjs/add/operator/take';
 import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/operator/catch';
-import {List} from 'immutable';
-import {FontSizeTableService} from '../../services/font-size-table.service';
-import {EXTRA_ITEM, ISSUE_SUMMARY_NAME} from '../../view-model/board/issue-height-calculator';
 import {Dictionary} from '../../common/dictionary';
 
 /**
@@ -28,73 +22,82 @@ import {Dictionary} from '../../common/dictionary';
 @Component({
   selector: 'app-font-measure-table',
   template: `
-    <div
-      *ngFor="let character of characters"
-      #characterHolder>
-      <div
-        class="font-size: 10px">
-        <span class="class">{{character}}</span>
-      </div>
-    </div>
+    <canvas #myCanvas width="0" height="0"></canvas>
+    <!--<div *ngFor="let test of testStrings" style="font-size: 10px"><span>{{test}}</span></div>-->
   `,
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FontMeasureTableComponent implements OnInit, AfterViewInit {
 
-  @ViewChildren('characterHolder')
-  characterHolders: QueryList<ElementRef>;
+  // Leave this commented out so we can easily reenable
+  // testStrings: string[] = ['One', 'Two', 'One Two', 'WFCORE-1234'];
 
-  characters: string[] = [];
+  @ViewChild('myCanvas') myCanvas;
 
   constructor() {
   }
 
   ngOnInit(): void {
-    const characters: string[] = [];
-    for (let i = 33 ; i <= 1327 /* 0x052F */ ; i++) {
-      characters.push(String.fromCharCode(i));
-    }
+  }
 
-    for (const char of characters) {
-      let arr: string = char;
-      let arr4: string;
-
-      for (let i = 0 ; i < 5 ; i++) {
-        arr += arr;
-        if (i === 1) {
-          arr4 = arr;
-        }
-      }
-      const arr32: string = arr;
-      arr = arr32 + arr32 + arr32 + arr4;
-      this.characters.push(arr);
-    }
+  times10(s: string): string {
+    s = s + s + s + s + s;
+    s += s;
+    return s;
   }
 
   ngAfterViewInit(): void {
-    console.log('Starting font calculation');
-    const elements: ElementRef[] = this.characterHolders.toArray();
+    // Leave this commented out so we can easily reenable
+    // const widths: any = {};
+    const canvas: HTMLCanvasElement = this.myCanvas.nativeElement;
+    const context: CanvasRenderingContext2D = canvas.getContext('2d');
 
     // Group the characters into groups of widths
     const groups: Dictionary<string[]> = {};
+    context.font = '10px Roboto';
+    for (let i = 32 ; i <= 1327 ; i++) {
+      const char: string = String.fromCharCode(i);
+      const metrics: TextMetrics = context.measureText(char);
+      const width: number = metrics.width;
+      // console.log(`${char}: ${width}`);
 
-    for (const element of elements) {
-      const divEl: HTMLElement = element.nativeElement.querySelector('div');
-      const span: HTMLElement = divEl.querySelector('span');
-      const text: string = span.textContent;
-      const character = text.charAt(0);
-      const width: number = span.offsetWidth / text.length;
-
-      console.log(character + ': ' + width);
-      this.addCharacter(groups, character, width);
+      this.addCharacter(groups, char, width);
+      // widths[char] = width;
+      /* Double width is smaller for some characters
+      metrics = context.measureText(char + char);
+      if (metrics.width / 2 !== width) {
+        console.log('Double width is not the same for \'' + char + '\': metrics.width / 2);
+      }*/
     }
+    console.log(groups);
+    console.log(Object.keys(groups).length);
 
     const lookupTable: Dictionary<string> = this.createLookupTable(groups);
     console.log(lookupTable)
     console.log(JSON.stringify(lookupTable));
 
+    // Leave this commented out so we can easily reenable
+    // this.checkTestStrings(widths);
   }
+
+  // Leave this commented out so we can easily reenable
+  // private checkTestStrings(widths: any) {
+  //   for (const test of this.testStrings) {
+  //     this.measureItem(widths, test);
+  //   }
+  // }
+  //
+  // private measureItem(widths: any, s: string) {
+  //   let size = 0;
+  //   for (let i = 0 ; i < s.length ; i++) {
+  //     const char: string = s.charAt(i);
+  //     const charSize: number = widths[char];
+  //     // console.log(`'${char}': ${charSize}`);
+  //     size += charSize;
+  //   }
+  //   console.log(`size of '${s}': ${size}`);
+  // }
 
   addCharacter(groups: Dictionary<string[]>, character: string, width: number) {
     const widthAsString: string = width.toString();
@@ -104,6 +107,7 @@ export class FontMeasureTableComponent implements OnInit, AfterViewInit {
       groups[widthAsString] = arr;
     }
     arr.push(character);
+
   }
 
   createLookupTable(groups: Dictionary<string[]>): Dictionary<string> {

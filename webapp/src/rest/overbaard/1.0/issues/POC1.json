@@ -162,12 +162,14 @@
         "ranked" : []
       }
     },
-    "linked" : {"US" : {"states" : [
-      "Backlog",
-      "Selected for Development",
-      "In Progress",
-      "Done"
-    ]}}
+    "linked" : {
+      "US" : {
+        "states" : ["Backlog", "Selected for Development", "In Progress", "Done"]
+      },
+      "WFCORE" : {
+        "states" : ["Backlog", "Selected for Development", "In Progress", "Done"]
+      }
+    }
   },
   "issues" : {
     "FEAT-1" : {
@@ -243,21 +245,21 @@
     },
     "FEAT-4" : {
       "key": "FEAT-4",
-      "state": 6,
-      "summary": "Issue number 4.",
-      "priority": 2,
-      "type": 0,
-      "parallel-tasks": [1, 1],
-      "linked-issues" : [
+      "state": 5,
+      "summary": "javax.sql.api should declare a dependency on javax.transaction.api",
+      "priority": 0,
+      "type": 1,
+      "assignee": 1,
+      "linked-issues": [
         {
-          "key" : "US-7",
-          "state" : 1,
-          "summary" : "A linked issue in the upstream project"
+          "key": "WFCORE-1356",
+          "state": 4,
+          "summary": "javax.sql.api should declare a dependency on javax.transaction.api"
         },
         {
-          "key" : "US-8",
-          "state" : 3,
-          "summary" : "Another upstream issue"
+          "key": "WFCORE-561",
+          "state": 4,
+          "summary": "Class loading problem with XAResource and XADataSource"
         }
       ]
     },
