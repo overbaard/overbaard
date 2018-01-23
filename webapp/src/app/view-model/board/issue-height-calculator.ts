@@ -184,13 +184,15 @@ export class LineFitter {
       }
 
       test += nextWordWidth;
-      if (test <= ctx.currentLineMaxWidth) {
+      test = this.round(test);
+
+      if (test < ctx.currentLineMaxWidth) {
         // It fits, continue with everything
         ctx.appendWord(nextWord, nextWordWidth);
         continue;
       }
 
-      if (nextWordWidth <= ctx.nextLineWidth) {
+      if (nextWordWidth < ctx.nextLineMaxWidth) {
         // The word all fits on the next line, so put it there
         ctx.newLine();
         ctx.appendWord(nextWord, nextWordWidth);
@@ -198,7 +200,9 @@ export class LineFitter {
         // It is a long word spanning more than one line. Put what we can on the current line, and the rest
         // on the next. In the summary text, we introduce a space to allow the line break
         test = ctx.currentLineWidth === 0 ? ctx.currentLineWidth : ctx.currentLineWidth + this._spaceWidth;
-        if (test > ctx.currentLineMaxWidth) {
+        test = this.round(test);
+
+        if (test >= ctx.currentLineMaxWidth) {
           ctx.newLine();
         } else if (ctx.currentLineWidth > 0) {
           ctx.appendCharacter(' ', this._spaceWidth);
@@ -207,7 +211,10 @@ export class LineFitter {
         for (let ci = 0 ; ci < nextWord.length ; ci++) {
           const char: string = nextWord[ci];
           const charWidth: number = this._charWidthLookup(char);
-          if (ctx.currentLineWidth + charWidth > ctx.currentLineMaxWidth) {
+          test = ctx.currentLineWidth + charWidth;
+          test = this.round(test);
+
+          if (test >= ctx.currentLineMaxWidth) {
             ctx.newLine();
           }
           ctx.appendCharacter(char, charWidth);
@@ -219,6 +226,10 @@ export class LineFitter {
 
   get summaryLines(): string[] {
     return this._summaryLines;
+  }
+
+  private round(width: number): number {
+    return Math.ceil(width);
   }
 }
 
@@ -326,10 +337,12 @@ class LineFitterContext {
   }
 
   newLine() {
-    this._currentLineIndex++;
-    this._summaryLines.push('');
-    this._currentLineWidth = 0;
-    this._currentLineMaxWidth = this._getLineWidth(this._currentLineIndex);
+    if (this._currentLineWidth > 0) {
+      this._currentLineIndex++;
+      this._summaryLines.push('');
+      this._currentLineWidth = 0;
+      this._currentLineMaxWidth = this._getLineWidth(this._currentLineIndex);
+    }
   }
 
   get summaryLines(): string[] {
@@ -340,7 +353,7 @@ class LineFitterContext {
     return this._currentLineWidth;
   }
 
-  get nextLineWidth(): number {
+  get nextLineMaxWidth(): number {
     return this._getLineWidth(this._currentLineIndex + 1);
   }
 

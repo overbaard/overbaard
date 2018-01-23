@@ -57,6 +57,7 @@
           class="avatar-icon">person_outline</mat-icon>
       </div>
       <div class="mat-caption"
+           style="white-space: nowrap"
            [class.short-summary]="shortSummary"
            [class.avatar-summary]="showAvatar">
         <div *ngFor="let line of issue.summaryLines">{{line}}</div>
