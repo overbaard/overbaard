@@ -70,7 +70,10 @@ export class BoardIssueComponent implements OnInit, OnChanges, AfterViewInit {
     const calculatedHeight: number = this.issue.calculatedTotalHeight;
     const card: HTMLElement = this._elementRef.nativeElement.querySelector('mat-card');
     const margin = 10; // We need to add the margin ourselves
-    const actualHeight: number = card.offsetHeight + margin;
+    let actualHeight: number = card.offsetHeight + margin;
+    if (this.viewMode === this.viewModeEnum.RANK) {
+      actualHeight += 2; // Add the border of the containing div
+    }
 
     const s = `${this.issue.key} ${calculatedHeight} ${actualHeight}`;
     if (actualHeight !== calculatedHeight) {

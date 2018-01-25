@@ -3,8 +3,13 @@
 .mat-card {
   min-width: 186px;
   max-width: 186px;
-  margin: 0px 0px 10px;
   padding: 3px;
+}
+.rank-view-margin {
+  margin: 5px 0px 5px 0px;
+}
+.kanban-view-margin {
+  margin: 0px 0px 10px;
 }
 .mat-card-title {
   margin-bottom: 0px;

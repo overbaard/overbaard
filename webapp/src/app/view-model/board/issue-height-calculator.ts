@@ -4,6 +4,7 @@ import {IssueSummaryLevel} from '../../model/board/user/issue-summary-level';
 import {IssueDetailState} from '../../model/board/user/issue-detail/issue-detail.model';
 import {UserSettingState} from '../../model/board/user/user-setting';
 import {List} from 'immutable';
+import {BoardViewMode} from '../../model/board/user/board-view-mode';
 
 export class IssueHeightCalculator {
 
@@ -17,12 +18,14 @@ export class IssueHeightCalculator {
 
   private _issueDetail: IssueDetailState;
   private _summaryCalcConfig: SummaryCalulationConfig;
+  private _viewMode: BoardViewMode;
 
   private _calculatedHeight: number;
   private _summaryLines: string[];
 
   private constructor(private _boardIssue: BoardIssue, private _fontSizeTable: FontSizeTableService, userSettingState: UserSettingState) {
     this._issueDetail = userSettingState.issueDetail;
+    this._viewMode = userSettingState.viewMode;
     this._summaryCalcConfig = SummaryCalculationConfig(this._issueDetail.issueSummaryLevel);
   }
 
@@ -48,6 +51,10 @@ export class IssueHeightCalculator {
       24 +          // card title height
       4;            // Height of div containing colours for project, issue type and priority
 
+    if (this._viewMode === BoardViewMode.RANK) {
+      issueHeight += 2; // extra border for rank container (not strictly part of the issue)
+    }
+
     issueHeight += this.calculateSummaryHeight();
     issueHeight += this.calculateLinkedIssueLines() * IssueHeightCalculator.LINKED_ISSUE_HEIGHT;
     issueHeight += this.calculateParallelTaskLines() * IssueHeightCalculator.PARALLEL_TASK_HEIGHT;
@@ -67,6 +74,7 @@ export class IssueHeightCalculator {
     if (lines > this._summaryCalcConfig.maxLines && this._summaryCalcConfig.maxLines >= 0) {
       lines = this._summaryCalcConfig.maxLines;
     }
+
     return lines * IssueHeightCalculator.ISSUE_SUMMARY_LINE_HEIGHT;
   }
 
