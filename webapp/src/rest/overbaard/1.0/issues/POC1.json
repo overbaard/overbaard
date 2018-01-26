@@ -26,16 +26,16 @@
   "headers": ["Analysis", "Development", "QA"],
   "assignees" : [
     {
-      "key" : "kabir.khan",
-      "email" : "kabir.khan@example.com",
-      "avatar" : "https://static.jboss.org/developer/gravatar/00aa85cb5ea8fd5882bab9765f40655e?d=mm&s=32",
-      "name" : "Kabir Khan"
-    },
-    {
       "key" : "other",
       "email" : "another@example.com",
       "avatar" : "https://static.jboss.org/developer/gravatar/ddb8426eafc8e3628d263af28aa13086?d=mm&s=32",
       "name" : "Another Programmer"
+    },
+    {
+      "key" : "kabir.khan",
+      "email" : "kabir.khan@example.com",
+      "avatar" : "https://static.jboss.org/developer/gravatar/00aa85cb5ea8fd5882bab9765f40655e?d=mm&s=32",
+      "name" : "Kabir Khan"
     }
   ],
   "components": ["Component One", "Component Two", "Component Three"],
@@ -225,6 +225,7 @@
       "summary": "Issue number 3. This has a really, really long description which will span a lot. Whoever wrote this should perhaps use the description field instead of putting everything into the issue summary!",
       "priority": 2,
       "type": 0,
+      "assignee": 0,
       "parallel-tasks": [1, 2],
       "linked-issues" : [
         {

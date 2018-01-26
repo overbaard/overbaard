@@ -46,24 +46,28 @@ export function assigneeMetaReducer(state: AssigneeState = initialAssigneeState,
 
   switch (action.type) {
     case ADD_INITAL_ASSIGNEES:
-      return addAssignees(state, (<AddInitialAssignees>action).payload);
+      // These are already sorted from thr server
+      return addAssignees(state, (<AddInitialAssignees>action).payload, false);
     case ADD_ASSIGNEES: {
-      return addAssignees(state, (<AddAssigneesAction>action).payload);
+      return addAssignees(state, (<AddAssigneesAction>action).payload, true);
     }
     default:
       return state;
   }
 };
 
-function addAssignees(state: AssigneeState, added: Assignee[]): AssigneeState {
+function addAssignees(state: AssigneeState, added: Assignee[], sort: boolean): AssigneeState {
   let assignees = state.assignees;
   assignees = assignees.withMutations(mutable => {
     for (const assignee of added) {
       mutable.set(assignee.key, assignee);
     }
   });
-  assignees = <OrderedMap<string, Assignee>>assignees.sort(
-    (valueA, valueB) => valueA.name.toLocaleLowerCase().localeCompare(valueB.name.toLocaleLowerCase()));
+
+  if (sort) {
+    assignees = <OrderedMap<string, Assignee>>assignees.sort(
+      (valueA, valueB) => valueA.name.toLocaleLowerCase().localeCompare(valueB.name.toLocaleLowerCase()));
+  }
 
   return AssigneeUtil.withMutations(state, mutable => {
     if (!mutable.assignees.equals(assignees)) {

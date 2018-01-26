@@ -13,17 +13,18 @@
   "backlog": 3,
   "headers": ["Analysis"],
   "assignees" : [
-    {
-      "key" : "kabir.khan",
-      "email" : "kabir.khan@example.com",
-      "avatar" : "https://static.jboss.org/developer/gravatar/00aa85cb5ea8fd5882bab9765f40655e?d=mm&s=32",
-      "name" : "Kabir Khan"
-    },
+
     {
       "key" : "other",
       "email" : "another@example.com",
       "avatar" : "https://static.jboss.org/developer/gravatar/ddb8426eafc8e3628d263af28aa13086?d=mm&s=32",
       "name" : "Another Programmer"
+    },
+    {
+      "key" : "kabir.khan",
+      "email" : "kabir.khan@example.com",
+      "avatar" : "https://static.jboss.org/developer/gravatar/00aa85cb5ea8fd5882bab9765f40655e?d=mm&s=32",
+      "name" : "Kabir Khan"
     }
   ],
   "components": ["Component One", "Component Two", "Component Three"],
