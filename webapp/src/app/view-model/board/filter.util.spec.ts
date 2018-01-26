@@ -6,7 +6,6 @@ import {BoardIssueView} from './board-issue-view';
 import {Assignee, NO_ASSIGNEE} from '../../model/board/data/assignee/assignee.model';
 import {List, Map, OrderedSet} from 'immutable';
 import {CustomField} from '../../model/board/data/custom-field/custom-field.model';
-import {Issue} from '../../model/board/data/issue/issue';
 import {AllFilters} from './filter.util';
 import {NONE_FILTER} from '../../model/board/user/board-filter/board-filter.constants';
 import {ParallelTask, ProjectState} from '../../model/board/data/project/project.model';
@@ -327,7 +326,8 @@ describe('Apply filter tests', () => {
       ownState: -1,
       visible: true,
       projectColour: 'red',
-      issueUrl: 'x'
+      issueUrl: null,
+      ownStateName: null
     }
   }
 });
