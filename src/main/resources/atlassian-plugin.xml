@@ -75,7 +75,7 @@
 
   <web-item name="Overbaard Agile Menu item" key="overbaard-config" section="greenhopper_menu/greenhopper_menu_dropdown" weight="1000">
     <description>The Agile menu item taking you to the Overbård boards</description>
-    <label>Overbård Boards</label>
+    <label>Overbård</label>
     <link linkId="overbaard-config-link">/plugins/servlet/overbaard</link>
     <condition class="org.overbaard.jira.api.IsLoggedInCondition"/>
   </web-item>
