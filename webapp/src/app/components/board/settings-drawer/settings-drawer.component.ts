@@ -29,7 +29,8 @@ import {
   FIX_VERSION_ATTRIBUTES,
   ISSUE_TYPE_ATTRIBUTES,
   LABEL_ATTRIBUTES,
-  NONE_FILTER,
+  NONE_FILTER_KEY,
+  CURRENT_USER_FILTER_KEY,
   PARALLEL_TASK_ATTRIBUTES,
   PRIORITY_ATTRIBUTES,
   PROJECT_ATTRIBUTES
@@ -53,7 +54,8 @@ import {toIssueSummaryLevel} from '../../../model/board/user/issue-summary-level
 })
 export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
 
-  readonly none = NONE_FILTER;
+  readonly none: string = NONE_FILTER_KEY;
+  readonly currentUser: string = CURRENT_USER_FILTER_KEY;
 
   // Have this come in via an input to be able to decide the state of showing/hiding empty swimlanes
   @Input()
@@ -237,6 +239,9 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
   private createGroup(filterFormEntries: FilterFormEntry[], filter: FilterAttributes, setFilterGetter: () => Set<string>) {
     if (filter.hasNone) {
       filterFormEntries.unshift(FilterFormEntry(this.none, 'None'));
+    }
+    if (filter === ASSIGNEE_ATTRIBUTES) {
+      filterFormEntries.unshift(FilterFormEntry(this.currentUser, 'Current User'));
     }
     let set: Set<string> = setFilterGetter();
     if (!set) {

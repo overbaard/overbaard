@@ -1,11 +1,11 @@
 import {
   ASSIGNEE_ATTRIBUTES,
-  COMPONENT_ATTRIBUTES,
+  COMPONENT_ATTRIBUTES, CURRENT_USER_FILTER_KEY,
   FilterAttributes, FilterAttributesUtil,
   FIX_VERSION_ATTRIBUTES,
   ISSUE_TYPE_ATTRIBUTES,
   LABEL_ATTRIBUTES,
-  NONE_FILTER, PARALLEL_TASK_ATTRIBUTES,
+  NONE_FILTER_KEY, PARALLEL_TASK_ATTRIBUTES,
   PRIORITY_ATTRIBUTES,
   PROJECT_ATTRIBUTES
 } from '../../model/board/user/board-filter/board-filter.constants';
@@ -28,11 +28,11 @@ export class AllFilters {
   private _parallelTaskFilters: Map<string, SimpleFilter>;
   private _parallelTaskFilterIndicesByProject: Map<string, Map<string, number>>;
 
-  constructor(boardFilters: BoardFilterState, private projectState: ProjectState) {
+  constructor(boardFilters: BoardFilterState, projectState: ProjectState, currentUser: string) {
     this._project = new SimpleFilter(PROJECT_ATTRIBUTES, boardFilters.project);
     this._priority = new SimpleFilter(PRIORITY_ATTRIBUTES, boardFilters.priority);
     this._issueType = new SimpleFilter(ISSUE_TYPE_ATTRIBUTES, boardFilters.issueType);
-    this._assignee = new SimpleFilter(ASSIGNEE_ATTRIBUTES, boardFilters.assignee);
+    this._assignee = new AssigneeFilter(ASSIGNEE_ATTRIBUTES, boardFilters.assignee, currentUser);
     this._component = new MultiSelectFilter(COMPONENT_ATTRIBUTES, boardFilters.component)
     this._label = new MultiSelectFilter(LABEL_ATTRIBUTES, boardFilters.label);
     this._fixVersion = new MultiSelectFilter(FIX_VERSION_ATTRIBUTES, boardFilters.fixVersion);
@@ -132,18 +132,31 @@ export class AllFilters {
 }
 
 class SimpleFilter {
-  constructor(private readonly _filterAttributes: FilterAttributes, private readonly _filter: Set<string>) {
+  constructor(private readonly _filterAttributes: FilterAttributes, protected readonly _filter: Set<string>) {
   }
 
   doFilter(key: string): boolean {
     if (this._filter.size > 0) {
       let useKey: string = key;
       if (!key && this._filterAttributes.hasNone) {
-        useKey = NONE_FILTER;
+        useKey = NONE_FILTER_KEY;
       }
       return this._filter.contains(useKey);
     }
     return true;
+  }
+}
+
+class AssigneeFilter extends SimpleFilter {
+  constructor(filterAttributes: FilterAttributes, filter: Set<string>, private readonly _currentUser: string) {
+    super(filterAttributes, filter);
+  }
+
+  doFilter(key: string): boolean {
+    if (this._filter.contains(CURRENT_USER_FILTER_KEY) && key === this._currentUser) {
+      return true;
+    }
+    return super.doFilter(key);
   }
 }
 
@@ -157,9 +170,9 @@ class MultiSelectFilter {
   doFilter(keys: Set<string>): boolean {
     if (this._filter.size > 0) {
       if (!keys) {
-        return this._filter.contains(NONE_FILTER);
+        return this._filter.contains(NONE_FILTER_KEY);
       } else {
-        if (this._filter.size === 1 && this._filter.contains(NONE_FILTER)) {
+        if (this._filter.size === 1 && this._filter.contains(NONE_FILTER_KEY)) {
           // All we want to match is no components, and we have some components so return that we
           // should be filtered out
           return false;
@@ -167,7 +180,7 @@ class MultiSelectFilter {
 
 
         for (const key of this._filterArray) {
-          if (key === NONE_FILTER) {
+          if (key === NONE_FILTER_KEY) {
             // We have values and we are looking for some values, for this case ignore the
             // none filter
             continue;
@@ -182,4 +195,3 @@ class MultiSelectFilter {
     return true;
   }
 }
-

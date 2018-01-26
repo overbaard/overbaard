@@ -13,7 +13,7 @@ import {HeaderState} from '../../model/board/data/header/header.state';
 import {BoardIssueView} from './board-issue-view';
 import {
   ASSIGNEE_ATTRIBUTES, COMPONENT_ATTRIBUTES, FIX_VERSION_ATTRIBUTES,
-  ISSUE_TYPE_ATTRIBUTES, LABEL_ATTRIBUTES, NONE_FILTER, PRIORITY_ATTRIBUTES,
+  ISSUE_TYPE_ATTRIBUTES, LABEL_ATTRIBUTES, NONE_FILTER_KEY, PRIORITY_ATTRIBUTES,
   PROJECT_ATTRIBUTES
 } from '../../model/board/user/board-filter/board-filter.constants';
 import {CustomField} from '../../model/board/data/custom-field/custom-field.model';
@@ -577,7 +577,8 @@ class IssueTableBuilder {
     switch (this._changeType) {
       case ChangeType.LOAD_BOARD:
       case ChangeType.APPLY_FILTERS: {
-        const filters: AllFilters = new AllFilters(this._currentUserSettingState.filters, this._currentBoardState.projects);
+        const filters: AllFilters =
+          new AllFilters(this._currentUserSettingState.filters, this._currentBoardState.projects, this._currentBoardState.currentUser);
         issues.forEach((issue, key) => {
           const visible = filters.filterVisible(issue);
           if (visible !== issue.visible) {
@@ -590,7 +591,8 @@ class IssueTableBuilder {
       }
       case ChangeType.UPDATE_BOARD_AFTER_BACKLOG_TOGGLE:
       case ChangeType.UPDATE_BOARD: {
-        const filters: AllFilters = new AllFilters(this._currentUserSettingState.filters, this._currentBoardState.projects);
+        const filters: AllFilters =
+          new AllFilters(this._currentUserSettingState.filters, this._currentBoardState.projects, this._currentBoardState.currentUser);
         this._currentBoardState.issues.lastChanged.forEach((change, key) => {
           if (change.change === IssueChange.DELETE) {
             issues = issues.asMutable();
@@ -759,7 +761,7 @@ class SwimlaneInfoBuilder {
     const states: number = boardState.headers.states.size;
     let builderMap: OrderedMap<string, SwimlaneDataBuilder> = OrderedMap<string, SwimlaneDataBuilder>().asMutable();
     let builderNone: SwimlaneDataBuilder =
-      new SwimlaneDataBuilder(NONE_FILTER, 'None', states, collapsed(userSettingState, NONE_FILTER),  existingInfo);
+      new SwimlaneDataBuilder(NONE_FILTER_KEY, 'None', states, collapsed(userSettingState, NONE_FILTER_KEY),  existingInfo);
     let issueMatcher:
       (issue: BoardIssueView, dataBuilders: Map<string, SwimlaneDataBuilder>) => SwimlaneDataBuilder[];
     switch (userSettingState.swimlane) {
@@ -796,7 +798,7 @@ class SwimlaneInfoBuilder {
               new SwimlaneDataBuilder(a.key, a.name, states, collapsed(userSettingState, a.key), existingInfo))
           });
         issueMatcher = ((issue, dataBuilders) =>
-          [dataBuilders.get(issue.assignee === NO_ASSIGNEE ? NONE_FILTER : issue.assignee.key)]);
+          [dataBuilders.get(issue.assignee === NO_ASSIGNEE ? NONE_FILTER_KEY : issue.assignee.key)]);
         break;
       case COMPONENT_ATTRIBUTES.key:
         boardState.components.components.forEach(
@@ -831,7 +833,7 @@ class SwimlaneInfoBuilder {
             });
           issueMatcher = ((issue, dataBuilders) => {
             const issueField: CustomField = issue.customFields.get(userSettingState.swimlane);
-            return [dataBuilders.get(issueField ? issueField.key : NONE_FILTER)];
+            return [dataBuilders.get(issueField ? issueField.key : NONE_FILTER_KEY)];
           });
         }
       }
@@ -846,7 +848,7 @@ class SwimlaneInfoBuilder {
   private static multiStringMatcher(issueSet: OrderedSet<string>,
                                     dataBuilders: OrderedMap<string, SwimlaneDataBuilder>): SwimlaneDataBuilder[] {
     if (!issueSet || issueSet.size === 0) {
-      return [dataBuilders.get(NONE_FILTER)];
+      return [dataBuilders.get(NONE_FILTER_KEY)];
     }
     return issueSet.map(v => dataBuilders.get(v)).toArray();
   }

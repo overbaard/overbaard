@@ -16,7 +16,8 @@ const DEFAULT_ATTRIBUTES: FilterAttributes = {
   swimlaneOption: false
 };
 
-export const NONE_FILTER = '$n$o$n$e$';
+export const NONE_FILTER_KEY = '$n$o$n$e$';
+export const CURRENT_USER_FILTER_KEY = '$cu$u$r$r$e$n$t$';
 
 interface FilterAttributesRecord extends TypedRecord<FilterAttributesRecord>, FilterAttributes {
 }

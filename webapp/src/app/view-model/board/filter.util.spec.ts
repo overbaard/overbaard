@@ -7,7 +7,7 @@ import {Assignee, NO_ASSIGNEE} from '../../model/board/data/assignee/assignee.mo
 import {List, Map, OrderedSet} from 'immutable';
 import {CustomField} from '../../model/board/data/custom-field/custom-field.model';
 import {AllFilters} from './filter.util';
-import {NONE_FILTER} from '../../model/board/user/board-filter/board-filter.constants';
+import {CURRENT_USER_FILTER_KEY, NONE_FILTER_KEY} from '../../model/board/user/board-filter/board-filter.constants';
 import {ParallelTask, ProjectState} from '../../model/board/data/project/project.model';
 import {LinkedIssue} from '../../model/board/data/issue/linked-issue';
 
@@ -74,11 +74,11 @@ describe('Apply filter tests', () => {
       });
       it ('Matches one (no assignee)', () => {
         const issue: BoardIssueView = emptyIssue();
-        expect(filtersFromQs({assignee: NONE_FILTER}).filterVisible(issue)).toBe(true);
+        expect(filtersFromQs({assignee: NONE_FILTER_KEY}).filterVisible(issue)).toBe(true);
       });
       it ('Matches one (no assignee) out of several', () => {
         const issue: BoardIssueView = emptyIssue();
-        expect(filtersFromQs({assignee: 'bob,' + NONE_FILTER}).filterVisible(issue)).toBe(true);
+        expect(filtersFromQs({assignee: 'bob,' + NONE_FILTER_KEY}).filterVisible(issue)).toBe(true);
       });
       it ('Non Match', () => {
         const issue: BoardIssueView = emptyIssue();
@@ -92,7 +92,30 @@ describe('Apply filter tests', () => {
       it ('Non Match (has assignee)', () => {
         const issue: BoardIssueView = emptyIssue();
         issue['assignee'] = <Assignee>{key: 'bob'} ;
-        expect(filtersFromQs({assignee: NONE_FILTER}).filterVisible(issue)).toBe(false);
+        expect(filtersFromQs({assignee: NONE_FILTER_KEY}).filterVisible(issue)).toBe(false);
+      });
+
+      describe('Current User', () => {
+        it ('Matches current user', () => {
+          const issue: BoardIssueView = emptyIssue();
+          issue['assignee'] = <Assignee>{key: 'bob'};
+          expect(filtersFromQs({assignee: CURRENT_USER_FILTER_KEY}, 'bob').filterVisible(issue)).toBe(true);
+        });
+        it ('Does not match current user', () => {
+          const issue: BoardIssueView = emptyIssue();
+          issue['assignee'] = <Assignee>{key: 'bob'};
+          expect(filtersFromQs({assignee: CURRENT_USER_FILTER_KEY}, 'rob').filterVisible(issue)).toBe(false);
+        });
+        it ('Matches current user and explicit filter', () => {
+          const issue: BoardIssueView = emptyIssue();
+          issue['assignee'] = <Assignee>{key: 'bob'};
+          expect(filtersFromQs({assignee: CURRENT_USER_FILTER_KEY + ',bob'}, 'bob').filterVisible(issue)).toBe(true);
+        });
+        it ('Does not match current user but matches explicit filter', () => {
+          const issue: BoardIssueView = emptyIssue();
+          issue['assignee'] = <Assignee>{key: 'bob'};
+          expect(filtersFromQs({assignee: CURRENT_USER_FILTER_KEY + ',bob'}, 'rob').filterVisible(issue)).toBe(true);
+        });
       });
     });
     describe('Component', () => {
@@ -111,7 +134,7 @@ describe('Apply filter tests', () => {
       it ('Matches no components', () => {
         const issue: BoardIssueView = emptyIssue();
         delete issue['components'];
-        expect(filtersFromQs({component: NONE_FILTER}).filterVisible(issue)).toBe(true);
+        expect(filtersFromQs({component: NONE_FILTER_KEY}).filterVisible(issue)).toBe(true);
       });
       it ('Non Match (out of one)', () => {
         const issue: BoardIssueView = emptyIssue();
@@ -123,7 +146,7 @@ describe('Apply filter tests', () => {
       });
       it ('Non Match (no components)', () => {
         const issue: BoardIssueView = emptyIssue();
-        expect(filtersFromQs({component: NONE_FILTER}).filterVisible(issue)).toBe(false);
+        expect(filtersFromQs({component: NONE_FILTER_KEY}).filterVisible(issue)).toBe(false);
       });
     });
     describe('Labels', () => {
@@ -142,7 +165,7 @@ describe('Apply filter tests', () => {
       it ('Matches no labels', () => {
         const issue: BoardIssueView = emptyIssue();
         delete issue['labels'];
-        expect(filtersFromQs({label: NONE_FILTER}).filterVisible(issue)).toBe(true);
+        expect(filtersFromQs({label: NONE_FILTER_KEY}).filterVisible(issue)).toBe(true);
       });
       it ('Non Match (out of one)', () => {
         const issue: BoardIssueView = emptyIssue();
@@ -154,7 +177,7 @@ describe('Apply filter tests', () => {
       });
       it ('Non Match (no labels)', () => {
         const issue: BoardIssueView = emptyIssue();
-        expect(filtersFromQs({label: NONE_FILTER}).filterVisible(issue)).toBe(false);
+        expect(filtersFromQs({label: NONE_FILTER_KEY}).filterVisible(issue)).toBe(false);
       });
     });
     describe('Fix Versions', () => {
@@ -173,7 +196,7 @@ describe('Apply filter tests', () => {
       it ('Matches no fix versions', () => {
         const issue: BoardIssueView = emptyIssue();
         delete issue['fixVersions'];
-        expect(filtersFromQs({'fix-version': NONE_FILTER}).filterVisible(issue)).toBe(true);
+        expect(filtersFromQs({'fix-version': NONE_FILTER_KEY}).filterVisible(issue)).toBe(true);
       });
       it ('Non Match (out of one)', () => {
         const issue: BoardIssueView = emptyIssue();
@@ -185,7 +208,7 @@ describe('Apply filter tests', () => {
       });
       it ('Non Match (no fix versions)', () => {
         const issue: BoardIssueView = emptyIssue();
-        expect(filtersFromQs({'fix-version': NONE_FILTER}).filterVisible(issue)).toBe(false);
+        expect(filtersFromQs({'fix-version': NONE_FILTER_KEY}).filterVisible(issue)).toBe(false);
       });
     });
     describe('Custom Fields', () => {
@@ -196,7 +219,7 @@ describe('Apply filter tests', () => {
       });
       it ('Matches one, none (out of one)', () => {
         const issue: BoardIssueView = emptyIssue();
-        expect(filtersFromQs({'cf.1': NONE_FILTER}).filterVisible(issue)).toBe(true);
+        expect(filtersFromQs({'cf.1': NONE_FILTER_KEY}).filterVisible(issue)).toBe(true);
       });
       it ('Matches two (out of two)', () => {
         const issue: BoardIssueView = emptyIssue();
@@ -205,12 +228,12 @@ describe('Apply filter tests', () => {
       });
       it ('Matches two, none (out of two)', () => {
         const issue: BoardIssueView = emptyIssue();
-        expect(filtersFromQs({'cf.1': NONE_FILTER, 'cf.2': NONE_FILTER}).filterVisible(issue)).toBe(true);
+        expect(filtersFromQs({'cf.1': NONE_FILTER_KEY, 'cf.2': NONE_FILTER_KEY}).filterVisible(issue)).toBe(true);
       });
       it ('Matches two, one none (out of two)', () => {
         const issue: BoardIssueView = emptyIssue();
         issue.customFields = Map<string, CustomField>({1: {key: 'C1-1', value: 'One One'}});
-        expect(filtersFromQs({'cf.1': 'C1-1', 'cf.2': NONE_FILTER}).filterVisible(issue)).toBe(true);
+        expect(filtersFromQs({'cf.1': 'C1-1', 'cf.2': NONE_FILTER_KEY}).filterVisible(issue)).toBe(true);
       });
       it ('Non match, one out of two', () => {
         const issue: BoardIssueView = emptyIssue();
@@ -229,7 +252,7 @@ describe('Apply filter tests', () => {
       it ('Non match (none)', () => {
         const issue: BoardIssueView = emptyIssue();
         issue.customFields = Map<string, CustomField>({1: {key: 'C1-1', value: 'One One'}});
-        expect(filtersFromQs({'cf.1': NONE_FILTER}).filterVisible(issue)).toBe(false);
+        expect(filtersFromQs({'cf.1': NONE_FILTER_KEY}).filterVisible(issue)).toBe(false);
       });
     });
     describe('Parallel Tasks', () => {
@@ -294,18 +317,17 @@ describe('Apply filter tests', () => {
     });
   });
 
-  function filtersFromQs(qs: Dictionary<string>, projectState?: ProjectState): AllFilters {
-    if (!projectState) {
-      projectState = {
+  function filtersFromQs(qs: Dictionary<string>, currentUser?: string): AllFilters {
+    const projectState = {
         owner: 'ISSUE',
         boardProjects: null,
         linkedProjects: null,
         parallelTasks: Map<string, List<ParallelTask>>()
       };
-    }
+
     const boardFilters: BoardFilterState =
       boardFilterMetaReducer(initialBoardFilterState, UserSettingActions.createInitialiseFromQueryString(qs));
-    return new AllFilters(boardFilters, projectState);
+    return new AllFilters(boardFilters, projectState, currentUser);
   }
 
   function emptyIssue(): BoardIssueView {
