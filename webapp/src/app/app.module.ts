@@ -45,6 +45,7 @@ import {LinkedIssueComponent} from './components/board/issue/linked-issue.compon
 import {DbExplorerComponent} from './components/db-explorer/db-explorer.component';
 import {AccessLogViewComponent} from './components/access-log/access-log.component';
 import {ScrollListenerDirective} from './directives/scroll-listener.directive';
+import {FilterFormEntryPipe} from './pipes/filter-entry.pipe';
 
 const appState: AppState = initialAppState;
 export function getInitialAppState(): AppState {
@@ -82,7 +83,8 @@ export function getInitialAppState(): AppState {
     BlacklistDialogComponent,
     DbExplorerComponent,
     AccessLogViewComponent,
-    ScrollListenerDirective
+    ScrollListenerDirective,
+    FilterFormEntryPipe
   ],
   entryComponents: [
     CommentIssueDialogComponent,
@@ -99,7 +101,7 @@ export function getInitialAppState(): AppState {
     ReactiveFormsModule,
     AppRoutingModule,
     StoreModule.forRoot(reducers, {initialState: getInitialAppState, metaReducers: metaReducers}),
-    !environment.production ? StoreDevtoolsModule.instrument({ maxAge: 50 }) : []
+    !environment.production ? StoreDevtoolsModule.instrument({ maxAge: 2 }) : []
   ],
   providers: [
     {provide: APP_BASE_HREF, useValue: '/'},

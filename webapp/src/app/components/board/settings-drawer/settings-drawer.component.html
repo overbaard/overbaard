@@ -141,8 +141,16 @@
           </div>
 
           <div [formGroup]="filterForm" #f="ngForm">
+            <!-- Only do this for long lists and NOT for the parallel tasks -->
+            <mat-form-field *ngIf="filtersToDisplay.key != 'Parallel Tasks' && currentFilterEntries.length > 5">
+              <input
+                matInput
+                [placeholder]="'Filter options'"
+                [(ngModel)]="filterSearch"
+                [ngModelOptions]="{standalone: true}">
+            </mat-form-field>
             <div formGroupName="{{filtersToDisplay.key}}">
-              <div *ngFor="let entry of currentFilterEntries">
+              <div *ngFor="let entry of currentFilterEntries | formEntryFilter: filterSearch">
                 <div *ngIf="!entry.children; else parallelTasksForm">
                   <mat-checkbox formControlName="{{entry.key}}">{{entry.display}}</mat-checkbox>
                 </div>

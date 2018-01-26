@@ -45,12 +45,13 @@ import {UserSettingState} from '../../../model/board/user/user-setting';
 import {BoardViewMode} from '../../../model/board/user/board-view-mode';
 import {MatCheckboxChange, MatSliderChange} from '@angular/material';
 import {toIssueSummaryLevel} from '../../../model/board/user/issue-summary-level';
+import {FilterFormEntry} from '../../../common/filter-form-entry';
 
 @Component({
   selector: 'app-board-settings-drawer',
   templateUrl: './settings-drawer.component.html',
-  styleUrls: ['./settings-drawer.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  styleUrls: ['./settings-drawer.component.scss']/*,
+  changeDetection: ChangeDetectionStrategy.OnPush*/
 })
 export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
 
@@ -75,6 +76,7 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
 
   filtersToDisplay: FilterAttributes = null;
   currentFilterEntries: FilterFormEntry[];
+  filterSearch: string;
 
   filterTooltips: Dictionary<string> = {};
 
@@ -263,6 +265,7 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
   onOpenFilterPane(filter: FilterAttributes) {
     this.filtersToDisplay = filter;
     this.currentFilterEntries = this.filterEntries[filter.key];
+    this.filterSearch = null;
   }
 
   onCloseFilterPanel(filter: FilterAttributes) {
@@ -465,11 +468,6 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
 
 }
 
-interface FilterFormEntry {
-  key: string;
-  display: string;
-  children: FilterFormEntry[];
-}
 function FilterFormEntry(key: string, display: string, children?: FilterFormEntry[]): FilterFormEntry {
   return {key: key, display: display, children: children};
 }
