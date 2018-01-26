@@ -38,6 +38,7 @@ public class Constants {
     public static final String CONFIG = "config";
     public static final String CURRENT_BOARD = "current-board";
     public static final String CURRENT_BOARD_LAST_LOGGED_ACCESS = "current-board-time";
+    public static final String CURRENT_USER = "current-user";
     public static final String CUSTOM = "custom";
     public static final String DELETE = "delete";
     public static final String DISPLAY = "display";

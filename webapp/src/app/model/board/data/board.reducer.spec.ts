@@ -19,7 +19,7 @@ import {getTestAssigneesInput} from './assignee/assignee.reducer.spec';
 import {getTestFixVersionsInput} from './fix-version/fix-version.reducer.spec';
 import {IssueChecker} from './issue/issue.model.spec';
 import {BoardState} from './board';
-import {BoardUtil, initialBoardState} from './board.model';
+import {initialBoardState} from './board.model';
 import {HeaderState} from './header/header.state';
 import {TypedRecord} from 'typed-immutable-record';
 
@@ -27,6 +27,7 @@ export function getTestBoardsInput(): any {
   return cloneObject(
     {
       view: 10,
+      'current-user': 'bob',
       'rank-custom-field-id': 12345,
       states: [
         {name: 'S1'},
@@ -118,6 +119,7 @@ describe('Board reducer tests', () => {
       const boardState: BoardState = boardReducer(
         initialBoardState, BoardActions.createDeserializeBoard('http://jira.example.com/', getTestBoardsInput()));
       expect(boardState.viewId).toBe(10);
+      expect(boardState.currentUser).toBe('bob');
       expect(boardState.rankCustomFieldId).toBe(12345);
       expect(boardState.jiraUrl).toBe('http://jira.example.com/')
 
@@ -340,7 +342,7 @@ describe('Board reducer tests', () => {
       const newState: BoardState = boardReducer(boardState, BoardActions.createChanges(changes));
       expect(newState.viewId).toBe(11);
       // These will never change via changes
-      checkSameStateEntries(boardState, newState, 'jiraUrl', 'rankCustomField', '_headers',
+      checkSameStateEntries(boardState, newState, 'currentUser', 'jiraUrl', 'rankCustomField', '_headers',
         'headers', 'priorities', 'issueTypes', 'projects');
 
       // Do some sanity checking of the contents. The individual reducer tests do in-depth checking
@@ -404,7 +406,7 @@ describe('Board reducer tests', () => {
       const newState: BoardState = boardReducer(boardState, BoardActions.createChanges(changes));
       expect(newState.viewId).toBe(11);
 
-      checkSameStateEntries(boardState, newState, 'jiraUrl', '_headers', 'headers', 'assignees', 'issueTypes',
+      checkSameStateEntries(boardState, newState, 'currentUser', 'jiraUrl', '_headers', 'headers', 'assignees', 'issueTypes',
         'priorities', 'components',
         'labels', 'fixVersions', 'customFields', 'projects', 'issues');
 
@@ -433,7 +435,7 @@ describe('Board reducer tests', () => {
       const newState: BoardState = boardReducer(boardState, BoardActions.createChanges(changes));
       expect(newState.viewId).toBe(11);
 
-      checkSameStateEntries(boardState, newState, 'jiraUrl', '_headers', 'headers', 'assignees',
+      checkSameStateEntries(boardState, newState, 'currentUser', 'jiraUrl', '_headers', 'headers', 'assignees',
         'issueTypes', 'priorities', 'components',
         'labels', 'fixVersions', 'customFields', 'projects', 'issues');
 

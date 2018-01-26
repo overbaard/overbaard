@@ -13,6 +13,7 @@ import {BlacklistState} from './blacklist/blacklist.model';
 
 export interface BoardState {
   viewId: number;
+  currentUser: string;
   rankCustomFieldId: number;
   jiraUrl: string;
   headers: HeaderState;

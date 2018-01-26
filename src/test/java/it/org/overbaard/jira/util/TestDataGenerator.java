@@ -6,6 +6,7 @@ import static org.overbaard.jira.impl.Constants.AVATAR;
 import static org.overbaard.jira.impl.Constants.BACKLOG;
 import static org.overbaard.jira.impl.Constants.COLOUR;
 import static org.overbaard.jira.impl.Constants.COMPONENTS;
+import static org.overbaard.jira.impl.Constants.CURRENT_USER;
 import static org.overbaard.jira.impl.Constants.DONE;
 import static org.overbaard.jira.impl.Constants.EMAIL;
 import static org.overbaard.jira.impl.Constants.FIX_VERSIONS;
@@ -93,6 +94,7 @@ public class TestDataGenerator {
     private ModelNode generateOutput() {
         final ModelNode modelNode = new ModelNode();
         modelNode.get(VIEW).set(1);
+        modelNode.get(CURRENT_USER).set("kabir");
         modelNode.get(RANK_CUSTOM_FIELD_ID).set(11111L);
 
         ModelNode states = modelNode.get(STATES).setEmptyList();

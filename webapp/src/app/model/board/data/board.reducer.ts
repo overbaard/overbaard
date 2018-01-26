@@ -153,6 +153,7 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
 
       return BoardUtil.withMutations(state, mutable => {
         mutable.viewId = viewId;
+        mutable.currentUser = input['current-user'];
         mutable.rankCustomFieldId = rankCustomFieldId;
         mutable.jiraUrl = dbAction.jiraUrl;
         mutable.headers =  headerState;

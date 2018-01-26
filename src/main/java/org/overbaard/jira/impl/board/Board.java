@@ -116,6 +116,7 @@ public class Board {
         ModelNode outputNode = new ModelNode();
         //Sort the assignees by name
         outputNode.get(Constants.VIEW).set(currentView);
+        outputNode.get(Constants.CURRENT_USER).set(user.getKey());
 
         ModelNode assigneesNode = outputNode.get(Constants.ASSIGNEES);
         assigneesNode.setEmptyList();

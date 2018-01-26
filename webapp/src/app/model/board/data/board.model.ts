@@ -15,6 +15,7 @@ import {BoardState} from './board';
 
 const DEFAULT_STATE: BoardState = {
   viewId: -1,
+  currentUser: null,
   rankCustomFieldId: -1,
   jiraUrl: null,
   headers: initialHeaderState,

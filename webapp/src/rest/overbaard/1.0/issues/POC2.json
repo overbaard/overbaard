@@ -1,5 +1,6 @@
 {
   "view" : 11,
+  "current-user": "kabir.khan",
   "rank-custom-field-id" : 12311940,
   "states" : [
     {"name": "Backlog Pool"},
