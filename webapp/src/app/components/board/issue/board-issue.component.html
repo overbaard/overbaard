@@ -5,6 +5,7 @@
             matTooltip="{{cardTooltip}}"
             [matTooltipClass]="'card-tooltip'"
             [matTooltipShowDelay]="500"
+            [matTooltipPosition]="viewMode === viewModeEnum.RANK ? 'right' : 'below'"
       >
         <span class="mat-h4">
           <a href="{{issue.issueUrl}}"
