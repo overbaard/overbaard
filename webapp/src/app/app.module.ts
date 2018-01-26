@@ -93,8 +93,8 @@ export function getInitialAppState(): AppState {
     RankIssueDialogComponent,
     BlacklistDialogComponent],
   imports: [
-    BrowserModule,
     BrowserAnimationsModule,
+    BrowserModule,
     FormsModule,
     HttpClientModule,
     MaterialModule,
