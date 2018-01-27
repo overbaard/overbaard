@@ -419,6 +419,42 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <!--
+                !!!! USE THIS FOR PRODUCTION BUILDS - IT RESULTS IN A MUCH SMALLER SIZE!!!!
+
+                Since building the ui this way is very time-consuming, and not all changes necessarily affect the ui, turn on
+                building the ui explicitly by running 'atlas-package -Dob.ui.aot'
+            -->
+            <id>Build the UI with AOT</id>
+            <activation>
+                <property>
+                    <name>ob.ui.aot</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <!--
+                                    Uses webpack to bundle the application as set up in package.json
+                                -->
+                                <id>yarn run build</id>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <configuration>
+                                    <arguments>run build --output-hashing=all</arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <!-- After upgrading IntelliJ IDEA to 2016.3.2, this is suddenly needed -->
