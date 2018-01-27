@@ -67,7 +67,9 @@ export class FontMeasureComponent implements OnInit, AfterViewInit {
     for (let i = 0 ; i < s.length ; i++) {
       const char: string = s.charAt(i);
       const charSize: number = table.getWidth(char);
-      // console.log(`'${char}': ${charSize}`);
+      if (i < 127) {
+        console.log(`'${char}': ${charSize}`);
+      }
       size += charSize;
     }
     console.log(`size of '${s}': ${size}`);
@@ -81,6 +83,9 @@ export class FontMeasureComponent implements OnInit, AfterViewInit {
     for (const char of Object.keys(this._sameCharLookupTable)) {
       const metrics: TextMetrics = context.measureText(char);
       const width: number = metrics.width;
+      if (char.charCodeAt(0) < 128) {
+        console.log(`${size}px - '${char}': ${width}`);
+      }
       this._fontSizeTable.addItem(`${size}px`, char, width);
     }
   }
