@@ -91,4 +91,8 @@ export class BoardHeaderGroupComponent implements OnInit {
   onMouseLeave(event: MouseEvent) {
     this.hovering = false;
   }
+
+  headerStateTrackByFn(index: number, header: BoardHeader) {
+    return header.name;
+  }
 }

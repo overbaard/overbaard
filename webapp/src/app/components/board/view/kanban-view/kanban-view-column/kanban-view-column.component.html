@@ -2,7 +2,7 @@
   <!-- trackBy is a hint to angular to be able to keep (i.e. don't destroy and recreate) as many components as possible -->
   <div *ngIf="displayIssues">
     <!-- This pipe converts keys to issues and it only shows the visible ones according to filters -->
-    <div *ngFor="let issue of issueKeys | keyToIssueFilteredPipe: issues ; trackBy: issueTrackByFn">
+    <div *ngFor="let issue  of issueKeys | keyToIssueFilteredPipe: issues ; trackBy: issueTrackByFn">
       <app-board-issue
         [issue]="issue"
         [issueDetailState]="issueDetailState"

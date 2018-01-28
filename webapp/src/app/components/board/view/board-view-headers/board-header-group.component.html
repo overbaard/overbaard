@@ -14,7 +14,7 @@
   <div
     class="header-line">
     <app-board-header-content
-      *ngFor="let stateHeader of header.states ; first as isFirst ; last as isLast"
+      *ngFor="let stateHeader of header.states ; first as isFirst ; last as isLast ; trackBy: headerStateTrackByFn"
       [header]="stateHeader"
       [viewMode]="viewMode"
       [leftBorder]="!isFirst"

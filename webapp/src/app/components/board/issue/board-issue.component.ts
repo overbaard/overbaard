@@ -21,7 +21,8 @@ import {CommentIssueDialogComponent} from './comment-issue-dialog.component';
 import {BoardService} from '../../../services/board.service';
 import {RankIssueDialogComponent} from './rank-issue-dialog.component';
 import {BoardViewMode} from '../../../model/board/user/board-view-mode';
-import {ParallelTaskOption} from '../../../model/board/data/project/project.model';
+import {ParallelTask, ParallelTaskOption} from '../../../model/board/data/project/project.model';
+import {LinkedIssue} from '../../../model/board/data/issue/linked-issue';
 
 @Component({
   selector: 'app-board-issue',
@@ -161,5 +162,13 @@ export class BoardIssueComponent implements OnInit, OnChanges {
         boardService: this._boardService
       }
     });
+  }
+
+  parallelTaskTrackByFn(index: number, pt: ParallelTask) {
+    return index;
+  }
+
+  linkedIssueTrackByFn(index: number, li: LinkedIssue) {
+    return li.key;
   }
 }

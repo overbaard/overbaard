@@ -12,7 +12,7 @@
 </div>
 <div *ngIf="groupType === visible_bl_or_normal_category" class="column">
   <app-kanban-view-column
-    *ngFor="let header of header.states ; trackBy: columnTrackByFn"
+    *ngFor="let header of header.states ; trackBy: headerStateTrackByFn"
     [header]="header"
     [issueKeys]="table.get(header.stateIndices.get(0))"
     [issues]="issues"

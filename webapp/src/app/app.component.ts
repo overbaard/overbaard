@@ -91,6 +91,11 @@ export class AppComponent implements OnInit, AfterViewInit {
     return this._urlService.localImageUrl(name);
   }
 
+  navItemTrackByFn(index: number, navItem: any) {
+    return navItem['name'];
+  }
+
+
   get jiraUrl(): string {
     return this._urlService.jiraUrl;
   }

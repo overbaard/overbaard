@@ -67,7 +67,7 @@
       <div *ngIf="issue.selectedParallelTasks && issueDetailState.parallelTasks" class="parallel-tasks-container">
         <!-- Display of the parallel tasks -->
         <app-parallel-task
-          *ngFor="let pt of issue.parallelTasks ; let i = index"
+          *ngFor="let pt of issue.parallelTasks ; let i = index ; trackBy: parallelTaskTrackByFn"
           [issue]="issue"
           [taskIndex]="i"
           (updateParallelTask)="onUpdateParallelTask($event)"
@@ -75,7 +75,7 @@
       </div>
       <div *ngIf="hasLinkedIssues && issueDetailState.linkedIssues"  class="linked-issues-container">
         <app-linked-issue
-          *ngFor="let li of issue.linkedIssues"
+          *ngFor="let li of issue.linkedIssues ; trackBy: linkedIssueTrackByFn"
           [linkedIssue]="li"
         >
         </app-linked-issue>

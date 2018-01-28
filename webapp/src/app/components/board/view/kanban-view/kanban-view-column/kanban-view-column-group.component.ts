@@ -65,8 +65,8 @@ export class KanbanViewColumnGroupComponent implements OnInit, OnChanges {
   }
 
 // trackBy is a hint to angular to be able to keep (i.e. don't destroy and recreate) as many components as possible
-  issueTrackByFn(index: number, key: string) {
-    return key;
+  headerStateTrackByFn(index: number, header: BoardHeader) {
+    return header.name;
   }
 
   onUpdateParallelTask(event: UpdateParallelTaskEvent) {

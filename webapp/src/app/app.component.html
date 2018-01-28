@@ -6,7 +6,7 @@
           <span class="sidenav-header">Overbård</span>
         </mat-toolbar>
         <mat-nav-list>
-          <a *ngFor="let navItem of navItems"
+          <a *ngFor="let navItem of navItems ; trackBy: navItemTrackByFn"
              mat-list-item
              (click)="navigation.close()"
              routerLinkActive
