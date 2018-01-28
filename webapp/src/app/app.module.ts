@@ -46,6 +46,7 @@ import {DbExplorerComponent} from './components/db-explorer/db-explorer.componen
 import {AccessLogViewComponent} from './components/access-log/access-log.component';
 import {ScrollListenerDirective} from './directives/scroll-listener.directive';
 import {FilterFormEntryPipe} from './pipes/filter-entry.pipe';
+import {KeyToIssueFilteredPipe} from './pipes/key-to-issue-filtered.pipe';
 
 const appState: AppState = initialAppState;
 export function getInitialAppState(): AppState {
@@ -84,7 +85,8 @@ export function getInitialAppState(): AppState {
     DbExplorerComponent,
     AccessLogViewComponent,
     ScrollListenerDirective,
-    FilterFormEntryPipe
+    FilterFormEntryPipe,
+    KeyToIssueFilteredPipe
   ],
   entryComponents: [
     CommentIssueDialogComponent,
