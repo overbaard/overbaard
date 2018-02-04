@@ -78,7 +78,7 @@ export class FontMeasureComponent implements OnInit, AfterViewInit {
   private createTableForFontSize(size: number) {
     const canvas: HTMLCanvasElement = this.myCanvas.nativeElement;
     const context: CanvasRenderingContext2D = canvas.getContext('2d');
-    context.font = `${size}px Roboto`;
+    context.font = `${size}px Arial`;
 
     for (const char of Object.keys(this._sameCharLookupTable)) {
       const metrics: TextMetrics = context.measureText(char);

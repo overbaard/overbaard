@@ -55,7 +55,7 @@ export class FontMeasureTableComponent implements OnInit, AfterViewInit {
 
     // Group the characters into groups of widths
     const groups: Dictionary<string[]> = {};
-    context.font = '10px Roboto';
+    context.font = '10px Arial';
     for (let i = 32 ; i <= 1327 ; i++) {
       const char: string = String.fromCharCode(i);
       const metrics: TextMetrics = context.measureText(char);

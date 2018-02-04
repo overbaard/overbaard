@@ -1,12 +1,15 @@
+import {enableDebugTools} from '@angular/platform-browser';
+
 const __webpack_public_path__ = calculatePublicPath();
 console.log('Calculated webpack public path: ' + __webpack_public_path__);
 
 
-import {enableProdMode} from '@angular/core';
+import {ComponentRef, enableProdMode} from '@angular/core';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 
 import {AppModule} from './app/app.module';
 import {environment} from './environments/environment';
+
 
 
 function calculatePublicPath(): string {
@@ -33,4 +36,6 @@ if (environment.production) {
   enableProdMode();
 }
 
-platformBrowserDynamic().bootstrapModule(AppModule);
+platformBrowserDynamic().bootstrapModule(AppModule).then((ref: any) => {
+  enableDebugTools(ref);
+});

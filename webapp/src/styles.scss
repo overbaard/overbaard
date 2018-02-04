@@ -82,6 +82,8 @@ $black-text: rgba(0,0,0,.87)!important;
   font-kerning: none;
   font-variant-ligatures: none;
   text-rendering: optimizeSpeed;
+  /* For some reason Safari does not calculate the proper width for the Roboto font (unless you do a reload), so use a system font instead */
+  font-family: Arial;
 }
 
 @mixin sized-icon-button-class($size, $font-size, $line-height) {
