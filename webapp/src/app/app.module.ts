@@ -45,7 +45,6 @@ import {DbExplorerComponent} from './components/db-explorer/db-explorer.componen
 import {AccessLogViewComponent} from './components/access-log/access-log.component';
 import {ScrollListenerDirective} from './directives/scroll-listener.directive';
 import {FilterFormEntryPipe} from './pipes/filter-entry.pipe';
-import {KeyToIssueFilteredPipe} from './pipes/key-to-issue-filtered.pipe';
 import {FontMeasureComponent} from './components/font-measure/font-measure.component';
 import {FontSizeTableService} from './services/font-size-table.service';
 import {FontMeasureTableComponent} from './components/font-measure/font-measure-table.component';
@@ -88,7 +87,6 @@ export function getInitialAppState(): AppState {
     AccessLogViewComponent,
     ScrollListenerDirective,
     FilterFormEntryPipe,
-    KeyToIssueFilteredPipe,
     FontMeasureComponent,
     FontMeasureTableComponent
   ],
