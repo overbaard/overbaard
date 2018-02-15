@@ -6,7 +6,7 @@
   (toggleBacklog)="onToggleBacklog($event)"
 >
 </app-board-headers-container>
-<div id="board-body" [style.height]="boardBodyHeight">
+<div id="board-body" [style.height.px]="boardBodyHeight">
   <app-kanban-normal-view
     *ngIf="!board.issueTable.swimlaneInfo"
     [board]="board"

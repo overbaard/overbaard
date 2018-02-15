@@ -2,7 +2,7 @@
   <mat-sidenav-container #navigation class="sidenav-container">
     <mat-sidenav mode="over" #navigation class="sidenav-navigation">
       <div style="display: flex; flex-direction: column; width: 100%; height: 100%">
-        <mat-toolbar [ngStyle]="{'min-height': toolbarHeight, 'max-height': toolbarHeight}">
+        <mat-toolbar [style.height.px]="toolbarHeight">
           <span class="sidenav-header">Overbård</span>
         </mat-toolbar>
         <mat-nav-list>

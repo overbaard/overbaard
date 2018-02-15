@@ -27,7 +27,7 @@ import {Router} from '@angular/router';
 })
 export class AppComponent implements OnInit, AfterViewInit {
 
-  readonly toolbarHeight: string = TOOLBAR_HEIGHT + 'px';
+  readonly toolbarHeight: number = TOOLBAR_HEIGHT;
 
   loading$: Observable<boolean>;
   version$: Observable<string>

@@ -9,7 +9,7 @@
     <span
       class="header-icon"
       style="display: flex"
-      [ngStyle]="{'margin-left': headerTextOffset + 'px'}">
+      [style.margin-left.px]="headerTextOffset">
       <mat-icon
         *ngIf="swimlane.collapsed"
       >chevron_right</mat-icon>

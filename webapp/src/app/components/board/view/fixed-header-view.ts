@@ -24,7 +24,7 @@ export class FixedHeaderView implements OnChanges {
   boardLeftOffset = 0;
 
   // Initialise to the same value as in the CSS. This will be calculated by ngOnChanges
-  boardBodyHeight = '200px';
+  boardBodyHeight = 200;
 
   onScrollLeft(leftOffset: number) {
     // console.log('--- parent scroll ' + leftOffset * -1);
@@ -37,7 +37,7 @@ export class FixedHeaderView implements OnChanges {
     const heightChange: SimpleChange = changes['windowHeight'];
     if (heightChange) {
       const height = heightChange.currentValue;
-      this.boardBodyHeight = (height - TOOLBAR_HEIGHT - BOARD_HEADERS_HEIGHT) + 'px';
+      this.boardBodyHeight = (height - TOOLBAR_HEIGHT - BOARD_HEADERS_HEIGHT);
     }
   }
 }
