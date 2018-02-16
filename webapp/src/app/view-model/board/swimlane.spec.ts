@@ -1750,8 +1750,8 @@ class BoardChecker {
     const issueTable: IssueTable = board.issueTable;
 
     const actualTable: string[][] = [];
-    issueTable._table.forEach((v, i) => {
-      actualTable.push(issueTable._table.get(i).toArray());
+    issueTable._old_table.forEach((v, i) => {
+      actualTable.push(issueTable._old_table.get(i).toArray());
     });
     expect(actualTable).toEqual(this._expectedTable);
 
@@ -1801,8 +1801,8 @@ class BoardChecker {
       const sl: SwimlaneData = slInfo.swimlanes.get(check.key);
 
       const expectedTable: string[][] = [];
-      issueTable._table.forEach((v, i) => {
-        expectedTable.push(issueTable._table.get(i).toArray().filter(key =>  checkIssueSet.contains(key)));
+      issueTable._old_table.forEach((v, i) => {
+        expectedTable.push(issueTable._old_table.get(i).toArray().filter(key =>  checkIssueSet.contains(key)));
       });
       const actualTable: string[][] = [];
       sl.table.forEach((v, i) => {

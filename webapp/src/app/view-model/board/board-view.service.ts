@@ -318,7 +318,7 @@ class HeadersBuilder {
     const statesList: List<BoardHeader> = this.flattenHeaders();
     const updatedStates: Map<number, BoardHeader> = Map<number, BoardHeader>().asMutable();
     statesList.forEach((h, i) => {
-      const newTotal = issueTable._table.get(i).size;
+      const newTotal = issueTable._old_table.get(i).size;
       const newVisible = visibleIssueCounts.get(i);
 
       if (newTotal !== h.totalIssues || newVisible !== h.visibleIssues) {
@@ -501,7 +501,8 @@ class IssueTableBuilder {
 
   // Initialised in createTableAndRankView
   private _rankView: List<RankViewEntry>;
-  private _table: List<List<string>>;
+  private _old_style_table: List<List<string>>;
+  private _table: List<List<BoardIssueView>>;
 
 
   // Just a throwaway lookup so don't bother making this immutable
@@ -514,7 +515,7 @@ class IssueTableBuilder {
     private readonly _currentBoardState: BoardState,
     private readonly _oldUserSettingState: UserSettingState,
     private readonly _currentUserSettingState: UserSettingState) {
-    this._table = _oldIssueTableState._table;
+    this._old_style_table = _oldIssueTableState._old_table;
     this._rankView = _oldIssueTableState.rankView;
   }
 
@@ -528,16 +529,16 @@ class IssueTableBuilder {
 
     this.createTableAndRankView(issues);
 
-    this._visibleIssueCounts = this.calculateVisibleIssueCounts(issues, this._table);
-    const swimlaneInfo: SwimlaneInfo = this.calculateSwimlane(issues, this._table);
+    this._visibleIssueCounts = this.calculateVisibleIssueCounts(issues, this._old_style_table);
+    const swimlaneInfo: SwimlaneInfo = this.calculateSwimlane(issues, this._old_style_table);
     if (issues === this._oldIssueTableState.issues &&
-      this._table === this._oldIssueTableState._table &&
+      this._old_style_table === this._oldIssueTableState._old_table &&
       this._rankView === this._oldIssueTableState.rankView &&
       swimlaneInfo === this._oldIssueTableState.swimlaneInfo) {
       return this._oldIssueTableState;
     }
 
-    return BoardViewModelUtil.createIssueTable(issues, this._rankView, this._table, swimlaneInfo);
+    return BoardViewModelUtil.createIssueTable(issues, this._rankView, this._old_style_table, this._table, swimlaneInfo);
   }
 
   private populateIssues(): Map<string, BoardIssueView> {
@@ -648,30 +649,30 @@ class IssueTableBuilder {
     }
 
     const viewMode: BoardViewMode = this._currentUserSettingState.viewMode;
-    const oldTable: List<List<string>> = this._changeType === ChangeType.LOAD_BOARD ? null : this._oldIssueTableState._table;
+    const oldTable: List<List<string>> = this._changeType === ChangeType.LOAD_BOARD ? null : this._oldIssueTableState._old_table;
     const oldRank: List<RankViewEntry> = this._changeType === ChangeType.LOAD_BOARD ? null : this._oldIssueTableState.rankView;
 
     // We always need this since the issue table is used to calculate the total issues
-    const tableBuilder: TableBuilder = new TableBuilder(this._currentBoardState.headers.states.size, oldTable);
+    const old_style_tableBuilder: TableBuilder<string> = new TableBuilder(this._currentBoardState.headers.states.size, oldTable);
     // Only calculate the rank view if we have that viewMode
     const rankViewBuilder: RankViewBuilder = viewMode === BoardViewMode.RANK ? new RankViewBuilder(oldRank) : null;
 
     this.addProjectIssues(
-      tableBuilder,
+      old_style_tableBuilder,
       rankViewBuilder,
       this._currentBoardState.projects.boardProjects.get(this._currentBoardState.projects.owner));
     this._currentBoardState.projects.boardProjects.forEach((project, key) => {
       if (key !== this._currentBoardState.projects.owner) {
-        this.addProjectIssues(tableBuilder, rankViewBuilder, project);
+        this.addProjectIssues(old_style_tableBuilder, rankViewBuilder, project);
       }
     });
 
-    this._table = tableBuilder.getTable();
+    this._old_style_table = old_style_tableBuilder.getTable();
     this._rankView = rankViewBuilder ? rankViewBuilder.getRankView() : initialIssueTable.rankView;
     return issues;
   }
 
-  private addProjectIssues(tableBuilder: TableBuilder, rankViewBuilder: RankViewBuilder,
+  private addProjectIssues(tableBuilder: TableBuilder<string>, rankViewBuilder: RankViewBuilder,
                            project: BoardProject) {
     const rankedKeysForProject: List<string> = this._currentBoardState.ranks.rankedIssueKeys.get(project.key);
     if (!rankedKeysForProject) {
@@ -987,7 +988,7 @@ class SwimlaneInfoBuilder {
 
 class SwimlaneDataBuilder {
   private readonly _existing: SwimlaneData;
-  private readonly _tableBuilder: TableBuilder;
+  private readonly _tableBuilder: TableBuilder<string>;
   private _visibleIssuesCount = 0;
   filterVisible = true;
 
@@ -1065,11 +1066,11 @@ class SwimlaneDataBuilder {
   }
 }
 
-class TableBuilder {
-  private readonly _current: ColumnBuilder[];
+class TableBuilder<T> {
+  private readonly _current: ColumnBuilder<T>[];
 
-  constructor(states: number, private readonly _existing: List<List<string>>) {
-    this._current = new Array<ColumnBuilder>(states);
+  constructor(states: number, private readonly _existing: List<List<T>>) {
+    this._current = new Array<ColumnBuilder<T>>(states);
     for (let i = 0 ; i < this._current.length ; i++) {
       if (_existing) {
         this._current[i] = new ExistingColumnBuilder(i, this._existing.get(i));
@@ -1080,20 +1081,20 @@ class TableBuilder {
 
   }
 
-  push(index: number, value: string) {
+  push(index: number, value: T) {
     this._current[index].push(value);
   }
 
-  getTable(): List<List<string>> {
+  getTable(): List<List<T>> {
     if (!this._existing) {
-      return List<List<string>>().withMutations(mutable => {
+      return List<List<T>>().withMutations(mutable => {
         for (const column of this._current) {
           mutable.push(column.getList());
         }
       });
     } else {
       let changed = false;
-      const table: List<List<string>> = List<List<string>>().withMutations(mutable => {
+      const table: List<List<T>> = List<List<T>>().withMutations(mutable => {
         for (const column of this._current) {
           changed = changed || column.isChanged();
           mutable.push(column.getList());
@@ -1107,21 +1108,21 @@ class TableBuilder {
   }
 }
 
-interface ColumnBuilder {
-  push(value: string);
+interface ColumnBuilder<T> {
+  push(value: T);
   isChanged(): boolean;
-  getList(): List<string>;
+  getList(): List<T>;
 }
 
-class ExistingColumnBuilder implements ColumnBuilder {
-  private _current: List<string>;
+class ExistingColumnBuilder<T> implements ColumnBuilder<T> {
+  private _current: List<T>;
   private _index = 0;
   private _changed = false;
 
-  constructor(private _column: number, private _existing: List<string>) {
+  constructor(private _column: number, private _existing: List<T>) {
   }
 
-  push(value: string) {
+  push(value: T) {
     if (!this._changed) {
       if (this._existing.size <= this._index) {
         this._changed = true;
@@ -1133,7 +1134,7 @@ class ExistingColumnBuilder implements ColumnBuilder {
       this._index++;
     }
     if (!this._current) {
-      this._current = List<string>().asMutable();
+      this._current = List<T>().asMutable();
     }
     this._current.push(value);
   }
@@ -1142,27 +1143,27 @@ class ExistingColumnBuilder implements ColumnBuilder {
     return this._changed || this.safeSize(this._existing) !== this.safeSize(this._current);
   }
 
-  private safeSize(list: List<string>): number {
+  private safeSize(list: List<T>): number {
     if (!list) {
       return 0;
     }
     return list.size;
   }
 
-  getList(): List<string> {
+  getList(): List<T> {
     if (this.isChanged()) {
-      return this._current ? this._current.asImmutable() : List<string>();
+      return this._current ? this._current.asImmutable() : List<T>();
     }
     return this._existing;
   }
 }
 
-class NewColumnBuilder implements ColumnBuilder {
-  private _current: List<string> = List<string>().asMutable();
+class NewColumnBuilder<T> implements ColumnBuilder<T> {
+  private _current: List<T> = List<T>().asMutable();
   private _changed = true;
 
 
-  push(value: string) {
+  push(value: T) {
     this._current.push(value);
   }
 
@@ -1170,7 +1171,7 @@ class NewColumnBuilder implements ColumnBuilder {
     return this._changed;
   }
 
-  getList(): List<string> {
+  getList(): List<T> {
     return this._current.asImmutable();
   }
 }

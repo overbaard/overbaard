@@ -7,6 +7,7 @@ import {RankViewEntry} from './rank-view-entry';
 export interface IssueTable {
   issues: Map<string, BoardIssueView>;
   rankView: List<RankViewEntry>;
-  _table: List<List<string>>;
+  _old_table: List<List<string>>;
+  table: List<List<BoardIssueView>>;
   swimlaneInfo: SwimlaneInfo;
 }

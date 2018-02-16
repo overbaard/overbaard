@@ -3,7 +3,7 @@
   *ngFor="let header of board.headers.headersList ; trackBy: columnTrackByFn"
   [header]="header"
   [issues]="board.issueTable.issues"
-  [table]="board.issueTable._table"
+  [table]="board.issueTable._old_table"
   [issueDetailState]="board.issueDetail"
   (updateParallelTask)="onUpdateParallelTask($event)"
 ></app-kanban-view-column-group>
