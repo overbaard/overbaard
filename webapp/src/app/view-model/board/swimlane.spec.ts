@@ -14,6 +14,7 @@ import {BoardViewModel} from './board-view';
 import {SwimlaneData} from './swimlane-data';
 import {BoardHeader} from './board-header';
 import {IssueTable} from './issue-table';
+import {BoardIssueView} from './board-issue-view';
 
 describe('Swimlane observer tests', () => {
 
@@ -1089,7 +1090,8 @@ describe('Swimlane observer tests', () => {
 
                 new EqualityChecker()
                 // Although we set F-10, it was used in the original data
-                  .cleanSwimlanes('F-10', 'F-30', NONE_FILTER_KEY)
+                  .cleanSwimlanes('F-30', NONE_FILTER_KEY)
+                  .addChangedSwimlaneColumns('F-10', 0)
                   .addChangedSwimlaneColumns('F-20', 0)
                   .check(originalView, board);
               });
@@ -1270,7 +1272,7 @@ describe('Swimlane observer tests', () => {
                 .checkBoard(board);
               new EqualityChecker()
                 .cleanSwimlanes('ONE')
-                .cleanSwimlaneTables('TWO')
+                .addChangedSwimlaneColumns('TWO', 1, 2)
                 .check(originalView, board);
               originalView = board;
             });
@@ -1286,7 +1288,7 @@ describe('Swimlane observer tests', () => {
                 .checkBoard(board);
               new EqualityChecker()
                 .cleanSwimlanes('TWO')
-                .cleanSwimlaneTables('ONE')
+                .addChangedSwimlaneColumns('ONE', 0, 1, 2)
                 .check(originalView, board);
               originalView = board;
             });
@@ -1300,7 +1302,7 @@ describe('Swimlane observer tests', () => {
                 .checkBoard(board);
               new EqualityChecker()
                 .cleanSwimlanes('TWO')
-                .cleanSwimlaneTables('ONE')
+                .addChangedSwimlaneColumns('ONE', 0, 1, 2)
                 .check(originalView, board);
             });
         });
@@ -1325,7 +1327,8 @@ describe('Swimlane observer tests', () => {
                 {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3', 'ONE-5'], visibleFilter: false}])
               .checkBoard(board);
             new EqualityChecker()
-              .cleanSwimlaneTables('task', 'bug')
+              .addChangedSwimlaneColumns('task', 0, 1)
+              .addChangedSwimlaneColumns('bug', 0, 1)
               .check(originalView, board);
           });
         });
@@ -1350,7 +1353,8 @@ describe('Swimlane observer tests', () => {
                 {key: 'Major', name: 'Major', issues: ['ONE-2', 'ONE-4'], visibleFilter: true}])
               .checkBoard(board);
             new EqualityChecker()
-              .cleanSwimlaneTables('Blocker', 'Major')
+              .addChangedSwimlaneColumns('Blocker', 0, 1)
+              .addChangedSwimlaneColumns('Major', 0, 1)
               .check(originalView, board);
           });
         });
@@ -1378,7 +1382,7 @@ describe('Swimlane observer tests', () => {
               .checkBoard(board);
             new EqualityChecker()
               .cleanSwimlanes('bob', 'kabir')
-              .cleanSwimlaneTables(NONE_FILTER_KEY)
+              .addChangedSwimlaneColumns(NONE_FILTER_KEY, 0, 1)
               .check(originalView, board);
           });
         });
@@ -1407,7 +1411,10 @@ describe('Swimlane observer tests', () => {
                 {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-5'], visibleFilter: false}])
               .checkBoard(board);
             new EqualityChecker()
-              .cleanSwimlaneTables('C-10', 'C-20', 'C-30', NONE_FILTER_KEY)
+              .addChangedSwimlaneColumns('C-10', 0, 1)
+              .addChangedSwimlaneColumns('C-20', 0, 1)
+              .addChangedSwimlaneColumns('C-30', 1)
+              .addChangedSwimlaneColumns(NONE_FILTER_KEY, 1)
               .check(originalView, board);
           });
         });
@@ -1436,7 +1443,10 @@ describe('Swimlane observer tests', () => {
                 {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-4'], visibleFilter: false}])
               .checkBoard(board);
             new EqualityChecker()
-              .cleanSwimlaneTables('F-10', 'F-20', 'F-30', NONE_FILTER_KEY)
+              .addChangedSwimlaneColumns('F-10', 0)
+              .addChangedSwimlaneColumns('F-20', 0)
+              .addChangedSwimlaneColumns('F-30', 0)
+              .addChangedSwimlaneColumns(NONE_FILTER_KEY, 1)
               .check(originalView, board);
           });
         });
@@ -1465,7 +1475,9 @@ describe('Swimlane observer tests', () => {
               .checkBoard(board);
             new EqualityChecker()
               .cleanSwimlanes(NONE_FILTER_KEY)
-              .cleanSwimlaneTables('L-10', 'L-20', 'L-30')
+              .addChangedSwimlaneColumns('L-10', 0)
+              .addChangedSwimlaneColumns('L-20', 0, 1)
+              .addChangedSwimlaneColumns('L-30', 0, 1)
               .check(originalView, board);
           });
         });
@@ -1493,7 +1505,8 @@ describe('Swimlane observer tests', () => {
               .checkBoard(board);
             new EqualityChecker()
               .cleanSwimlanes(NONE_FILTER_KEY)
-              .cleanSwimlaneTables('c2-A', 'c2-B')
+              .addChangedSwimlaneColumns('c2-A', 0)
+              .addChangedSwimlaneColumns('c2-B', 1)
               .check(originalView, board);
           });
         });
@@ -1530,7 +1543,9 @@ describe('Swimlane observer tests', () => {
                 .checkBoard(board);
 
               new EqualityChecker()
-                .cleanSwimlanes('bob', NONE_FILTER_KEY, 'kabir')
+                .addChangedSwimlaneColumns('bob')
+                .addChangedSwimlaneColumns('kabir', 0, 1)
+                .addChangedSwimlaneColumns(NONE_FILTER_KEY)
                 .check(originalView, board);
             });
         });
@@ -1696,8 +1711,10 @@ describe('Swimlane observer tests', () => {
           {components: [1], 'fix-versions': [0], labels: [0, 1, 2], custom: {'Custom-2': 0}})
         .addIssue('ONE-3', 0,
           {components: [2], 'fix-versions': [1], labels: [0], custom: {'Custom-2': 0}})
-        .addIssue('ONE-4', 1, {components: [0, 1, 2], labels: [1], custom: {'Custom-2': 1}})
-        .addIssue('ONE-5', 1, {'fix-versions': [2], labels: [2]})
+        .addIssue('ONE-4', 1,
+          {components: [0, 1, 2], labels: [1], custom: {'Custom-2': 1}})
+        .addIssue('ONE-5', 1,
+          {'fix-versions': [2], labels: [2]})
     );
   }
 
@@ -1749,14 +1766,20 @@ class BoardChecker {
   checkBoard(board: BoardViewModel) {
     const issueTable: IssueTable = board.issueTable;
 
+    const invisibleIssueSet: Set<string> = Set<string>(this._expectedInvisible);
+    const expectedVisible: string[][] = this._expectedTable.map(
+      col => col.filter(k => !invisibleIssueSet.contains(k)))
+
+
     const actualTable: string[][] = [];
-    issueTable._old_table.forEach((v, i) => {
-      actualTable.push(issueTable._old_table.get(i).toArray());
+    issueTable.table.forEach((v, i) => {
+      actualTable.push(issueTable.table.get(i).map(issue => issue.key).toArray());
     });
-    expect(actualTable).toEqual(this._expectedTable);
+    expect(actualTable).toEqual(expectedVisible);
 
     // Check the size of the issues map
-    expect(issueTable.issues.size).toBe(this._expectedTable.map(issues => issues.length).reduce((s, c) => s + c));
+    expect(issueTable.issues.size).toBe(
+      this._expectedInvisible.length + expectedVisible.map(issues => issues.length).reduce((s, c) => s + c));
 
     // Check issue visibilities
     const invisibleKeys: string[] =
@@ -1764,7 +1787,6 @@ class BoardChecker {
     expect(invisibleKeys).toEqual(this._expectedInvisible.sort((a, b) => a.localeCompare(b)));
 
     // Check issue counts
-    const invisibleIssueSet: Set<string> = Set<string>(this._expectedInvisible);
     const totalIssueCounts: number[] = new Array<number>(this._expectedTable.length);
     const visibleIssueCounts: number[] = new Array<number>(this._expectedTable.length);
     for (let i = 0 ; i < this._expectedTable.length ; i++) {
@@ -1801,12 +1823,15 @@ class BoardChecker {
       const sl: SwimlaneData = slInfo.swimlanes.get(check.key);
 
       const expectedTable: string[][] = [];
-      issueTable._old_table.forEach((v, i) => {
-        expectedTable.push(issueTable._old_table.get(i).toArray().filter(key =>  checkIssueSet.contains(key)));
+      issueTable.table.forEach((v, i) => {
+        expectedTable.push(
+          issueTable.table.get(i).toArray()
+            .filter(issue =>  checkIssueSet.contains(issue.key))
+            .map(issue => issue.key));
       });
       const actualTable: string[][] = [];
-      sl._old_table.forEach((v, i) => {
-        actualTable.push(sl._old_table.get(i).toArray());
+      sl.table.forEach((v, i) => {
+        actualTable.push(sl.table.get(i).toArray().map(issue => issue.key));
       });
       expect(actualTable).toEqual(expectedTable);
       expect(sl.visibleIssues).toBe(check.issues.reduce((s, key) => issueTable.issues.get(key).visible ? s + 1 : s, 0));
@@ -1908,17 +1933,17 @@ class EqualityChecker {
     });
     unchangedSwimlaneTables.forEach(k => {
       expect(curr.swimlanes.get(k)).toBeTruthy();
-      expect(curr.swimlanes.get(k)._old_table).toBe(old.swimlanes.get(k)._old_table, `Different swimlane table: ${k}`);
+      expect(curr.swimlanes.get(k).table).toBe(old.swimlanes.get(k).table, `Different swimlane table: ${k}`);
       expect(curr.swimlanes.get(k)).not.toBe(old.swimlanes.get(k), `Same swimlane: ${k}`);
     });
     changedSwimlaneColumns.forEach((changedColumns, k) => {
       expect(curr.swimlanes.get(k)).toBeTruthy();
-      const oldSlTable: List<List<string>> = old.swimlanes.get(k) ? old.swimlanes.get(k)._old_table : null;
-      const newTable: List<List<string>> = curr.swimlanes.get(k)._old_table;
+      const oldSlTable: List<List<BoardIssueView>> = old.swimlanes.get(k) ? old.swimlanes.get(k).table : null;
+      const newTable: List<List<BoardIssueView>> = curr.swimlanes.get(k).table;
       const expectedChanged: Set<number> = Set<number>(changedColumns);
       for (let i = 0 ; i < newTable.size ; i++) {
-        const oldCol: List<string> = oldSlTable ? oldSlTable.get(i) : null;
-        const newCol: List<string> = newTable.get(i);
+        const oldCol: List<BoardIssueView> = oldSlTable ? oldSlTable.get(i) : null;
+        const newCol: List<BoardIssueView> = newTable.get(i);
         if (expectedChanged.contains(i)) {
           expect(oldCol).not.toBe(newCol, `Column ${i} of ${k} should not have been the same`);
         } else {

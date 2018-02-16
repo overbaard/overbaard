@@ -14,6 +14,7 @@ import {Dictionary} from '../../common/dictionary';
 import {BoardViewModel} from './board-view';
 import {BoardHeader} from './board-header';
 import {initialIssueDetailState} from '../../model/board/user/issue-detail/issue-detail.model';
+import {BoardIssueView} from './board-issue-view';
 
 describe('Issue Table observer tests', () => {
 
@@ -321,11 +322,21 @@ describe('Issue Table observer tests', () => {
                 checker.rankOrder('ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6', 'ONE-7');
               }
               checker.checkBoard(board);
-              expect(board.issueTable._old_table).toBe(original.issueTable._old_table);
+              expect(board.issueTable.table).not.toBe(original.issueTable.table);
+              checkSameColumns(original, board, 0, 2, 3);
+              const issue: BoardIssueView = board.issueTable.issues.get('ONE-2');
+              expect(issue.summary).toEqual('Test summary');
               if (rank) {
-                expect(board.issueTable.rankView).toBe(original.issueTable.rankView);
+                expect(board.issueTable.rankView).not.toBe(original.issueTable.rankView);
+                let foundRankedIssue: BoardIssueView = null;
+                board.issueTable.rankView.forEach(re => {
+                  if (re.issue.key === 'ONE-2') {
+                    foundRankedIssue = re.issue;
+                  }
+                });
+                expect(foundRankedIssue).toBe(issue);
               }
-              expect(board.issueTable.issues.get('ONE-2').summary).toEqual('Test summary');
+              expect(board.issueTable.table.get(1).get(0)).toBe(issue);
               expect(board.headers).toBe(board.headers);
             });
         }
@@ -549,7 +560,7 @@ describe('Issue Table observer tests', () => {
               board => {
                 // Everything should be the same in the issue table and headers
                 if (rank) {
-                  expect(board.issueTable._old_table).toBe(original.issueTable._old_table);
+                  expect(board.issueTable.table).toBe(original.issueTable.table);
                   new BoardChecker([['ONE-1'], ['ONE-2'], ['ONE-3', 'ONE-5', 'ONE-6'], ['ONE-4', 'ONE-7']])
                     .rankOrder('ONE-3', 'ONE-1', 'ONE-2', 'ONE-4', 'ONE-5', 'ONE-6', 'ONE-7')
                     .checkBoard(board);
@@ -973,7 +984,7 @@ describe('Switch View Mode (effect on Backlog) Tests', () => {
             .rankOrder('ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6')
             .checkBoard(board);
           expect(board).not.toBe(last);
-          expect(board.issueTable._old_table).toBe(last.issueTable._old_table);
+          expect(board.issueTable.table).toBe(last.issueTable.table);
           last = board;
         });
 
@@ -985,7 +996,7 @@ describe('Switch View Mode (effect on Backlog) Tests', () => {
           new BoardChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
             .checkBoard(board);
           expect(board).not.toBe(last);
-          expect(board.issueTable._old_table).toBe(last.issueTable._old_table);
+          expect(board.issueTable.table).toBe(last.issueTable.table);
           last = board;
         });
       });
@@ -1113,14 +1124,14 @@ describe('Switch View Mode (effect on Backlog) Tests', () => {
 });
 
 function checkSameColumns(oldState: BoardViewModel, newState: BoardViewModel, ...cols: number[]) {
-  const oldTable: List<List<string>> = oldState.issueTable._old_table;
-  const newTable: List<List<string>> = newState.issueTable._old_table;
+  const oldTable: List<List<BoardIssueView>> = oldState.issueTable.table;
+  const newTable: List<List<BoardIssueView>> = newState.issueTable.table;
 
   const expectedEqual: OrderedSet<number> = OrderedSet<number>(cols);
   expect(oldTable.size).toBe(newTable.size);
   for (let i = 0 ; i < oldTable.size ; i++) {
-    const oldCol: List<string> = oldTable.get(i);
-    const newCol: List<string> = newTable.get(i);
+    const oldCol: List<BoardIssueView> = oldTable.get(i);
+    const newCol: List<BoardIssueView> = newTable.get(i);
     if (expectedEqual.contains(i)) {
       expect(oldCol).toBe(newCol, 'Column ' + i);
     } else {
@@ -1212,19 +1223,25 @@ class BoardChecker {
   }
 
   checkBoard(board: BoardViewModel) {
+    // Get rid of all the invisible issues from the 'expected' table
+    const invisibleIssueSet: Set<string> = Set<string>(this._invisibleIssues);
+    const expectedVisible: string[][] = this._expected.map(
+      col => col.filter(k => !invisibleIssueSet.contains(k)))
+
     // We are not changing the issue details in this test
     expect(board.issueDetail).toBe(initialIssueDetailState);
 
     const issueTable: IssueTable = board.issueTable;
-
+    // Convert the issue table to a string[][]
     const actualTable: string[][] = [];
-    issueTable._old_table.forEach((v, i) => {
-      actualTable.push(issueTable._old_table.get(i).toArray());
+    issueTable.table.forEach((v, i) => {
+      actualTable.push(issueTable.table.get(i).map(issue => issue.key).toArray());
     });
-    expect(actualTable).toEqual(this._expected);
+    expect(actualTable).toEqual(expectedVisible);
 
     // Check the size of the issues map
-    expect(issueTable.issues.size).toBe(this._expected.map(issues => issues.length).reduce((s, c) => s + c));
+    expect(issueTable.issues.size).toBe(
+      this._invisibleIssues.length + expectedVisible.map(issues => issues.length).reduce((s, c) => s + c));
 
     // Check issue visibilities
     const invisibleKeys: string[] =
@@ -1232,7 +1249,6 @@ class BoardChecker {
     expect(invisibleKeys).toEqual(this._invisibleIssues.sort((a, b) => a.localeCompare(b)));
 
     // Check issue counts
-    const invisibleIssueSet: Set<string> = Set<string>(this._invisibleIssues);
     const totalIssueCounts: number[] = new Array<number>(this._expected.length);
     const visibleIssueCounts: number[] = new Array<number>(this._expected.length);
     for (let i = 0 ; i < this._expected.length ; i++) {
@@ -1248,13 +1264,14 @@ class BoardChecker {
     if (!this._rankOrder) {
       expect(issueTable.rankView.size).toBe(0);
     } else {
+      const expectedVisibleRank: string[] = this._rankOrder.filter(k => !invisibleIssueSet.contains(k));
       // Work out the board index from the issue table
       const issueDictionary: Dictionary<number> = {}
-      issueTable._old_table.forEach((state, boardIndex) => {
-        state.forEach(issueKey => issueDictionary[issueKey] = boardIndex);
+      issueTable.table.forEach((state, boardIndex) => {
+        state.forEach(issue => issueDictionary[issue.key] = boardIndex);
       });
-      expect(issueTable.rankView.map(re => re.issueKey).toArray()).toEqual(this._rankOrder);
-      issueTable.rankView.forEach(re => expect(re.boardIndex).toBe((issueDictionary[re.issueKey])));
+      expect(issueTable.rankView.map(re => re.issue.key).toArray()).toEqual(expectedVisibleRank);
+      issueTable.rankView.forEach(re => expect(re.boardIndex).toBe((issueDictionary[re.issue.key])));
     }
   }
 

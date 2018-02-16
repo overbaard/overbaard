@@ -11,7 +11,7 @@ import {IssueSummaryLevel} from '../../../../../model/board/user/issue-summary-l
 import {IssueDetailState} from '../../../../../model/board/user/issue-detail/issue-detail.model';
 
 @Component({
-  selector: 'app-kanban-view-column-group]',
+  selector: 'app-kanban-view-column-group',
   templateUrl: './kanban-view-column-group.component.html',
   styleUrls: ['./kanban-view-column-group.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush

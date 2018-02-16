@@ -38,8 +38,9 @@ const DEFAULT_BOARD_HEADER: BoardHeader = {
 
 const DEFAULT_ISSUE_TABLE: IssueTable = {
   issues: Map<string, BoardIssueView>(),
+  totalIssues: List<number>(),
+  visibleIssues: List<number>(),
   rankView: List<RankViewEntry>(),
-  _old_table: List<List<string>>(),
   table: List<List<BoardIssueView>>(),
   swimlaneInfo: null
 };
@@ -52,7 +53,6 @@ const DEFAULT_SWIMLANE_INFO: SwimlaneInfo = {
 const DEFAULT_SWIMLANE_DATA: SwimlaneData = {
   key: null,
   display: null,
-  _old_table: List<List<string>>(),
   table: List<List<BoardIssueView>>(),
   visibleIssues: 0,
   filterVisible: true,
@@ -60,7 +60,7 @@ const DEFAULT_SWIMLANE_DATA: SwimlaneData = {
 };
 
 const DEFAULT_RANK_VIEW_ENTRY: RankViewEntry = {
-  issueKey: null,
+  issue: null,
   boardIndex: 0
 }
 
@@ -146,15 +146,17 @@ export class BoardViewModelUtil {
 
   static createIssueTable(
     issues: Map<string, BoardIssueView>,
+    totalIssues: List<number>,
+    visibleIssues: List<number>,
     rankView: List<RankViewEntry>,
-    _old_style_tableList: List<List<string>>,
     tableList: List<List<BoardIssueView>>,
     swimlaneInfo: SwimlaneInfo): IssueTable {
 
     const state: IssueTable = {
       issues: issues,
+      totalIssues,
+      visibleIssues,
       rankView: rankView,
-      _old_table: _old_style_tableList,
       table: tableList,
       swimlaneInfo: swimlaneInfo
     };
@@ -164,7 +166,6 @@ export class BoardViewModelUtil {
   static createSwimlaneDataView(
     key: string,
     display: string,
-    _old_style_table: List<List<string>>,
     table: List<List<BoardIssueView>>,
     visibleIssues: number,
     filterVisible: boolean,
@@ -172,12 +173,11 @@ export class BoardViewModelUtil {
     const state: SwimlaneData = {
       key: key,
       display: display,
-      _old_table: _old_style_table,
       table: table,
       visibleIssues: visibleIssues,
       filterVisible: filterVisible,
       collapsed: collapsed
-    }
+    };
     return SWIMLANE_DATA_STATE_FACTORY(state);
   }
 
@@ -189,7 +189,7 @@ export class BoardViewModelUtil {
     return SWIMLANE_INFO_STATE_FACTORY(state);
   }
 
-  static createRankViewEntry(key: string, boardIndex: number) {
-    return RANK_VIEW_ENTRY_RECORD({issueKey: key, boardIndex: boardIndex});
+  static createRankViewEntry(issue: BoardIssueView, boardIndex: number) {
+    return RANK_VIEW_ENTRY_RECORD({issue: issue, boardIndex: boardIndex});
   }
 }

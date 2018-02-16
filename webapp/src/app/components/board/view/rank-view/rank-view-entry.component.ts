@@ -16,9 +16,6 @@ export class RankViewEntryComponent implements OnInit {
   @Input()
   rankEntry: RankViewEntry
 
-  @Input()
-  issue: BoardIssueView;
-
   // Just an array here to be able to do 'for s of states; let i = index' in the template
   @Input()
   statesDummyArray: number[];

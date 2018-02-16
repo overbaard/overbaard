@@ -5,9 +5,13 @@ import {BoardViewMode} from '../../model/board/user/board-view-mode';
 import {RankViewEntry} from './rank-view-entry';
 
 export interface IssueTable {
+  // Fields for internal state tracking, should not be used by the UI
   issues: Map<string, BoardIssueView>;
+  totalIssues: List<number>;
+  visibleIssues: List<number>;
+
+  // Fields used by the UI
   rankView: List<RankViewEntry>;
-  _old_table: List<List<string>>;
   table: List<List<BoardIssueView>>;
   swimlaneInfo: SwimlaneInfo;
 }

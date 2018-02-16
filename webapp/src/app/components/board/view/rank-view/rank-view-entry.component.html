@@ -1,8 +1,7 @@
-<div class="rank-line"
-  *ngIf="issue.visible">
+<div class="rank-line">
   <div class="rank-issue">
     <app-board-issue
-      [issue]="issue"
+      [issue]="rankEntry.issue"
       [viewMode]="rankViewMode"
       [issueDetailState]="issueDetailState"
       (updateParallelTask)="onUpdateParallelTask($event)"

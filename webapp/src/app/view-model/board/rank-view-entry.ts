@@ -1,4 +1,6 @@
+import {BoardIssueView} from './board-issue-view';
+
 export interface RankViewEntry {
-  issueKey: string;
+  issue: BoardIssueView;
   boardIndex: number;
 }

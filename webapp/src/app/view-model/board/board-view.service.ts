@@ -154,7 +154,7 @@ class BoardViewBuilder {
         this._lastUserSettingState, this._currentUserSettingState);
     const issueTable: IssueTable = issueTableBuilder.build();
 
-    headersBuilder.updateIssueHeaderCounts(issueTable, issueTableBuilder.visibleIssueCounts);
+    headersBuilder.updateIssueHeaderCounts(issueTableBuilder.totalIssueCounts, issueTableBuilder.visibleIssueCounts);
 
     const newHeaders: BoardHeaders = headersBuilder.build();
     const newIssueDetail: IssueDetailState = this._currentUserSettingState.issueDetail;
@@ -304,7 +304,7 @@ class HeadersBuilder {
     });
   }
 
-  updateIssueHeaderCounts(issueTable: IssueTable, visibleIssueCounts: List<number>): HeadersBuilder {
+  updateIssueHeaderCounts(totalIssueCounts: List<number>, visibleIssueCounts: List<number>): HeadersBuilder {
     switch (this._changeType) {
       case ChangeType.UPDATE_BOARD:
       case ChangeType.UPDATE_BOARD_AFTER_BACKLOG_TOGGLE:
@@ -318,7 +318,7 @@ class HeadersBuilder {
     const statesList: List<BoardHeader> = this.flattenHeaders();
     const updatedStates: Map<number, BoardHeader> = Map<number, BoardHeader>().asMutable();
     statesList.forEach((h, i) => {
-      const newTotal = issueTable._old_table.get(i).size;
+      const newTotal = totalIssueCounts.get(i);
       const newVisible = visibleIssueCounts.get(i);
 
       if (newTotal !== h.totalIssues || newVisible !== h.visibleIssues) {
@@ -496,13 +496,13 @@ function abbreviate(str: string): string {
 }
 
 class IssueTableBuilder {
-  private _visibleIssueCounts: List<number>;
-
   // Initialised in createTableAndRankView
   private _rankView: List<RankViewEntry>;
   private _old_style_table: List<List<string>>;
   private _table: List<List<BoardIssueView>>;
 
+  private _totalIssueCounts: List<number>;
+  private _visibleIssueCounts: List<number>;
 
   // Just a throwaway lookup so don't bother making this immutable
   private _ownStateNames: Dictionary<string[]> = {};
@@ -514,8 +514,13 @@ class IssueTableBuilder {
     private readonly _currentBoardState: BoardState,
     private readonly _oldUserSettingState: UserSettingState,
     private readonly _currentUserSettingState: UserSettingState) {
-    this._old_style_table = _oldIssueTableState._old_table;
+    this._table = _oldIssueTableState.table;
     this._rankView = _oldIssueTableState.rankView;
+
+  }
+
+  get totalIssueCounts(): List<number> {
+    return this._totalIssueCounts;
   }
 
   get visibleIssueCounts(): List<number> {
@@ -528,22 +533,21 @@ class IssueTableBuilder {
 
     this.createTableAndRankView(issues);
 
-    this._visibleIssueCounts = this.calculateVisibleIssueCounts(issues, this._old_style_table);
-    const swimlaneInfo: SwimlaneInfo = this.calculateSwimlane(issues, this._old_style_table);
+    const swimlaneInfo: SwimlaneInfo = this.calculateSwimlane(this._table);
     if (issues === this._oldIssueTableState.issues &&
-      this._old_style_table === this._oldIssueTableState._old_table &&
+      this._table === this._oldIssueTableState.table &&
       this._rankView === this._oldIssueTableState.rankView &&
       swimlaneInfo === this._oldIssueTableState.swimlaneInfo) {
       return this._oldIssueTableState;
     }
 
-
-    // Debug logging
-    // if (this._table) {
-    //   console.log(this._table.map(col => col.map(issue => issue.key).toArray()).toArray());
-    // }
-
-    return BoardViewModelUtil.createIssueTable(issues, this._rankView, this._old_style_table, this._table, swimlaneInfo);
+    return BoardViewModelUtil.createIssueTable(
+      issues,
+      this._totalIssueCounts,
+      this._visibleIssueCounts,
+      this._rankView,
+      this._table,
+      swimlaneInfo);
   }
 
   private populateIssues(): Map<string, BoardIssueView> {
@@ -649,35 +653,41 @@ class IssueTableBuilder {
       case ChangeType.CHANGE_COLUMN_VISIBILITY:
       case ChangeType.TOGGLE_SWIMLANE_COLLAPSED:
       case ChangeType.UPDATE_ISSUE_DETAIL:
+        this._totalIssueCounts = this._oldIssueTableState.totalIssues;
+        this._visibleIssueCounts = this._oldIssueTableState.visibleIssues;
         return;
     }
 
     const viewMode: BoardViewMode = this._currentUserSettingState.viewMode;
-    const _oldTable: List<List<string>> = this._changeType === ChangeType.LOAD_BOARD ? null : this._oldIssueTableState._old_table;
     const oldTable: List<List<BoardIssueView>> = this._changeType === ChangeType.LOAD_BOARD ? null : this._oldIssueTableState.table;
     const oldRank: List<RankViewEntry> = this._changeType === ChangeType.LOAD_BOARD ? null : this._oldIssueTableState.rankView;
 
+    const statesSize = this._currentBoardState.headers.states.size;
     // We always need this since the issue table is used to calculate the total issues
-    const _old_style_tableBuilder: TableBuilder<string> =
-      new TableBuilder<string>(this._currentBoardState.headers.states.size, _oldTable);
     const tableBuilder: TableBuilder<BoardIssueView> =
-      new TableBuilder<BoardIssueView>(this._currentBoardState.headers.states.size, oldTable);
+      new TableBuilder<BoardIssueView>(statesSize, oldTable);
     // Only calculate the rank view if we have that viewMode
     const rankViewBuilder: RankViewBuilder = viewMode === BoardViewMode.RANK ? new RankViewBuilder(oldRank) : null;
 
+    const totalIssues: number[] = [];
+    const visibleIssues: number[] = [];
+    for (let i = 0 ; i < statesSize ; i++) {
+      totalIssues.push(0);
+      visibleIssues.push(0);
+    }
+
+    const mainProj: BoardProject = this._currentBoardState.projects.boardProjects.get(this._currentBoardState.projects.owner);
     this.addProjectIssues(
-      issues,
-      _old_style_tableBuilder,
-      tableBuilder,
-      rankViewBuilder,
-      this._currentBoardState.projects.boardProjects.get(this._currentBoardState.projects.owner));
+      issues, totalIssues, visibleIssues, tableBuilder, rankViewBuilder, mainProj);
     this._currentBoardState.projects.boardProjects.forEach((project, key) => {
       if (key !== this._currentBoardState.projects.owner) {
-        this.addProjectIssues(issues, _old_style_tableBuilder, tableBuilder, rankViewBuilder, project);
+        this.addProjectIssues(issues, totalIssues, visibleIssues, tableBuilder, rankViewBuilder, project);
       }
     });
 
-    this._old_style_table = _old_style_tableBuilder.build();
+    this._totalIssueCounts = List<number>(totalIssues);
+    this._visibleIssueCounts = List<number>(visibleIssues);
+
     this._table = tableBuilder.build();
     this._rankView = rankViewBuilder ? rankViewBuilder.getRankView() : initialIssueTable.rankView;
     return issues;
@@ -685,7 +695,8 @@ class IssueTableBuilder {
 
   private addProjectIssues(
       issues: Map<string, BoardIssueView>,
-      _old_tableBuilder: TableBuilder<string>,
+      totalIssues: number[],
+      visibleIssues: number[],
       tableBuilder: TableBuilder<BoardIssueView>,
       rankViewBuilder: RankViewBuilder,
       project: BoardProject) {
@@ -699,32 +710,18 @@ class IssueTableBuilder {
       const issue: BoardIssueView = issues.get(key);
       // find the index and add the issue
       const boardIndex: number = ownToBoardIndex[issue.ownState];
-      _old_tableBuilder.push(boardIndex, key);
+      totalIssues[boardIndex] += 1;
       if (issue.visible) {
         tableBuilder.push(boardIndex, issue);
-      }
-      if (rankViewBuilder) {
-        rankViewBuilder.push(boardIndex, key);
+        visibleIssues[boardIndex] += 1;
+        if (rankViewBuilder) {
+          rankViewBuilder.push(boardIndex, issue);
+        }
       }
     });
   }
 
-  private calculateVisibleIssueCounts(issues: Map<string, BoardIssueView>, table: List<List<string>>): List<number> {
-    const visibilities: List<number> = List<number>().withMutations(mutable => {
-      table.forEach(issueKeys => {
-        let visible = 0;
-        issueKeys.forEach(key => {
-          if (issues.get(key).visible) {
-            visible += 1;
-          }
-        });
-        mutable.push(visible);
-      });
-    });
-    return visibilities;
-  }
-
-  private calculateSwimlane(issues: Map<string, BoardIssueView>, table: List<List<string>>): SwimlaneInfo {
+  private calculateSwimlane(table: List<List<BoardIssueView>>): SwimlaneInfo {
     if (!this._currentUserSettingState.swimlane) {
       return null;
     }
@@ -755,7 +752,7 @@ class IssueTableBuilder {
     }
 
     if (swimlaneBuilder) {
-      this.populateSwimlanes(swimlaneBuilder, issues, table);
+      this.populateSwimlanes(swimlaneBuilder, table);
       swimlaneBuilder.applySwimlaneFilters();
 
       return swimlaneBuilder.build();
@@ -764,11 +761,10 @@ class IssueTableBuilder {
   }
 
   private populateSwimlanes(swimlaneBuilder: SwimlaneInfoBuilder,
-                            issues: Map<string, BoardIssueView>, table: List<List<string>>): SwimlaneInfoBuilder {
+                            table: List<List<BoardIssueView>>): SwimlaneInfoBuilder {
     for (let i = 0 ; i < table.size ; i++) {
-      const column: List<string> = table.get(i);
-      column.forEach(key => {
-        const issue: BoardIssueView = issues.get(key);
+      const column: List<BoardIssueView> = table.get(i);
+      column.forEach(issue => {
         swimlaneBuilder.indexIssue(issue, i);
       });
     }
@@ -1005,21 +1001,19 @@ class SwimlaneInfoBuilder {
 
 class SwimlaneDataBuilder {
   private readonly _existing: SwimlaneData;
-  private readonly _old_style_tableBuilder: TableBuilder<string>;
   private readonly _tableBuilder: TableBuilder<BoardIssueView>;
   private _visibleIssuesCount = 0;
   filterVisible = true;
+  private _table: List<List<BoardIssueView>>;
 
 
   constructor(private readonly _key: string, private readonly _display: string,
               states: number, private _collapsed: boolean, exisitingInfo: SwimlaneInfo) {
     this._existing = exisitingInfo ? exisitingInfo.swimlanes.get(_key) : null;
-    this._old_style_tableBuilder = new TableBuilder(states, this._existing ? this._existing._old_table : null);
     this._tableBuilder = new TableBuilder<BoardIssueView>(states, this._existing ? this._existing.table : null);
   }
 
   addIssue(issue: BoardIssueView, boardIndex: number) {
-    this._old_style_tableBuilder.push(boardIndex, issue.key);
     if (issue.visible) {
       this._tableBuilder.push(boardIndex, issue);
       this._visibleIssuesCount++;
@@ -1027,7 +1021,10 @@ class SwimlaneDataBuilder {
   }
 
   get table() {
-    return this._old_style_tableBuilder.build();
+    if (!this._table) {
+      this._table = this._tableBuilder.build();
+    }
+    return this._table;
   }
 
   get key(): string {
@@ -1047,7 +1044,7 @@ class SwimlaneDataBuilder {
     }
     return this._key !== this._existing.key ||
       this._display !== this._existing.display ||
-      this.table !== this._existing._old_table ||
+      this.table !== this._existing.table ||
       this._visibleIssuesCount !== this._existing.visibleIssues;
   }
 
@@ -1063,7 +1060,6 @@ class SwimlaneDataBuilder {
   }
 
   build(): SwimlaneData {
-    const table: List<List<string>> = this._old_style_tableBuilder.build();
     if (this._existing) {
       if (!this.isChanged()) {
         return this._existing;
@@ -1072,12 +1068,11 @@ class SwimlaneDataBuilder {
     return BoardViewModelUtil.createSwimlaneDataView(
       this._key,
       this._display,
-      this._old_style_tableBuilder.build(),
       this._tableBuilder.build(),
       this._visibleIssuesCount,
       this.filterVisible,
       this._collapsed);
-  }
+  };
 
   updateCollapsed() {
     // This code path is only used when the swimlanes have been populated already. So if the visibility was changed we need
@@ -1215,15 +1210,15 @@ class RankViewBuilder {
     } else {
       this._currentMap =
         this._existing.reduce(
-          (map, entry) => map.set(entry.issueKey, entry), Map<string, RankViewEntry>());
+          (map, entry) => map.set(entry.issue.key, entry), Map<string, RankViewEntry>());
     }
   }
 
-  push(boardIndex: number, key: string): RankViewBuilder {
+  push(boardIndex: number, issue: BoardIssueView): RankViewBuilder {
     let entry: RankViewEntry = null;
     if (!this._changed) {
       const existing: RankViewEntry = this._existing.get(this._currentIndex);
-      if (existing && existing.issueKey === key && existing.boardIndex === boardIndex) {
+      if (existing && existing.issue === issue && existing.boardIndex === boardIndex) {
         entry = existing;
         this._currentIndex++;
       } else {
@@ -1231,9 +1226,9 @@ class RankViewBuilder {
       }
     }
     if (!entry) {
-      entry = this._currentMap.get(key);
-      if (!entry || entry.boardIndex !== boardIndex) {
-        entry = BoardViewModelUtil.createRankViewEntry(key, boardIndex);
+      entry = this._currentMap.get(issue.key);
+      if (!entry || (entry.issue !== issue || entry.boardIndex !== boardIndex)) {
+        entry = BoardViewModelUtil.createRankViewEntry(issue, boardIndex);
       }
     }
     this._current.push(entry);
