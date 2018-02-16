@@ -677,8 +677,8 @@ class IssueTableBuilder {
       }
     });
 
-    this._old_style_table = _old_style_tableBuilder.getTable();
-    this._table = tableBuilder.getTable();
+    this._old_style_table = _old_style_tableBuilder.build();
+    this._table = tableBuilder.build();
     this._rankView = rankViewBuilder ? rankViewBuilder.getRankView() : initialIssueTable.rankView;
     return issues;
   }
@@ -1027,7 +1027,7 @@ class SwimlaneDataBuilder {
   }
 
   get table() {
-    return this._old_style_tableBuilder.getTable();
+    return this._old_style_tableBuilder.build();
   }
 
   get key(): string {
@@ -1063,7 +1063,7 @@ class SwimlaneDataBuilder {
   }
 
   build(): SwimlaneData {
-    const table: List<List<string>> = this._old_style_tableBuilder.getTable();
+    const table: List<List<string>> = this._old_style_tableBuilder.build();
     if (this._existing) {
       if (!this.isChanged()) {
         return this._existing;
@@ -1072,8 +1072,8 @@ class SwimlaneDataBuilder {
     return BoardViewModelUtil.createSwimlaneDataView(
       this._key,
       this._display,
-      this._old_style_tableBuilder.getTable(),
-      this._tableBuilder.getTable(),
+      this._old_style_tableBuilder.build(),
+      this._tableBuilder.build(),
       this._visibleIssuesCount,
       this.filterVisible,
       this._collapsed);
@@ -1111,7 +1111,7 @@ class TableBuilder<T> {
     this._current[index].push(value);
   }
 
-  getTable(): List<List<T>> {
+  build(): List<List<T>> {
     if (!this._existing) {
       return List<List<T>>().withMutations(mutable => {
         for (const column of this._current) {
