@@ -25,8 +25,7 @@
     <app-kanban-view-column-group
       *ngFor="let header of board.headers.headersList ; trackBy: columnTrackByFn"
       [header]="header"
-      [issues]="board.issueTable.issues"
-      [table]="swimlane._old_table"
+      [table]="swimlane.table"
       [issueDetailState]="issueDetailState"
       [displayIssues]="!swimlane.collapsed"
       (updateParallelTask)="onUpdateParallelTask($event)"

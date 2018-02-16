@@ -22,10 +22,7 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
   header: BoardHeader;
 
   @Input()
-  issues: Map<string, BoardIssueView>;
-
-  @Input()
-  issueKeys: List<string>;
+  issues: List<BoardIssueView>;
 
   @Input()
   issueDetailState: IssueDetailState;
@@ -58,8 +55,8 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
   }
 
   // trackBy is a hint to angular to be able to keep (i.e. don't destroy and recreate) as many components as possible
-  issueTrackByFn(index: number, key: string) {
-    return key;
+  issueTrackByFn(index: number, issue: BoardIssueView) {
+    return issue.key;
   }
 
   onUpdateParallelTask(event: UpdateParallelTaskEvent) {

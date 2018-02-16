@@ -22,10 +22,7 @@ export class KanbanViewColumnGroupComponent implements OnInit, OnChanges {
   header: BoardHeader;
 
   @Input()
-  issues: Map<string, BoardIssueView>;
-
-  @Input()
-  table: List<List<string>>;
+  table: List<List<BoardIssueView>>;
 
   @Input()
   issueDetailState: IssueDetailState;
