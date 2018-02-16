@@ -1805,8 +1805,8 @@ class BoardChecker {
         expectedTable.push(issueTable._old_table.get(i).toArray().filter(key =>  checkIssueSet.contains(key)));
       });
       const actualTable: string[][] = [];
-      sl.table.forEach((v, i) => {
-        actualTable.push(sl.table.get(i).toArray());
+      sl._old_table.forEach((v, i) => {
+        actualTable.push(sl._old_table.get(i).toArray());
       });
       expect(actualTable).toEqual(expectedTable);
       expect(sl.visibleIssues).toBe(check.issues.reduce((s, key) => issueTable.issues.get(key).visible ? s + 1 : s, 0));
@@ -1908,13 +1908,13 @@ class EqualityChecker {
     });
     unchangedSwimlaneTables.forEach(k => {
       expect(curr.swimlanes.get(k)).toBeTruthy();
-      expect(curr.swimlanes.get(k).table).toBe(old.swimlanes.get(k).table, `Different swimlane table: ${k}`);
+      expect(curr.swimlanes.get(k)._old_table).toBe(old.swimlanes.get(k)._old_table, `Different swimlane table: ${k}`);
       expect(curr.swimlanes.get(k)).not.toBe(old.swimlanes.get(k), `Same swimlane: ${k}`);
     });
     changedSwimlaneColumns.forEach((changedColumns, k) => {
       expect(curr.swimlanes.get(k)).toBeTruthy();
-      const oldSlTable: List<List<string>> = old.swimlanes.get(k) ? old.swimlanes.get(k).table : null;
-      const newTable: List<List<string>> = curr.swimlanes.get(k).table;
+      const oldSlTable: List<List<string>> = old.swimlanes.get(k) ? old.swimlanes.get(k)._old_table : null;
+      const newTable: List<List<string>> = curr.swimlanes.get(k)._old_table;
       const expectedChanged: Set<number> = Set<number>(changedColumns);
       for (let i = 0 ; i < newTable.size ; i++) {
         const oldCol: List<string> = oldSlTable ? oldSlTable.get(i) : null;

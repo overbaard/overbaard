@@ -658,8 +658,10 @@ class IssueTableBuilder {
     const oldRank: List<RankViewEntry> = this._changeType === ChangeType.LOAD_BOARD ? null : this._oldIssueTableState.rankView;
 
     // We always need this since the issue table is used to calculate the total issues
-    const _old_style_tableBuilder: TableBuilder<string> = new TableBuilder(this._currentBoardState.headers.states.size, _oldTable);
-    const tableBuilder: TableBuilder<BoardIssueView> = new TableBuilder(this._currentBoardState.headers.states.size, oldTable);
+    const _old_style_tableBuilder: TableBuilder<string> =
+      new TableBuilder<string>(this._currentBoardState.headers.states.size, _oldTable);
+    const tableBuilder: TableBuilder<BoardIssueView> =
+      new TableBuilder<BoardIssueView>(this._currentBoardState.headers.states.size, oldTable);
     // Only calculate the rank view if we have that viewMode
     const rankViewBuilder: RankViewBuilder = viewMode === BoardViewMode.RANK ? new RankViewBuilder(oldRank) : null;
 
@@ -1003,7 +1005,8 @@ class SwimlaneInfoBuilder {
 
 class SwimlaneDataBuilder {
   private readonly _existing: SwimlaneData;
-  private readonly _tableBuilder: TableBuilder<string>;
+  private readonly _old_style_tableBuilder: TableBuilder<string>;
+  private readonly _tableBuilder: TableBuilder<BoardIssueView>;
   private _visibleIssuesCount = 0;
   filterVisible = true;
 
@@ -1011,18 +1014,20 @@ class SwimlaneDataBuilder {
   constructor(private readonly _key: string, private readonly _display: string,
               states: number, private _collapsed: boolean, exisitingInfo: SwimlaneInfo) {
     this._existing = exisitingInfo ? exisitingInfo.swimlanes.get(_key) : null;
-    this._tableBuilder = new TableBuilder(states, this._existing ? this._existing.table : null);
+    this._old_style_tableBuilder = new TableBuilder(states, this._existing ? this._existing._old_table : null);
+    this._tableBuilder = new TableBuilder<BoardIssueView>(states, this._existing ? this._existing.table : null);
   }
 
   addIssue(issue: BoardIssueView, boardIndex: number) {
-    this._tableBuilder.push(boardIndex, issue.key);
+    this._old_style_tableBuilder.push(boardIndex, issue.key);
     if (issue.visible) {
+      this._tableBuilder.push(boardIndex, issue);
       this._visibleIssuesCount++;
     }
   }
 
   get table() {
-    return this._tableBuilder.getTable();
+    return this._old_style_tableBuilder.getTable();
   }
 
   get key(): string {
@@ -1042,7 +1047,7 @@ class SwimlaneDataBuilder {
     }
     return this._key !== this._existing.key ||
       this._display !== this._existing.display ||
-      this.table !== this._existing.table ||
+      this.table !== this._existing._old_table ||
       this._visibleIssuesCount !== this._existing.visibleIssues;
   }
 
@@ -1058,14 +1063,20 @@ class SwimlaneDataBuilder {
   }
 
   build(): SwimlaneData {
-    const table: List<List<string>> = this._tableBuilder.getTable();
+    const table: List<List<string>> = this._old_style_tableBuilder.getTable();
     if (this._existing) {
       if (!this.isChanged()) {
         return this._existing;
       }
     }
     return BoardViewModelUtil.createSwimlaneDataView(
-      this._key, this._display, this._tableBuilder.getTable(), this._visibleIssuesCount, this.filterVisible, this._collapsed);
+      this._key,
+      this._display,
+      this._old_style_tableBuilder.getTable(),
+      this._tableBuilder.getTable(),
+      this._visibleIssuesCount,
+      this.filterVisible,
+      this._collapsed);
   }
 
   updateCollapsed() {

@@ -26,7 +26,7 @@
       *ngFor="let header of board.headers.headersList ; trackBy: columnTrackByFn"
       [header]="header"
       [issues]="board.issueTable.issues"
-      [table]="swimlane.table"
+      [table]="swimlane._old_table"
       [issueDetailState]="issueDetailState"
       [displayIssues]="!swimlane.collapsed"
       (updateParallelTask)="onUpdateParallelTask($event)"
