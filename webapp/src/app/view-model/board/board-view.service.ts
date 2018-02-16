@@ -318,7 +318,7 @@ class HeadersBuilder {
     const statesList: List<BoardHeader> = this.flattenHeaders();
     const updatedStates: Map<number, BoardHeader> = Map<number, BoardHeader>().asMutable();
     statesList.forEach((h, i) => {
-      const newTotal = issueTable.table.get(i).size;
+      const newTotal = issueTable._table.get(i).size;
       const newVisible = visibleIssueCounts.get(i);
 
       if (newTotal !== h.totalIssues || newVisible !== h.visibleIssues) {
@@ -514,7 +514,7 @@ class IssueTableBuilder {
     private readonly _currentBoardState: BoardState,
     private readonly _oldUserSettingState: UserSettingState,
     private readonly _currentUserSettingState: UserSettingState) {
-    this._table = _oldIssueTableState.table;
+    this._table = _oldIssueTableState._table;
     this._rankView = _oldIssueTableState.rankView;
   }
 
@@ -531,7 +531,7 @@ class IssueTableBuilder {
     this._visibleIssueCounts = this.calculateVisibleIssueCounts(issues, this._table);
     const swimlaneInfo: SwimlaneInfo = this.calculateSwimlane(issues, this._table);
     if (issues === this._oldIssueTableState.issues &&
-      this._table === this._oldIssueTableState.table &&
+      this._table === this._oldIssueTableState._table &&
       this._rankView === this._oldIssueTableState.rankView &&
       swimlaneInfo === this._oldIssueTableState.swimlaneInfo) {
       return this._oldIssueTableState;
@@ -648,7 +648,7 @@ class IssueTableBuilder {
     }
 
     const viewMode: BoardViewMode = this._currentUserSettingState.viewMode;
-    const oldTable: List<List<string>> = this._changeType === ChangeType.LOAD_BOARD ? null : this._oldIssueTableState.table;
+    const oldTable: List<List<string>> = this._changeType === ChangeType.LOAD_BOARD ? null : this._oldIssueTableState._table;
     const oldRank: List<RankViewEntry> = this._changeType === ChangeType.LOAD_BOARD ? null : this._oldIssueTableState.rankView;
 
     // We always need this since the issue table is used to calculate the total issues

@@ -39,7 +39,7 @@ const DEFAULT_BOARD_HEADER: BoardHeader = {
 const DEFAULT_ISSUE_TABLE: IssueTable = {
   issues: Map<string, BoardIssueView>(),
   rankView: List<RankViewEntry>(),
-  table: List<List<string>>(),
+  _table: List<List<string>>(),
   swimlaneInfo: null
 };
 
@@ -151,7 +151,7 @@ export class BoardViewModelUtil {
     const state: IssueTable = {
       issues: issues,
       rankView: rankView,
-      table: tableList,
+      _table: tableList,
       swimlaneInfo: swimlaneInfo
     };
     return ISSUE_TABLE_STATE_FACTORY(state);
