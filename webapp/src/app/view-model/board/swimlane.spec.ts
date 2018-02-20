@@ -1257,8 +1257,7 @@ describe('Swimlane observer tests', () => {
               new BoardChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']])
                 .invisibleIssues(['TWO-1', 'TWO-2', 'TWO-3'])
                 .swimlanes([
-                  {key: 'ONE', name: 'ONE', issues: ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4'], visibleFilter: true},
-                  {key: 'TWO', name: 'TWO', issues: ['TWO-1', 'TWO-2', 'TWO-3'], visibleFilter: false}])
+                  {key: 'ONE', name: 'ONE', issues: ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4']}])
                 .checkBoard(board);
               originalView = board;
             });
@@ -1267,28 +1266,25 @@ describe('Swimlane observer tests', () => {
             board => {
               new BoardChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']])
                 .swimlanes([
-                  {key: 'ONE', name: 'ONE', issues: ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4'], visibleFilter: true},
-                  {key: 'TWO', name: 'TWO', issues: ['TWO-1', 'TWO-2', 'TWO-3'], visibleFilter: true}])
+                  {key: 'ONE', name: 'ONE', issues: ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4']},
+                  {key: 'TWO', name: 'TWO', issues: ['TWO-1', 'TWO-2', 'TWO-3']}])
                 .checkBoard(board);
               new EqualityChecker()
                 .cleanSwimlanes('ONE')
-                .addChangedSwimlaneColumns('TWO', 1, 2)
+                .addChangedSwimlaneColumns('TWO', 0, 1, 2)
                 .check(originalView, board);
               originalView = board;
             });
-
           util.getUserSettingUpdater().updateFilters('project', 'TWO')
             .observer().take(1).subscribe(
             board => {
               new BoardChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']])
                 .invisibleIssues(['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4'])
                 .swimlanes([
-                  {key: 'ONE', name: 'ONE', issues: ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4'], visibleFilter: false},
-                  {key: 'TWO', name: 'TWO', issues: ['TWO-1', 'TWO-2', 'TWO-3'], visibleFilter: true}])
+                  {key: 'TWO', name: 'TWO', issues: ['TWO-1', 'TWO-2', 'TWO-3']}])
                 .checkBoard(board);
               new EqualityChecker()
                 .cleanSwimlanes('TWO')
-                .addChangedSwimlaneColumns('ONE', 0, 1, 2)
                 .check(originalView, board);
               originalView = board;
             });
@@ -1297,8 +1293,8 @@ describe('Swimlane observer tests', () => {
             board => {
               new BoardChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']])
                 .swimlanes([
-                  {key: 'ONE', name: 'ONE', issues: ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4'], visibleFilter: true},
-                  {key: 'TWO', name: 'TWO', issues: ['TWO-1', 'TWO-2', 'TWO-3'], visibleFilter: true}])
+                  {key: 'ONE', name: 'ONE', issues: ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4']},
+                  {key: 'TWO', name: 'TWO', issues: ['TWO-1', 'TWO-2', 'TWO-3']}])
                 .checkBoard(board);
               new EqualityChecker()
                 .cleanSwimlanes('TWO')
@@ -1313,8 +1309,7 @@ describe('Swimlane observer tests', () => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .invisibleIssues(['ONE-2', 'ONE-4'])
                 .swimlanes([
-                  {key: 'task', name: 'task', issues: ['ONE-2', 'ONE-4'], visibleFilter: false},
-                  {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3', 'ONE-5'], visibleFilter: true}])
+                  {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3', 'ONE-5']}])
                 .checkBoard(board);
               originalView = board;
             });
@@ -1323,12 +1318,10 @@ describe('Swimlane observer tests', () => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .invisibleIssues(['ONE-1', 'ONE-3', 'ONE-5'])
               .swimlanes([
-                {key: 'task', name: 'task', issues: ['ONE-2', 'ONE-4'], visibleFilter: true},
-                {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3', 'ONE-5'], visibleFilter: false}])
+                {key: 'task', name: 'task', issues: ['ONE-2', 'ONE-4']}])
               .checkBoard(board);
             new EqualityChecker()
-              .addChangedSwimlaneColumns('task', 0, 1)
-              .addChangedSwimlaneColumns('bug', 0, 1)
+              .addChangedSwimlaneColumns('task', 0, 1, 2)
               .check(originalView, board);
           });
         });
@@ -1339,8 +1332,7 @@ describe('Swimlane observer tests', () => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .invisibleIssues(['ONE-2', 'ONE-4'])
                 .swimlanes([
-                  {key: 'Blocker', name: 'Blocker', issues: ['ONE-1', 'ONE-3', 'ONE-5'], visibleFilter: true},
-                  {key: 'Major', name: 'Major', issues: ['ONE-2', 'ONE-4'], visibleFilter: false}])
+                  {key: 'Blocker', name: 'Blocker', issues: ['ONE-1', 'ONE-3', 'ONE-5']}])
                 .checkBoard(board);
               originalView = board;
             });
@@ -1349,12 +1341,10 @@ describe('Swimlane observer tests', () => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .invisibleIssues(['ONE-1', 'ONE-3', 'ONE-5'])
               .swimlanes([
-                {key: 'Blocker', name: 'Blocker', issues: ['ONE-1', 'ONE-3', 'ONE-5'], visibleFilter: false},
-                {key: 'Major', name: 'Major', issues: ['ONE-2', 'ONE-4'], visibleFilter: true}])
+                {key: 'Major', name: 'Major', issues: ['ONE-2', 'ONE-4']}])
               .checkBoard(board);
             new EqualityChecker()
-              .addChangedSwimlaneColumns('Blocker', 0, 1)
-              .addChangedSwimlaneColumns('Major', 0, 1)
+              .addChangedSwimlaneColumns('Major', 0, 1, 2)
               .check(originalView, board);
           });
         });
@@ -1365,9 +1355,7 @@ describe('Swimlane observer tests', () => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .invisibleIssues(['ONE-3', 'ONE-2', 'ONE-5'])
                 .swimlanes([
-                  {key: 'bob', name: 'Bob Brent Barlow', issues: ['ONE-3'], visibleFilter: false},
-                  {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4'], visibleFilter: true},
-                  {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-2', 'ONE-5'], visibleFilter: false}])
+                  {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4']}])
                 .checkBoard(board);
               originalView = board;
             });
@@ -1376,13 +1364,12 @@ describe('Swimlane observer tests', () => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .invisibleIssues(['ONE-3'])
               .swimlanes([
-                {key: 'bob', name: 'Bob Brent Barlow', issues: ['ONE-3'], visibleFilter: false},
-                {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4'], visibleFilter: true},
-                {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-2', 'ONE-5'], visibleFilter: true}])
+                {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4']},
+                {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-2', 'ONE-5']}])
               .checkBoard(board);
             new EqualityChecker()
-              .cleanSwimlanes('bob', 'kabir')
-              .addChangedSwimlaneColumns(NONE_FILTER_KEY, 0, 1)
+              .cleanSwimlanes('kabir')
+              .addChangedSwimlaneColumns(NONE_FILTER_KEY, 0, 1, 2)
               .check(originalView, board);
           });
         });
@@ -1393,10 +1380,7 @@ describe('Swimlane observer tests', () => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .invisibleIssues(['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4'])
                 .swimlanes([
-                  {key: 'C-10', name: 'C-10', issues: ['ONE-1', 'ONE-4'], visibleFilter: false},
-                  {key: 'C-20', name: 'C-20', issues: ['ONE-2', 'ONE-4'], visibleFilter: false},
-                  {key: 'C-30', name: 'C-30', issues: ['ONE-3', 'ONE-4'], visibleFilter: false},
-                  {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-5'], visibleFilter: true}])
+                  {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-5']}])
                 .checkBoard(board);
               originalView = board;
             });
@@ -1405,16 +1389,12 @@ describe('Swimlane observer tests', () => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .invisibleIssues(['ONE-3', 'ONE-5'])
               .swimlanes([
-                {key: 'C-10', name: 'C-10', issues: ['ONE-1', 'ONE-4'], visibleFilter: true},
-                {key: 'C-20', name: 'C-20', issues: ['ONE-2', 'ONE-4'], visibleFilter: true},
-                {key: 'C-30', name: 'C-30', issues: ['ONE-3', 'ONE-4'], visibleFilter: false},
-                {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-5'], visibleFilter: false}])
+                {key: 'C-10', name: 'C-10', issues: ['ONE-1', 'ONE-4']},
+                {key: 'C-20', name: 'C-20', issues: ['ONE-2', 'ONE-4']}])
               .checkBoard(board);
             new EqualityChecker()
-              .addChangedSwimlaneColumns('C-10', 0, 1)
-              .addChangedSwimlaneColumns('C-20', 0, 1)
-              .addChangedSwimlaneColumns('C-30', 1)
-              .addChangedSwimlaneColumns(NONE_FILTER_KEY, 1)
+              .addChangedSwimlaneColumns('C-10', 0, 1, 2)
+              .addChangedSwimlaneColumns('C-20', 0, 1, 2)
               .check(originalView, board);
           });
         });
@@ -1425,10 +1405,7 @@ describe('Swimlane observer tests', () => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .invisibleIssues(['ONE-1', 'ONE-2', 'ONE-3', 'ONE-5'])
                 .swimlanes([
-                  {key: 'F-10', name: 'F-10', issues: ['ONE-1', 'ONE-2'], visibleFilter: false},
-                  {key: 'F-20', name: 'F-20', issues: ['ONE-1', 'ONE-3'], visibleFilter: false},
-                  {key: 'F-30', name: 'F-30', issues: ['ONE-1', 'ONE-5'], visibleFilter: false},
-                  {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-4'], visibleFilter: true}])
+                  {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-4']}])
                 .checkBoard(board);
               originalView = board;
             });
@@ -1437,16 +1414,10 @@ describe('Swimlane observer tests', () => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .invisibleIssues(['ONE-3', 'ONE-4', 'ONE-5'])
               .swimlanes([
-                {key: 'F-10', name: 'F-10', issues: ['ONE-1', 'ONE-2'], visibleFilter: true},
-                {key: 'F-20', name: 'F-20', issues: ['ONE-1', 'ONE-3'], visibleFilter: false},
-                {key: 'F-30', name: 'F-30', issues: ['ONE-1', 'ONE-5'], visibleFilter: false},
-                {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-4'], visibleFilter: false}])
+                {key: 'F-10', name: 'F-10', issues: ['ONE-1', 'ONE-2']}])
               .checkBoard(board);
             new EqualityChecker()
-              .addChangedSwimlaneColumns('F-10', 0)
-              .addChangedSwimlaneColumns('F-20', 0)
-              .addChangedSwimlaneColumns('F-30', 0)
-              .addChangedSwimlaneColumns(NONE_FILTER_KEY, 1)
+              .addChangedSwimlaneColumns('F-10', 0, 1, 2)
               .check(originalView, board);
           });
         });
@@ -1457,10 +1428,7 @@ describe('Swimlane observer tests', () => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .invisibleIssues(['ONE-2', 'ONE-3', 'ONE-4', 'ONE-5'])
                 .swimlanes([
-                  {key: 'L-10', name: 'L-10', issues: ['ONE-2', 'ONE-3'], visibleFilter: false},
-                  {key: 'L-20', name: 'L-20', issues: ['ONE-2', 'ONE-4'], visibleFilter: false},
-                  {key: 'L-30', name: 'L-30', issues: ['ONE-2', 'ONE-5'], visibleFilter: false},
-                  {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-1'], visibleFilter: true}])
+                  {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-1']}])
                 .checkBoard(board);
               originalView = board;
             });
@@ -1468,16 +1436,16 @@ describe('Swimlane observer tests', () => {
             .observer().take(1).subscribe(board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .swimlanes([
-                {key: 'L-10', name: 'L-10', issues: ['ONE-2', 'ONE-3'], visibleFilter: true},
-                {key: 'L-20', name: 'L-20', issues: ['ONE-2', 'ONE-4'], visibleFilter: true},
-                {key: 'L-30', name: 'L-30', issues: ['ONE-2', 'ONE-5'], visibleFilter: true},
-                {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-1'], visibleFilter: true}])
+                {key: 'L-10', name: 'L-10', issues: ['ONE-2', 'ONE-3']},
+                {key: 'L-20', name: 'L-20', issues: ['ONE-2', 'ONE-4']},
+                {key: 'L-30', name: 'L-30', issues: ['ONE-2', 'ONE-5']},
+                {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-1']}])
               .checkBoard(board);
             new EqualityChecker()
               .cleanSwimlanes(NONE_FILTER_KEY)
-              .addChangedSwimlaneColumns('L-10', 0)
-              .addChangedSwimlaneColumns('L-20', 0, 1)
-              .addChangedSwimlaneColumns('L-30', 0, 1)
+              .addChangedSwimlaneColumns('L-10', 0, 1, 2)
+              .addChangedSwimlaneColumns('L-20', 0, 1, 2)
+              .addChangedSwimlaneColumns('L-30', 0, 1, 2)
               .check(originalView, board);
           });
         });
@@ -1488,9 +1456,7 @@ describe('Swimlane observer tests', () => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .invisibleIssues(['ONE-4', 'ONE-5'])
                 .swimlanes([
-                  {key: 'c2-A', name: 'First C2', issues: ['ONE-1', 'ONE-2', 'ONE-3'], visibleFilter: true},
-                  {key: 'c2-B', name: 'Second C2', issues: ['ONE-4'], visibleFilter: false},
-                  {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-5'], visibleFilter: false}])
+                  {key: 'c2-A', name: 'First C2', issues: ['ONE-1', 'ONE-2', 'ONE-3']}])
                 .checkBoard(board);
               originalView = board;
             });
@@ -1499,14 +1465,10 @@ describe('Swimlane observer tests', () => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .invisibleIssues(['ONE-1', 'ONE-2', 'ONE-3', 'ONE-5'])
               .swimlanes([
-                {key: 'c2-A', name: 'First C2', issues: ['ONE-1', 'ONE-2', 'ONE-3'], visibleFilter: false},
-                {key: 'c2-B', name: 'Second C2', issues: ['ONE-4'], visibleFilter: true},
-                {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-5'], visibleFilter: false}])
+                {key: 'c2-B', name: 'Second C2', issues: ['ONE-4']}])
               .checkBoard(board);
             new EqualityChecker()
-              .cleanSwimlanes(NONE_FILTER_KEY)
-              .addChangedSwimlaneColumns('c2-A', 0)
-              .addChangedSwimlaneColumns('c2-B', 1)
+              .addChangedSwimlaneColumns('c2-B', 0, 1, 2)
               .check(originalView, board);
           });
         });
@@ -1524,9 +1486,7 @@ describe('Swimlane observer tests', () => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .invisibleIssues(['ONE-1', 'ONE-2', 'ONE-3', 'ONE-5'])
                 .swimlanes([
-                  {key: 'bob', name: 'Bob Brent Barlow', issues: ['ONE-3'], visibleFilter: false},
-                  {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4'], visibleFilter: true},
-                  {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-2', 'ONE-5'], visibleFilter: false}])
+                  {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4']}])
                 .checkBoard(board);
               originalView = board;
             });
@@ -1537,15 +1497,11 @@ describe('Swimlane observer tests', () => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .invisibleIssues(['ONE-2', 'ONE-3', 'ONE-4', 'ONE-5'])
                 .swimlanes([
-                  {key: 'bob', name: 'Bob Brent Barlow', issues: ['ONE-3'], visibleFilter: false},
-                  {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4'], visibleFilter: true},
-                  {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-2', 'ONE-5'], visibleFilter: false}])
+                  {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4']}])
                 .checkBoard(board);
 
               new EqualityChecker()
-                .addChangedSwimlaneColumns('bob')
                 .addChangedSwimlaneColumns('kabir', 0, 1)
-                .addChangedSwimlaneColumns(NONE_FILTER_KEY)
                 .check(originalView, board);
             });
         });
@@ -1613,19 +1569,17 @@ describe('Swimlane observer tests', () => {
 
     describe('Toggle collapsed swimlane', () => {
       let util: BoardViewObservableUtil;
-      let originalView: BoardViewModel;
       let checker: BoardChecker;
 
       beforeEach(() => {
         checker = new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
-          .invisibleIssues(['ONE-2', 'ONE-4'])
           .swimlanes([
-            {key: 'Blocker', name: 'Blocker', issues: ['ONE-1', 'ONE-3', 'ONE-5'], visibleFilter: true},
-            {key: 'Major', name: 'Major', issues: ['ONE-2', 'ONE-4'], visibleFilter: false}]);
+            {key: 'Blocker', name: 'Blocker', issues: ['ONE-1', 'ONE-3', 'ONE-5']},
+            {key: 'Major', name: 'Major', issues: ['ONE-2', 'ONE-4']}]);
       });
 
       it('Default settings', () => {
-        util = createUtilWithStandardIssues({swimlane: 'priority', 'priority': 'Blocker'});
+        util = createUtilWithStandardIssues({swimlane: 'priority'});
         util.observer().take(1).subscribe(
           board => {
             checker.checkBoard(board);
@@ -1650,7 +1604,7 @@ describe('Swimlane observer tests', () => {
         });
       });
       it('Initially Collapsed/hidden', () => {
-        util = createUtilWithStandardIssues({swimlane: 'priority', 'priority': 'Blocker', 'hidden-sl': 'Blocker'});
+        util = createUtilWithStandardIssues({swimlane: 'priority', 'hidden-sl': 'Blocker'});
         util.observer().take(1).subscribe(
           board => {
             checker
@@ -1677,7 +1631,7 @@ describe('Swimlane observer tests', () => {
         });
       });
       it('Initially visible', () => {
-        util = createUtilWithStandardIssues({swimlane: 'priority', 'priority': 'Blocker', 'visible-sl': 'Blocker'});
+        util = createUtilWithStandardIssues({swimlane: 'priority', 'visible-sl': 'Blocker'});
         util.observer().take(1).subscribe(
           board => {
             checker
@@ -1694,6 +1648,26 @@ describe('Swimlane observer tests', () => {
           .observer().take(1).subscribe(board => {
           checker
             .collapsedSwimlanes('Blocker')
+            .checkBoard(board);
+        });
+      });
+      it('With Filters', () => {
+        util = createUtilWithStandardIssues({swimlane: 'priority', priority: 'Blocker'});
+        checker
+          .invisibleIssues(['ONE-2', 'ONE-4'])
+          .swimlanes([
+            {key: 'Blocker', name: 'Blocker', issues: ['ONE-1', 'ONE-3', 'ONE-5']}]);
+
+        util.getUserSettingUpdater().toggleCollapsedSwimlane('Blocker')
+          .observer().take(1).subscribe(board => {
+          checker
+            .collapsedSwimlanes('Blocker')
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().toggleCollapsedSwimlane('Blocker')
+          .observer().take(1).subscribe(board => {
+          checker
+            .collapsedSwimlanes()
             .checkBoard(board);
         });
       });
@@ -1836,9 +1810,6 @@ class BoardChecker {
       expect(actualTable).toEqual(expectedTable);
       expect(sl.visibleIssues).toBe(check.issues.reduce((s, key) => issueTable.issues.get(key).visible ? s + 1 : s, 0));
 
-      // Undefined means true
-      const expectedVisible: boolean = !(check.visibleFilter === false);
-      expect(sl.filterVisible).toBe(expectedVisible);
 
       if (this._expectedCollapsedSwimlanes && this._expectedCollapsedSwimlanes.contains(sl.key)) {
         expect(sl.collapsed).toBe(true);

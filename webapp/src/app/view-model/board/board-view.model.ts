@@ -55,7 +55,6 @@ const DEFAULT_SWIMLANE_DATA: SwimlaneData = {
   display: null,
   table: List<List<BoardIssueView>>(),
   visibleIssues: 0,
-  filterVisible: true,
   collapsed: false
 };
 
@@ -168,14 +167,12 @@ export class BoardViewModelUtil {
     display: string,
     table: List<List<BoardIssueView>>,
     visibleIssues: number,
-    filterVisible: boolean,
     collapsed: boolean): SwimlaneData {
     const state: SwimlaneData = {
       key: key,
       display: display,
       table: table,
       visibleIssues: visibleIssues,
-      filterVisible: filterVisible,
       collapsed: collapsed
     };
     return SWIMLANE_DATA_STATE_FACTORY(state);

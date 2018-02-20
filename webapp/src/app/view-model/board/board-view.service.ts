@@ -974,7 +974,9 @@ class SwimlaneInfoBuilder {
       if (dataBuilder.isChanged()) {
         changed = true;
       }
-      swimlanes.set(key, dataBuilder.build());
+      if (dataBuilder.filterVisible) {
+        swimlanes.set(key, dataBuilder.build());
+      }
     }
 
     if (!changed) {
@@ -987,9 +989,11 @@ class SwimlaneInfoBuilder {
     const updatedSwimlanes: Map<string, SwimlaneData> = this._existing.swimlanes.withMutations(mutable => {
       this._dataBuilders.forEach((sdb, k) => {
         const existing = mutable.get(k);
-        const data: SwimlaneData = sdb.updateCollapsed();
-        if (existing !== data) {
-          mutable.set(k, data);
+        if (existing) {
+          const data: SwimlaneData = sdb.updateCollapsed();
+          if (existing !== data) {
+            mutable.set(k, data);
+          }
         }
       });
     });
@@ -1031,13 +1035,6 @@ class SwimlaneDataBuilder {
     return this._key;
   }
 
-  private isChangedFilterVisibility(): boolean {
-    if (!this._existing) {
-      return true;
-    }
-    return this._existing.filterVisible !== this.filterVisible;
-  }
-
   private isChangedTable(): boolean {
     if (!this._existing) {
       return true;
@@ -1056,7 +1053,7 @@ class SwimlaneDataBuilder {
   }
 
   isChanged(): boolean {
-    return this.isChangedTable() || this.isChangedFilterVisibility() || this.isChangedCollapsed();
+    return this.isChangedTable() || this.isChangedCollapsed();
   }
 
   build(): SwimlaneData {
@@ -1070,7 +1067,6 @@ class SwimlaneDataBuilder {
       this._display,
       this._tableBuilder.build(),
       this._visibleIssuesCount,
-      this.filterVisible,
       this._collapsed);
   };
 

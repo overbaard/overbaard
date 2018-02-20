@@ -6,6 +6,5 @@ export interface SwimlaneData {
   display: string;
   table: List<List<BoardIssueView>>;
   visibleIssues: number;
-  filterVisible: boolean;
   collapsed: boolean;
 }

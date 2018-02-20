@@ -17,7 +17,7 @@ import {IssueDetailState} from '../../../../../model/board/user/issue-detail/iss
 export class KanbanSwimlaneEntryComponent implements OnInit, OnChanges {
 
   @Input()
-  board: BoardViewModel
+  board: BoardViewModel;
 
   @Input()
   showEmpty: boolean;
@@ -49,9 +49,7 @@ export class KanbanSwimlaneEntryComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     this.visible = true;
-    if (!this.swimlane.filterVisible) {
-      this.visible = false;
-    } else if (!this.showEmpty && this.swimlane.visibleIssues === 0) {
+    if (!this.showEmpty && this.swimlane.visibleIssues === 0) {
       this.visible = false;
     }
   }
