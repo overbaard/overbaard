@@ -1876,16 +1876,10 @@ interface SwimlaneCheck {
 
 class EqualityChecker {
   private _unchangedSwimlanes: string[];
-  private _unchangedSwimlaneTables: string[];
   private _changedSwimlaneColumns: Dictionary<number[]> = {};
 
   cleanSwimlanes(...unchangedSwimlanes: string[]): EqualityChecker {
     this._unchangedSwimlanes = unchangedSwimlanes;
-    return this;
-  }
-
-  cleanSwimlaneTables(...unchangedSwimlaneTables: string[]): EqualityChecker {
-    this._unchangedSwimlaneTables = unchangedSwimlaneTables;
     return this;
   }
 
@@ -1899,28 +1893,15 @@ class EqualityChecker {
     const curr: SwimlaneInfo = newBoard.issueTable.swimlaneInfo;
     const unchangedSwimlanes: Set<string> =
       this._unchangedSwimlanes ? Set<string>(this._unchangedSwimlanes) : Set<string>();
-    const unchangedSwimlaneTables: Set<string> =
-      this._unchangedSwimlaneTables ? Set<string>(this._unchangedSwimlaneTables) : Set<string>();
     const changedSwimlaneColumns: Map<string, List<number>> = Map<string, List<number>>(this._changedSwimlaneColumns);
     // Do some validation of user errors
     unchangedSwimlanes.forEach(v => {
       if (changedSwimlaneColumns.has(v)) {
         fail(`'${v}' appears in both clean swimlanes and where we are expecting a change`);
       }
-      if (unchangedSwimlaneTables.has(v)) {
-        fail(`'${v}' appears in both clean swimlanes and clean tables`);
-      }
-    });
-    unchangedSwimlaneTables.forEach(v => {
-      if (changedSwimlaneColumns.has(v)) {
-        fail(`'${v}' appears in both clean swimlane tables and where we are expecting a change`);
-      }
-      if (unchangedSwimlanes.has(v)) {
-        fail(`'${v}' appears in both clean swimlanes and clean tables`);
-      }
     });
     const allKeys: Set<string> =
-      Set<string>().intersect(unchangedSwimlanes, unchangedSwimlaneTables, changedSwimlaneColumns.keySeq());
+      Set<string>().intersect(unchangedSwimlanes, changedSwimlaneColumns.keySeq());
     const missingChecks: Set<string> =
       Set<string>().subtract(curr.swimlanes.keySeq(), allKeys);
     if (missingChecks.size > 0) {
@@ -1930,11 +1911,6 @@ class EqualityChecker {
     unchangedSwimlanes.forEach(k => {
       expect(curr.swimlanes.get(k)).toBeTruthy();
       expect(curr.swimlanes.get(k)).toBe(old.swimlanes.get(k), `Different swimlane: ${k}`);
-    });
-    unchangedSwimlaneTables.forEach(k => {
-      expect(curr.swimlanes.get(k)).toBeTruthy();
-      expect(curr.swimlanes.get(k).table).toBe(old.swimlanes.get(k).table, `Different swimlane table: ${k}`);
-      expect(curr.swimlanes.get(k)).not.toBe(old.swimlanes.get(k), `Same swimlane: ${k}`);
     });
     changedSwimlaneColumns.forEach((changedColumns, k) => {
       expect(curr.swimlanes.get(k)).toBeTruthy();
