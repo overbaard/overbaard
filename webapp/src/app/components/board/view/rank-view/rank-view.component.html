@@ -4,13 +4,13 @@
   [boardLeftOffset]="boardLeftOffset"
 >
 </app-board-headers-container>
-<div id="board-body" [style.height.px]="boardBodyHeight">
+<div #boardBody id="board-body" [style.height.px]="boardBodyHeight">
   <app-rank-view-container
     [board]="board"
     [statesDummyArray]="statesDummyArray"
     (updateParallelTask)="onUpdateParallelTask($event)"
     appScrollListener
-    (scrollLeft)="onScrollLeft($event)"
+    [scrollLeftObserver]="scrollLeftObserver$"
   >
   </app-rank-view-container>
 </div>

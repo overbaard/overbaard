@@ -1,8 +1,13 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output, SimpleChanges} from '@angular/core';
+import {
+  ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, NgZone, OnDestroy, OnInit, Output,
+  SimpleChanges
+} from '@angular/core';
 import {FixedHeaderView} from '../fixed-header-view';
 import {BoardHeader} from '../../../../view-model/board/board-header';
 import {BoardViewMode} from '../../../../model/board/user/board-view-mode';
 import {UpdateParallelTaskEvent} from '../../../../events/update-parallel-task.event';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import {Subject} from 'rxjs/Subject';
 
 @Component({
   selector: 'app-kanban-view',
@@ -10,7 +15,7 @@ import {UpdateParallelTaskEvent} from '../../../../events/update-parallel-task.e
   styleUrls: ['./kanban-view.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class KanbanViewComponent extends FixedHeaderView implements OnInit {
+export class KanbanViewComponent extends FixedHeaderView implements OnInit, OnDestroy {
 
   @Output()
   toggleColumnVisibility: EventEmitter<BoardHeader> = new EventEmitter<BoardHeader>();
@@ -27,12 +32,18 @@ export class KanbanViewComponent extends FixedHeaderView implements OnInit {
 
   readonly viewMode =  BoardViewMode.KANBAN;
 
+  private destroy$: Subject<void> = new Subject<void>();
 
-  constructor() {
-    super();
+  constructor(changeDetector: ChangeDetectorRef, zone: NgZone) {
+    super(changeDetector, zone);
   }
 
   ngOnInit() {
+    super.observeLeftScroll(this.destroy$)
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next(null);
   }
 
   onToggleVisibility(header: BoardHeader) {

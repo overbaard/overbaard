@@ -1,4 +1,8 @@
+:host{
+  overflow: hidden;
+}
 #board-body {
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   height: 200px; /** This will get calculated and set by the component code */
 }

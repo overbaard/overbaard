@@ -1,4 +1,7 @@
-import {Directive, ElementRef, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output, Renderer2} from '@angular/core';
+import {
+  AfterViewInit, Directive, ElementRef, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output,
+  Renderer2
+} from '@angular/core';
 import {Subject} from 'rxjs/Subject';
 import 'rxjs/add/operator/throttleTime';
 import 'rxjs/add/operator/debounceTime';
@@ -6,16 +9,20 @@ import 'rxjs/add/operator/merge';
 import 'rxjs/add/operator/distinctUntilChanged';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/observable/fromEvent';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
 
 @Directive({
   selector: '[appScrollListener]'
 })
-export class ScrollListenerDirective implements OnInit, OnDestroy {
-  @Output()
-  scrollLeft: EventEmitter<number> = new EventEmitter<number>();
+export class ScrollListenerDirective implements OnInit, OnDestroy, AfterViewInit {
 
-  private destroy$: Subject<boolean> = new Subject<boolean>();
+  /**
+   * Values emitted on this observer are OUTSIDE the angular zone
+   */
+  @Input()
+  scrollLeftObserver: Subject<number>;
+
   private _disposeScrollHandler: () => void | undefined;
   private refreshHandler = () => {
     this.refresh();
@@ -35,7 +42,11 @@ export class ScrollListenerDirective implements OnInit, OnDestroy {
     this.removeParentEventHandlers();
   }
 
-  private addParentEventHandlers(parentScroll: Element | Window) {
+  ngAfterViewInit(): void {
+    this.refresh();
+  }
+
+  private addParentEventHandlers(parentScroll: Element) {
     this.removeParentEventHandlers();
     this._zone.runOutsideAngular(() => {
       this._disposeScrollHandler =
@@ -53,7 +64,9 @@ export class ScrollListenerDirective implements OnInit, OnDestroy {
   refresh() {
     this._zone.runOutsideAngular(() => {
       requestAnimationFrame(() => {
-        this._zone.run(() => this.scrollLeft.next(this._ref.nativeElement.scrollLeft * -1));
+        if (this.scrollLeftObserver) {
+          this.scrollLeftObserver.next(this._ref.nativeElement.scrollLeft);
+        }
       });
     });
   }

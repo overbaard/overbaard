@@ -1,16 +1,18 @@
 import {
-  ChangeDetectionStrategy,
-  Component,
-  EventEmitter,
-  OnChanges,
+  AfterViewInit,
+  ChangeDetectionStrategy, ChangeDetectorRef,
+  Component, ElementRef,
+  EventEmitter, NgZone,
+  OnChanges, OnDestroy,
   OnInit,
-  Output,
+  Output, Renderer2,
   SimpleChange,
-  SimpleChanges
+  SimpleChanges, ViewChild
 } from '@angular/core';
 import {FixedHeaderView} from '../fixed-header-view';
 import {BoardViewMode} from '../../../../model/board/user/board-view-mode';
 import {UpdateParallelTaskEvent} from '../../../../events/update-parallel-task.event';
+import {Subject} from 'rxjs/Subject';
 
 @Component({
   selector: 'app-rank-view',
@@ -18,7 +20,7 @@ import {UpdateParallelTaskEvent} from '../../../../events/update-parallel-task.e
   styleUrls: ['./rank-view.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RankViewComponent extends FixedHeaderView implements OnInit, OnChanges {
+export class RankViewComponent extends FixedHeaderView implements OnInit, OnChanges, OnDestroy, AfterViewInit {
 
   readonly viewMode = BoardViewMode.RANK;
 
@@ -28,12 +30,27 @@ export class RankViewComponent extends FixedHeaderView implements OnInit, OnChan
   // Just an array here to be able to do 'for s of states; let i = index' in the template
   statesDummyArray: number[];
 
-  constructor() {
-    super();
+  private destroy$: Subject<void> = new Subject<void>();
+
+  @ViewChild('boardBody')
+  bodyElement: ElementRef;
+
+  private _disposeScrollHandler: () => void | undefined;
+  private refreshHandler = () => {
+    this.refresh();
+  };
+
+  constructor(
+              changeDetector: ChangeDetectorRef,
+              zone: NgZone,
+              private readonly _renderer: Renderer2,
+              private readonly _zone: NgZone) {
+    super(changeDetector, zone);
   }
 
   ngOnInit() {
     this.createEmptyStatesDummyArray();
+    super.observeLeftScroll(this.destroy$);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -46,6 +63,10 @@ export class RankViewComponent extends FixedHeaderView implements OnInit, OnChan
     }
   }
 
+  ngAfterViewInit(): void {
+    this.addParentEventHandlers(this.bodyElement.nativeElement);
+  }
+
   private createEmptyStatesDummyArray() {
     const numberStates =
       this.board.headers.headersList.reduce((sum, header) => sum += header.stateIndices.size, 0);
@@ -56,4 +77,29 @@ export class RankViewComponent extends FixedHeaderView implements OnInit, OnChan
     this.updateParallelTask.emit(event);
   }
 
+  private addParentEventHandlers(parentScroll: Element) {
+    this.removeParentEventHandlers();
+    console.log(parentScroll);
+    this._zone.runOutsideAngular(() => {
+      this._disposeScrollHandler =
+        this._renderer.listen(parentScroll, 'scroll', this.refreshHandler);
+    });
+  }
+
+  private removeParentEventHandlers() {
+    if (this._disposeScrollHandler) {
+      this._disposeScrollHandler();
+      this._disposeScrollHandler = undefined;
+    }
+  }
+
+  refresh() {
+    this._zone.runOutsideAngular(() => {
+      requestAnimationFrame(() => {
+        this._zone.run(() => {
+          console.log('test' + this.bodyElement.nativeElement.scrollTop);
+        });
+      });
+    });
+  }
 }

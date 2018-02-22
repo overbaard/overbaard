@@ -12,7 +12,7 @@
     [board]="board"
     (updateParallelTask)="onUpdateParallelTask($event)"
     appScrollListener
-    (scrollLeft)="onScrollLeft($event)"
+    [scrollLeftObserver]="scrollLeftObserver$"
   ></app-kanban-normal-view>
   <app-kanban-swimlane-view
     *ngIf="board.issueTable.swimlaneInfo"
@@ -21,6 +21,6 @@
     (toggleCollapsedSwimlane)="onToggleCollapsedSwimlane($event)"
     (updateParallelTask)="onUpdateParallelTask($event)"
     appScrollListener
-    (scrollLeft)="onScrollLeft($event)"
+    [scrollLeftObserver]="scrollLeftObserver$"
   ></app-kanban-swimlane-view>
 </div>
