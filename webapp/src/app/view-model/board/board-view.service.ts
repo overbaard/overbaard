@@ -1227,7 +1227,9 @@ class RankViewBuilder {
         entry = BoardViewModelUtil.createRankViewEntry(issue, boardIndex);
       }
     }
-    this._current.push(entry);
+    if (entry.issue.visible) {
+      this._current.push(entry);
+    }
     return this;
   }
 
