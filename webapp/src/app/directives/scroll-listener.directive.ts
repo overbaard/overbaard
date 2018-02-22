@@ -18,10 +18,20 @@ import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 export class ScrollListenerDirective implements OnInit, OnDestroy, AfterViewInit {
 
   /**
-   * Values emitted on this observer are OUTSIDE the angular zone
+   * Values emitted on this observer are OUTSIDE the angular zone.
+   * If null the left value is not emitted.
    */
   @Input()
   scrollLeftObserver: Subject<number>;
+
+  /**
+   * Values emitted on this observer are OUTSIDE the angular zone.
+   * If null the top value is not emitted.
+   */
+  @Input()
+  scrollTopObserver: Subject<number>;
+
+
 
   private _disposeScrollHandler: () => void | undefined;
   private refreshHandler = () => {
@@ -66,6 +76,9 @@ export class ScrollListenerDirective implements OnInit, OnDestroy, AfterViewInit
       requestAnimationFrame(() => {
         if (this.scrollLeftObserver) {
           this.scrollLeftObserver.next(this._ref.nativeElement.scrollLeft);
+        }
+        if (this.scrollTopObserver) {
+          this.scrollTopObserver.next(this._ref.nativeElement.scrollTop);
         }
       });
     });

@@ -13,6 +13,7 @@ import {FixedHeaderView} from '../fixed-header-view';
 import {BoardViewMode} from '../../../../model/board/user/board-view-mode';
 import {UpdateParallelTaskEvent} from '../../../../events/update-parallel-task.event';
 import {Subject} from 'rxjs/Subject';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
 @Component({
   selector: 'app-rank-view',
@@ -20,7 +21,7 @@ import {Subject} from 'rxjs/Subject';
   styleUrls: ['./rank-view.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RankViewComponent extends FixedHeaderView implements OnInit, OnChanges, OnDestroy, AfterViewInit {
+export class RankViewComponent extends FixedHeaderView implements OnInit, OnChanges, OnDestroy {
 
   readonly viewMode = BoardViewMode.RANK;
 
@@ -32,19 +33,13 @@ export class RankViewComponent extends FixedHeaderView implements OnInit, OnChan
 
   private destroy$: Subject<void> = new Subject<void>();
 
-  @ViewChild('boardBody')
-  bodyElement: ElementRef;
-
-  private _disposeScrollHandler: () => void | undefined;
-  private refreshHandler = () => {
-    this.refresh();
-  };
+  // Passed in to the ScrollListenerDirective. Values here are emitted OUTSIDE the angular zone
+  scrollTopObserver$: Subject<number> = new BehaviorSubject<number>(0);
 
   constructor(
               changeDetector: ChangeDetectorRef,
               zone: NgZone,
-              private readonly _renderer: Renderer2,
-              private readonly _zone: NgZone) {
+              private readonly _renderer: Renderer2) {
     super(changeDetector, zone);
   }
 
@@ -63,8 +58,8 @@ export class RankViewComponent extends FixedHeaderView implements OnInit, OnChan
     }
   }
 
-  ngAfterViewInit(): void {
-    this.addParentEventHandlers(this.bodyElement.nativeElement);
+  ngOnDestroy(): void {
+    this.destroy$.next(null);
   }
 
   private createEmptyStatesDummyArray() {
@@ -77,29 +72,4 @@ export class RankViewComponent extends FixedHeaderView implements OnInit, OnChan
     this.updateParallelTask.emit(event);
   }
 
-  private addParentEventHandlers(parentScroll: Element) {
-    this.removeParentEventHandlers();
-    console.log(parentScroll);
-    this._zone.runOutsideAngular(() => {
-      this._disposeScrollHandler =
-        this._renderer.listen(parentScroll, 'scroll', this.refreshHandler);
-    });
-  }
-
-  private removeParentEventHandlers() {
-    if (this._disposeScrollHandler) {
-      this._disposeScrollHandler();
-      this._disposeScrollHandler = undefined;
-    }
-  }
-
-  refresh() {
-    this._zone.runOutsideAngular(() => {
-      requestAnimationFrame(() => {
-        this._zone.run(() => {
-          console.log('test' + this.bodyElement.nativeElement.scrollTop);
-        });
-      });
-    });
-  }
 }
