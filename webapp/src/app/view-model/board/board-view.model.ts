@@ -60,7 +60,8 @@ const DEFAULT_SWIMLANE_DATA: SwimlaneData = {
 
 const DEFAULT_RANK_VIEW_ENTRY: RankViewEntry = {
   issue: null,
-  boardIndex: 0
+  boardIndex: 0,
+  calculatedTotalHeight: 0
 }
 
 interface BoardViewModelRecord extends TypedRecord<BoardViewModelRecord>, BoardViewModel {
@@ -187,6 +188,9 @@ export class BoardViewModelUtil {
   }
 
   static createRankViewEntry(issue: BoardIssueView, boardIndex: number) {
-    return RANK_VIEW_ENTRY_RECORD({issue: issue, boardIndex: boardIndex});
+    // The sum of the top and bottom borders added to issues in the rank view
+    const BORDER_HEIGHT = 2;
+    const calculatedTotalHeight: number = issue.calculatedTotalHeight + BORDER_HEIGHT;
+    return RANK_VIEW_ENTRY_RECORD({issue: issue, boardIndex: boardIndex, calculatedTotalHeight: calculatedTotalHeight});
   }
 }

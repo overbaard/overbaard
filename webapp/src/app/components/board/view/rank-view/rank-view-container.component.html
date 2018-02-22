@@ -1,8 +1,10 @@
+<div [style.height.px]="beforePadding"></div>
 <app-rank-view-entry
-  *ngFor="let rankEntry of board.issueTable.rankView"
+  *ngFor="let rankEntry of visibleEntries"
   [rankEntry]="rankEntry"
-  [issueDetailState]="board.issueDetail"
+  [issueDetailState]="issueDetailState"
   [statesDummyArray]="statesDummyArray"
   (updateParallelTask)="onUpdateParallelTask($event)"
 >
 </app-rank-view-entry>
+<div [style.height.px]="afterPadding"></div>

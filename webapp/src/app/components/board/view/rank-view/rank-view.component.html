@@ -13,9 +13,11 @@
 
 >
   <app-rank-view-container
-    [board]="board"
+    [rankEntries]="board.issueTable.rankView"
+    [issueDetailState]="board.issueDetail"
     [topOffsetObserver]="scrollTopObserver$"
     [statesDummyArray]="statesDummyArray"
+    [boardBodyHeight]="boardBodyHeight"
     (updateParallelTask)="onUpdateParallelTask($event)"
     appScrollListener
     [scrollLeftObserver]="scrollLeftObserver$"
