@@ -552,6 +552,7 @@ class IssueTableBuilder {
 
   private populateIssues(): Map<string, BoardIssueView> {
     switch (this._changeType) {
+      case ChangeType.UPDATE_ISSUE_DETAIL:
       case ChangeType.LOAD_BOARD: {
         const issues: Map<string, BoardIssueView> = Map<string, BoardIssueView>().asMutable();
         this._currentBoardState.issues.issues.forEach((issue, key) => {
@@ -652,7 +653,6 @@ class IssueTableBuilder {
       case ChangeType.CHANGE_SWIMLANE:
       case ChangeType.CHANGE_COLUMN_VISIBILITY:
       case ChangeType.TOGGLE_SWIMLANE_COLLAPSED:
-      case ChangeType.UPDATE_ISSUE_DETAIL:
         this._totalIssueCounts = this._oldIssueTableState.totalIssues;
         this._visibleIssueCounts = this._oldIssueTableState.visibleIssues;
         return;
@@ -730,6 +730,7 @@ class IssueTableBuilder {
       case ChangeType.CHANGE_COLUMN_VISIBILITY:
       case ChangeType.LOAD_BOARD:
       case ChangeType.CHANGE_SWIMLANE:
+      case ChangeType.UPDATE_ISSUE_DETAIL:
         swimlaneBuilder = SwimlaneInfoBuilder.create(this._currentBoardState, this._currentUserSettingState, null);
         break;
       case ChangeType.APPLY_FILTERS:

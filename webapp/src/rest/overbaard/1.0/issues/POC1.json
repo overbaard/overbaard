@@ -266,7 +266,7 @@
     "FEAT-5" : {
       "key": "FEAT-5",
       "state": 4,
-      "summary": "Issue number 5",
+      "summary": "Issue number 5 has a long description and no extra information.",
       "priority": 2,
       "type": 0
     },
