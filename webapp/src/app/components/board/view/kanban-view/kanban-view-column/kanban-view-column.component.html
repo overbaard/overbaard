@@ -1,12 +1,14 @@
 <div *ngIf="header.visible" class="column visible">
-  <!-- trackBy is a hint to angular to be able to keep (i.e. don't destroy and recreate) as many components as possible -->
   <div *ngIf="displayIssues">
+    <div [style.height.px]="beforePadding"></div>
+    <!-- trackBy is a hint to angular to be able to keep (i.e. don't destroy and recreate) as many components as possible -->
     <app-board-issue
-      *ngFor="let issue of issues ; trackBy: issueTrackByFn "
+      *ngFor="let issue of visibleIssues ; trackBy: issueTrackByFn "
       [issue]="issue"
       [issueDetailState]="issueDetailState"
       (updateParallelTask)="onUpdateParallelTask($event)"
     ></app-board-issue>
+    <div [style.height.px]="afterPadding"></div>
   </div>
 </div>
 <div *ngIf="!header.visible" class="column invisible">

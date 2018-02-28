@@ -29,6 +29,8 @@ export class KanbanViewComponent extends FixedHeaderView implements OnInit, OnDe
   @Output()
   updateParallelTask: EventEmitter<UpdateParallelTaskEvent> = new EventEmitter<UpdateParallelTaskEvent>();
 
+  scrollTopObserver$: Subject<number> = new BehaviorSubject<number>(0);
+
 
   readonly viewMode =  BoardViewMode.KANBAN;
 
@@ -39,7 +41,7 @@ export class KanbanViewComponent extends FixedHeaderView implements OnInit, OnDe
   }
 
   ngOnInit() {
-    super.observeLeftScroll(this.destroy$)
+    super.observeLeftScroll(this.destroy$);
   }
 
   ngOnDestroy(): void {
@@ -61,5 +63,6 @@ export class KanbanViewComponent extends FixedHeaderView implements OnInit, OnDe
   onUpdateParallelTask(event: UpdateParallelTaskEvent) {
     this.updateParallelTask.emit(event);
   }
+
 
 }

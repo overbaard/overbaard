@@ -6,11 +6,16 @@
   (toggleBacklog)="onToggleBacklog($event)"
 >
 </app-board-headers-container>
-<div id="board-body" [style.height.px]="boardBodyHeight">
+<div id="board-body"
+     [style.height.px]="boardBodyHeight"
+     appScrollListener
+     [scrollTopObserver]="scrollTopObserver$">
   <app-kanban-normal-view
     *ngIf="!board.issueTable.swimlaneInfo"
     [board]="board"
     (updateParallelTask)="onUpdateParallelTask($event)"
+    [boardBodyHeight]="boardBodyHeight"
+    [topOffsetObserver]="scrollTopObserver$"
     appScrollListener
     [scrollLeftObserver]="scrollLeftObserver$"
   ></app-kanban-normal-view>

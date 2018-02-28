@@ -3,6 +3,7 @@ import {BoardViewModel} from '../../../../../view-model/board/board-view';
 import {UpdateParallelTaskEvent} from '../../../../../events/update-parallel-task.event';
 import {IssueSummaryLevel} from '../../../../../model/board/user/issue-summary-level';
 import {IssueDetailState} from '../../../../../model/board/user/issue-detail/issue-detail.model';
+import {Observable} from 'rxjs/Observable';
 
 @Component({
   selector: 'app-kanban-normal-view',
@@ -14,6 +15,14 @@ export class KanbanNormalViewComponent implements OnInit {
 
   @Input()
   board: BoardViewModel;
+
+  @Input()
+  boardBodyHeight: number;
+  /**
+   * Values emitted here come from the ScrollListenerDirective and are OUTSIDE the angular zone.
+   */
+  @Input()
+  topOffsetObserver: Observable<number>;
 
   @Output()
   scrollTableBodyX: EventEmitter<number> = new EventEmitter<number>();

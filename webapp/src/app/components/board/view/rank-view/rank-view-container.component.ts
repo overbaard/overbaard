@@ -12,7 +12,7 @@ import {Observable} from 'rxjs/Observable';
 import {RankViewEntry} from '../../../../view-model/board/rank-view-entry';
 import {List} from 'immutable';
 import {Subject} from 'rxjs/Subject';
-import {ScrollHeightSplitter, StartAndEndIndex, StartAndHeight} from '../../../../common/scroll-height-splitter';
+import {ScrollHeightSplitter, VirtualScrollInfo, StartAndHeight} from '../../../../common/scroll-height-splitter';
 
 @Component({
   selector: 'app-rank-view-container',
@@ -40,24 +40,22 @@ export class RankViewContainerComponent implements OnInit, OnChanges, OnDestroy 
   @Output()
   updateParallelTask: EventEmitter<UpdateParallelTaskEvent> = new EventEmitter<UpdateParallelTaskEvent>();
 
-  visibleEntries: List<RankViewEntry>;
-
   readonly viewMode = BoardViewMode.RANK;
 
   // Just an array here to be able to do 'for s of states; let i = index' in the entry template
   @Input()
   statesDummyArray: number[];
 
-  private _scrollTop = 0;
-  beforePadding = 0;
-  afterPadding = 0;
-
   private _destroy$: Subject<void> = new Subject<void>();
 
   private _splitter: ScrollHeightSplitter<RankViewEntry> = ScrollHeightSplitter.create(rve => rve.calculatedTotalHeight);
-  private _lastIndices: StartAndEndIndex = {start: 0, end: 0};
+  private _lastScrollInfo: VirtualScrollInfo = {start: 0, end: 0, beforePadding: 0, afterPadding: 0};
+  private _scrollTop = 0;
+  visibleEntries: List<RankViewEntry>;
+  beforePadding = 0;
+  afterPadding = 0;
 
-  constructor(private _zome: NgZone, private _changeDetectorRef: ChangeDetectorRef) {
+  constructor(private _zone: NgZone, private _changeDetectorRef: ChangeDetectorRef) {
   }
 
   ngOnInit() {
@@ -90,44 +88,38 @@ export class RankViewContainerComponent implements OnInit, OnChanges, OnDestroy 
 
 
   private calculateVisibleEntries(forceUpdate: boolean = false) {
-    const indices: StartAndEndIndex = this._splitter.getStartAndEndIndex(this._scrollTop, this.boardBodyHeight);
+    const scrollInfo: VirtualScrollInfo = this._splitter.getVirtualScrollInfo(this._scrollTop, this.boardBodyHeight);
     if (!forceUpdate) {
-      if (this._lastIndices.start === indices.start && this._lastIndices.end === indices.end) {
+      if (this.same(this._lastScrollInfo, scrollInfo)) {
         return;
       }
     }
-    this._lastIndices = indices;
+    this._lastScrollInfo = scrollInfo;
 
     let visibleEntries: List<RankViewEntry>;
-    let beforePadding: number = this.beforePadding;
-    let afterPadding: number = this.afterPadding;
-    if (indices.start === -1) {
+    if (scrollInfo.start === -1) {
       visibleEntries = List<RankViewEntry>();
     } else {
-      visibleEntries = <List<RankViewEntry>>this.rankEntries.slice(indices.start, indices.end + 1);
-      const startPositions: List<StartAndHeight> = this._splitter.startPositions;
-      beforePadding = startPositions.get(indices.start).start;
-
-      afterPadding = 0;
-      if ((startPositions.size - 1) > indices.end) {
-        const endStartPos: StartAndHeight = startPositions.get(indices.end);
-        const lastStartPos: StartAndHeight = startPositions.get(startPositions.size - 1);
-        const last: number = lastStartPos.start + lastStartPos.height;
-        const end: number = endStartPos.start + endStartPos.height;
-        afterPadding = last - end;
-      }
+      visibleEntries = <List<RankViewEntry>>this.rankEntries.slice(scrollInfo.start, scrollInfo.end + 1);
     }
 
-    this._zome.run(() => {
+    this._zone.run(() => {
       this.visibleEntries = visibleEntries;
-      this.beforePadding = beforePadding;
-      this.afterPadding = afterPadding;
+      this.beforePadding = scrollInfo.beforePadding;
+      this.afterPadding = scrollInfo.afterPadding;
       this._changeDetectorRef.markForCheck();
     });
   }
 
   onUpdateParallelTask(event: UpdateParallelTaskEvent) {
     this.updateParallelTask.emit(event);
+  }
+
+  same(a: VirtualScrollInfo, b: VirtualScrollInfo) {
+    return a.start === b.start &&
+      a.end === b.end &&
+      a.beforePadding === b.beforePadding &&
+      a.afterPadding === b.afterPadding;
   }
 }
 

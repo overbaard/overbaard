@@ -9,6 +9,7 @@ import {BoardHeader} from '../../../../../view-model/board/board-header';
 import {UpdateParallelTaskEvent} from '../../../../../events/update-parallel-task.event';
 import {IssueSummaryLevel} from '../../../../../model/board/user/issue-summary-level';
 import {IssueDetailState} from '../../../../../model/board/user/issue-detail/issue-detail.model';
+import {Observable} from 'rxjs/Observable';
 
 @Component({
   selector: 'app-kanban-view-column-group',
@@ -30,6 +31,14 @@ export class KanbanViewColumnGroupComponent implements OnInit, OnChanges {
   // If a swimlane is collapsed, we still need to display empty columns so the header has the correct width
   @Input()
   displayIssues = true;
+
+  @Input()
+  boardBodyHeight: number;
+  /**
+   * Values emitted here come from the ScrollListenerDirective and are OUTSIDE the angular zone.
+   */
+  @Input()
+  topOffsetObserver: Observable<number>;
 
   @Output()
   updateParallelTask: EventEmitter<UpdateParallelTaskEvent> = new EventEmitter<UpdateParallelTaskEvent>();

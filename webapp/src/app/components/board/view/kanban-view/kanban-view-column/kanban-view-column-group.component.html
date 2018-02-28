@@ -4,6 +4,8 @@
   <app-kanban-view-column
     [header]="header"
     [issues]="table.get(header.stateIndices.get(0))"
+    [boardBodyHeight]="boardBodyHeight"
+    [topOffsetObserver]="topOffsetObserver"
     [displayIssues]="displayIssues"
     [issueDetailState]="issueDetailState"
     (updateParallelTask)="onUpdateParallelTask($event)"
@@ -14,6 +16,8 @@
     *ngFor="let header of header.states ; trackBy: headerStateTrackByFn"
     [header]="header"
     [issues]="table.get(header.stateIndices.get(0))"
+    [boardBodyHeight]="boardBodyHeight"
+    [topOffsetObserver]="topOffsetObserver"
     [displayIssues]="displayIssues"
     [issueDetailState]="issueDetailState"
     (updateParallelTask)="onUpdateParallelTask($event)"

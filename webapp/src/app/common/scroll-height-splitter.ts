@@ -5,6 +5,8 @@ export class ScrollHeightSplitter<T> {
   private _list: List<T>;
   private _startPositions: List<StartAndHeight>;
 
+  private _lastIndices: VirtualScrollInfo = {start: 0, end: 0, beforePadding: 0, afterPadding: 0};
+
   static create<T>(itemHeight: (t: T) => number): ScrollHeightSplitter<T> {
     const splitter: ScrollHeightSplitter<T> = new ScrollHeightSplitter<T>(itemHeight);
     return splitter;
@@ -32,9 +34,12 @@ export class ScrollHeightSplitter<T> {
     }
   }
 
-  getStartAndEndIndex(scrollPos: number, containerHeight: number): StartAndEndIndex {
+  getVirtualScrollInfo(scrollPos: number, containerHeight: number): VirtualScrollInfo {
     let startIndex = -1;
     let endIndex = -1;
+    let beforePadding = 0;
+    let afterPadding = 0;
+
     const endPosition: StartAndHeight = this._startPositions.get(this._startPositions.size - 1);
     if (this._startPositions.size > 0) {
       if (endPosition.start + endPosition.height > scrollPos) {
@@ -51,9 +56,18 @@ export class ScrollHeightSplitter<T> {
           endIndex = this.findEndIndex(startIndex, scrollPos, containerHeight);
         }
       }
+
+      beforePadding = this._startPositions.get(startIndex).start;
+      if ((this._startPositions.size - 1) > endIndex) {
+        const endStartPos: StartAndHeight = this._startPositions.get(endIndex);
+        const lastStartPos: StartAndHeight = this._startPositions.get(this._startPositions.size - 1);
+        const last: number = lastStartPos.start + lastStartPos.height;
+        const end: number = endStartPos.start + endStartPos.height;
+        afterPadding = last - end;
+      }
     }
 
-    return {start: startIndex, end: endIndex};
+    return {start: startIndex, end: endIndex, beforePadding: beforePadding, afterPadding: afterPadding};
   }
 
   private findStartIndex(scrollPos: number): number {
@@ -99,7 +113,9 @@ export interface StartAndHeight {
   height: number;
 }
 
-export interface StartAndEndIndex {
+export interface VirtualScrollInfo {
   start: number,
-  end: number
+  end: number,
+  beforePadding: number,
+  afterPadding: number
 }
