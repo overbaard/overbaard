@@ -77,7 +77,7 @@ export class BoardIssueComponent implements OnInit, OnChanges, AfterViewInit {
 
     const s = `${this.issue.key} ${calculatedHeight} ${actualHeight}`;
     if (actualHeight !== calculatedHeight) {
-      console.error(s);
+      // console.error(s);
     } else {
       // console.log(s);
     }
