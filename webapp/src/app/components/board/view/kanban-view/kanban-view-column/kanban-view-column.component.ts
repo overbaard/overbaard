@@ -53,7 +53,7 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
   private _destroy$: Subject<void> = new Subject<void>();
 
   private _splitter: ScrollHeightSplitter<BoardIssueView> = ScrollHeightSplitter.create(rve => rve.calculatedTotalHeight);
-  private _lastScrollInfo: VirtualScrollInfo = {start: 0, end: 0, beforePadding: 0, afterPadding: 0};
+  private _lastScrollInfo: VirtualScrollInfo = {start: 0, end: 0, beforePadding: 0, afterPadding: 0, lowWaterMark: 0, highWaterMark: 0};
   private _scrollTop = 0;
   visibleIssues: List<BoardIssueView>;
   beforePadding = 0;
@@ -107,9 +107,12 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
 
 
   private calculateVisibleEntries(forceUpdate: boolean = false) {
+    if (!forceUpdate && ScrollHeightSplitter.isWithinScrollWaterMark(this._scrollTop, this._lastScrollInfo)) {
+      return;
+    }
     const scrollInfo: VirtualScrollInfo = this._splitter.getVirtualScrollInfo(this._scrollTop, this.boardBodyHeight);
     if (!forceUpdate) {
-      if (this.same(this._lastScrollInfo, scrollInfo)) {
+      if (ScrollHeightSplitter.same(this._lastScrollInfo, scrollInfo)) {
         return;
       }
     }
@@ -120,7 +123,6 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
       visibleIssues = List<BoardIssueView>();
     } else {
       visibleIssues = <List<BoardIssueView>>this.issues.slice(scrollInfo.start, scrollInfo.end + 1);
-      const startPositions: List<StartAndHeight> = this._splitter.startPositions;
     }
 
     this._zone.run(() => {
@@ -129,13 +131,5 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
       this.afterPadding = scrollInfo.afterPadding;
       this._changeDetectorRef.markForCheck();
     });
-  }
-
-
-  same(a: VirtualScrollInfo, b: VirtualScrollInfo) {
-    return a.start === b.start &&
-      a.end === b.end &&
-      a.beforePadding === b.beforePadding &&
-      a.afterPadding === b.afterPadding;
   }
 }

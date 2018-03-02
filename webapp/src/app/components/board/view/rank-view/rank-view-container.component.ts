@@ -49,7 +49,7 @@ export class RankViewContainerComponent implements OnInit, OnChanges, OnDestroy 
   private _destroy$: Subject<void> = new Subject<void>();
 
   private _splitter: ScrollHeightSplitter<RankViewEntry> = ScrollHeightSplitter.create(rve => rve.calculatedTotalHeight);
-  private _lastScrollInfo: VirtualScrollInfo = {start: 0, end: 0, beforePadding: 0, afterPadding: 0};
+  private _lastScrollInfo: VirtualScrollInfo = {start: 0, end: 0, beforePadding: 0, afterPadding: 0, lowWaterMark: -1, highWaterMark: -1};
   private _scrollTop = 0;
   visibleEntries: List<RankViewEntry>;
   beforePadding = 0;
@@ -82,15 +82,18 @@ export class RankViewContainerComponent implements OnInit, OnChanges, OnDestroy 
     }
     const heightChange: SimpleChange = changes['boardBodyHeight'];
     if (heightChange && !heightChange.firstChange && heightChange.currentValue !== heightChange.previousValue) {
-      this.calculateVisibleEntries();
+      this.calculateVisibleEntries(true);
     }
   }
 
 
   private calculateVisibleEntries(forceUpdate: boolean = false) {
+    if (!forceUpdate && ScrollHeightSplitter.isWithinScrollWaterMark(this._scrollTop, this._lastScrollInfo)) {
+      return;
+    }
     const scrollInfo: VirtualScrollInfo = this._splitter.getVirtualScrollInfo(this._scrollTop, this.boardBodyHeight);
     if (!forceUpdate) {
-      if (this.same(this._lastScrollInfo, scrollInfo)) {
+      if (ScrollHeightSplitter.same(this._lastScrollInfo, scrollInfo)) {
         return;
       }
     }
@@ -115,11 +118,12 @@ export class RankViewContainerComponent implements OnInit, OnChanges, OnDestroy 
     this.updateParallelTask.emit(event);
   }
 
-  same(a: VirtualScrollInfo, b: VirtualScrollInfo) {
-    return a.start === b.start &&
-      a.end === b.end &&
-      a.beforePadding === b.beforePadding &&
-      a.afterPadding === b.afterPadding;
+
+  private isWithinScrollWaterMark() {
+    if (this._lastScrollInfo.highWaterMark === -1 || this._lastScrollInfo.lowWaterMark === -1) {
+      return false;
+    }
+    return this._scrollTop < this._lastScrollInfo.lowWaterMark || this._scrollTop > this._lastScrollInfo.highWaterMark;
   }
 }
 
