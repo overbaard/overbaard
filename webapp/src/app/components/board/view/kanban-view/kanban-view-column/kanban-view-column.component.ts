@@ -53,7 +53,6 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
   private _destroy$: Subject<void> = new Subject<void>();
 
   private _splitter: ScrollHeightSplitter<BoardIssueView> = ScrollHeightSplitter.create(rve => rve.calculatedTotalHeight);
-  private _lastScrollInfo: VirtualScrollInfo = {start: 0, end: 0, beforePadding: 0, afterPadding: 0, lowWaterMark: 0, highWaterMark: 0};
   private _scrollTop = 0;
   visibleIssues: List<BoardIssueView>;
   beforePadding = 0;
@@ -107,29 +106,23 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
 
 
   private calculateVisibleEntries(forceUpdate: boolean = false) {
-    if (!forceUpdate && ScrollHeightSplitter.isWithinScrollWaterMark(this._scrollTop, this._lastScrollInfo)) {
-      return;
-    }
-    const scrollInfo: VirtualScrollInfo = this._splitter.getVirtualScrollInfo(this._scrollTop, this.boardBodyHeight);
-    if (!forceUpdate) {
-      if (ScrollHeightSplitter.same(this._lastScrollInfo, scrollInfo)) {
-        return;
-      }
-    }
-    this._lastScrollInfo = scrollInfo;
-
-    let visibleIssues: List<BoardIssueView>;
-    if (scrollInfo.start === -1) {
-      visibleIssues = List<BoardIssueView>();
-    } else {
-      visibleIssues = <List<BoardIssueView>>this.issues.slice(scrollInfo.start, scrollInfo.end + 1);
-    }
-
-    this._zone.run(() => {
-      this.visibleIssues = visibleIssues;
-      this.beforePadding = scrollInfo.beforePadding;
-      this.afterPadding = scrollInfo.afterPadding;
-      this._changeDetectorRef.markForCheck();
-    });
+    this._splitter.updateVirtualScrollInfo(
+      this._scrollTop,
+      this.boardBodyHeight,
+      forceUpdate,
+      scrollInfo => {
+        let visibleIssues: List<BoardIssueView>;
+        if (scrollInfo.start === -1) {
+          visibleIssues = List<BoardIssueView>();
+        } else {
+          visibleIssues = <List<BoardIssueView>>this.issues.slice(scrollInfo.start, scrollInfo.end + 1);
+        }
+        this._zone.run(() => {
+          this.visibleIssues = visibleIssues;
+          this.beforePadding = scrollInfo.beforePadding;
+          this.afterPadding = scrollInfo.afterPadding;
+          this._changeDetectorRef.markForCheck();
+        });
+      });
   }
 }

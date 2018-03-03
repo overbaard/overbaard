@@ -13,6 +13,7 @@ import {RankViewEntry} from '../../../../view-model/board/rank-view-entry';
 import {List} from 'immutable';
 import {Subject} from 'rxjs/Subject';
 import {ScrollHeightSplitter, VirtualScrollInfo, StartAndHeight} from '../../../../common/scroll-height-splitter';
+import {BoardIssueView} from '../../../../view-model/board/board-issue-view';
 
 @Component({
   selector: 'app-rank-view-container',
@@ -49,7 +50,6 @@ export class RankViewContainerComponent implements OnInit, OnChanges, OnDestroy 
   private _destroy$: Subject<void> = new Subject<void>();
 
   private _splitter: ScrollHeightSplitter<RankViewEntry> = ScrollHeightSplitter.create(rve => rve.calculatedTotalHeight);
-  private _lastScrollInfo: VirtualScrollInfo = {start: 0, end: 0, beforePadding: 0, afterPadding: 0, lowWaterMark: -1, highWaterMark: -1};
   private _scrollTop = 0;
   visibleEntries: List<RankViewEntry>;
   beforePadding = 0;
@@ -88,42 +88,28 @@ export class RankViewContainerComponent implements OnInit, OnChanges, OnDestroy 
 
 
   private calculateVisibleEntries(forceUpdate: boolean = false) {
-    if (!forceUpdate && ScrollHeightSplitter.isWithinScrollWaterMark(this._scrollTop, this._lastScrollInfo)) {
-      return;
-    }
-    const scrollInfo: VirtualScrollInfo = this._splitter.getVirtualScrollInfo(this._scrollTop, this.boardBodyHeight);
-    if (!forceUpdate) {
-      if (ScrollHeightSplitter.same(this._lastScrollInfo, scrollInfo)) {
-        return;
-      }
-    }
-    this._lastScrollInfo = scrollInfo;
-
-    let visibleEntries: List<RankViewEntry>;
-    if (scrollInfo.start === -1) {
-      visibleEntries = List<RankViewEntry>();
-    } else {
-      visibleEntries = <List<RankViewEntry>>this.rankEntries.slice(scrollInfo.start, scrollInfo.end + 1);
-    }
-
-    this._zone.run(() => {
-      this.visibleEntries = visibleEntries;
-      this.beforePadding = scrollInfo.beforePadding;
-      this.afterPadding = scrollInfo.afterPadding;
-      this._changeDetectorRef.markForCheck();
-    });
+    this._splitter.updateVirtualScrollInfo(
+      this._scrollTop,
+      this.boardBodyHeight,
+      forceUpdate,
+      scrollInfo => {
+        let visibleEntries: List<RankViewEntry>;
+        if (scrollInfo.start === -1) {
+          visibleEntries = List<RankViewEntry>();
+        } else {
+          visibleEntries = <List<RankViewEntry>>this.rankEntries.slice(scrollInfo.start, scrollInfo.end + 1);
+        }
+        this._zone.run(() => {
+          this.visibleEntries = visibleEntries;
+          this.beforePadding = scrollInfo.beforePadding;
+          this.afterPadding = scrollInfo.afterPadding;
+          this._changeDetectorRef.markForCheck();
+        });
+      });
   }
 
   onUpdateParallelTask(event: UpdateParallelTaskEvent) {
     this.updateParallelTask.emit(event);
-  }
-
-
-  private isWithinScrollWaterMark() {
-    if (this._lastScrollInfo.highWaterMark === -1 || this._lastScrollInfo.lowWaterMark === -1) {
-      return false;
-    }
-    return this._scrollTop < this._lastScrollInfo.lowWaterMark || this._scrollTop > this._lastScrollInfo.highWaterMark;
   }
 }
 

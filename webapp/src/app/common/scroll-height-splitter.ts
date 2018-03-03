@@ -1,11 +1,14 @@
 import {List} from 'immutable';
+import {SwimlaneData} from '../view-model/board/swimlane-data';
+import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
+import {BoardViewModel} from '../view-model/board/board-view';
 
 export class ScrollHeightSplitter<T> {
 
   private _list: List<T>;
   private _startPositions: List<StartAndHeight>;
 
-  private _lastIndices: VirtualScrollInfo = {start: 0, end: 0, beforePadding: 0, afterPadding: 0, lowWaterMark: -1, highWaterMark: -1};
+  private _lastInfo: VirtualScrollInfo = INITIAL_SCROLL_INFO;
 
   static create<T>(itemHeight: (t: T) => number): ScrollHeightSplitter<T> {
     const splitter: ScrollHeightSplitter<T> = new ScrollHeightSplitter<T>(itemHeight);
@@ -48,13 +51,99 @@ export class ScrollHeightSplitter<T> {
     }
   }
 
+  updateVirtualScrollInfo(
+    scrollPos: number,
+    containerHeight: number,
+    force: boolean,
+    newInfoCallback: (newInfo: VirtualScrollInfo) => void) {
+    if (force || this._lastInfo === INITIAL_SCROLL_INFO) {
+      this._lastInfo = this.binarySearchVirtualScrollInfos(scrollPos, containerHeight);
+      newInfoCallback(this._lastInfo);
+      return;
+    }
+
+    if (scrollPos > this._lastInfo.lowWaterMark && scrollPos < this._lastInfo.highWaterMark) {
+      return;
+    }
+
+    this._lastInfo = this.calculateNewScrollInfo(this._lastInfo, scrollPos, containerHeight);
+    newInfoCallback(this._lastInfo);
+  }
+
+  private calculateNewScrollInfo(scrollInfo: VirtualScrollInfo, scrollPos: number, containerHeight: number): VirtualScrollInfo {
+    let newStart = -1;
+    let newEnd = -1;
+
+    // Check the next entries, as they are more likely to be the ones (especially if scrolling is not super-fast)
+    // in order to avoid the overhead of doing the binary search on every scroll
+    if (scrollPos <= scrollInfo.lowWaterMark) {
+      newStart = this.checkIncrementCurrentLowWaterMark(scrollInfo, scrollPos, false);
+      newEnd = this.checkIncrementCurrentHighWaterMark(scrollInfo, scrollPos, containerHeight, false);
+    }
+    if (scrollPos >= scrollInfo.highWaterMark) {
+      newStart = this.checkIncrementCurrentLowWaterMark(scrollInfo, scrollPos, true);
+      newEnd = this.checkIncrementCurrentHighWaterMark(scrollInfo, scrollPos, containerHeight, true);
+    }
+
+    if (newStart === -1 || newEnd === -1) {
+      // console.log(`Binary Search ${newStart} ${newEnd}`);
+      // It is not a simple increment so do the full binary search again
+      return this.binarySearchVirtualScrollInfos(scrollPos, containerHeight);
+    }
+
+    // console.log(`Incremented ${newStart} ${newEnd}`);
+    return this.createVirtualScrollInfo(scrollPos, containerHeight, newStart, newEnd);
+  }
+
+  private checkIncrementCurrentLowWaterMark(scrollInfo: VirtualScrollInfo, scrollPos: number, increment: boolean): number {
+    let index = scrollInfo.start;
+    let pos: StartAndHeight = this._startPositions.get(index);
+    if (this.checkInStartRange(pos, scrollPos) === 0) {
+      return index;
+    } else if (increment || scrollInfo.start > 0) {
+      index += increment ? 1 : -1;
+      if (index >= this._startPositions.size - 1) {
+        return scrollInfo.start;
+      }
+      pos = this._startPositions.get(index);
+      if (this.checkInStartRange(pos, scrollPos) === 0) {
+        return index;
+      }
+    }
+    // It is not a simple increment, so give up and handle this in the caller
+    return -1;
+  }
+
+  private checkIncrementCurrentHighWaterMark(
+    scrollInfo: VirtualScrollInfo, scrollPos: number, containerHeight: number, increment: boolean): number {
+
+    let index = scrollInfo.end;
+    let pos: StartAndHeight = this._startPositions.get(index);
+    if (this.checkInEndRange(pos, scrollPos, containerHeight) === 0) {
+      return index;
+    } else if (scrollInfo.end === this._startPositions.size - 1) {
+      return this._startPositions.size - 1;
+    } else if (!increment || scrollInfo.end < this.startPositions.size - 1) {
+      index += increment ? 1 : -1;
+      if (index < 0) {
+        return scrollInfo.end;
+      }
+      pos = this._startPositions.get(index);
+      if (this.checkInEndRange(pos, scrollPos, containerHeight) === 0) {
+        return index;
+      }
+    }
+    // It is not a simple increment, so give up and handle this in the caller
+    return -1;
+  }
+
   getVirtualScrollInfo(scrollPos: number, containerHeight: number): VirtualScrollInfo {
+    return this.binarySearchVirtualScrollInfos(scrollPos, containerHeight);
+  }
+
+  private binarySearchVirtualScrollInfos(scrollPos: number, containerHeight: number): VirtualScrollInfo {
     let startIndex = -1;
     let endIndex = -1;
-    let beforePadding = 0;
-    let afterPadding = 0;
-    let highWaterMark = -1;
-    let lowWaterMark = -1;
 
     const lastPosition: StartAndHeight = this._startPositions.get(this._startPositions.size - 1);
     if (this._startPositions.size > 0) {
@@ -71,26 +160,36 @@ export class ScrollHeightSplitter<T> {
         } else {
           endIndex = this.findEndIndex(startIndex, scrollPos, containerHeight);
         }
-        const endPosition: StartAndHeight = this._startPositions.get(endIndex);
 
-        // Calculate paddings
-        beforePadding = startPosition.start;
-        if ((this._startPositions.size - 1) > endIndex) {
-          const last: number = lastPosition.start + lastPosition.height;
-          const end: number = endPosition.start + endPosition.height;
-          afterPadding = last - end;
-        }
-
-        // Calculate watermarks
-        lowWaterMark = this.findLowWaterMark(scrollPos, containerHeight, startPosition, endPosition);
-        highWaterMark = this.findHighWaterMark(scrollPos, containerHeight, startPosition, endPosition);
+        return this.createVirtualScrollInfo(scrollPos, containerHeight, startIndex, endIndex);
       }
     }
 
-    return {
-      start: startIndex, end: endIndex,
-      beforePadding: beforePadding, afterPadding: afterPadding,
-      lowWaterMark: lowWaterMark, highWaterMark: highWaterMark};
+    return INITIAL_SCROLL_INFO;
+  }
+
+  private createVirtualScrollInfo(scrollPos: number, containerHeight: number, startIndex: number, endIndex: number) {
+
+    const startPosition: StartAndHeight = this._startPositions.get(startIndex);
+    const endPosition: StartAndHeight = this._startPositions.get(endIndex);
+    const lastPosition: StartAndHeight = this._startPositions.get(this._startPositions.size - 1);
+
+    // Calculate paddings
+    const beforePadding: number = startPosition.start;
+    let afterPadding = 0;
+    if ((this._startPositions.size - 1) > endIndex) {
+      const last: number = lastPosition.start + lastPosition.height;
+      const end: number = endPosition.start + endPosition.height;
+      afterPadding = last - end;
+    }
+
+    // Calculate watermarks
+    const lowWaterMark = this.findLowWaterMark(scrollPos, containerHeight, startPosition, endPosition);
+    const highWaterMark = this.findHighWaterMark(scrollPos, containerHeight, startPosition, endPosition);
+
+    return INFO_FACTORY(
+      {start: startIndex, end: endIndex, beforePadding: beforePadding,
+        afterPadding: afterPadding, lowWaterMark: lowWaterMark, highWaterMark: highWaterMark});
   }
 
   private findLowWaterMark(scrollPos: number, containerHeight: number, startPos: StartAndHeight, endPos: StartAndHeight): number {
@@ -130,13 +229,25 @@ export class ScrollHeightSplitter<T> {
       checks++;
       const middle: number = low === high ? low : Math.floor((low + high) / 2);
       const current: StartAndHeight = this._startPositions.get(middle);
-      if (current.start === scrollPos || current.start < scrollPos && current.start + current.height > scrollPos) {
-        return middle;
-      } else if (current.start > scrollPos) {
-        high = middle - 1;
-      } else {
-        low = middle + 1;
+      switch (this.checkInStartRange(current, scrollPos)) {
+        case 0:
+          return middle;
+        case -1:
+          low = middle + 1;
+          break;
+        case 1:
+          high = middle - 1;
       }
+    }
+  }
+
+  private checkInStartRange(sah: StartAndHeight, scrollPos: number): number {
+    if (sah.start === scrollPos || sah.start < scrollPos && sah.start + sah.height > scrollPos) {
+      return 0;
+    } else if (sah.start > scrollPos) {
+      return 1;
+    } else {
+      return -1;
     }
   }
 
@@ -144,21 +255,34 @@ export class ScrollHeightSplitter<T> {
     let checks = 0;
     let low = startIndex;
     let high: number = this._startPositions.size - 1;
-    const endPos: number = scrollPos + containerHeight;
 
     while (true) {
       checks++;
       const middle: number = low === high ? low : Math.floor((low + high) / 2);
       const current: StartAndHeight = this._startPositions.get(middle);
-      const currEnd = current.start + current.height
-      if (currEnd < endPos) {
-        low = middle + 1;
-      } else {
-        if (current.start < endPos && currEnd >= endPos) {
+      const currEnd = current.start + current.height;
+      switch (this.checkInEndRange(current, scrollPos, containerHeight)) {
+        case 0:
           return middle;
-        }
-        high = middle - 1;
+        case -1:
+          low = middle + 1;
+          break;
+        case 1:
+          high = middle - 1;
       }
+    }
+  }
+
+  private checkInEndRange(sah: StartAndHeight, scrollPos: number, containerHeight: number): number {
+    const endPos: number = scrollPos + containerHeight;
+    const currEnd = sah.start + sah.height;
+    if (currEnd < endPos) {
+      return -1;
+    } else {
+      if (sah.start < endPos && currEnd >= endPos) {
+        return 0;
+      }
+      return 1;
     }
   }
 }
@@ -176,3 +300,14 @@ export interface VirtualScrollInfo {
   lowWaterMark: number,
   highWaterMark: number
 }
+
+export interface VirtualScrollInfoRecord extends TypedRecord<VirtualScrollInfoRecord>, VirtualScrollInfo {
+}
+
+const DEFAULT_INFO: VirtualScrollInfo = {start: -1, end: -1, beforePadding: 0, afterPadding: 0, lowWaterMark: -1, highWaterMark: -1};
+const INFO_FACTORY = makeTypedFactory<VirtualScrollInfo, VirtualScrollInfoRecord>(DEFAULT_INFO);
+const INITIAL_SCROLL_INFO = INFO_FACTORY(DEFAULT_INFO);
+
+
+
+
