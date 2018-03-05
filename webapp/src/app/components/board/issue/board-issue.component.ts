@@ -53,7 +53,7 @@ export class BoardIssueComponent implements OnInit, OnChanges, AfterViewInit {
   viewModeEnum = BoardViewMode;
 
 
-  constructor(public menuDialog: MatDialog, private _boardService: BoardService, private _elementRef: ElementRef) { }
+  constructor(public menuDialog: MatDialog, private _boardService: BoardService/*, private _elementRef: ElementRef*/) { }
 
   ngOnInit() {
   }
@@ -66,7 +66,11 @@ export class BoardIssueComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+
+    /*
     // Debug code only
+    // This compares the measured height with the calculated height. Only enable this when that area is problematic,
+    // as it has a performance overhead, which slows down the virtual scrolling.
     const calculatedHeight: number = this.issue.calculatedTotalHeight;
     const card: HTMLElement = this._elementRef.nativeElement.querySelector('mat-card');
     const margin = 10; // We need to add the margin ourselves
@@ -77,10 +81,11 @@ export class BoardIssueComponent implements OnInit, OnChanges, AfterViewInit {
 
     const s = `${this.issue.key} ${calculatedHeight} ${actualHeight}`;
     if (actualHeight !== calculatedHeight) {
-      // console.error(s);
+      console.error(s);
     } else {
-      // console.log(s);
+      console.log(s);
     }
+    */
   }
 
   get showSummary(): boolean {
