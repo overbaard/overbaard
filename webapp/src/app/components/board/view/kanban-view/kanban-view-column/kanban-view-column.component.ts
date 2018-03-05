@@ -61,14 +61,19 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
   constructor(private _zone: NgZone, private _changeDetectorRef: ChangeDetectorRef) { }
 
   ngOnInit() {
-    this.topOffsetObserver
-      .takeUntil(this._destroy$)
-      .subscribe(
-        value => {
-          this._scrollTop = value;
-          this.calculateVisibleEntries();
-        }
-      );
+    if (this.topOffsetObserver) {
+      this.topOffsetObserver
+        .takeUntil(this._destroy$)
+        .subscribe(
+          value => {
+            this._scrollTop = value;
+            this.calculateVisibleEntries();
+          }
+        );
+    } else {
+      // Temp fix to get swimlanes working without virtual scrolling
+      this.visibleIssues = this.issues;
+    }
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -86,7 +91,12 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
     if (issuesChange && issuesChange.currentValue !== issuesChange.previousValue) {
       this._splitter.updateList(this.issues);
       // Force an update here since the underlying list has changed
-      this.calculateVisibleEntries(true);
+      if (this.topOffsetObserver) {
+        this.calculateVisibleEntries(true);
+      } else {
+        // Temp fix to get swimlanes working without virtual scrolling
+        this.visibleIssues = this.issues;
+      }
     }
     const heightChange: SimpleChange = changes['boardBodyHeight'];
     if (heightChange && !heightChange.firstChange && heightChange.currentValue !== heightChange.previousValue) {
