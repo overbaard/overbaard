@@ -55,7 +55,7 @@ export class ScrollHeightSplitter<T> {
     scrollPos: number,
     containerHeight: number,
     force: boolean,
-    newInfoCallback: (newInfo: VirtualScrollInfo) => void) {
+    newInfoCallback: (startIndex: number, endIndex: number, beforePadding: number, afterPadding: number) => void) {
 
     if (scrollPos < 0) {
       scrollPos = 0;
@@ -63,7 +63,7 @@ export class ScrollHeightSplitter<T> {
 
     if (force || this._lastInfo === INITIAL_SCROLL_INFO) {
       this._lastInfo = this.binarySearchVirtualScrollInfos(scrollPos, containerHeight);
-      newInfoCallback(this._lastInfo);
+      newInfoCallback(this._lastInfo.start, this._lastInfo.end, this._lastInfo.beforePadding, this._lastInfo.afterPadding);
       return;
     }
 
@@ -72,8 +72,9 @@ export class ScrollHeightSplitter<T> {
     }
 
     this._lastInfo = this.calculateNewScrollInfo(this._lastInfo, scrollPos, containerHeight);
-    newInfoCallback(this._lastInfo);
+    newInfoCallback(this._lastInfo.start, this._lastInfo.end, this._lastInfo.beforePadding, this._lastInfo.afterPadding);
   }
+
 
   private calculateNewScrollInfo(scrollInfo: VirtualScrollInfo, scrollPos: number, containerHeight: number): VirtualScrollInfo {
     let newStart = -1;
@@ -173,7 +174,7 @@ export class ScrollHeightSplitter<T> {
     return INITIAL_SCROLL_INFO;
   }
 
-  private createVirtualScrollInfo(scrollPos: number, containerHeight: number, startIndex: number, endIndex: number) {
+  private createVirtualScrollInfo(scrollPos: number, containerHeight: number, startIndex: number, endIndex: number): VirtualScrollInfo {
 
     const startPosition: StartAndHeight = this._startPositions.get(startIndex);
     const endPosition: StartAndHeight = this._startPositions.get(endIndex);
@@ -192,9 +193,11 @@ export class ScrollHeightSplitter<T> {
     const lowWaterMark = this.findLowWaterMark(scrollPos, containerHeight, startPosition, endPosition);
     const highWaterMark = this.findHighWaterMark(scrollPos, containerHeight, startPosition, endPosition);
 
-    return INFO_FACTORY(
-      {start: startIndex, end: endIndex, beforePadding: beforePadding,
-        afterPadding: afterPadding, lowWaterMark: lowWaterMark, highWaterMark: highWaterMark});
+    // Always create a new instance
+    return {
+      start: startIndex, end: endIndex,
+      beforePadding: beforePadding, afterPadding: afterPadding,
+      lowWaterMark: lowWaterMark, highWaterMark: highWaterMark};
   }
 
   private findLowWaterMark(scrollPos: number, containerHeight: number, startPos: StartAndHeight, endPos: StartAndHeight): number {
@@ -306,13 +309,5 @@ export interface VirtualScrollInfo {
   highWaterMark: number
 }
 
-export interface VirtualScrollInfoRecord extends TypedRecord<VirtualScrollInfoRecord>, VirtualScrollInfo {
-}
-
-const DEFAULT_INFO: VirtualScrollInfo = {start: -1, end: -1, beforePadding: 0, afterPadding: 0, lowWaterMark: -1, highWaterMark: -1};
-const INFO_FACTORY = makeTypedFactory<VirtualScrollInfo, VirtualScrollInfoRecord>(DEFAULT_INFO);
-const INITIAL_SCROLL_INFO = INFO_FACTORY(DEFAULT_INFO);
-
-
-
+const INITIAL_SCROLL_INFO: VirtualScrollInfo = {start: -1, end: -1, beforePadding: 0, afterPadding: 0, lowWaterMark: -1, highWaterMark: -1};
 

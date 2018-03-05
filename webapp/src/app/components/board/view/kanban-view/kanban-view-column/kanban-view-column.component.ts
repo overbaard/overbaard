@@ -104,23 +104,22 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
     this.updateParallelTask.emit(event);
   }
 
-
   private calculateVisibleEntries(forceUpdate: boolean = false) {
     this._splitter.updateVirtualScrollInfo(
       this._scrollTop,
       this.boardBodyHeight,
       forceUpdate,
-      scrollInfo => {
+      (startIndex: number, endIndex: number, beforePadding: number, afterPadding: number) => {
         let visibleIssues: List<BoardIssueView>;
-        if (scrollInfo.start === -1) {
+        if (startIndex === -1) {
           visibleIssues = List<BoardIssueView>();
         } else {
-          visibleIssues = <List<BoardIssueView>>this.issues.slice(scrollInfo.start, scrollInfo.end + 1);
+          visibleIssues = <List<BoardIssueView>>this.issues.slice(startIndex, endIndex+ 1);
         }
         this._zone.run(() => {
           this.visibleIssues = visibleIssues;
-          this.beforePadding = scrollInfo.beforePadding;
-          this.afterPadding = scrollInfo.afterPadding;
+          this.beforePadding = beforePadding;
+          this.afterPadding = afterPadding;
           this._changeDetectorRef.markForCheck();
         });
       });

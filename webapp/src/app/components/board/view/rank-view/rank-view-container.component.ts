@@ -92,17 +92,17 @@ export class RankViewContainerComponent implements OnInit, OnChanges, OnDestroy 
       this._scrollTop,
       this.boardBodyHeight,
       forceUpdate,
-      scrollInfo => {
+      (startIndex: number, endIndex: number, beforePadding: number, afterPadding: number) => {
         let visibleEntries: List<RankViewEntry>;
-        if (scrollInfo.start === -1) {
+        if (startIndex === -1) {
           visibleEntries = List<RankViewEntry>();
         } else {
-          visibleEntries = <List<RankViewEntry>>this.rankEntries.slice(scrollInfo.start, scrollInfo.end + 1);
+          visibleEntries = <List<RankViewEntry>>this.rankEntries.slice(startIndex, endIndex + 1);
         }
         this._zone.run(() => {
           this.visibleEntries = visibleEntries;
-          this.beforePadding = scrollInfo.beforePadding;
-          this.afterPadding = scrollInfo.afterPadding;
+          this.beforePadding = beforePadding;
+          this.afterPadding = afterPadding;
           this._changeDetectorRef.markForCheck();
         });
       });
