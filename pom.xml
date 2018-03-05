@@ -447,7 +447,7 @@
                                     <goal>yarn</goal>
                                 </goals>
                                 <configuration>
-                                    <arguments>run build --output-hashing=all</arguments>
+                                    <arguments>run build --output-hashing=all --env=prod --aot</arguments>
                                 </configuration>
                             </execution>
                         </executions>
