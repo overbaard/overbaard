@@ -190,8 +190,8 @@ export class ScrollHeightSplitter<T> {
     }
 
     // Calculate watermarks
-    const lowWaterMark = this.findLowWaterMark(scrollPos, containerHeight, startPosition, endPosition);
-    const highWaterMark = this.findHighWaterMark(scrollPos, containerHeight, startPosition, endPosition);
+    const lowWaterMark = this.findLowWaterMark(scrollPos, containerHeight, startPosition);
+    const highWaterMark = this.findHighWaterMark(scrollPos, containerHeight, endPosition);
 
     // Always create a new instance
     return {
@@ -200,32 +200,12 @@ export class ScrollHeightSplitter<T> {
       lowWaterMark: lowWaterMark, highWaterMark: highWaterMark};
   }
 
-  private findLowWaterMark(scrollPos: number, containerHeight: number, startPos: StartAndHeight, endPos: StartAndHeight): number {
-    const startMark: number = startPos.start;
-    const endMark: number = endPos.start - containerHeight;
-    if (endMark < 0) {
-      return startMark;
-    }
-    return this.minimumDeltaMark(scrollPos, startMark, endMark);
+  private findLowWaterMark(scrollPos: number, containerHeight: number, startPos: StartAndHeight): number {
+    return startPos.start;
   }
 
-  private findHighWaterMark(scrollPos: number, containerHeight: number, startPos: StartAndHeight, endPos: StartAndHeight): number {
-    const startMark: number = startPos.start + startPos.height;
-    const endMark: number = endPos.start + endPos.height - containerHeight;
-    return this.minimumDeltaMark(scrollPos, startMark, endMark);
-  }
-
-  private minimumDeltaMark(scrollPos: number, startMark: number, endMark: number): number {
-    if (endMark < 0) {
-      return startMark;
-    }
-
-    const startDelta = Math.abs(startMark - scrollPos);
-    const endDelta = Math.abs(endMark - scrollPos);
-    if (endDelta < startDelta) {
-      return endMark;
-    }
-    return startMark;
+  private findHighWaterMark(scrollPos: number, containerHeight: number, endPos: StartAndHeight): number {
+    return endPos.start + endPos.height - containerHeight;
   }
 
   private findStartIndex(scrollPos: number): number {
