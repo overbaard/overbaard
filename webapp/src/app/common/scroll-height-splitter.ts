@@ -10,8 +10,8 @@ export class ScrollHeightSplitter<T> {
 
   private _lastInfo: VirtualScrollInfo = INITIAL_SCROLL_INFO;
 
-  static create<T>(itemHeight: (t: T) => number): ScrollHeightSplitter<T> {
-    const splitter: ScrollHeightSplitter<T> = new ScrollHeightSplitter<T>(itemHeight);
+  static create<T>(itemHeightGetter: (t: T) => number): ScrollHeightSplitter<T> {
+    const splitter: ScrollHeightSplitter<T> = new ScrollHeightSplitter<T>(itemHeightGetter);
     return splitter;
   }
 
@@ -30,7 +30,7 @@ export class ScrollHeightSplitter<T> {
   }
 
   private constructor(
-    private _itemHeight: (t: T) => number) {
+    private _itemHeightGetter: (t: T) => number) {
   }
 
   get startPositions(): List<StartAndHeight> {
@@ -43,7 +43,7 @@ export class ScrollHeightSplitter<T> {
       this._startPositions = List<StartAndHeight>().withMutations(mutable => {
         let current = 0;
         this._list.forEach(item => {
-          const height: number = this._itemHeight(item);
+          const height: number = this._itemHeightGetter(item);
           mutable.push({start: current, height: height});
           current += height;
         })
@@ -56,6 +56,11 @@ export class ScrollHeightSplitter<T> {
     containerHeight: number,
     force: boolean,
     newInfoCallback: (newInfo: VirtualScrollInfo) => void) {
+
+    if (scrollPos < 0) {
+      scrollPos = 0;
+    }
+
     if (force || this._lastInfo === INITIAL_SCROLL_INFO) {
       this._lastInfo = this.binarySearchVirtualScrollInfos(scrollPos, containerHeight);
       newInfoCallback(this._lastInfo);
