@@ -32,8 +32,8 @@ export class ScrollListenerDirective implements OnInit, OnDestroy, AfterViewInit
   scrollTopObserver: Subject<number>;
 
 
-  private lastLeft = -1;
-  private lastTop = -1;
+  private _lastLeft = -1;
+  private _lastTop = -1;
 
   private _disposeScrollHandler: () => void | undefined;
   private refreshHandler = () => {
@@ -86,9 +86,9 @@ export class ScrollListenerDirective implements OnInit, OnDestroy, AfterViewInit
     this._zone.runOutsideAngular(() => {
       requestAnimationFrame((timeStamp: any) => {
         const left: number = this._ref.nativeElement.scrollLeft;
-        if (left !== this.lastLeft) {
-          this.lastLeft = left;
-          this.scrollLeftObserver.next(this._ref.nativeElement.scrollLeft);
+        if (left !== this._lastLeft) {
+          this._lastLeft = left;
+          this.scrollLeftObserver.next(left);
         }
       });
     });
@@ -99,9 +99,9 @@ export class ScrollListenerDirective implements OnInit, OnDestroy, AfterViewInit
       requestAnimationFrame((timeStamp: any) => {
         if (this.scrollTopObserver) {
           const top: number = this._ref.nativeElement.scrollTop;
-          if (top !== this.lastTop) {
-            this.lastTop = top;
-            this.scrollTopObserver.next(this._ref.nativeElement.scrollTop);
+          if (top !== this._lastTop) {
+            this._lastTop = top;
+            this.scrollTopObserver.next(top);
           }
         }
       });

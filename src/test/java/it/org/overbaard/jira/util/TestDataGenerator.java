@@ -180,7 +180,7 @@ public class TestDataGenerator {
             ModelNode issue = new ModelNode();
             issue.get(KEY).set(key);
             issue.get(STATE).set(i % NUMBER_STATES);
-            issue.get(SUMMARY).set("Someone needs to implement and test Issue Number " + (i + 1));
+            issue.get(SUMMARY).set(createSummary(i));
             issue.get(COMPONENTS).add(i % NUMBER_COMPONENTS);
             issue.get(LABELS).add(i % NUMBER_LABELS);
             issue.get(FIX_VERSIONS).add(i % NUMBER_FIX_VERSIONS);
@@ -191,6 +191,15 @@ public class TestDataGenerator {
             issues.get(key).set(issue);
         }
         return issues;
+    }
+
+    private String createSummary(int issue) {
+        StringBuilder sb = new StringBuilder("Someone needs to implement and test Issue Number " + issue);
+        int words = (int)(Math.random() * 20);
+        for (int i = 0 ; i < words ; i++) {
+            sb.append(" word" + i);
+        }
+        return sb.toString();
     }
 
     public static void main(String[] args) throws IOException {
