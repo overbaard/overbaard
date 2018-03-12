@@ -403,12 +403,11 @@ describe('Boards Query Parameters Service Tests', () => {
 
   function parseQueryString(qs: string): Dictionary<string> {
     const dict: Dictionary<string> = {};
-    qs.split('&').reduce((map, pair) => {
+    return qs.split('&').reduce((map, pair) => {
       const entry: string[] = pair.split('=');
       map[entry[0]] = entry[1];
       return map;
     }, dict);
-    return dict;
   }
 
 });
