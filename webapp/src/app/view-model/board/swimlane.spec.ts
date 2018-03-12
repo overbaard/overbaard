@@ -1829,7 +1829,6 @@ class BoardChecker {
       let visible: number;
       header.states.forEach((h, i) => {
         this.checkHeader(header, totalIssueCounts, visibleIssueCounts);
-        const stateIndex = header.stateIndices.get(0);
         total += header.totalIssues;
         visible += header.visibleIssues;
       });

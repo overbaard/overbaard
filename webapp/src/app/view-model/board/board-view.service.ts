@@ -1021,7 +1021,6 @@ class SwimlaneDataBuilder {
   }
 
   build(): SwimlaneData {
-    const table: List<List<string>> = this._tableBuilder.getTable();
     if (this._existing) {
       if (!this.isChanged()) {
         return this._existing;

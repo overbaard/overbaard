@@ -242,7 +242,7 @@ export class BoardComponent implements OnInit, OnDestroy {
             this._store.dispatch(ProgressLogActions.createExternallyDismissFirstMessage());
           }
         });
-    const dialogRef = this.menuDialog.open(BlacklistDialogComponent, {
+    this.menuDialog.open(BlacklistDialogComponent, {
       data: {
         blacklist: this.blacklist
       }
