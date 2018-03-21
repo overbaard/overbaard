@@ -124,7 +124,10 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
         if (startIndex === -1) {
           visibleIssues = List<BoardIssueView>();
         } else {
-          visibleIssues = <List<BoardIssueView>>this.issues.slice(startIndex, endIndex+ 1);
+          if (endIndex > 0) {
+            // console.log(`${startIndex}-${endIndex} ${this.beforePadding}/${this.afterPadding} ${this.issues.slice(startIndex, endIndex).map(i => i.key).toArray()}`);
+          }
+          visibleIssues = <List<BoardIssueView>>this.issues.slice(startIndex, endIndex + 1);
         }
         this._zone.run(() => {
           this.visibleIssues = visibleIssues;

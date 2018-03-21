@@ -1010,18 +1010,25 @@ class SwimlaneDataBuilder {
   private _visibleIssuesCount = 0;
   filterVisible = true;
   private _table: List<List<BoardIssueView>>;
+  private readonly _calculatedColumnHeights: number[];
 
 
   constructor(private readonly _key: string, private readonly _display: string,
               states: number, private _collapsed: boolean, exisitingInfo: SwimlaneInfo) {
     this._existing = exisitingInfo ? exisitingInfo.swimlanes.get(_key) : null;
     this._tableBuilder = new TableBuilder<BoardIssueView>(states, this._existing ? this._existing.table : null);
+    console.log('--- Calculated heights');
+    this._calculatedColumnHeights = new Array<number>(states);
+    for (let i = 0 ; i < states ; i++) {
+      this._calculatedColumnHeights[i] = 0;
+    }
   }
 
   addIssue(issue: BoardIssueView, boardIndex: number) {
     if (issue.visible) {
       this._tableBuilder.push(boardIndex, issue);
       this._visibleIssuesCount++;
+      this._calculatedColumnHeights[boardIndex] += issue.calculatedTotalHeight;
     }
   }
 
@@ -1063,12 +1070,24 @@ class SwimlaneDataBuilder {
         return this._existing;
       }
     }
+
+    let maxColumnHeight = 0;
+    if (!this._collapsed) {
+      this._calculatedColumnHeights.forEach(v => {
+        if (v > maxColumnHeight) {
+          maxColumnHeight = v;
+        }
+      });
+    }
+
     return BoardViewModelUtil.createSwimlaneDataView(
       this._key,
       this._display,
       this._tableBuilder.build(),
       this._visibleIssuesCount,
-      this._collapsed);
+      this._collapsed,
+      maxColumnHeight += 36 /* header height: 30; header bottom border: 1, column top padding: 5 */
+      );
   };
 
   updateCollapsed() {

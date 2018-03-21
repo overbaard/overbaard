@@ -21,10 +21,14 @@
   ></app-kanban-normal-view>
   <app-kanban-swimlane-view
     *ngIf="board.issueTable.swimlaneInfo"
-    [board]="board"
+    [headers]="board.headers"
+    [swimlaneInfo]="board.issueTable.swimlaneInfo"
+    [issueDetailState]="board.issueDetail"
     [headerTextOffset]="boardLeftOffset * -1"
+    [boardBodyHeight]="boardBodyHeight"
     (toggleCollapsedSwimlane)="onToggleCollapsedSwimlane($event)"
     (updateParallelTask)="onUpdateParallelTask($event)"
+    [topOffsetObserver]="scrollTopObserver$"
     appScrollListener
     [scrollLeftObserver]="scrollLeftObserver$"
   ></app-kanban-swimlane-view>

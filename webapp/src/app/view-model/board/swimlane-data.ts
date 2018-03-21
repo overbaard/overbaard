@@ -7,4 +7,5 @@ export interface SwimlaneData {
   table: List<List<BoardIssueView>>;
   visibleIssues: number;
   collapsed: boolean;
+  calculatedTotalHeight: number
 }

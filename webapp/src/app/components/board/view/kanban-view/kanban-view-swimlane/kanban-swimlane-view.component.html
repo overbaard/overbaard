@@ -1,13 +1,15 @@
 <!-- trackBy is a hint to angular to be able to keep (i.e. don't destroy and recreate) as many components as possible -->
 <div>
-<app-kanban-swimlane-entry
-  *ngFor="let swimlane of swimlaneInfo.swimlanes.values()"
-  [board]="board"
-  [swimlane]="swimlane"
-  [showEmpty]="swimlaneInfo.showEmpty"
-  [headerTextOffset]="headerTextOffset"
-  [issueDetailState]="board.issueDetail"
-  (toggleCollapsedSwimlane)="onToggleCollapsedSwimlane($event)"
-  (updateParallelTask)="onUpdateParallelTask($event)"
-></app-kanban-swimlane-entry>
+  <div [style.height.px]="beforePadding"></div>
+  <app-kanban-swimlane-entry
+    *ngFor="let swimlane of visibleSwimlanes"
+    [headers]="headers"
+    [swimlane]="swimlane"
+    [showEmpty]="swimlaneInfo.showEmpty"
+    [headerTextOffset]="headerTextOffset"
+    [issueDetailState]="issueDetailState"
+    (toggleCollapsedSwimlane)="onToggleCollapsedSwimlane($event)"
+    (updateParallelTask)="onUpdateParallelTask($event)"
+  ></app-kanban-swimlane-entry>
+  <div [style.height.px]="afterPadding"></div>
 </div>

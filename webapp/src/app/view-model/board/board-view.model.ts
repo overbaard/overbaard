@@ -55,7 +55,8 @@ const DEFAULT_SWIMLANE_DATA: SwimlaneData = {
   display: null,
   table: List<List<BoardIssueView>>(),
   visibleIssues: 0,
-  collapsed: false
+  collapsed: false,
+  calculatedTotalHeight: 0
 };
 
 const DEFAULT_RANK_VIEW_ENTRY: RankViewEntry = {
@@ -168,13 +169,15 @@ export class BoardViewModelUtil {
     display: string,
     table: List<List<BoardIssueView>>,
     visibleIssues: number,
-    collapsed: boolean): SwimlaneData {
+    collapsed: boolean,
+    calculatedTotalHeight): SwimlaneData {
     const state: SwimlaneData = {
       key: key,
       display: display,
       table: table,
       visibleIssues: visibleIssues,
-      collapsed: collapsed
+      collapsed: collapsed,
+      calculatedTotalHeight: calculatedTotalHeight
     };
     return SWIMLANE_DATA_STATE_FACTORY(state);
   }
