@@ -163,7 +163,7 @@ export class BoardIssueComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   onOpenMoveIssueDialog(event: MouseEvent) {
-    const dialogRef = this.menuDialog.open(MoveIssueDialogComponent, {
+    this.menuDialog.open(MoveIssueDialogComponent, {
       data: {
         issue: this.issue,
         boardService: this._boardService
@@ -172,7 +172,7 @@ export class BoardIssueComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   onOpenCommentIssueDialog(event: MouseEvent) {
-    const dialogRef = this.menuDialog.open(CommentIssueDialogComponent, {
+    this.menuDialog.open(CommentIssueDialogComponent, {
       data: {
         issue: this.issue,
         boardService: this._boardService
@@ -181,7 +181,7 @@ export class BoardIssueComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   onOpenRankIssueDialog(event: MouseEvent) {
-    const dialogRef = this.menuDialog.open(RankIssueDialogComponent, {
+    this.menuDialog.open(RankIssueDialogComponent, {
       data: {
         issue: this.issue,
         boardService: this._boardService

@@ -1246,7 +1246,7 @@ class BoardChecker {
     // Check issue visibilities
     const invisibleKeys: string[] =
       issueTable.issues.filter(issue => !issue.visible).keySeq().toArray().sort((a, b) => a.localeCompare(b));
-    expect(invisibleKeys).toEqual(this._invisibleIssues.sort((a, b) => a.localeCompare(b)));
+    expect(invisibleKeys).toEqual([...this._invisibleIssues].sort((a, b) => a.localeCompare(b)));
 
     // Check issue counts
     const totalIssueCounts: number[] = new Array<number>(this._expected.length);

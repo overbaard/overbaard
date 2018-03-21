@@ -55,7 +55,7 @@ export class ParallelTaskComponent implements OnInit {
       if (option && option !== this.selectedOption) {
         this.updateParallelTask.emit({
           issueKey: this.issue.key,
-          taskIndex: this.taskIndex = this.taskIndex,
+          taskIndex: this.taskIndex,
           selectedOptionIndex: index,
           taskName: this.parallelTask.name,
           optionName: option.name

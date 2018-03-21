@@ -1758,7 +1758,7 @@ class BoardChecker {
     // Check issue visibilities
     const invisibleKeys: string[] =
       issueTable.issues.filter(issue => !issue.visible).keySeq().toArray().sort((a, b) => a.localeCompare(b));
-    expect(invisibleKeys).toEqual(this._expectedInvisible.sort((a, b) => a.localeCompare(b)));
+    expect(invisibleKeys).toEqual([...this._expectedInvisible].sort((a, b) => a.localeCompare(b)));
 
     // Check issue counts
     const totalIssueCounts: number[] = new Array<number>(this._expectedTable.length);
@@ -1825,7 +1825,6 @@ class BoardChecker {
       let visible: number;
       header.states.forEach((h, i) => {
         this.checkHeader(header, totalIssueCounts, visibleIssueCounts);
-        const stateIndex = header.stateIndices.get(0);
         total += header.totalIssues;
         visible += header.visibleIssues;
       });

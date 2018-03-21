@@ -189,8 +189,8 @@ export class FilterChecker {
 
   checkFilter(expected: string[], actual: Set<string>) {
     expect(actual.size).toBe(expected.length);
-    const eSorted: string[] = expected.sort((a, b) => a.localeCompare(b));
-    const aSorted: string[] = actual.toArray().sort((a, b) => a.localeCompare(b));
+    const eSorted: string[] = [...expected].sort((a, b) => a.localeCompare(b));
+    const aSorted: string[] = [...actual.toArray()].sort((a, b) => a.localeCompare(b));
     expect(aSorted).toEqual(eSorted);
   }
 }
