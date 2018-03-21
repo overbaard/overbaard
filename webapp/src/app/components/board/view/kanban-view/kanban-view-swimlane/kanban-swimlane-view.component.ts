@@ -126,7 +126,7 @@ export class KanbanSwimlaneViewComponent implements OnInit, OnChanges {
         } else {
           visibleSwimlanes = <List<SwimlaneData>>this._swimlanes.slice(startIndex, endIndex + 1);
         }
-        console.log(`${startIndex}-${endIndex} ${this.beforePadding}/${this.afterPadding} ${this._swimlanes.slice(startIndex, endIndex).map(i => i.display).toArray()}`);
+        // console.log(`${startIndex}-${endIndex} ${beforePadding}/${afterPadding} ${this._swimlanes.slice(startIndex, endIndex + 1).map(i => i.display).toArray()}`);
         this._zone.run(() => {
           this.visibleSwimlanes = visibleSwimlanes;
           this.beforePadding = beforePadding;

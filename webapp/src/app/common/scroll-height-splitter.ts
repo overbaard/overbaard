@@ -15,20 +15,6 @@ export class ScrollHeightSplitter<T> {
     return splitter;
   }
 
-  static same(a: VirtualScrollInfo, b: VirtualScrollInfo) {
-    return a.start === b.start &&
-      a.end === b.end &&
-      a.beforePadding === b.beforePadding &&
-      a.afterPadding === b.afterPadding;
-  }
-
-  static isWithinScrollWaterMark(scrollTop: number, scrollInfo: VirtualScrollInfo) {
-    if (scrollInfo.highWaterMark === -1 || scrollInfo.lowWaterMark === -1) {
-      return false;
-    }
-    return scrollTop > scrollInfo.lowWaterMark && scrollTop < scrollInfo.highWaterMark;
-  }
-
   private constructor(
     private _itemHeightGetter: (t: T) => number) {
   }
@@ -58,6 +44,7 @@ export class ScrollHeightSplitter<T> {
     newInfoCallback: (startIndex: number, endIndex: number, beforePadding: number, afterPadding: number) => void) {
 
     if (scrollPos < 0) {
+      // Deal with any 'bounce' when quickly scrolling to the top of the page
       scrollPos = 0;
     }
 
@@ -67,7 +54,7 @@ export class ScrollHeightSplitter<T> {
       return;
     }
 
-    if (scrollPos > this._lastInfo.lowWaterMark && scrollPos < this._lastInfo.highWaterMark) {
+    if (scrollPos >= this._lastInfo.lowWaterMark && (this._lastInfo.isPastLast || scrollPos <= this._lastInfo.highWaterMark)) {
       return;
     }
 
@@ -82,11 +69,11 @@ export class ScrollHeightSplitter<T> {
 
     // Check the next entries, as they are more likely to be the ones (especially if scrolling is not super-fast)
     // in order to avoid the overhead of doing the binary search on every scroll
-    if (scrollPos <= scrollInfo.lowWaterMark) {
+    if (scrollPos < scrollInfo.lowWaterMark) {
       newStart = this.checkIncrementCurrentLowWaterMark(scrollInfo, scrollPos, false);
       newEnd = this.checkIncrementCurrentHighWaterMark(scrollInfo, scrollPos, containerHeight, false);
     }
-    if (scrollPos >= scrollInfo.highWaterMark) {
+    if (scrollPos > scrollInfo.highWaterMark) {
       newStart = this.checkIncrementCurrentLowWaterMark(scrollInfo, scrollPos, true);
       newEnd = this.checkIncrementCurrentHighWaterMark(scrollInfo, scrollPos, containerHeight, true);
     }
@@ -104,18 +91,21 @@ export class ScrollHeightSplitter<T> {
   private checkIncrementCurrentLowWaterMark(scrollInfo: VirtualScrollInfo, scrollPos: number, increment: boolean): number {
     let index = scrollInfo.start;
     let pos: StartAndHeight = this._startPositions.get(index);
-    if (this.checkInStartRange(pos, scrollPos) === 0) {
-      return index;
-    } else if (increment || scrollInfo.start > 0) {
-      index += increment ? 1 : -1;
-      if (index >= this._startPositions.size - 1) {
-        return scrollInfo.start;
-      }
-      pos = this._startPositions.get(index);
+    if (pos) {
       if (this.checkInStartRange(pos, scrollPos) === 0) {
         return index;
+      } else if (increment || scrollInfo.start > 0) {
+        index += increment ? 1 : -1;
+        if (index >= this._startPositions.size - 1) {
+          return scrollInfo.start;
+        }
+        pos = this._startPositions.get(index);
+        if (this.checkInStartRange(pos, scrollPos) === 0) {
+          return index;
+        }
       }
     }
+
     // It is not a simple increment, so give up and handle this in the caller
     return -1;
   }
@@ -125,26 +115,22 @@ export class ScrollHeightSplitter<T> {
 
     let index = scrollInfo.end;
     let pos: StartAndHeight = this._startPositions.get(index);
-    if (this.checkInEndRange(pos, scrollPos, containerHeight) === 0) {
-      return index;
-    } else if (scrollInfo.end === this._startPositions.size - 1) {
-      return this._startPositions.size - 1;
-    } else if (!increment || scrollInfo.end < this.startPositions.size - 1) {
-      index += increment ? 1 : -1;
-      if (index < 0) {
-        return scrollInfo.end;
-      }
-      pos = this._startPositions.get(index);
+    if (pos) {
       if (this.checkInEndRange(pos, scrollPos, containerHeight) === 0) {
         return index;
+      } else if (!increment || scrollInfo.end < this.startPositions.size - 1) {
+        index += increment ? 1 : -1;
+        if (index < 0) {
+          return scrollInfo.end;
+        }
+        pos = this._startPositions.get(index);
+        if (this.checkInEndRange(pos, scrollPos, containerHeight) === 0) {
+          return index;
+        }
       }
     }
     // It is not a simple increment, so give up and handle this in the caller
     return -1;
-  }
-
-  getVirtualScrollInfo(scrollPos: number, containerHeight: number): VirtualScrollInfo {
-    return this.binarySearchVirtualScrollInfos(scrollPos, containerHeight);
   }
 
   private binarySearchVirtualScrollInfos(scrollPos: number, containerHeight: number): VirtualScrollInfo {
@@ -154,7 +140,7 @@ export class ScrollHeightSplitter<T> {
     const lastPosition: StartAndHeight = this._startPositions.get(this._startPositions.size - 1);
     if (this._startPositions.size > 0) {
       if (lastPosition.start + lastPosition.height > scrollPos) {
-        startIndex = this.findStartIndex(scrollPos);
+        startIndex = this.binarySearchStartIndex(scrollPos);
         // Find end index
         const endPos: number = scrollPos + containerHeight;
         const startPosition: StartAndHeight = this._startPositions.get(startIndex);
@@ -164,51 +150,38 @@ export class ScrollHeightSplitter<T> {
         } else if (lastPosition.start + lastPosition.height < endPos) {
           endIndex = this._startPositions.size - 1;
         } else {
-          endIndex = this.findEndIndex(startIndex, scrollPos, containerHeight);
+          endIndex = this.binarySearchEndIndex(startIndex, scrollPos, containerHeight);
         }
-
         return this.createVirtualScrollInfo(scrollPos, containerHeight, startIndex, endIndex);
       }
     }
 
-    return INITIAL_SCROLL_INFO;
-  }
-
-  private createVirtualScrollInfo(scrollPos: number, containerHeight: number, startIndex: number, endIndex: number): VirtualScrollInfo {
-
-    const startPosition: StartAndHeight = this._startPositions.get(startIndex);
-    const endPosition: StartAndHeight = this._startPositions.get(endIndex);
-    const lastPosition: StartAndHeight = this._startPositions.get(this._startPositions.size - 1);
-
-    // Calculate paddings
-    const beforePadding: number = startPosition.start;
-    let afterPadding = 0;
-    if ((this._startPositions.size - 1) > endIndex) {
-      const last: number = lastPosition.start + lastPosition.height;
-      const end: number = endPosition.start + endPosition.height;
-      afterPadding = last - end;
+    let beforePadding = 0;
+    if (lastPosition) {
+      beforePadding = lastPosition.start + lastPosition.height;
     }
 
-    // Calculate watermarks
-    const lowWaterMark = this.findLowWaterMark(scrollPos, containerHeight, startPosition);
-    const highWaterMark = this.findHighWaterMark(scrollPos, containerHeight, endPosition);
-
-    // Always create a new instance
     return {
-      start: startIndex, end: endIndex,
-      beforePadding: beforePadding, afterPadding: afterPadding,
-      lowWaterMark: lowWaterMark, highWaterMark: highWaterMark};
+      start: -1, end: -1,
+      beforePadding: beforePadding, afterPadding: 0,
+      lowWaterMark: beforePadding, highWaterMark: -1,
+      isPastLast: true};
   }
 
   private findLowWaterMark(scrollPos: number, containerHeight: number, startPos: StartAndHeight): number {
     return startPos.start;
   }
 
-  private findHighWaterMark(scrollPos: number, containerHeight: number, endPos: StartAndHeight): number {
-    return endPos.start + endPos.height - containerHeight;
+  private findHighWaterMark(scrollPos: number, containerHeight: number, endPos: StartAndHeight, last: boolean): number {
+    const wm: number = this.calculateEndPos(endPos);
+    if (last) {
+      return wm;
+    }
+
+    return wm - containerHeight;
   }
 
-  private findStartIndex(scrollPos: number): number {
+  private binarySearchStartIndex(scrollPos: number): number {
     let checks = 0;
     let low = 0;
     let high: number = this._startPositions.size - 1;
@@ -230,7 +203,8 @@ export class ScrollHeightSplitter<T> {
   }
 
   private checkInStartRange(sah: StartAndHeight, scrollPos: number): number {
-    if (sah.start === scrollPos || sah.start < scrollPos && sah.start + sah.height > scrollPos) {
+    const currEnd = this.calculateEndPos(sah);
+    if (sah.start <= scrollPos && currEnd >= scrollPos) {
       return 0;
     } else if (sah.start > scrollPos) {
       return 1;
@@ -239,7 +213,7 @@ export class ScrollHeightSplitter<T> {
     }
   }
 
-  private findEndIndex(startIndex: number, scrollPos: number, containerHeight: number): number {
+  private binarySearchEndIndex(startIndex: number, scrollPos: number, containerHeight: number): number {
     let checks = 0;
     let low = startIndex;
     let high: number = this._startPositions.size - 1;
@@ -248,7 +222,6 @@ export class ScrollHeightSplitter<T> {
       checks++;
       const middle: number = low === high ? low : Math.floor((low + high) / 2);
       const current: StartAndHeight = this._startPositions.get(middle);
-      const currEnd = current.start + current.height;
       switch (this.checkInEndRange(current, scrollPos, containerHeight)) {
         case 0:
           return middle;
@@ -263,15 +236,48 @@ export class ScrollHeightSplitter<T> {
 
   private checkInEndRange(sah: StartAndHeight, scrollPos: number, containerHeight: number): number {
     const endPos: number = scrollPos + containerHeight;
-    const currEnd = sah.start + sah.height;
+    const currEnd = this.calculateEndPos(sah);
     if (currEnd < endPos) {
       return -1;
-    } else {
-      if (sah.start < endPos && currEnd >= endPos) {
+    } else if (sah.start <= endPos && currEnd >= endPos) {
         return 0;
-      }
+    } else {
       return 1;
     }
+  }
+
+  private createVirtualScrollInfo(scrollPos: number, containerHeight: number, startIndex: number, endIndex: number): VirtualScrollInfo {
+
+    const startPosition: StartAndHeight = this._startPositions.get(startIndex);
+    const endPosition: StartAndHeight = this._startPositions.get(endIndex);
+    const lastPosition: StartAndHeight = this._startPositions.get(this._startPositions.size - 1);
+
+    // Calculate paddings
+    const beforePadding: number = startPosition.start;
+    let afterPadding = 0;
+    if ((this._startPositions.size - 1) > endIndex) {
+      const last: number = lastPosition.start + lastPosition.height;
+      const end: number = endPosition.start + endPosition.height;
+      afterPadding = last - end;
+    }
+
+    // Calculate watermarks
+    const lowWaterMark = this.findLowWaterMark(scrollPos, containerHeight, startPosition);
+    const highWaterMark = this.findHighWaterMark(scrollPos, containerHeight, endPosition, lastPosition === endPosition);
+
+    // Always create a new instance
+    const info: VirtualScrollInfo = {
+      start: startIndex, end: endIndex,
+      beforePadding: beforePadding, afterPadding: afterPadding,
+      lowWaterMark: lowWaterMark, highWaterMark: highWaterMark,
+      isPastLast: false};
+
+    console.log(JSON.stringify(info));
+    return info;
+  }
+
+  private calculateEndPos(sah: StartAndHeight) {
+    return sah.start + sah.height - 1;
   }
 }
 
@@ -280,14 +286,15 @@ export interface StartAndHeight {
   height: number;
 }
 
-export interface VirtualScrollInfo {
-  start: number,
-  end: number,
-  beforePadding: number,
-  afterPadding: number,
-  lowWaterMark: number,
-  highWaterMark: number
+interface VirtualScrollInfo {
+  start: number;
+  end: number;
+  beforePadding: number;
+  afterPadding: number;
+  lowWaterMark: number;
+  highWaterMark: number;
+  isPastLast: boolean;
 }
 
-const INITIAL_SCROLL_INFO: VirtualScrollInfo = {start: -1, end: -1, beforePadding: 0, afterPadding: 0, lowWaterMark: -1, highWaterMark: -1};
-
+const INITIAL_SCROLL_INFO: VirtualScrollInfo = {
+  start: -1, end: -1, beforePadding: 0, afterPadding: 0, lowWaterMark: -1, highWaterMark: -1, isPastLast: false};

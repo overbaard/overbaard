@@ -12,7 +12,7 @@ import {Observable} from 'rxjs/Observable';
 import {RankViewEntry} from '../../../../view-model/board/rank-view-entry';
 import {List} from 'immutable';
 import {Subject} from 'rxjs/Subject';
-import {ScrollHeightSplitter, VirtualScrollInfo, StartAndHeight} from '../../../../common/scroll-height-splitter';
+import {ScrollHeightSplitter, StartAndHeight} from '../../../../common/scroll-height-splitter';
 import {BoardIssueView} from '../../../../view-model/board/board-issue-view';
 import {takeUntil} from 'rxjs/operators';
 
@@ -102,6 +102,7 @@ export class RankViewContainerComponent implements OnInit, OnChanges, OnDestroy 
         } else {
           visibleEntries = <List<RankViewEntry>>this.rankEntries.slice(startIndex, endIndex + 1);
         }
+        // console.log(`${startIndex}-${endIndex} ${this.beforePadding}/${this.afterPadding} ${this.rankEntries.slice(startIndex, endIndex + 1).map(r => r.issue.key).toArray()}`);
         this._zone.run(() => {
           this.visibleEntries = visibleEntries;
           this.beforePadding = beforePadding;
