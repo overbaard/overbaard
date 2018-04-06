@@ -1,7 +1,4 @@
-import {
-  AfterViewInit, Directive, ElementRef, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output,
-  Renderer2
-} from '@angular/core';
+import {AfterViewInit, Directive, ElementRef, Input, NgZone, OnDestroy, OnInit, Renderer2} from '@angular/core';
 import {Subject} from 'rxjs/Subject';
 import 'rxjs/add/observable/fromEvent';
 
@@ -25,15 +22,12 @@ export class ScrollListenerDirective implements OnInit, OnDestroy, AfterViewInit
   @Input()
   scrollTopObserver: Subject<number>;
 
-
-  private _lastLeft = -1;
-  private _lastTop = -1;
-
   private _disposeScrollHandler: () => void | undefined;
+
+
   private refreshHandler = () => {
     this.refresh();
   };
-
 
   constructor(private _ref: ElementRef,
               private readonly _renderer: Renderer2,
@@ -77,28 +71,28 @@ export class ScrollListenerDirective implements OnInit, OnDestroy, AfterViewInit
   }
 
   private refreshLeft() {
-    this._zone.runOutsideAngular(() => {
-      requestAnimationFrame((timeStamp: any) => {
-        const left: number = this._ref.nativeElement.scrollLeft;
-        if (left !== this._lastLeft) {
-          this._lastLeft = left;
-          this.scrollLeftObserver.next(left);
-        }
-      });
-    });
+    this.refreshPosition(
+      this.scrollLeftObserver,
+      () => this._ref.nativeElement.scrollLeft);
   }
 
   private refreshTop() {
-    this._zone.runOutsideAngular(() => {
-      requestAnimationFrame((timeStamp: any) => {
-        if (this.scrollTopObserver) {
-          const top: number = this._ref.nativeElement.scrollTop;
-          if (top !== this._lastTop) {
-            this._lastTop = top;
-            this.scrollTopObserver.next(top);
-          }
-        }
+    this.refreshPosition(
+      this.scrollTopObserver,
+      () => this._ref.nativeElement.scrollTop);
+  }
+
+  private refreshPosition(
+    observer: Subject<number>,
+    positionGetter: () => number) {
+
+    const pos = positionGetter();
+    if (observer) {
+      requestAnimationFrame((timestamp: any) => {
+        this._zone.runOutsideAngular(() => {
+          observer.next(pos)
+        });
       });
-    });
+    }
   }
 }

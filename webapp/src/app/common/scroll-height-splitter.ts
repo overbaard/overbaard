@@ -272,7 +272,7 @@ export class ScrollHeightSplitter<T> {
       lowWaterMark: lowWaterMark, highWaterMark: highWaterMark,
       isPastLast: false};
 
-    console.log(JSON.stringify(info));
+    // console.log(JSON.stringify(info));
     return info;
   }
 

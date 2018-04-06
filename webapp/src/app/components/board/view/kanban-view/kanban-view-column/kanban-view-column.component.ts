@@ -29,6 +29,9 @@ import {takeUntil} from 'rxjs/operators';
 })
 export class KanbanViewColumnComponent implements OnInit, OnChanges {
 
+  /*static tempCounter = 0;
+  private tmpColumnNo;*/
+
   @Input()
   header: BoardHeader;
 
@@ -64,7 +67,9 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
   beforePadding = 0;
   afterPadding = 0;
 
-  constructor(private _zone: NgZone, private _changeDetectorRef: ChangeDetectorRef) { }
+  constructor(private _zone: NgZone, private _changeDetectorRef: ChangeDetectorRef) {
+    // this.tmpColumnNo = KanbanViewColumnComponent.tempCounter++;
+  }
 
   ngOnInit() {
     if (this.topOffsetObserver) {
@@ -132,16 +137,17 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
         if (startIndex === -1) {
           visibleIssues = List<BoardIssueView>();
         } else {
-          if (endIndex > 0) {
-            console.log(`${startIndex}-${endIndex} ${this.beforePadding}/${this.afterPadding} ${this.issues.slice(startIndex, endIndex + 1).map(i => i.key).toArray()}`);
-          }
+          // if (endIndex > 0) {
+          //   console.log(`Col ${this.tmpColumnNo}: ${startIndex}-${endIndex} ${this.beforePadding}/${this.afterPadding} ` +
+          //   `${this.issues.slice(startIndex, endIndex + 1).map(i => i.key).toArray()}`);
+          // }
           visibleIssues = <List<BoardIssueView>>this.issues.slice(startIndex, endIndex + 1);
         }
         this._zone.run(() => {
           this.visibleIssues = visibleIssues;
           this.beforePadding = beforePadding;
           this.afterPadding = afterPadding;
-          this._changeDetectorRef.markForCheck();
+          this._changeDetectorRef.detectChanges();
         });
       });
   }
