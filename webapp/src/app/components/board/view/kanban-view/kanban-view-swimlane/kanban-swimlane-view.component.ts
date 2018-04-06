@@ -92,11 +92,15 @@ export class KanbanSwimlaneViewComponent implements OnInit, OnChanges {
       this._swimlanes = List<SwimlaneData>(this.swimlaneInfo.swimlanes.values());
       this._splitter.updateList(this._swimlanes);
       console.log(JSON.stringify(this._splitter.startPositions));
-      this.calculateVisibleEntries(true);
+      requestAnimationFrame(() => {
+        this.calculateVisibleEntries(true);
+      });
     }
     const heightChange: SimpleChange = changes['boardBodyHeight'];
     if (heightChange && !heightChange.firstChange && heightChange.currentValue !== heightChange.previousValue) {
-      this.calculateVisibleEntries();
+      requestAnimationFrame(() => {
+        this.calculateVisibleEntries(true);
+      });
     }
 
   }

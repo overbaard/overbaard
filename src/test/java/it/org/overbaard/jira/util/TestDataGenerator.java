@@ -68,7 +68,7 @@ public class TestDataGenerator {
     //private static final int NUMBER_LINKED_PROJECT_STATES = 0;
     //private static final int NUMBER_LINKED_PROJECT_ENTRIES = 0;
 
-    private static final int NUMBER_ISSUES = 2500;
+    private static final int NUMBER_ISSUES = 13;
 
     TestDataGenerator() {
     }

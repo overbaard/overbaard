@@ -81,11 +81,15 @@ export class RankViewContainerComponent implements OnInit, OnChanges, OnDestroy 
     if (rankChange && rankChange.currentValue !== rankChange.previousValue) {
       this._splitter.updateList(this.rankEntries);
       // Force an update here since the underlying list has changed
-      this.calculateVisibleEntries(true);
+      requestAnimationFrame(() => {
+        this.calculateVisibleEntries(true);
+      });
     }
     const heightChange: SimpleChange = changes['boardBodyHeight'];
     if (heightChange && !heightChange.firstChange && heightChange.currentValue !== heightChange.previousValue) {
-      this.calculateVisibleEntries(true);
+      requestAnimationFrame(() => {
+        this.calculateVisibleEntries(true);
+      });
     }
   }
 
@@ -102,7 +106,8 @@ export class RankViewContainerComponent implements OnInit, OnChanges, OnDestroy 
         } else {
           visibleEntries = <List<RankViewEntry>>this.rankEntries.slice(startIndex, endIndex + 1);
         }
-        // console.log(`${startIndex}-${endIndex} ${this.beforePadding}/${this.afterPadding} ${this.rankEntries.slice(startIndex, endIndex + 1).map(r => r.issue.key).toArray()}`);
+        // console.log(`${startIndex}-${endIndex} ${this.beforePadding}/${this.afterPadding} ` +
+        //   `${this.rankEntries.slice(startIndex, endIndex + 1).map(r => r.issue.key).toArray()}`);
         this._zone.run(() => {
           this.visibleEntries = visibleEntries;
           this.beforePadding = beforePadding;

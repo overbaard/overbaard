@@ -105,7 +105,9 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
       this._splitter.updateList(this.issues);
       // Force an update here since the underlying list has changed
       if (this.topOffsetObserver) {
-        this.calculateVisibleEntries(true);
+        requestAnimationFrame(() => {
+          this.calculateVisibleEntries(true);
+        });
       } else {
         // Temp fix to get swimlanes working without virtual scrolling
         this.visibleIssues = this.issues;
@@ -113,9 +115,10 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
     }
     const heightChange: SimpleChange = changes['boardBodyHeight'];
     if (heightChange && !heightChange.firstChange && heightChange.currentValue !== heightChange.previousValue) {
-      this.calculateVisibleEntries(true);
+      requestAnimationFrame(() => {
+        this.calculateVisibleEntries(true);
+      });
     }
-
   }
 
   // trackBy is a hint to angular to be able to keep (i.e. don't destroy and recreate) as many components as possible
