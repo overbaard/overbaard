@@ -113,7 +113,7 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
     }
     const heightChange: SimpleChange = changes['boardBodyHeight'];
     if (heightChange && !heightChange.firstChange && heightChange.currentValue !== heightChange.previousValue) {
-      this.calculateVisibleEntries();
+      this.calculateVisibleEntries(true);
     }
 
   }
