@@ -61,7 +61,7 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
 
   private _destroy$: Subject<void> = new Subject<void>();
 
-  private _splitter: ScrollHeightSplitter<BoardIssueView> = ScrollHeightSplitter.create(rve => rve.calculatedTotalHeight);
+  private _splitter: ScrollHeightSplitter<BoardIssueView> = ScrollHeightSplitter.create(false, rve => rve.calculatedTotalHeight);
   private _scrollTop = 0;
   visibleIssues: List<BoardIssueView>;
   beforePadding = 0;

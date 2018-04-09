@@ -10,12 +10,13 @@ export class ScrollHeightSplitter<T> {
 
   private _lastInfo: VirtualScrollInfo = INITIAL_SCROLL_INFO;
 
-  static create<T>(itemHeightGetter: (t: T) => number): ScrollHeightSplitter<T> {
-    const splitter: ScrollHeightSplitter<T> = new ScrollHeightSplitter<T>(itemHeightGetter);
+  static create<T>(eagerlyDrop: boolean, itemHeightGetter: (t: T) => number): ScrollHeightSplitter<T> {
+    const splitter: ScrollHeightSplitter<T> = new ScrollHeightSplitter<T>(eagerlyDrop, itemHeightGetter);
     return splitter;
   }
 
-  private constructor(
+  constructor(
+    private _eagerlyDrop: boolean,
     private _itemHeightGetter: (t: T) => number) {
   }
 
@@ -54,8 +55,15 @@ export class ScrollHeightSplitter<T> {
       return;
     }
 
-    if (scrollPos >= this._lastInfo.lowWaterMark && (this._lastInfo.isPastLast || scrollPos <= this._lastInfo.highWaterMark)) {
-      return;
+    if (scrollPos >= this._lastInfo.newEntryLowMark && (this._lastInfo.isPastLast || scrollPos <= this._lastInfo.newEntryHighMark)) {
+      if (!this._eagerlyDrop || scrollPos === this._lastInfo.scrollPos) {
+        return;
+      }
+      if (scrollPos > this._lastInfo.scrollPos && (this._lastInfo.isPastLast || scrollPos < this._lastInfo.dropIncrementMark)) {
+        return;
+      } else if (scrollPos < this._lastInfo.scrollPos && scrollPos > this._lastInfo.dropDecrementMark) {
+        return;
+      }
     }
 
     this._lastInfo = this.calculateNewScrollInfo(this._lastInfo, scrollPos, containerHeight);
@@ -69,11 +77,11 @@ export class ScrollHeightSplitter<T> {
 
     // Check the next entries, as they are more likely to be the ones (especially if scrolling is not super-fast)
     // in order to avoid the overhead of doing the binary search on every scroll
-    if (scrollPos < scrollInfo.lowWaterMark) {
+    if (scrollPos < scrollInfo.newEntryLowMark) {
       newStart = this.checkIncrementCurrentLowWaterMark(scrollInfo, scrollPos, false);
       newEnd = this.checkIncrementCurrentHighWaterMark(scrollInfo, scrollPos, containerHeight, false);
     }
-    if (scrollPos > scrollInfo.highWaterMark) {
+    if (scrollPos > scrollInfo.newEntryHighMark) {
       newStart = this.checkIncrementCurrentLowWaterMark(scrollInfo, scrollPos, true);
       newEnd = this.checkIncrementCurrentHighWaterMark(scrollInfo, scrollPos, containerHeight, true);
     }
@@ -162,23 +170,33 @@ export class ScrollHeightSplitter<T> {
     }
 
     return {
+      scrollPos: scrollPos,
       start: -1, end: -1,
       beforePadding: beforePadding, afterPadding: 0,
-      lowWaterMark: beforePadding, highWaterMark: -1,
+      newEntryLowMark: beforePadding, newEntryHighMark: -1,
+      dropIncrementMark: -1, dropDecrementMark: -1,
       isPastLast: true};
   }
 
-  private findLowWaterMark(scrollPos: number, containerHeight: number, startPos: StartAndHeight): number {
+  private findNewEntryLowMark(startPos: StartAndHeight): number {
     return startPos.start;
   }
 
-  private findHighWaterMark(scrollPos: number, containerHeight: number, endPos: StartAndHeight, last: boolean): number {
+  private findNewEntryHighMark(containerHeight: number, endPos: StartAndHeight, last: boolean): number {
     const wm: number = this.calculateEndPos(endPos);
     if (last) {
       return wm;
     }
 
     return wm - containerHeight;
+  }
+
+  private findDropLowMark(startPos: StartAndHeight) {
+    return startPos.start + startPos.height;
+  }
+
+  private findDropHighMark(containerHeight: number, endPos: StartAndHeight) {
+    return endPos.start - 1 - containerHeight;
   }
 
   private binarySearchStartIndex(scrollPos: number): number {
@@ -226,6 +244,9 @@ export class ScrollHeightSplitter<T> {
         case 0:
           return middle;
         case -1:
+          if (middle === high) {
+            return middle;
+          }
           low = middle + 1;
           break;
         case 1:
@@ -237,10 +258,10 @@ export class ScrollHeightSplitter<T> {
   private checkInEndRange(sah: StartAndHeight, scrollPos: number, containerHeight: number): number {
     const endPos: number = scrollPos + containerHeight;
     const currEnd = this.calculateEndPos(sah);
-    if (currEnd < endPos) {
+    if (sah.start <= endPos && currEnd >= endPos) {
+      return 0;
+    } else if (currEnd < endPos) {
       return -1;
-    } else if (sah.start <= endPos && currEnd >= endPos) {
-        return 0;
     } else {
       return 1;
     }
@@ -262,14 +283,22 @@ export class ScrollHeightSplitter<T> {
     }
 
     // Calculate watermarks
-    const lowWaterMark = this.findLowWaterMark(scrollPos, containerHeight, startPosition);
-    const highWaterMark = this.findHighWaterMark(scrollPos, containerHeight, endPosition, lastPosition === endPosition);
+    const newEntryLowMark = this.findNewEntryLowMark(startPosition);
+    const newEntryHighMark = this.findNewEntryHighMark(containerHeight, endPosition, lastPosition === endPosition);
+    let dropLowMark = -1;
+    let dropHighMark = -1;
+    if (this._eagerlyDrop) {
+      dropLowMark = this.findDropLowMark(startPosition);
+      dropHighMark = this.findDropHighMark(containerHeight, endPosition);
+    }
 
     // Always create a new instance
     const info: VirtualScrollInfo = {
+      scrollPos: scrollPos,
       start: startIndex, end: endIndex,
       beforePadding: beforePadding, afterPadding: afterPadding,
-      lowWaterMark: lowWaterMark, highWaterMark: highWaterMark,
+      newEntryLowMark: newEntryLowMark, newEntryHighMark: newEntryHighMark,
+      dropIncrementMark: dropLowMark, dropDecrementMark: dropHighMark,
       isPastLast: false};
 
     // console.log(JSON.stringify(info));
@@ -287,14 +316,19 @@ export interface StartAndHeight {
 }
 
 interface VirtualScrollInfo {
+  scrollPos: number;
   start: number;
   end: number;
   beforePadding: number;
   afterPadding: number;
-  lowWaterMark: number;
-  highWaterMark: number;
+  newEntryLowMark: number;
+  newEntryHighMark: number;
+  dropIncrementMark: number;
+  dropDecrementMark: number;
   isPastLast: boolean;
 }
 
 const INITIAL_SCROLL_INFO: VirtualScrollInfo = {
-  start: -1, end: -1, beforePadding: 0, afterPadding: 0, lowWaterMark: -1, highWaterMark: -1, isPastLast: false};
+  scrollPos: -1,
+  start: -1, end: -1, beforePadding: 0, afterPadding: 0,
+  newEntryLowMark: -1, newEntryHighMark: -1, dropIncrementMark: -1, dropDecrementMark: -1, isPastLast: false};

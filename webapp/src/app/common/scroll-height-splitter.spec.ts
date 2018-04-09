@@ -11,90 +11,90 @@ export interface ScrollInfo {
 let callbackInfo: ScrollInfo;
 
 describe('Scroll Height Splitter Tests', () => {
-  const splitter: ScrollHeightSplitter<number> = ScrollHeightSplitter.create(n => n);
-  const containerHeight = 60;
-  beforeEach(() => {
-    const list: List<number> = List<number>([20, 30, 20, 20, 30, 30]);
-    splitter.updateList(list);
-    expect(splitter.startPositions.toArray()).toEqual([
-      {start: 0, height: 20},  // 0
-      {start: 20, height: 30},  // 1
-      {start: 50, height: 20},  // 2
-      {start: 70, height: 20},  // 3
-      {start: 90, height: 30},  // 4
-      {start: 120, height: 30}, // 5
-    ]);
-  });
-
-  describe('Non-Binary Search', () => {
-
-    /*
-     * force=false for these ones indicates it should attempt to increment to the next issue
-     * before doing a binary search. Most of these tests do a slow increment so the
-     * incrementation is tested. The fallback to binary search is tested in the New Issues/Decrement
-     * test where it jumps to the end
-     */
-
-    const force = false;
-
+  describe('Non-eager drop', () => {
+    const splitter: ScrollHeightSplitter<number> = ScrollHeightSplitter.create(false, n => n);
+    const containerHeight = 60;
     beforeEach(() => {
+      const list: List<number> = List<number>([20, 30, 20, 20, 30, 30]);
+      splitter.updateList(list);
+      expect(splitter.startPositions.toArray()).toEqual([
+        {start: 0, height: 20},  // 0
+        {start: 20, height: 30},  // 1
+        {start: 50, height: 20},  // 2
+        {start: 70, height: 20},  // 3
+        {start: 90, height: 30},  // 4
+        {start: 120, height: 30}, // 5
+      ]);
+
       callbackInfo = null;
       splitter.updateVirtualScrollInfo(0, containerHeight, true, callback);
       checkCallbackInfo(0, 2, 0, 80);
       callbackInfo = null;
+
     });
 
-    describe('Same issue', () => {
+    describe('Non-Binary Search', () => {
 
-      // Just scrolls over the same issue
+      /*
+       * force=false for these ones indicates it should attempt to increment to the next issue
+       * before doing a binary search. Most of these tests do a slow increment so the
+       * incrementation is tested. The fallback to binary search is tested in the New Issues/Decrement
+       * test where it jumps to the end
+       */
 
-      it('Increment scroll', () => {
-        checkNoNewCallbackInfo(splitter, containerHeight, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+      const force = false;
+
+      describe('Same issue', () => {
+
+        // Just scrolls over the same issue
+
+        it('Increment scroll', () => {
+          checkNoNewCallbackInfo(splitter, containerHeight, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+        });
+
+        it ('Decrement scroll', () => {
+          checkNoNewCallbackInfo(splitter, containerHeight, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+        });
       });
+      describe('New issues', () => {
 
-      it ('Decrement scroll', () => {
-        checkNoNewCallbackInfo(splitter, containerHeight, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
-      });
-    });
-    describe('New issues', () => {
+        // Brings in new issues as we scroll
 
-      // Brings in new issues as we scroll
+        it('Increment', () => {
+          // Bring in a new issue
+          splitter.updateVirtualScrollInfo(11, containerHeight, force, callback);
+          checkCallbackInfo(0, 3, 0, 60);
 
-      it('Increment', () => {
-        // Bring in a new issue
-        splitter.updateVirtualScrollInfo(11, containerHeight, force, callback);
-        checkCallbackInfo(0, 3, 0, 60);
+          // These don't bring in new issues. Although we could lose some of the older issues here,
+          // we don't bother recalculating every time here
+          checkNoNewCallbackInfo(splitter, containerHeight, 20, 29);
 
-        // These don't bring in new issues. Although we could lose some of the older issues here,
-        // we don't bother recalculating every time here
-        checkNoNewCallbackInfo(splitter, containerHeight, 20, 29);
+          splitter.updateVirtualScrollInfo(30, containerHeight, force, callback);
+          checkCallbackInfo(1, 4, 20, 30);
 
-        splitter.updateVirtualScrollInfo(30, containerHeight, force, callback);
-        checkCallbackInfo(1, 4, 20, 30);
+          // These don't bring in new issues
+          checkNoNewCallbackInfo(splitter, containerHeight, 31, 50, 59);
 
-        // These don't bring in new issues
-        checkNoNewCallbackInfo(splitter, containerHeight, 31, 50, 59);
+          splitter.updateVirtualScrollInfo(60, containerHeight, force, callback);
+          checkCallbackInfo(2, 5, 50, 0);
 
-        splitter.updateVirtualScrollInfo(60, containerHeight, force, callback);
-        checkCallbackInfo(2, 5, 50, 0);
+          // These don't bring in new issues
+          checkNoNewCallbackInfo(splitter, containerHeight, 61, 70, 80);
 
-        // These don't bring in new issues
-        checkNoNewCallbackInfo(splitter, containerHeight, 61, 70, 80);
+          // Although the end of the screen is now past the end we're not bringing in any new issue
+          checkNoNewCallbackInfo(splitter, containerHeight, 90);
 
-        // Although the end of the screen is now past the end we're not bringing in any new issue
-        checkNoNewCallbackInfo(splitter, containerHeight, 90);
+          // These don't bring in new issues
+          checkNoNewCallbackInfo(splitter, containerHeight, 110, 120, 140, 149);
 
-        // These don't bring in new issues
-        checkNoNewCallbackInfo(splitter, containerHeight, 110, 120, 140, 149);
+          // We have now gone past the end
+          splitter.updateVirtualScrollInfo(150, containerHeight, force, callback);
+          checkCallbackInfo(-1, -1, 150, 0);
 
-        // We have now gone past the end
-        splitter.updateVirtualScrollInfo(150, containerHeight, force, callback);
-        checkCallbackInfo(-1, -1, 150, 0);
+          checkNoNewCallbackInfo(splitter, containerHeight, 151, 200, 300);
+        });
 
-        checkNoNewCallbackInfo(splitter, containerHeight, 151, 200, 300);
-      });
-
-      it ('Decrement', () => {
+        it ('Decrement', () => {
           // Jump to the end - this forces a binary search
           splitter.updateVirtualScrollInfo(300, containerHeight, force, callback);
           checkCallbackInfo(-1, -1, 150, 0);
@@ -136,68 +136,143 @@ describe('Scroll Height Splitter Tests', () => {
           checkCallbackInfo(0, 3, 0, 60);
 
           checkNoNewCallbackInfo(splitter, containerHeight, -1);
+        });
       });
+    });
+
+    it ('Binary Search', () => {
+      // Use force=true to enforce binary search
+      const force = true;
+
+      // Jump to the end - this forces a binary search
+      splitter.updateVirtualScrollInfo(300, containerHeight, force, callback);
+      checkCallbackInfo(-1, -1, 150, 0);
+
+      // The gap here is big enough to check the fallback to binary search
+      splitter.updateVirtualScrollInfo(19, containerHeight, false, callback);
+      checkCallbackInfo(0, 3, 0, 60);
+
+      splitter.updateVirtualScrollInfo(20, containerHeight, force, callback);
+      checkCallbackInfo(1, 3, 20, 60);
+
+      splitter.updateVirtualScrollInfo(29, containerHeight, force, callback);
+      checkCallbackInfo(1, 3, 20, 60);
+
+      splitter.updateVirtualScrollInfo(30, containerHeight, force, callback);
+      checkCallbackInfo(1, 4, 20, 30);
+
+      splitter.updateVirtualScrollInfo(49, containerHeight, force, callback);
+      checkCallbackInfo(1, 4, 20, 30);
+
+      splitter.updateVirtualScrollInfo(50, containerHeight, force, callback);
+      checkCallbackInfo(2, 4, 50, 30);
+
+      splitter.updateVirtualScrollInfo(69, containerHeight, force, callback);
+      checkCallbackInfo(2, 5, 50, 0);
+
+      splitter.updateVirtualScrollInfo(70, containerHeight, force, callback);
+      checkCallbackInfo(3, 5, 70, 0);
+
+      // Do some extra checks here as we're about to overrun the end
+      splitter.updateVirtualScrollInfo(89, containerHeight, force, callback);
+      checkCallbackInfo(3, 5, 70, 0);
+      splitter.updateVirtualScrollInfo(90, containerHeight, force, callback);
+      checkCallbackInfo(4, 5, 90, 0);
+      splitter.updateVirtualScrollInfo(91, containerHeight, force, callback);
+      checkCallbackInfo(4, 5, 90, 0);
+
+
+      splitter.updateVirtualScrollInfo(119, containerHeight, force, callback);
+      checkCallbackInfo(4, 5, 90, 0);
+
+      splitter.updateVirtualScrollInfo(149, containerHeight, force, callback);
+      checkCallbackInfo(5, 5, 120, 0);
+    });
+
+    it ('Test scroll, no issues', () => {
+      callbackInfo = null;
+      splitter.updateList(List<number>());
+      expect(splitter.startPositions.toArray()).toEqual([]);
+
+      // An update happens for the first change (to change the internal tracking), after that there should be no change
+      splitter.updateVirtualScrollInfo(40, containerHeight, true, callback); // Use force=true since we updated the list
+      checkCallbackInfo(-1, -1, 0, 0);
+
+      checkNoNewCallbackInfo(splitter, containerHeight, 800, 10, 0, -1, 10);
     });
   });
 
-  it ('Binary Search', () => {
-    // Use force=true to enforce binary search
-    const force = true;
+  describe('Eager drop', () => {
+    const splitter: ScrollHeightSplitter<number> = ScrollHeightSplitter.create(true, n => n);
+    const containerHeight = 60;
+    beforeEach(() => {
+      const list: List<number> = List<number>([20, 30, 20, 20, 30, 30]);
+      splitter.updateList(list);
+      expect(splitter.startPositions.toArray()).toEqual([
+        {start: 0, height: 20},  // 0
+        {start: 20, height: 30},  // 1
+        {start: 50, height: 20},  // 2
+        {start: 70, height: 20},  // 3
+        {start: 90, height: 30},  // 4
+        {start: 120, height: 30}, // 5
+      ]);
 
-    // Jump to the end - this forces a binary search
-    splitter.updateVirtualScrollInfo(300, containerHeight, force, callback);
-    checkCallbackInfo(-1, -1, 150, 0);
+      callbackInfo = null;
+      splitter.updateVirtualScrollInfo(0, containerHeight, true, callback);
+      checkCallbackInfo(0, 2, 0, 80);
+      callbackInfo = null;
+    });
 
-    // The gap here is big enough to check the fallback to binary search
-    splitter.updateVirtualScrollInfo(19, containerHeight, false, callback);
-    checkCallbackInfo(0, 3, 0, 60);
+    it ('Increment', () => {
+      checkNoNewCallbackInfo(splitter, containerHeight, 5);
 
-    splitter.updateVirtualScrollInfo(20, containerHeight, force, callback);
-    checkCallbackInfo(1, 3, 20, 60);
+      // This just brings in a new one but doesn't drop anything as we're still in the range of the start one
+      splitter.updateVirtualScrollInfo(10, containerHeight, false, callback); // Use force=true since we updated the list
+      checkCallbackInfo(0, 3, 0, 60);
 
-    splitter.updateVirtualScrollInfo(29, containerHeight, force, callback);
-    checkCallbackInfo(1, 3, 20, 60);
+      checkNoNewCallbackInfo(splitter, containerHeight, 11, 15, 19);
 
-    splitter.updateVirtualScrollInfo(30, containerHeight, force, callback);
-    checkCallbackInfo(1, 4, 20, 30);
+      // Should have dropped the start one
+      splitter.updateVirtualScrollInfo(20, containerHeight, false, callback); // Use force=true since we updated the list
+      checkCallbackInfo(1, 3, 20, 60);
 
-    splitter.updateVirtualScrollInfo(49, containerHeight, force, callback);
-    checkCallbackInfo(1, 4, 20, 30);
+      // This just brings in a new one but doesn't drop anything as we're still in the range of the start one
+      splitter.updateVirtualScrollInfo(45, containerHeight, false, callback); // Use force=true since we updated the list
+      checkCallbackInfo(1, 4, 20, 30);
 
-    splitter.updateVirtualScrollInfo(50, containerHeight, force, callback);
-    checkCallbackInfo(2, 4, 50, 30);
+      checkNoNewCallbackInfo(splitter, containerHeight, 49);
 
-    splitter.updateVirtualScrollInfo(69, containerHeight, force, callback);
-    checkCallbackInfo(2, 5, 50, 0);
+      // Should have dropped the start one
+      splitter.updateVirtualScrollInfo(50, containerHeight, false, callback); // Use force=true since we updated the list
+      checkCallbackInfo(2, 4, 50, 30);
 
-    splitter.updateVirtualScrollInfo(70, containerHeight, force, callback);
-    checkCallbackInfo(3, 5, 70, 0);
+      checkNoNewCallbackInfo(splitter, containerHeight, 51, 52, 55, 57, 59);
 
-    splitter.updateVirtualScrollInfo(89, containerHeight, force, callback);
-    checkCallbackInfo(3, 5, 70, 0);
+      // This just brings in a new one but doesn't drop anything as we're still in the range of the start one
+      splitter.updateVirtualScrollInfo(60, containerHeight, false, callback); // Use force=true since we updated the list
+      checkCallbackInfo(2, 5, 50, 0);
 
-    splitter.updateVirtualScrollInfo(119, containerHeight, force, callback);
-    checkCallbackInfo(4, 5, 90, 0);
+      // Should have dropped the start one
+      splitter.updateVirtualScrollInfo(70, containerHeight, false, callback); // Use force=true since we updated the list
+      checkCallbackInfo(3, 5, 70, 0);
 
-    splitter.updateVirtualScrollInfo(149, containerHeight, force, callback);
-    checkCallbackInfo(5, 5, 120, 0);
+      checkNoNewCallbackInfo(splitter, containerHeight, 71, 75, 80, 85, 89);
 
+      splitter.updateVirtualScrollInfo(90, containerHeight, false, callback); // Use force=true since we updated the list
+      checkCallbackInfo(4, 5, 90, 0);
 
+      checkNoNewCallbackInfo(splitter, containerHeight, 91, 100, 110, 115, 119);
 
+      splitter.updateVirtualScrollInfo(120, containerHeight, false, callback); // Use force=true since we updated the list
+      checkCallbackInfo(5, 5, 120, 0);
 
+      checkNoNewCallbackInfo(splitter, containerHeight, 121, 130, 140, 145, 149);
 
-  });
+      splitter.updateVirtualScrollInfo(150, containerHeight, false, callback); // Use force=true since we updated the list
+      checkCallbackInfo(-1, -1, 150, 0);
 
-  it ('Test scroll, no issues', () => {
-    callbackInfo = null;
-    splitter.updateList(List<number>());
-    expect(splitter.startPositions.toArray()).toEqual([]);
-
-    // An update happens for the first change (to change the internal tracking), after that there should be no change
-    splitter.updateVirtualScrollInfo(40, containerHeight, true, callback); // Use force=true since we updated the list
-    checkCallbackInfo(-1, -1, 0, 0);
-
-    checkNoNewCallbackInfo(splitter, containerHeight, 800, 10, 0, -1, 10);
+      checkNoNewCallbackInfo(splitter, containerHeight, 160, 170, 800);
+    });
   });
 });
 

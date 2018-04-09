@@ -50,7 +50,7 @@ export class RankViewContainerComponent implements OnInit, OnChanges, OnDestroy 
 
   private _destroy$: Subject<void> = new Subject<void>();
 
-  private _splitter: ScrollHeightSplitter<RankViewEntry> = ScrollHeightSplitter.create(rve => rve.calculatedTotalHeight);
+  private _splitter: ScrollHeightSplitter<RankViewEntry> = ScrollHeightSplitter.create(false, rve => rve.calculatedTotalHeight);
   private _scrollTop = 0;
   visibleEntries: List<RankViewEntry>;
   beforePadding = 0;
