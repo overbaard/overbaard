@@ -63,7 +63,7 @@ export class KanbanSwimlaneViewComponent implements OnInit, OnChanges {
   private _destroy$: Subject<void> = new Subject<void>();
 
   private _swimlanes: List<SwimlaneData>;
-  private _splitter: ScrollHeightSplitter<SwimlaneData> = ScrollHeightSplitter.create(false, sl => sl.calculatedTotalHeight);
+  private _splitter: ScrollHeightSplitter<SwimlaneData> = ScrollHeightSplitter.create(true, sl => sl.calculatedTotalHeight);
   private _scrollTop = 0;
   visibleSwimlanes: List<SwimlaneData>;
   beforePadding = 0;
