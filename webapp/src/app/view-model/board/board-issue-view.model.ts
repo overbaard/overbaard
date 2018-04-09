@@ -30,7 +30,7 @@ const DEFAULT_STATE: BoardIssueView = {
   summaryLines: null
 };
 
-interface BoardIssueViewRecord extends TypedRecord<BoardIssueViewRecord>, BoardIssueView {
+export interface BoardIssueViewRecord extends TypedRecord<BoardIssueViewRecord>, BoardIssueView {
 }
 
 const ISSUE_FACTORY = makeTypedFactory<BoardIssueView, BoardIssueViewRecord>(DEFAULT_STATE);

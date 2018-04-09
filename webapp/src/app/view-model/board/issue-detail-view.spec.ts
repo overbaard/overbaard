@@ -11,8 +11,13 @@ import {IssueTable} from './issue-table';
 import {initialIssueDetailState, IssueDetailState} from '../../model/board/user/issue-detail/issue-detail.model';
 import {BoardHeaders} from './board-headers';
 import {IssueSummaryLevel} from '../../model/board/user/issue-summary-level';
+import {BoardIssueView} from './board-issue-view';
+import {BoardIssue} from '../../model/board/data/issue/board-issue';
+import {Record} from 'immutable';
+import {TypedRecord} from 'typed-immutable-record';
+import {BoardIssueViewRecord} from './board-issue-view.model';
 
-describe('Issue Table observer tests', () => {
+describe('Issue detail view tests', () => {
 
   let util: BoardViewObservableUtil;
   let headers: BoardHeaders;
@@ -61,7 +66,8 @@ describe('Issue Table observer tests', () => {
         .take(1)
         .subscribe(board => {
           expect(board.headers).toBe(headers);
-          expect(board.issueTable).toBe(table);
+          expect(board.issueTable).not.toBe(table);
+          checkIssues(table, board.issueTable);
           expect(board.issueDetail.issueSummaryLevel).toBe(IssueSummaryLevel.HEADER_ONLY);
           expect(board.issueDetail.parallelTasks).toBe(initialIssueDetailState.parallelTasks);
         });
@@ -73,7 +79,8 @@ describe('Issue Table observer tests', () => {
         .take(1)
         .subscribe(board => {
           expect(board.headers).toBe(headers);
-          expect(board.issueTable).toBe(table);
+          expect(board.issueTable).not.toBe(table);
+          checkIssues(table, board.issueTable);
           expect(board.issueDetail.parallelTasks).toBe(initialIssueDetailState.parallelTasks);
         });
     });
@@ -86,6 +93,7 @@ describe('Issue Table observer tests', () => {
         .subscribe(board => {
           expect(board.headers).toBe(headers);
           expect(board.issueTable).not.toBe(table);
+          checkIssues(table, board.issueTable);
           table = board.issueTable;
           expect(board.issueDetail).toBe(initialIssueDetailState);
         });
@@ -96,7 +104,8 @@ describe('Issue Table observer tests', () => {
         .take(1)
         .subscribe(board => {
           expect(board.headers).toBe(headers);
-          expect(board.issueTable).toBe(table);
+          expect(board.issueTable).not.toBe(table);
+          checkIssues(table, board.issueTable);
           expect(board.issueDetail.issueSummaryLevel).toBe(IssueSummaryLevel.HEADER_ONLY);
           expect(board.issueDetail.parallelTasks).toBe(initialIssueDetailState.parallelTasks);
         });
@@ -108,16 +117,14 @@ describe('Issue Table observer tests', () => {
         .take(1)
         .subscribe(board => {
           expect(board.headers).toBe(headers);
-          expect(board.issueTable).toBe(table);
+          expect(board.issueTable).not.toBe(table);
+          checkIssues(table, board.issueTable);
           expect(board.issueDetail.issueSummaryLevel).toBe(IssueSummaryLevel.SHORT_SUMMARY);
           expect(board.issueDetail.parallelTasks).toBe(initialIssueDetailState.parallelTasks);
         });
     });
   });
 
-
-  it ('Update parallel tasks', () => {
-  });
 
   class SimpleIssueFactory implements IssuesFactory {
     _issueKeys: string[];
@@ -173,3 +180,21 @@ describe('Issue Table observer tests', () => {
   }
 
 });
+
+
+function checkIssues(original: IssueTable, current: IssueTable) {
+  expect(original.table.size).toBe(current.table.size);
+  original.table.forEach((col, i) => {
+    expect(col.size).toBe(current.table.get(i).size);
+    col.forEach((originalIssue, j) => {
+      const currIssue: BoardIssueView = current.table.get(i).get(j);
+
+      const keys: string[] = (<BoardIssueViewRecord>currIssue).keySeq().toArray();
+      for (const key of keys) {
+        if (key === 'calculatedTotalHeight') {
+          expect(currIssue[key]).toEqual(originalIssue[key]);
+        }
+      }
+    });
+  })
+}
