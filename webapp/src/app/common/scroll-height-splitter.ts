@@ -80,8 +80,7 @@ export class ScrollHeightSplitter<T> {
     if (scrollPos < scrollInfo.newEntryLowMark) {
       newStart = this.checkIncrementCurrentLowWaterMark(scrollInfo, scrollPos, false);
       newEnd = this.checkIncrementCurrentHighWaterMark(scrollInfo, scrollPos, containerHeight, false);
-    }
-    if (scrollPos > scrollInfo.newEntryHighMark) {
+    } else if (scrollPos > scrollInfo.newEntryHighMark) {
       newStart = this.checkIncrementCurrentLowWaterMark(scrollInfo, scrollPos, true);
       newEnd = this.checkIncrementCurrentHighWaterMark(scrollInfo, scrollPos, containerHeight, true);
     }

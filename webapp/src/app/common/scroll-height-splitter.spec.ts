@@ -52,7 +52,7 @@ describe('Scroll Height Splitter Tests', () => {
           checkNoNewCallbackInfo(splitter, containerHeight, 1, 2, 3, 4, 5, 6, 7, 8, 9);
         });
 
-        it ('Decrement scroll', () => {
+        it('Decrement scroll', () => {
           checkNoNewCallbackInfo(splitter, containerHeight, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
         });
       });
@@ -94,7 +94,7 @@ describe('Scroll Height Splitter Tests', () => {
           checkNoNewCallbackInfo(splitter, containerHeight, 151, 200, 300);
         });
 
-        it ('Decrement', () => {
+        it('Decrement', () => {
           // Jump to the end - this forces a binary search
           splitter.updateVirtualScrollInfo(300, containerHeight, force, callback);
           checkCallbackInfo(-1, -1, 150, 0);
@@ -140,7 +140,7 @@ describe('Scroll Height Splitter Tests', () => {
       });
     });
 
-    it ('Binary Search', () => {
+    it('Binary Search', () => {
       // Use force=true to enforce binary search
       const force = true;
 
@@ -189,7 +189,7 @@ describe('Scroll Height Splitter Tests', () => {
       checkCallbackInfo(5, 5, 120, 0);
     });
 
-    it ('Test scroll, no issues', () => {
+    it('Test scroll, no issues', () => {
       callbackInfo = null;
       splitter.updateList(List<number>());
       expect(splitter.startPositions.toArray()).toEqual([]);
@@ -223,59 +223,107 @@ describe('Scroll Height Splitter Tests', () => {
       callbackInfo = null;
     });
 
-    it ('Increment', () => {
+    it('Increment', () => {
       checkNoNewCallbackInfo(splitter, containerHeight, 5);
 
       // This just brings in a new one but doesn't drop anything as we're still in the range of the start one
-      splitter.updateVirtualScrollInfo(10, containerHeight, false, callback); // Use force=true since we updated the list
+      splitter.updateVirtualScrollInfo(10, containerHeight, false, callback);
       checkCallbackInfo(0, 3, 0, 60);
 
       checkNoNewCallbackInfo(splitter, containerHeight, 11, 15, 19);
 
       // Should have dropped the start one
-      splitter.updateVirtualScrollInfo(20, containerHeight, false, callback); // Use force=true since we updated the list
+      splitter.updateVirtualScrollInfo(20, containerHeight, false, callback);
       checkCallbackInfo(1, 3, 20, 60);
 
       // This just brings in a new one but doesn't drop anything as we're still in the range of the start one
-      splitter.updateVirtualScrollInfo(45, containerHeight, false, callback); // Use force=true since we updated the list
+      splitter.updateVirtualScrollInfo(45, containerHeight, false, callback);
       checkCallbackInfo(1, 4, 20, 30);
 
       checkNoNewCallbackInfo(splitter, containerHeight, 49);
 
       // Should have dropped the start one
-      splitter.updateVirtualScrollInfo(50, containerHeight, false, callback); // Use force=true since we updated the list
+      splitter.updateVirtualScrollInfo(50, containerHeight, false, callback);
       checkCallbackInfo(2, 4, 50, 30);
 
       checkNoNewCallbackInfo(splitter, containerHeight, 51, 52, 55, 57, 59);
 
       // This just brings in a new one but doesn't drop anything as we're still in the range of the start one
-      splitter.updateVirtualScrollInfo(60, containerHeight, false, callback); // Use force=true since we updated the list
+      splitter.updateVirtualScrollInfo(60, containerHeight, false, callback);
       checkCallbackInfo(2, 5, 50, 0);
 
       // Should have dropped the start one
-      splitter.updateVirtualScrollInfo(70, containerHeight, false, callback); // Use force=true since we updated the list
+      splitter.updateVirtualScrollInfo(70, containerHeight, false, callback);
       checkCallbackInfo(3, 5, 70, 0);
 
       checkNoNewCallbackInfo(splitter, containerHeight, 71, 75, 80, 85, 89);
 
-      splitter.updateVirtualScrollInfo(90, containerHeight, false, callback); // Use force=true since we updated the list
+      splitter.updateVirtualScrollInfo(90, containerHeight, false, callback);
       checkCallbackInfo(4, 5, 90, 0);
 
       checkNoNewCallbackInfo(splitter, containerHeight, 91, 100, 110, 115, 119);
 
-      splitter.updateVirtualScrollInfo(120, containerHeight, false, callback); // Use force=true since we updated the list
+      splitter.updateVirtualScrollInfo(120, containerHeight, false, callback);
       checkCallbackInfo(5, 5, 120, 0);
 
       checkNoNewCallbackInfo(splitter, containerHeight, 121, 130, 140, 145, 149);
 
-      splitter.updateVirtualScrollInfo(150, containerHeight, false, callback); // Use force=true since we updated the list
+      splitter.updateVirtualScrollInfo(150, containerHeight, false, callback);
       checkCallbackInfo(-1, -1, 150, 0);
 
       checkNoNewCallbackInfo(splitter, containerHeight, 160, 170, 800);
     });
+
+    it('Decrement', () => {
+      splitter.updateVirtualScrollInfo(200, containerHeight, false, callback);
+      checkCallbackInfo(-1, -1, 150, 0);
+
+      checkNoNewCallbackInfo(splitter, containerHeight, 150);
+
+      // These just bring in new issues but don't drop anything yet
+      splitter.updateVirtualScrollInfo(149, containerHeight, false, callback);
+      checkCallbackInfo(5, 5, 120, 0);
+      checkNoNewCallbackInfo(splitter, containerHeight, 140, 130, 120);
+      splitter.updateVirtualScrollInfo(119, containerHeight, false, callback);
+      checkCallbackInfo(4, 5, 90, 0);
+      checkNoNewCallbackInfo(splitter, containerHeight, 110, 100, 90);
+      splitter.updateVirtualScrollInfo(89, containerHeight, false, callback);
+      checkCallbackInfo(3, 5, 70, 0);
+      checkNoNewCallbackInfo(splitter, containerHeight, 85, 80, 70);
+      splitter.updateVirtualScrollInfo(69, containerHeight, false, callback);
+      checkCallbackInfo(2, 5, 50, 0);
+      checkNoNewCallbackInfo(splitter, containerHeight, 65, 60);
+
+      // Now we should start dropping old issues
+      splitter.updateVirtualScrollInfo(59, containerHeight, false, callback);
+      checkCallbackInfo(2, 4, 50, 30);
+
+      checkNoNewCallbackInfo(splitter, containerHeight, 55, 50);
+
+      // Just brings in a new one, the end is still in range
+      splitter.updateVirtualScrollInfo(49, containerHeight, false, callback);
+      checkCallbackInfo(1, 4, 20, 30);
+
+      checkNoNewCallbackInfo(splitter, containerHeight, 45, 40, 35, 30);
+
+      // Drop another issue
+      splitter.updateVirtualScrollInfo(29, containerHeight, false, callback);
+      checkCallbackInfo(1, 3, 20, 60);
+
+      checkNoNewCallbackInfo(splitter, containerHeight, 25, 20);
+
+      splitter.updateVirtualScrollInfo(19, containerHeight, false, callback);
+      checkCallbackInfo(0, 3, 0, 60);
+
+      checkNoNewCallbackInfo(splitter, containerHeight, 15, 10);
+
+      splitter.updateVirtualScrollInfo(9, containerHeight, false, callback);
+      checkCallbackInfo(0, 2, 0, 80);
+
+      checkNoNewCallbackInfo(splitter, containerHeight, 5, 0);
+    });
   });
 });
-
 
 function checkNoNewCallbackInfo(sp: ScrollHeightSplitter<number>, containerHeight: number, ...positions: number[]) {
   for (const pos of positions) {
