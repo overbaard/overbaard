@@ -268,9 +268,15 @@ class HeadersBuilder {
   }
 
   private toggleBacklog() {
-    const backlog = this.createBacklogHeader();
+    let backlog = null;
+    if (this._currentHeaderState.backlog > 0) {
+      backlog = this.createBacklogHeader();
+    }
+
     this._headers = BoardViewModelUtil.updateBoardHeaders(this._headers, boardHeaders => {
-      boardHeaders.headersList = boardHeaders.headersList.set(0, backlog);
+      if (backlog) {
+        boardHeaders.headersList = boardHeaders.headersList.set(0, backlog);
+      }
     });
   }
 
