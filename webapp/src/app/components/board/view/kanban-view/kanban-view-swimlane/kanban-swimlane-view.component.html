@@ -2,12 +2,13 @@
 <div>
   <div [style.height.px]="beforePadding"></div>
   <app-kanban-swimlane-entry
-    *ngFor="let swimlane of visibleSwimlanes"
+    *ngFor="let swimlane of visibleSwimlanes ; let i = index"
     [headers]="headers"
     [swimlane]="swimlane"
     [showEmpty]="swimlaneInfo.showEmpty"
     [headerTextOffset]="headerTextOffset"
     [issueDetailState]="issueDetailState"
+    [topOffset]="topOffsets.get(i)"
     (toggleCollapsedSwimlane)="onToggleCollapsedSwimlane($event)"
     (updateParallelTask)="onUpdateParallelTask($event)"
   ></app-kanban-swimlane-entry>

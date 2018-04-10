@@ -79,6 +79,8 @@ export class KanbanSwimlaneViewComponent implements OnInit, OnChanges {
   visibleSwimlanes: List<SwimlaneData>;
   beforePadding = 0;
   afterPadding = 0;
+  topOffsets: List<number>;
+
 
 
   constructor(private _zone: NgZone, private _changeDetectorRef: ChangeDetectorRef) {
@@ -102,6 +104,8 @@ export class KanbanSwimlaneViewComponent implements OnInit, OnChanges {
     if (swimlaneInfoChange && swimlaneInfoChange.currentValue !== swimlaneInfoChange.previousValue) {
       this._swimlanes = List<SwimlaneData>(this.swimlaneInfo.swimlanes.values());
       this._splitter.updateList(this._swimlanes);
+      this.topOffsets = List<number>(this._splitter.startPositions.map(sp => sp.start));
+      // console.log('----> topOffsets' + JSON.stringify(this.topOffsets));
       requestAnimationFrame(() => {
         this.calculateVisibleEntries(true);
       });
