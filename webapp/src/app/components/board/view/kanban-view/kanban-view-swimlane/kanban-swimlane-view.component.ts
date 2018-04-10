@@ -63,7 +63,18 @@ export class KanbanSwimlaneViewComponent implements OnInit, OnChanges {
   private _destroy$: Subject<void> = new Subject<void>();
 
   private _swimlanes: List<SwimlaneData>;
-  private _splitter: ScrollHeightSplitter<SwimlaneData> = ScrollHeightSplitter.create(true, sl => sl.calculatedTotalHeight);
+
+  private _splitter: ScrollHeightSplitter<SwimlaneData> =
+    ScrollHeightSplitter.create(
+      true,
+        sl => {
+          let height: number = sl.headerHeight;
+          if (!sl.collapsed) {
+            height += sl.calculatedTotalIssuesHeight;
+          }
+          return height;
+      });
+
   private _scrollTop = 0;
   visibleSwimlanes: List<SwimlaneData>;
   beforePadding = 0;
@@ -91,7 +102,6 @@ export class KanbanSwimlaneViewComponent implements OnInit, OnChanges {
     if (swimlaneInfoChange && swimlaneInfoChange.currentValue !== swimlaneInfoChange.previousValue) {
       this._swimlanes = List<SwimlaneData>(this.swimlaneInfo.swimlanes.values());
       this._splitter.updateList(this._swimlanes);
-      console.log(JSON.stringify(this._splitter.startPositions));
       requestAnimationFrame(() => {
         this.calculateVisibleEntries(true);
       });
@@ -130,7 +140,8 @@ export class KanbanSwimlaneViewComponent implements OnInit, OnChanges {
         } else {
           visibleSwimlanes = <List<SwimlaneData>>this._swimlanes.slice(startIndex, endIndex + 1);
         }
-        // console.log(`${startIndex}-${endIndex} ${beforePadding}/${afterPadding} ${this._swimlanes.slice(startIndex, endIndex + 1).map(i => i.display).toArray()}`);
+        // console.log(`${startIndex}-${endIndex} ${beforePadding}/${afterPadding} ` +
+        //   `${this._swimlanes.slice(startIndex, endIndex + 1).map(i => i.display).toArray()}`);
         this._zone.run(() => {
           this.visibleSwimlanes = visibleSwimlanes;
           this.beforePadding = beforePadding;

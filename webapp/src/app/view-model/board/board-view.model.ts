@@ -50,13 +50,16 @@ const DEFAULT_SWIMLANE_INFO: SwimlaneInfo = {
   swimlanes: OrderedMap<string, SwimlaneData>()
 };
 
+const SWIMLANE_HEADER_HEIGHT = 36; /* header height: 30; header bottom border: 1, column top padding: 5 */
+
 const DEFAULT_SWIMLANE_DATA: SwimlaneData = {
   key: null,
   display: null,
   table: List<List<BoardIssueView>>(),
   visibleIssues: 0,
   collapsed: false,
-  calculatedTotalHeight: 0
+  headerHeight: SWIMLANE_HEADER_HEIGHT,
+  calculatedTotalIssuesHeight: 0
 };
 
 const DEFAULT_RANK_VIEW_ENTRY: RankViewEntry = {
@@ -170,14 +173,15 @@ export class BoardViewModelUtil {
     table: List<List<BoardIssueView>>,
     visibleIssues: number,
     collapsed: boolean,
-    calculatedTotalHeight): SwimlaneData {
+    calculatedTotalIssuesHeight): SwimlaneData {
     const state: SwimlaneData = {
       key: key,
       display: display,
       table: table,
       visibleIssues: visibleIssues,
       collapsed: collapsed,
-      calculatedTotalHeight: calculatedTotalHeight
+      headerHeight: SWIMLANE_HEADER_HEIGHT,
+      calculatedTotalIssuesHeight: calculatedTotalIssuesHeight
     };
     return SWIMLANE_DATA_STATE_FACTORY(state);
   }

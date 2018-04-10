@@ -61,7 +61,7 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
 
   private _destroy$: Subject<void> = new Subject<void>();
 
-  private _splitter: ScrollHeightSplitter<BoardIssueView> = ScrollHeightSplitter.create(false, rve => rve.calculatedTotalHeight);
+  private _splitter: ScrollHeightSplitter<BoardIssueView> = ScrollHeightSplitter.create(false, bi => bi.calculatedTotalHeight);
   private _scrollTop = 0;
   visibleIssues: List<BoardIssueView>;
   beforePadding = 0;
@@ -108,7 +108,7 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
         requestAnimationFrame(() => {
           this.calculateVisibleEntries(true);
         });
-      } else {
+      } else {/**/
         // Temp fix to get swimlanes working without virtual scrolling
         this.visibleIssues = this.issues;
       }
