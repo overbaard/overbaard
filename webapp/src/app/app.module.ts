@@ -48,6 +48,7 @@ import {FilterFormEntryPipe} from './pipes/filter-entry.pipe';
 import {FontMeasureComponent} from './components/font-measure/font-measure.component';
 import {FontSizeTableService} from './services/font-size-table.service';
 import {FontMeasureTableComponent} from './components/font-measure/font-measure-table.component';
+import {ResetProgressGuard} from './services/router/reset-progress.guard';
 
 const appState: AppState = initialAppState;
 export function getInitialAppState(): AppState {
@@ -113,6 +114,7 @@ export function getInitialAppState(): AppState {
     AppHeaderService,
     FontSizeTableService,
     ProgressLogService,
+    ResetProgressGuard,
     UrlService,
     VersionService
   ],

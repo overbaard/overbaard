@@ -11,6 +11,7 @@ const CLEAR_FIRST_MESSAGE = 'CLEAR_FIRST_MESSAGE';
 const NOT_LOGGED_IN = 'NOT_LOGGED_IN';
 const EXTERNALLY_DISMISS_FIRST_MESSAGE = 'EXTERNALLY_DISMISS_FIRST_MESSAGE';
 const RESET_EXTERNALLY_DISMISS_FIRST_MESSAGE = 'RESET_EXTERNALLY_DISMISS_FIRST_MESSAGE';
+const RESET_PROGRESS_FOR_NEW_ROUTE = 'RESET_PROGRESS_FOR_NEW_ROUTE';
 
 export class StartLoadingAction implements Action {
   type = START_LOADING;
@@ -42,6 +43,10 @@ export class ResetExternallyDismissFirstMessageAction implements Action {
   type = RESET_EXTERNALLY_DISMISS_FIRST_MESSAGE;
 }
 
+export class ResetForNewRouteAction implements Action {
+  type = RESET_PROGRESS_FOR_NEW_ROUTE;
+}
+
 export class ProgressLogActions {
 
   static createStartLoading(): Action {
@@ -66,6 +71,10 @@ export class ProgressLogActions {
 
   static createResetExternallyFirstMessage() {
     return new ResetExternallyDismissFirstMessageAction();
+  }
+
+  static createResetForNewRoute() {
+    return new ResetForNewRouteAction();
   }
 
   static createNotLoggedIn() {
@@ -100,6 +109,11 @@ export function progressLogReducer(state: ProgressLogState = initialProgressLogS
     case NOT_LOGGED_IN: {
       return ProgressLogUtil.updateProgressLogState(state, mutable => {
         mutable.notLoggedIn = true;
+      });
+    }
+    case RESET_PROGRESS_FOR_NEW_ROUTE: {
+      return ProgressLogUtil.updateProgressLogState(state, mutable => {
+        mutable.loading = 0;
       });
     }
     case EXTERNALLY_DISMISS_FIRST_MESSAGE: {

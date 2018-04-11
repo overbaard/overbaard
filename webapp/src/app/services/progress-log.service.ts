@@ -3,6 +3,9 @@ import {Store} from '@ngrx/store';
 import {AppState} from '../app-store';
 import {ProgressLogActions} from '../model/global/progress-log/progress-log.reducer';
 import {HttpErrorResponse} from '@angular/common/http';
+import {Set} from 'immutable';
+import {Dictionary} from '../common/dictionary';
+import {current} from 'codelyzer/util/syntaxKind';
 
 @Injectable()
 export class ProgressLogService {
@@ -10,6 +13,10 @@ export class ProgressLogService {
 
   constructor(private _store: Store<AppState>) {
     this._delegate = new ProgressDelegate(_store);
+  }
+
+  resetForNewRoute() {
+    this._delegate.resetForNewRoute();
   }
 
   startAction(showProgress: boolean, message?: string): Progress {
@@ -26,16 +33,25 @@ export class ProgressLogService {
 }
 
 export class Progress {
-  constructor(private _delegate: ProgressDelegate, public _showProgress: boolean, private message?: string) {
+
+  constructor(
+    private readonly _delegate: ProgressDelegate,
+
+    // Incremented by the delegate each time we enter a new route
+    private readonly _routeId: number,
+
+    public _showProgress: boolean,
+    private message?: string) {
+
     if (this._showProgress) {
-      this._delegate.startLoading();
+      this._delegate.startLoading(this._routeId);
     }
   }
 
   complete() {
     this.finishProgress();
     if (this.message) {
-      this._delegate.logMessage(this.message, false);
+      this._delegate.logMessage(this._routeId, this.message, false);
     }
   }
 
@@ -50,44 +66,61 @@ export class Progress {
     if (status === 401) {
       this._delegate.notLoggedIn();
     } else {
-      this._delegate.logMessage(response.message, true);
+      this._delegate.logMessage(this._routeId, response.message, true);
     }
   }
 
   logError(message: string) {
     this.finishProgress();
-    this._delegate.logMessage(message, true);
+    this._delegate.logMessage(this._routeId, message, true);
 
   }
 
   private finishProgress() {
     if (this._showProgress) {
-      this._delegate.finishProgress();
+      this._delegate.finishProgress(this._routeId);
     }
   }
 }
 
 class ProgressDelegate {
+
+  // Incremented each time we enter a new route
+  private _currentRouteId = 0;
+
+
   constructor(private readonly _store: Store<AppState>) {
   }
 
+
+  resetForNewRoute() {
+    this._currentRouteId++;
+    this._store.dispatch(ProgressLogActions.createResetForNewRoute());
+  }
+
   createProgress(showProgress: boolean, message?: string): Progress {
-    return new Progress(this, showProgress, message);
+    return new Progress(this, this._currentRouteId, showProgress, message);
   }
 
-  startLoading() {
-    this._store.dispatch(ProgressLogActions.createStartLoading());
+  startLoading(routeId: number) {
+    if (this._currentRouteId === routeId) {
+      this._store.dispatch(ProgressLogActions.createStartLoading());
+    }
   }
 
-  finishProgress() {
-    this._store.dispatch(ProgressLogActions.createCompletedLoading());
+  finishProgress(routeId: number) {
+    if (this._currentRouteId === routeId) {
+      this._store.dispatch(ProgressLogActions.createCompletedLoading());
+    }
   }
 
   notLoggedIn() {
     this._store.dispatch(ProgressLogActions.createNotLoggedIn());
   }
 
-  logMessage(message: string, error: boolean) {
-    this._store.dispatch(ProgressLogActions.createLogMessage(message, error));
+  logMessage(routeId: number, message: string, error: boolean) {
+    if (this._currentRouteId === routeId) {
+      this._store.dispatch(ProgressLogActions.createLogMessage(message, error));
+    }
   }
 }

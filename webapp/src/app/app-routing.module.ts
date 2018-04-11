@@ -8,34 +8,38 @@ import {DbExplorerComponent} from './components/db-explorer/db-explorer.componen
 import {AccessLogViewComponent} from './components/access-log/access-log.component';
 import {FontMeasureComponent} from './components/font-measure/font-measure.component';
 import {FontMeasureTableComponent} from './components/font-measure/font-measure-table.component';
+import {ResetProgressGuard} from './services/router/reset-progress.guard';
 
+/**
+ * canActivate: [ResetProgress] is to reset the progress spinner when e.g. pressing the back button
+ */
 const routes: Routes = [
   {
     path: '', redirectTo: '/boards', pathMatch: 'full'
   },
   {
-    path: 'boards', component: BoardsComponent,
+    path: 'boards', component: BoardsComponent, canActivate: [ResetProgressGuard]
   },
   {
-    path: 'board', component: BoardComponent
+    path: 'board', component: BoardComponent, canActivate: [ResetProgressGuard]
   },
   {
-    path: 'config', component: ConfigurationComponent
+    path: 'config', component: ConfigurationComponent, canActivate: [ResetProgressGuard]
   },
   {
-    path: 'login', component: LoginComponent
+    path: 'login', component: LoginComponent, canActivate: [ResetProgressGuard]
   },
   {
-    path: 'db-explorer', component: DbExplorerComponent
+    path: 'db-explorer', component: DbExplorerComponent, canActivate: [ResetProgressGuard]
   },
   {
-    path: 'access-log', component: AccessLogViewComponent
+    path: 'access-log', component: AccessLogViewComponent, canActivate: [ResetProgressGuard]
   },
   {
-    path: 'font-measure', component: FontMeasureComponent
+    path: 'font-measure', component: FontMeasureComponent, canActivate: [ResetProgressGuard]
   },
   {
-    path: 'font-measure-table', component: FontMeasureTableComponent
+    path: 'font-measure-table', component: FontMeasureTableComponent, canActivate: [ResetProgressGuard]
   }
 ];
 
