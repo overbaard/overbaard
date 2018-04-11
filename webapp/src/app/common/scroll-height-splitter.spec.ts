@@ -15,7 +15,7 @@ describe('Scroll Height Splitter Tests', () => {
     let splitter: ScrollHeightSplitter<number>;
     const containerHeight = 60;
     beforeEach(() => {
-      splitter = ScrollHeightSplitter.create(false, n => n);
+      splitter = ScrollHeightSplitter.create(false, 0, n => n);
       const list: List<number> = List<number>([20, 30, 20, 20, 30, 30]);
       splitter.updateList(list);
       expect(splitter.startPositions.toArray()).toEqual([
@@ -204,7 +204,7 @@ describe('Scroll Height Splitter Tests', () => {
   });
 
   describe('Eager drop', () => {
-    const splitter: ScrollHeightSplitter<number> = ScrollHeightSplitter.create(true, n => n);
+    const splitter: ScrollHeightSplitter<number> = ScrollHeightSplitter.create(true, 0, n => n);
     const containerHeight = 60;
     beforeEach(() => {
       const list: List<number> = List<number>([20, 30, 20, 20, 30, 30]);

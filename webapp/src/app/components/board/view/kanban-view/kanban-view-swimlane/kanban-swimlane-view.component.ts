@@ -63,15 +63,13 @@ export class KanbanSwimlaneViewComponent implements OnInit, OnChanges {
   private _swimlanes: List<SwimlaneData>;
 
   private _splitter: ScrollHeightSplitter<SwimlaneData> =
-    ScrollHeightSplitter.create(
-      true,
-        sl => {
-          let height: number = sl.headerHeight;
-          if (!sl.collapsed) {
-            height += sl.calculatedTotalIssuesHeight;
-          }
-          return height;
-      });
+    ScrollHeightSplitter.create(true, 0, sl => {
+      let height: number = sl.headerHeight;
+      if (!sl.collapsed) {
+        height += sl.calculatedTotalIssuesHeight;
+      }
+      return height;
+    });
 
   private _scrollPositionAndHeight: ScrollPositionAndHeight = {scrollPos: 0, height: 0};
   visibleSwimlanes: List<SwimlaneData>;

@@ -75,7 +75,8 @@ export class KanbanSwimlaneEntryComponent implements OnInit, OnChanges, OnDestro
   }
 
   ngOnInit() {
-    // console.log(`==== ${this.swimlane.key}  ${this.swimlane.headerHeight}  ${this.swimlane.calculatedTotalIssuesHeight} ${JSON.stringify(this.startAndHeight)}`);
+    console.log(`==== ${this.swimlane.key}  ${this.swimlane.headerHeight} ` +
+      ` ${this.swimlane.calculatedTotalIssuesHeight} ${JSON.stringify(this.startAndHeight)}`);
     this.scrollPositionObserver$
       .pipe(
         takeUntil(this._destroy$)

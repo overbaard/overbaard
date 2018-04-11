@@ -8,13 +8,21 @@ export class ScrollHeightSplitter<T> {
   private _lastContainerHeight = -1;
   private _lastInfo: VirtualScrollInfo = INITIAL_SCROLL_INFO;
 
-  static create<T>(eagerlyDrop: boolean, itemHeightGetter: (t: T) => number): ScrollHeightSplitter<T> {
-    const splitter: ScrollHeightSplitter<T> = new ScrollHeightSplitter<T>(eagerlyDrop, itemHeightGetter);
+  /**
+   *
+   * @param {boolean} eagerlyDrop whether items moved out of the view should be eagerly dropped
+   * @param {number} buffer the number of issues to be added as 'padding' at the end in the current scroll direction
+   * @param {(t: T) => number} itemHeightGetter function to get the height of each item
+   * @return {ScrollHeightSplitter<T>} the created splitter
+   */
+  static create<T>(eagerlyDrop: boolean, buffer: number, itemHeightGetter: (t: T) => number): ScrollHeightSplitter<T> {
+    const splitter: ScrollHeightSplitter<T> = new ScrollHeightSplitter<T>(eagerlyDrop, buffer, itemHeightGetter);
     return splitter;
   }
 
   constructor(
     private _eagerlyDrop: boolean,
+    private _buffer: number,
     private _itemHeightGetter: (t: T) => number) {
   }
 
@@ -68,13 +76,14 @@ export class ScrollHeightSplitter<T> {
       }
     }
 
-    this._lastInfo = this.calculateNewScrollInfo(this._lastInfo, scrollPos, containerHeight);
+    this._lastInfo = this.calculateNewScrollInfo(scrollPos, containerHeight);
     newInfoCallback(this._lastInfo.start, this._lastInfo.end, this._lastInfo.beforePadding, this._lastInfo.afterPadding);
   }
 
 
-  private calculateNewScrollInfo(scrollInfo: VirtualScrollInfo, scrollPos: number, containerHeight: number): VirtualScrollInfo {
-    let newStart = -1;
+  private calculateNewScrollInfo(scrollPos: number, containerHeight: number): VirtualScrollInfo {
+    const scrollInfo: VirtualScrollInfo = this._lastInfo;
+      let newStart = -1;
     let newEnd = -1;
 
     // Check the next entries, as they are more likely to be the ones (especially if scrolling is not super-fast)
@@ -179,27 +188,6 @@ export class ScrollHeightSplitter<T> {
       isPastLast: true};
   }
 
-  private findNewEntryLowMark(startPos: StartAndHeight): number {
-    return startPos.start;
-  }
-
-  private findNewEntryHighMark(containerHeight: number, endPos: StartAndHeight, last: boolean): number {
-    const wm: number = this.calculateEndPos(endPos);
-    if (last) {
-      return wm;
-    }
-
-    return wm - containerHeight;
-  }
-
-  private findDropLowMark(startPos: StartAndHeight) {
-    return startPos.start + startPos.height;
-  }
-
-  private findDropHighMark(containerHeight: number, endPos: StartAndHeight) {
-    return endPos.start - 1 - containerHeight;
-  }
-
   private binarySearchStartIndex(scrollPos: number): number {
     let checks = 0;
     let low = 0;
@@ -270,6 +258,8 @@ export class ScrollHeightSplitter<T> {
 
   private createVirtualScrollInfo(scrollPos: number, containerHeight: number, startIndex: number, endIndex: number): VirtualScrollInfo {
 
+    startIndex = this.adjustStartIndex(scrollPos, startIndex);
+    endIndex = this.adjustEndIndex(scrollPos, endIndex);
     const startPosition: StartAndHeight = this._startPositions.get(startIndex);
     const endPosition: StartAndHeight = this._startPositions.get(endIndex);
     const lastPosition: StartAndHeight = this._startPositions.get(this._startPositions.size - 1);
@@ -304,6 +294,49 @@ export class ScrollHeightSplitter<T> {
 
     // console.log(JSON.stringify(info));
     return info;
+  }
+
+  private adjustStartIndex(scrollPos: number, startIndex: number): number {
+    let index: number = startIndex;
+    if (scrollPos < this._lastInfo.scrollPos && this._buffer > 0) {
+      index = startIndex - this._buffer;
+      if (index < 0) {
+        index = 0;
+      }
+    }
+    return index;
+  }
+
+  private adjustEndIndex(scrollPos: number, endIndex: number): number {
+    let index: number = endIndex;
+    if (scrollPos >= this._lastInfo.scrollPos && this._buffer > 0) {
+      index = endIndex + this._buffer;
+      if (index >= this._startPositions.size) {
+        index = this._startPositions.size - 1;
+      }
+    }
+    return index;
+  }
+
+  private findNewEntryLowMark(startPos: StartAndHeight): number {
+    return startPos.start;
+  }
+
+  private findNewEntryHighMark(containerHeight: number, endPos: StartAndHeight, last: boolean): number {
+    const wm: number = this.calculateEndPos(endPos);
+    if (last) {
+      return wm;
+    }
+
+    return wm - containerHeight;
+  }
+
+  private findDropLowMark(startPos: StartAndHeight) {
+    return startPos.start + startPos.height;
+  }
+
+  private findDropHighMark(containerHeight: number, endPos: StartAndHeight) {
+    return endPos.start - 1 - containerHeight;
   }
 
   private calculateEndPos(sah: StartAndHeight) {
