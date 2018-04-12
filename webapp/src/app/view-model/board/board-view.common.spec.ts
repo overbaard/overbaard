@@ -40,6 +40,7 @@ import {UserSettingState} from '../../model/board/user/user-setting';
 import {Action} from '@ngrx/store';
 import {IssueSummaryLevel} from '../../model/board/user/issue-summary-level';
 import {HeaderActions, headerMetaReducer} from '../../model/board/data/header/header.reducer';
+import {cloneObject} from '../../common/object-util';
 
 export class BoardViewObservableUtil {
   private _service: BoardViewModelHandler = new BoardViewModelHandler(null);
@@ -112,7 +113,7 @@ export class BoardStateInitializer {
   private _rankedIssueKeys: any = {};
   private _stateMap: Map<string, StateMapping[]> = Map<string, StateMapping[]>();
 
-  constructor(private _owner: string) {
+  constructor() {
   }
 
   issuesFactory(issuesFactory: IssuesFactory): BoardStateInitializer {
@@ -166,7 +167,7 @@ export class BoardStateInitializer {
     const projects: Map<string, BoardProject> = Map<string, BoardProject>().withMutations(projectMap => {
       if (this._stateMap.size === 0) {
         // Add an empty owner project for tests that are not really concerned with issues
-        this._stateMap = this._stateMap.set(this._owner, new Array<StateMapping>());
+        this._stateMap = this._stateMap.set('xxx', new Array<StateMapping>());
       }
       this._stateMap.forEach((mappings, projectKey) => {
         const stateMap: Map<string, string> = Map<string, string>().withMutations(states => {
@@ -185,7 +186,6 @@ export class BoardStateInitializer {
     });
 
     return {
-      owner: this._owner,
       boardProjects: projects,
       linkedProjects: Map<string, LinkedProject>(),
       parallelTasks: Map<string, List<ParallelTask>>()
@@ -193,7 +193,13 @@ export class BoardStateInitializer {
   }
 
   private createRankState(): RankState {
-    return rankMetaReducer(initialRankState, RankActions.createDeserializeRanks(this._rankedIssueKeys));
+    const projectsWithRankedKeys: any = [];
+    for (const key of Object.keys(this._rankedIssueKeys)) {
+      const project: any = cloneObject(this._rankedIssueKeys[key]);
+      project['code'] = key;
+      projectsWithRankedKeys.push(project);
+    }
+    return rankMetaReducer(initialRankState, RankActions.createDeserializeRanks(projectsWithRankedKeys));
   }
 
   private createIssueState(boardState: BoardState, params: DeserializeIssueLookupParams): IssueState {

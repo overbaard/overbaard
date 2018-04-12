@@ -25,8 +25,6 @@ import static org.overbaard.jira.impl.Constants.LINKED;
 import static org.overbaard.jira.impl.Constants.LINKED_PROJECTS;
 import static org.overbaard.jira.impl.Constants.MAIN;
 import static org.overbaard.jira.impl.Constants.NAME;
-import static org.overbaard.jira.impl.Constants.OWNER;
-import static org.overbaard.jira.impl.Constants.OWNING_PROJECT;
 import static org.overbaard.jira.impl.Constants.PARALLEL_TASKS;
 import static org.overbaard.jira.impl.Constants.PRIORITIES;
 import static org.overbaard.jira.impl.Constants.PROJECTS;
@@ -46,7 +44,6 @@ import java.util.Set;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 import org.overbaard.jira.OverbaardValidationException;
-import org.overbaard.jira.impl.Constants;
 import org.overbaard.jira.impl.JiraInjectables;
 
 import com.atlassian.jira.config.IssueTypeManager;
@@ -68,7 +65,6 @@ public class BoardConfig {
     private final String code;
     private final String name;
     private final String owningUserKey;
-    private final String ownerProjectCode;
     /** The 'Rank' custom field as output by  */
     private final long rankCustomFieldId;
     private final BoardStates boardStates;
@@ -84,7 +80,7 @@ public class BoardConfig {
     private final CustomFieldRegistry<CustomFieldConfig> customFields;
     private final ParallelTaskConfig parallelTaskConfig;
 
-    private BoardConfig(int id, String code, String name, String owningUserKey, String ownerProjectCode,
+    private BoardConfig(int id, String code, String name, String owningUserKey,
                         long rankCustomFieldId,
                         BoardStates boardStates,
                         Map<String, BoardProjectConfig> boardProjects, Map<String, LinkedProjectConfig> linkedProjects,
@@ -96,7 +92,6 @@ public class BoardConfig {
         this.code = code;
         this.name = name;
         this.owningUserKey = owningUserKey;
-        this.ownerProjectCode = ownerProjectCode;
         this.rankCustomFieldId = rankCustomFieldId;
         this.boardStates = boardStates;
         this.boardProjects = boardProjects;
@@ -120,23 +115,17 @@ public class BoardConfig {
         this.parallelTaskConfig = parallelTaskConfig;
     }
 
-    public static BoardConfig load(JiraInjectables jiraInjectables, int id,
-                                   String owningUserKey, String configJson, long rankCustomFieldId) {
+    public static BoardConfig loadAndValidate(JiraInjectables jiraInjectables, int id,
+                                              String owningUserKey, String configJson, long rankCustomFieldId) {
         ModelNode boardNode = ModelNode.fromJSONString(configJson);
-        return load(jiraInjectables, id, owningUserKey, boardNode, rankCustomFieldId);
+        return loadAndValidate(jiraInjectables, id, owningUserKey, boardNode, rankCustomFieldId);
     }
 
-    public static ModelNode validateAndSerialize(JiraInjectables jiraInjectables, int id, String owningUserKey,
-                                                 ModelNode boardNode, int rankCustomFieldId) {
-        BoardConfig boardConfig = load(jiraInjectables, id, owningUserKey, boardNode, rankCustomFieldId);
-        return boardConfig.serializeModelNodeForConfig();
-    }
-
-    public static BoardConfig load(JiraInjectables jiraInjectables,
-                                    int id, String owningUserKey, ModelNode boardNode, long rankCustomFieldId) {
+    public static BoardConfig loadAndValidate(JiraInjectables jiraInjectables,
+                                              int id, String owningUserKey, ModelNode boardNode, long rankCustomFieldId) {
         final String code = Util.getRequiredChild(boardNode, "Group", null, CODE).asString();
         final String boardName = Util.getRequiredChild(boardNode, "Group", null, NAME).asString();
-        final String owningProjectName = Util.getRequiredChild(boardNode, "Group", boardName, OWNING_PROJECT).asString();
+
 
         final BoardStates boardStates = BoardStates.loadBoardStates(boardNode.get(STATES));
         final CustomFieldRegistry<CustomFieldConfig> customFields =
@@ -144,18 +133,13 @@ public class BoardConfig {
         final ParallelTaskConfig parallelTaskConfig = loadParallelTasks(jiraInjectables, customFields, boardNode);
 
         final ModelNode projects = Util.getRequiredChild(boardNode, "Group", boardName, PROJECTS);
-        final ModelNode mainProject = projects.remove(owningProjectName);
-        if (mainProject == null || !mainProject.isDefined()) {
-            throw new IllegalStateException("Project group '" + boardName + "' specifies '" + owningProjectName + "' as its main project but it does not exist");
+        if (projects.getType() != ModelType.LIST) {
+            throw new IllegalStateException("'projects' must be an array");
         }
         final Map<String, BoardProjectConfig> mainProjects = new LinkedHashMap<>();
-        final BoardProjectConfig mainProjectConfig =
-                BoardProjectConfig.load(boardStates, owningProjectName, mainProject, customFields, parallelTaskConfig);
-        mainProjects.put(owningProjectName, mainProjectConfig);
-
-        for (String projectName : projects.keys()) {
-            ModelNode project = projects.get(projectName);
-            mainProjects.put(projectName, BoardProjectConfig.load(boardStates, projectName, project, customFields, parallelTaskConfig));
+        for (ModelNode project : projects.asList()) {
+            BoardProjectConfig projectConfig = BoardProjectConfig.load(boardStates, project, customFields, parallelTaskConfig);
+            mainProjects.put(projectConfig.getCode(), projectConfig);
         }
 
         final ModelNode linked = boardNode.get(LINKED_PROJECTS);
@@ -167,7 +151,7 @@ public class BoardConfig {
             }
         }
 
-        final BoardConfig boardConfig = new BoardConfig(id, code, boardName, owningUserKey, owningProjectName,
+        final BoardConfig boardConfig = new BoardConfig(id, code, boardName, owningUserKey,
                 rankCustomFieldId,
                 boardStates,
                 Collections.unmodifiableMap(mainProjects),
@@ -318,17 +302,16 @@ public class BoardConfig {
         }
 
         final ModelNode projects = boardNode.get(PROJECTS);
-        projects.get(OWNER).set(ownerProjectCode);
 
         final ModelNode main = projects.get(MAIN);
-        main.setEmptyObject();
+        main.setEmptyList();
         for (BoardProjectConfig project : boardProjects.values()) {
-            project.serializeModelNodeForBoard(this, main);
+            main.add(project.serializeModelNodeForBoard(main));
         }
         final ModelNode linked = projects.get(LINKED);
         linked.setEmptyObject();
         for (LinkedProjectConfig project : linkedProjects.values()) {
-            project.serializeModelNodeForBoard(this, linked);
+            linked.set(project.getCode(), project.serializeModelNodeForBoard(linked));
         }
     }
 
@@ -339,7 +322,6 @@ public class BoardConfig {
         ModelNode boardNode = new ModelNode();
         boardNode.get(NAME).set(name);
         boardNode.get(CODE).set(code);
-        boardNode.get(OWNING_PROJECT).set(ownerProjectCode);
 
         boardStates.toModelNodeForConfig(boardNode);
 
@@ -366,8 +348,9 @@ public class BoardConfig {
         }
 
         final ModelNode projectsNode = boardNode.get(PROJECTS);
+        projectsNode.setEmptyList();
         for (BoardProjectConfig project : boardProjects.values()) {
-            projectsNode.get(project.getCode()).set(project.serializeModelNodeForConfig());
+            projectsNode.add(project.serializeModelNodeForConfig());
         }
 
         final ModelNode linkedProjectsNode = boardNode.get(LINKED_PROJECTS);
@@ -376,10 +359,6 @@ public class BoardConfig {
             linkedProjectsNode.get(project.getCode()).set(project.serializeModelNodeForConfig());
         }
         return boardNode;
-    }
-
-    public String getOwnerProjectCode() {
-        return ownerProjectCode;
     }
 
     public Integer getIssueTypeIndex(String name) {

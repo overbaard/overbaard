@@ -20,6 +20,7 @@ import static org.overbaard.jira.impl.Constants.ASSIGNEES;
 import static org.overbaard.jira.impl.Constants.AVATAR;
 import static org.overbaard.jira.impl.Constants.BACKLOG;
 import static org.overbaard.jira.impl.Constants.BLACKLIST;
+import static org.overbaard.jira.impl.Constants.CODE;
 import static org.overbaard.jira.impl.Constants.COLOUR;
 import static org.overbaard.jira.impl.Constants.COMPONENTS;
 import static org.overbaard.jira.impl.Constants.CUSTOM;
@@ -32,6 +33,7 @@ import static org.overbaard.jira.impl.Constants.ISSUES;
 import static org.overbaard.jira.impl.Constants.ISSUE_TYPES;
 import static org.overbaard.jira.impl.Constants.KEY;
 import static org.overbaard.jira.impl.Constants.LABELS;
+import static org.overbaard.jira.impl.Constants.LINKED;
 import static org.overbaard.jira.impl.Constants.MAIN;
 import static org.overbaard.jira.impl.Constants.NAME;
 import static org.overbaard.jira.impl.Constants.OPTIONS;
@@ -49,6 +51,7 @@ import static org.overbaard.jira.impl.Constants.VALUE;
 import static org.overbaard.jira.impl.Constants.WIP;
 import static org.overbaard.jira.impl.board.CustomFieldValue.UNSET_VALUE;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -63,6 +66,7 @@ import org.overbaard.jira.impl.OverbaardIssueEvent;
 import org.overbaard.jira.impl.board.ProjectParallelTaskOptionsLoaderBuilder;
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.ui.Model;
 
 import com.atlassian.jira.issue.search.SearchException;
 
@@ -95,7 +99,19 @@ public class BoardManagerTest extends AbstractBoardTest {
         Assert.assertFalse(boardNode.hasDefined(BACKLOG));
         //The last 2 states are 'done' states (they must always be at the end)
         Assert.assertEquals(2, boardNode.get(DONE).asInt());
+    }
 
+    @Test
+    public void testLinkedProjects() throws Exception {
+        ModelNode boardNode = getJson(0);
+        Assert.assertTrue(boardNode.hasDefined(PROJECTS, LINKED));
+
+        Assert.assertTrue(boardNode.hasDefined(PROJECTS, LINKED, "TUP", STATES));
+        List<String> states = new ArrayList<>();
+        for (ModelNode state : boardNode.get(PROJECTS, LINKED, "TUP", STATES).asList()) {
+            states.add(state.asString());
+        }
+        Assert.assertArrayEquals(new String[]{"TUP-A", "TUP-B", "TUP-C"}, states.toArray(new String[states.size()]));
     }
 
     @Test
@@ -1444,8 +1460,8 @@ public class BoardManagerTest extends AbstractBoardTest {
     private void checkRankIssuesPermissions(boolean allow) throws Exception {
         ModelNode boardNode = getJson(0);
         ModelNode projectParent = boardNode.get(PROJECTS, MAIN);
-        for (String projectName : projectParent.keys()) {
-            ModelNode rank = projectParent.get(projectName).get(RANK);
+        for (ModelNode project : projectParent.asList()) {
+            ModelNode rank = project.get(RANK);
             Assert.assertTrue(rank.isDefined());
             Assert.assertEquals(allow, rank.asBoolean());
         }
@@ -1834,7 +1850,7 @@ public class BoardManagerTest extends AbstractBoardTest {
 
         ModelNode boardNode = getJson(0, new BoardAssigneeChecker("kabir"));
 
-        ModelNode parallelTasksNode = boardNode.get(PROJECTS, MAIN, "TDP", PARALLEL_TASKS);
+        ModelNode parallelTasksNode = getProjectFromBoardNode(boardNode, "TDP").get(PARALLEL_TASKS);
         Assert.assertEquals(ModelType.LIST, parallelTasksNode.getType());
         List<ModelNode> parallelTasks = parallelTasksNode.asList();
         Assert.assertEquals(2, parallelTasks.size());
@@ -2269,12 +2285,28 @@ public class BoardManagerTest extends AbstractBoardTest {
     }
 
     private void checkProjectRankedIssues(ModelNode boardNode, String projectCode, int...issueNumbers) {
-        Assert.assertTrue(boardNode.hasDefined(PROJECTS, MAIN, projectCode, RANKED));
-        List<ModelNode> ranked = boardNode.get(PROJECTS, MAIN, projectCode, RANKED).asList();
+        ModelNode project = getProjectFromBoardNode(boardNode, projectCode);
+        Assert.assertTrue(project.hasDefined(RANKED));
+        List<ModelNode> ranked = project.get(RANKED).asList();
         Assert.assertEquals(issueNumbers.length, ranked.size());
         for (int i = 0 ; i < issueNumbers.length ; i++) {
             Assert.assertEquals(projectCode + "-" + issueNumbers[i], ranked.get(i).asString());
         }
+    }
+
+    private ModelNode getProjectFromBoardNode(ModelNode boardNode, String projectCode) {
+        Assert.assertTrue(boardNode.hasDefined(PROJECTS, MAIN));
+        ModelNode main = boardNode.get(PROJECTS, MAIN);
+        Assert.assertTrue(main.getType() == ModelType.LIST);
+
+        for (ModelNode project : main.asList()) {
+            if (project.get(CODE).asString().equals(projectCode)) {
+                return project;
+            }
+        }
+
+        Assert.fail("Could not find project: " + projectCode);
+        return null;
     }
 
     private void checkNameAndColour(ModelNode board, String type, String...names) {

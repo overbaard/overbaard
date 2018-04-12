@@ -26,7 +26,7 @@ describe('Issue Table observer tests', () => {
     issueFactory = new SimpleIssueFactory();
     headerFactory = new NumberedHeaderStateFactory(4);
     init =
-      new BoardStateInitializer('ONE')
+      new BoardStateInitializer()
         .headerStateFactory(headerFactory)
         .mapState('ONE', 'S-1', '1-1')
         .mapState('ONE', 'S-2', '1-2')
@@ -139,7 +139,7 @@ describe('Issue Table observer tests', () => {
         });
         function doTest(rank: boolean) {
           init =
-            new BoardStateInitializer('ONE')
+            new BoardStateInitializer()
               .headerStateFactory(headerFactory)
               .setRank('ONE', 4, 3, 2, 1)
               .mapState('ONE', 'S-2', '1-1')
@@ -225,7 +225,7 @@ describe('Issue Table observer tests', () => {
         });
         function doTest(rank: boolean) {
           init =
-            new BoardStateInitializer('ONE')
+            new BoardStateInitializer()
               .headerStateFactory(new NumberedHeaderStateFactory(5))
               .setRank('ONE', 3, 2, 1)
               .mapState('ONE', 'S-2', '1-1')
@@ -270,7 +270,7 @@ describe('Issue Table observer tests', () => {
       // Don't do this in beforeEach, but rather call manually from tests since it is parameterised
       function setup(rank: boolean) {
         init =
-          new BoardStateInitializer('ONE')
+          new BoardStateInitializer()
             .headerStateFactory(headerFactory)
             .setRank('ONE', 1, 2, 3, 4, 5, 6, 7)
             .mapState('ONE', 'S-1', '1-1')
@@ -482,7 +482,7 @@ describe('Issue Table observer tests', () => {
           function doTest(rank: boolean) {
             // Don't use the standard setup here as we have another project
             init =
-              new BoardStateInitializer('ONE')
+              new BoardStateInitializer()
                 .headerStateFactory(headerFactory)
                 .setRank('ONE', 1, 2, 3, 4, 5, 6, 7)
                 .setRank('TWO', 1, 2)
@@ -846,7 +846,7 @@ describe('Issue table filter tests', () => {
 
   function setupTable(params?: Dictionary<string>): BoardViewObservableUtil {
     const init =
-      new BoardStateInitializer('ONE')
+      new BoardStateInitializer()
         .headerStateFactory(new NumberedHeaderStateFactory(3))
         .setRank('ONE', 1, 2, 3, 4, 5, 6, 7, 8, 9)
         .mapState('ONE', 'S-1', '1-1')
@@ -1092,7 +1092,7 @@ describe('Switch View Mode (effect on Backlog) Tests', () => {
 
   function createInitializer(loadBacklog: boolean): BoardStateInitializer {
     const init =
-      new BoardStateInitializer('ONE')
+      new BoardStateInitializer()
         .headerStateFactory(new BacklogStateFactory(3))
         .mapState('ONE', 'S-1', '1-1')
         .mapState('ONE', 'S-2', '1-2')

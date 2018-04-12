@@ -23,10 +23,8 @@ class RerankAction implements Action {
 export class RankActions {
   static createDeserializeRanks(input: any): Action {
     const rankedIssueKeys: Map<string, List<string>> = Map<string, List<string>>().asMutable();
-
-    for (const key of Object.keys(input)) {
-      const projectInput: any = input[key];
-      rankedIssueKeys.set(key, List<string>(projectInput['ranked']));
+    for (const projectInput of input) {
+      rankedIssueKeys.set(projectInput['code'], List<string>(projectInput['ranked']));
     }
 
     const payload: RankState = {

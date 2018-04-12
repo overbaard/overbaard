@@ -275,7 +275,6 @@ describe('Apply filter tests', () => {
           map.set('ISSUE', projectTasks);
         });
         projectState = {
-          owner: 'ISSUE',
           boardProjects: null,
           linkedProjects: null,
           parallelTasks: tasks
@@ -319,7 +318,6 @@ describe('Apply filter tests', () => {
 
   function filtersFromQs(qs: Dictionary<string>, currentUser?: string): AllFilters {
     const projectState = {
-        owner: 'ISSUE',
         boardProjects: null,
         linkedProjects: null,
         parallelTasks: Map<string, List<ParallelTask>>()

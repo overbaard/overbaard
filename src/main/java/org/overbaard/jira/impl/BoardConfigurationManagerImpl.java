@@ -112,6 +112,8 @@ public class BoardConfigurationManagerImpl implements BoardConfigurationManager 
 
     @Override
     public String getBoardJsonConfig(ApplicationUser user, int boardId) {
+        // Note that for this path (basically for the configuration page) we don't validate the loaded
+        // config. Otherwise if we break compatibility, people will not be able to fix it.
         BoardCfg[] cfgs = jiraInjectables.getActiveObjects().executeInTransaction(new TransactionCallback<BoardCfg[]>(){
             @Override
             public BoardCfg[] doInTransaction() {
@@ -153,7 +155,7 @@ public class BoardConfigurationManagerImpl implements BoardConfigurationManager 
 
             if (cfgs != null && cfgs.length == 1) {
                 BoardCfg cfg = cfgs[0];
-                boardConfig = BoardConfig.load(jiraInjectables, cfg.getID(),
+                boardConfig = BoardConfig.loadAndValidate(jiraInjectables, cfg.getID(),
                         cfg.getOwningUser(), cfg.getConfigJson(), getRankCustomFieldId());
 
                 BoardConfig old = boardConfigs.putIfAbsent(code, boardConfig);
@@ -174,7 +176,7 @@ public class BoardConfigurationManagerImpl implements BoardConfigurationManager 
         final BoardConfig boardConfig;
         final ModelNode validConfig;
         try {
-            boardConfig = BoardConfig.load(jiraInjectables, id,
+            boardConfig = BoardConfig.loadAndValidate(jiraInjectables, id,
                     user.getKey(), config, getRankCustomFieldId());
 
             validConfig = boardConfig.serializeModelNodeForConfig();

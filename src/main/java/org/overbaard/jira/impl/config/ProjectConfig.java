@@ -63,13 +63,9 @@ public abstract class ProjectConfig {
         return statesList.get(index);
     }
 
-    private ModelNode getModelNodeForCode(ModelNode parent) {
-        ModelNode projectNode = parent.get(code);
-        return projectNode;
-    }
-
-    ModelNode serializeModelNodeForBoard(BoardConfig boardConfig, ModelNode parent) {
-        ModelNode projectNode = getModelNodeForCode(parent);
+    ModelNode serializeModelNodeForBoard(ModelNode parent) {
+        ModelNode projectNode = new ModelNode();
+        projectNode.get(Constants.CODE).set(code);
         ModelNode states = projectNode.get(Constants.STATES).setEmptyList();
         for (String state : this.states.keySet()) {
             states.add(state);

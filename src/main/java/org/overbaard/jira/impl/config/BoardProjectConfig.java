@@ -73,8 +73,9 @@ public class BoardProjectConfig extends ProjectConfig {
         this.customFieldNames = customFieldNames;
     }
 
-    static BoardProjectConfig load(final BoardStates boardStates, final String projectCode, ModelNode project,
+    static BoardProjectConfig load(final BoardStates boardStates, ModelNode project,
                                    CustomFieldRegistry<CustomFieldConfig> customFieldConfigs, ParallelTaskConfig parallelTaskConfig) {
+        String projectCode = Util.getRequiredChild(project, "Project", null, Constants.CODE).asString();
         String colour = Util.getRequiredChild(project, "Project", projectCode, Constants.COLOUR).asString();
         ModelNode statesLinks = Util.getRequiredChild(project, "Project", projectCode, Constants.STATE_LINKS);
 
@@ -177,8 +178,8 @@ public class BoardProjectConfig extends ProjectConfig {
     }
 
     @Override
-    ModelNode serializeModelNodeForBoard(BoardConfig boardConfig, ModelNode parent) {
-        ModelNode projectNode = super.serializeModelNodeForBoard(boardConfig, parent);
+    ModelNode serializeModelNodeForBoard(ModelNode parent) {
+        ModelNode projectNode = super.serializeModelNodeForBoard(parent);
         ModelNode stateLinksNode = projectNode.get(Constants.STATE_LINKS);
         for (String state : boardStates.getStateNames()) {
             String myState = mapBoardStateOntoOwnState(state);
@@ -190,6 +191,7 @@ public class BoardProjectConfig extends ProjectConfig {
 
     ModelNode serializeModelNodeForConfig() {
         final ModelNode projectNode = new ModelNode();
+        projectNode.get(Constants.CODE).set(code);
         projectNode.get(Constants.QUERY_FILTER).set(queryFilter == null ? new ModelNode() : new ModelNode(queryFilter));
         projectNode.get(Constants.COLOUR).set(colour);
 

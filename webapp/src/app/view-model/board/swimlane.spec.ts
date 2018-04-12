@@ -1695,7 +1695,7 @@ describe('Swimlane observer tests', () => {
   function createUtil(params: Dictionary<string>, ranks: Dictionary<number[]>,
                       issueFactory: SwimlaneIssueFactory): BoardViewObservableUtil {
     const init: BoardStateInitializer =
-      new BoardStateInitializer('ONE')
+      new BoardStateInitializer()
         .headerStateFactory(new NumberedHeaderStateFactory(3))
         .issuesFactory(issueFactory)
         .mapState('ONE', 'S-1', '1-1')

@@ -27,12 +27,11 @@ export class ProjectActions {
     const linkedProjects: Map<string, LinkedProject> = Map<string, LinkedProject>().asMutable();
     const parallelTasks: Map<string, List<ParallelTask>> = Map<string, List<ParallelTask>>().asMutable();
 
-    const owner: string = input['owner'];
     const mainInput: any = input['main'];
 
-    for (const key of Object.keys(mainInput)) {
-      const projectInput: any = mainInput[key];
-      boardProjects.set(key, ProjectUtil.boardProjectFromJs(key, projectInput));
+    for (const projectInput of mainInput) {
+      const project: BoardProject = ProjectUtil.boardProjectFromJs(projectInput);
+      boardProjects.set(project.key, project);
       let parallelTasksInput: any[] = projectInput['parallel-tasks'];
       if (parallelTasksInput) {
         // Something makes this read-only so clone it
@@ -40,7 +39,7 @@ export class ProjectActions {
         for (let i = 0 ; i < parallelTasksInput.length ; i++) {
           const task: ParallelTask = ProjectUtil.parallelTaskFromJs(parallelTasksInput[i]);
           parallelTasksInput[i] = task;
-          parallelTasks.set(key, List<ParallelTask>(parallelTasksInput));
+          parallelTasks.set(project.key, List<ParallelTask>(parallelTasksInput));
         }
       }
     }
@@ -54,7 +53,6 @@ export class ProjectActions {
     }
 
     const payload: ProjectState = {
-      owner: owner,
       boardProjects: boardProjects.asImmutable(),
       linkedProjects: linkedProjects.asImmutable(),
       parallelTasks: parallelTasks.asImmutable()
@@ -70,7 +68,6 @@ export function projectMetaReducer(state: ProjectState = initialProjectState, ac
     case DESERIALIZE_PROJECTS: {
       const payload: ProjectState = (<DeserializeProjectsAction>action).payload;
       return ProjectUtil.withMutations(state, mutable => {
-        mutable.owner = payload.owner;
         if (!mutable.boardProjects.equals(payload.boardProjects)) {
           mutable.boardProjects = payload.boardProjects;
         }

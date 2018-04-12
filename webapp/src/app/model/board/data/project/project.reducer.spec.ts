@@ -7,8 +7,9 @@ export function getTestProjectsInput(): any {
   return cloneObject(
     {
       owner: 'P1',
-      main: {
-        P1: {
+      main: [
+        {
+          code: 'P1',
           colour: '#FF0000',
           rank: true,
           'state-links': {
@@ -20,9 +21,9 @@ export function getTestProjectsInput(): any {
             'P1-3',
             'P1-2'
           ],
-
         },
-        P2: {
+        {
+          code: 'P2',
           colour: '#00FF00',
           'state-links': {
             'Board1': 'Test1',
@@ -52,7 +53,7 @@ export function getTestProjectsInput(): any {
                 'Tres']
             }]
         }
-      },
+      ],
       linked: {
         L1: {
           states: [
@@ -84,7 +85,6 @@ describe('Projects reducer tests', () => {
     it('Deserialize', () => {
       const projectState: ProjectState = projectMetaReducer(
         initialProjectState, ProjectActions.createDeserializeProjects(getTestProjectsInput()));
-      expect(projectState.owner).toBe('P1');
 
       // Board projects
       expect(projectState.boardProjects.size).toBe(2);

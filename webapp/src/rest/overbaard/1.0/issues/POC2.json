@@ -90,9 +90,9 @@
     ]
   },
   "projects" : {
-    "owner" : "FEAT",
-    "main" : {
-      "FEAT" : {
+    "main" : [
+      {
+        "code": "FEAT",
         "colour" : "#4667CA",
         "rank" : true,
         "state-links" : {
@@ -106,7 +106,7 @@
         },
         "ranked": ["FEAT-1", "FEAT-2", "FEAT-3"]
       }
-    }
+    ]
   },
   "issues" : {
     "FEAT-1" : {

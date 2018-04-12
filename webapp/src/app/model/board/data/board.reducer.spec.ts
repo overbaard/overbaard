@@ -48,9 +48,9 @@ export function getTestBoardsInput(): any {
       'issue-types': getTestIssueTypesInput(),
       custom: getTestCustomFieldsInput(),
       projects: {
-        owner: 'P1',
-        main: {
-          P1: {
+        main: [
+          {
+            code: 'P1',
             colour: '#FF0000',
             rank: true,
             'state-links': {
@@ -70,7 +70,7 @@ export function getTestBoardsInput(): any {
                   'Two']
               }]
           }
-        },
+        ],
         linked: {
           L1: {
             states: [
@@ -161,7 +161,6 @@ describe('Board reducer tests', () => {
       expect(customFields.get('Custom-2').size).toBe(2);
 
       const projectState: ProjectState = boardState.projects;
-      expect(projectState.owner).toEqual('P1');
       expect(projectState.boardProjects.size).toEqual(1);
       const project1: BoardProject = projectState.boardProjects.get('P1');
       expect(project1.boardStateNameToOwnStateName.size).toBe(2);
@@ -203,7 +202,7 @@ describe('Board reducer tests', () => {
       delete input['labels'];
       delete input['fix-versions'];
       delete input['custom'];
-      delete input['projects']['main']['P1']['parallel-tasks'];
+      delete input['projects']['main'][0]['parallel-tasks'];
       delete input['issues']['P1-1']['components'];
       delete input['issues']['P1-1']['labels'];
       delete input['issues']['P1-1']['custom'];
@@ -250,7 +249,6 @@ describe('Board reducer tests', () => {
       expect(customFields.size).toBe(0);
 
       const projectState: ProjectState = boardState.projects;
-      expect(projectState.owner).toEqual('P1');
       expect(projectState.boardProjects.size).toEqual(1);
       const project1: BoardProject = projectState.boardProjects.get('P1');
       expect(project1.boardStateNameToOwnStateName.size).toBe(2);

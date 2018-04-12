@@ -32,8 +32,9 @@
     {"name": "Bug", "colour": "red"},
     {"name": "Epic", "colour": "purple"}
   ],
-  "projects": {
-    "FEAT": {
+  "projects": [
+    {
+      "code": "FEAT",
       "query-filter": null,
       "colour": "#4667CA",
       "state-links": {
@@ -43,7 +44,8 @@
         "Backlog": "Backlog"
       }
     },
-    "SUP": {
+    {
+      "code": "SUP",
       "query-filter": null,
       "colour": "#CA6746",
       "state-links": {
@@ -53,7 +55,7 @@
         "Backlog": "Backlog"
       }
     }
-  },
+  ],
   "linked-projects": {
     "UP": {
       "states": [

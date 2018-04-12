@@ -33,9 +33,7 @@ describe('Rank reducer tests', () => {
     let input: any;
     let state: RankState;
     beforeEach(() => {
-      input = cloneObject({
-        P: {ranked: ['P-1', 'P-2', 'P-3', 'P-4']}
-      });
+      input = cloneObject([{code: 'P', ranked: ['P-1', 'P-2', 'P-3', 'P-4']}]);
       state = rankMetaReducer(
         initialRankState, RankActions.createDeserializeRanks(input));
       expect(state.rankedIssueKeys.size).toBe(1);

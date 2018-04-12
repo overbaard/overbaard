@@ -154,9 +154,13 @@ public class Board {
 
         ModelNode mainProjectsParent = outputNode.get(Constants.PROJECTS, Constants.MAIN);
 
+        Map<String, ModelNode> projectLookup = new HashMap<>();
+        for (ModelNode project : mainProjectsParent.asList()) {
+            projectLookup.put(project.get(Constants.CODE).asString(), project);
+        }
         for (Map.Entry<String, BoardProject> projectEntry : projects.entrySet()) {
             final String projectCode = projectEntry.getKey();
-            ModelNode project = mainProjectsParent.get(projectCode);
+            ModelNode project = projectLookup.get(projectCode);
             projectEntry.getValue().serialize(jiraInjectables, this, project, user, backlog);
         }
 
@@ -450,9 +454,6 @@ public class Board {
 
         public Board build() {
             Map<String, BoardProject> projects = new LinkedHashMap<>();
-
-            BoardProject.Builder ownerProject = this.projects.remove(boardConfig.getOwnerProjectCode());
-            projects.put(boardConfig.getOwnerProjectCode(), ownerProject.build());
 
             this.projects.forEach((name, projectBuilder) -> {
                 if (boardConfig.getBoardProject(name) != null) {

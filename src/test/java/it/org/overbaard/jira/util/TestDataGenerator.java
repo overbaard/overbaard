@@ -4,6 +4,7 @@ import static org.overbaard.jira.impl.Constants.ASSIGNEE;
 import static org.overbaard.jira.impl.Constants.ASSIGNEES;
 import static org.overbaard.jira.impl.Constants.AVATAR;
 import static org.overbaard.jira.impl.Constants.BACKLOG;
+import static org.overbaard.jira.impl.Constants.CODE;
 import static org.overbaard.jira.impl.Constants.COLOUR;
 import static org.overbaard.jira.impl.Constants.COMPONENTS;
 import static org.overbaard.jira.impl.Constants.CURRENT_USER;
@@ -150,8 +151,7 @@ public class TestDataGenerator {
         }
 
         ModelNode projects = modelNode.get(PROJECTS).setEmptyObject();
-        projects.get(OWNER).set(MAIN_PROJECT_NAME);
-        projects.get(MAIN, MAIN_PROJECT_NAME).set(generateProject());
+        projects.get(MAIN).add(generateProject());
 
         modelNode.get(ISSUES).set(generateIssues());
         return modelNode;
@@ -159,6 +159,7 @@ public class TestDataGenerator {
 
     private ModelNode generateProject() {
         ModelNode project = new ModelNode();
+        project.get(CODE).set(MAIN_PROJECT_NAME);
         project.get(COLOUR).set("#4667CA");
         project.get(RANK).set(true);
         ModelNode stateLinks = project.get(STATE_LINKS).setEmptyObject();

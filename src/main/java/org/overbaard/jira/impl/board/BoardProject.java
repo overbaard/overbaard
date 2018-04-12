@@ -118,11 +118,6 @@ public class BoardProject {
             getParallelTaskValues().values().forEach(
                     sortedCustomFieldValues -> sortedCustomFieldValues.serialize(parallelTasks));
         }
-
-    }
-
-    boolean isOwner() {
-        return board.getConfig().getOwnerProjectCode().equals(projectConfig.getCode());
     }
 
     static Builder builder(JiraInjectables jiraInjectables, ProjectParallelTaskOptionsLoader projectParallelTaskOptionsLoader, Board.Builder builder, BoardProjectConfig projectConfig,

@@ -20,7 +20,7 @@ describe('Board headers tests', () => {
       let initializer: BoardStateInitializer;
       let states: any[];
       beforeEach(() => {
-        initializer = new BoardStateInitializer('TEST')
+        initializer = new BoardStateInitializer()
           .issuesFactory(new EmptyIssuesFactory());
         states = [
           {name: 'S1'},
@@ -63,7 +63,7 @@ describe('Board headers tests', () => {
       describe('Wip', () => {
         it('Some wip', () => {
           states[1]['wip'] = 4;
-          initializer = new BoardStateInitializer('TEST')
+          initializer = new BoardStateInitializer()
             .issuesFactory(new EmptyIssuesFactory())
             .headerStateFactory(createHeaderStateFactory(states, 1, 0));
           util
@@ -86,7 +86,7 @@ describe('Board headers tests', () => {
           states[2]['wip'] = 11;
           states[3]['wip'] = 9;
           states[4]['wip'] = 23;
-          initializer = new BoardStateInitializer('TEST')
+          initializer = new BoardStateInitializer()
             .issuesFactory(new EmptyIssuesFactory())
             .headerStateFactory(createHeaderStateFactory(states, 1, 0));
           util
@@ -115,7 +115,7 @@ describe('Board headers tests', () => {
       let initializer: BoardStateInitializer;
       let states: any[];
       beforeEach(() => {
-        initializer = new BoardStateInitializer('TEST')
+        initializer = new BoardStateInitializer()
           .issuesFactory(new EmptyIssuesFactory());
         states = [
           {name: 'S1'},
@@ -127,7 +127,7 @@ describe('Board headers tests', () => {
       describe('No backlog', () => {
         it('Header one state, start', () => {
           states[0]['header'] = 0;
-          initializer = new BoardStateInitializer('TEST')
+          initializer = new BoardStateInitializer()
             .issuesFactory(new EmptyIssuesFactory())
             .headerStateFactory(new TestHeaderStateFactory(states, ['H1'], 0, 0));
           util
@@ -148,7 +148,7 @@ describe('Board headers tests', () => {
         it('Header two states, start', () => {
           states[0]['header'] = 0;
           states[1]['header'] = 0;
-          initializer = new BoardStateInitializer('TEST')
+          initializer = new BoardStateInitializer()
             .issuesFactory(new EmptyIssuesFactory())
             .headerStateFactory(new TestHeaderStateFactory(states, ['H1'], 0, 0));
           util
@@ -168,7 +168,7 @@ describe('Board headers tests', () => {
         });
         it('Header one state, middle', () => {
           states[2]['header'] = 0;
-          initializer = new BoardStateInitializer('TEST')
+          initializer = new BoardStateInitializer()
             .issuesFactory(new EmptyIssuesFactory())
             .headerStateFactory(new TestHeaderStateFactory(states, ['H1'], 0, 0));
           util
@@ -189,7 +189,7 @@ describe('Board headers tests', () => {
         it('Header two states, middle', () => {
           states[2]['header'] = 0;
           states[3]['header'] = 0;
-          initializer = new BoardStateInitializer('TEST')
+          initializer = new BoardStateInitializer()
             .issuesFactory(new EmptyIssuesFactory())
             .headerStateFactory(new TestHeaderStateFactory(states, ['H1'], 0, 0));
           util
@@ -209,7 +209,7 @@ describe('Board headers tests', () => {
         });
         it('Header one state, end', () => {
           states[4]['header'] = 0;
-          initializer = new BoardStateInitializer('TEST')
+          initializer = new BoardStateInitializer()
             .issuesFactory(new EmptyIssuesFactory())
             .headerStateFactory(new TestHeaderStateFactory(states, ['H1'], 0, 0));
           util
@@ -231,7 +231,7 @@ describe('Board headers tests', () => {
         it('Header one state, end', () => {
           states[3]['header'] = 0;
           states[4]['header'] = 0;
-          initializer = new BoardStateInitializer('TEST')
+          initializer = new BoardStateInitializer()
             .issuesFactory(new EmptyIssuesFactory())
             .headerStateFactory(new TestHeaderStateFactory(states, ['H1'], 0, 0));
           util
@@ -261,7 +261,7 @@ describe('Board headers tests', () => {
           states[4]['header'] = 1;
           states[4]['wip'] = 11;
 
-          initializer = new BoardStateInitializer('TEST')
+          initializer = new BoardStateInitializer()
             .issuesFactory(new EmptyIssuesFactory())
             .headerStateFactory(new TestHeaderStateFactory(states, ['H1', 'H2'], 0, 0));
           util
@@ -293,7 +293,7 @@ describe('Board headers tests', () => {
           states[4]['header'] = 1;
           states[4]['wip'] = 11;
 
-          initializer = new BoardStateInitializer('TEST')
+          initializer = new BoardStateInitializer()
             .issuesFactory(new EmptyIssuesFactory())
             .headerStateFactory(new TestHeaderStateFactory(states, ['H1', 'H2'], 0, 0));
           util
@@ -329,7 +329,7 @@ describe('Board headers tests', () => {
             {name: 'S5', header: 1, wip: 11}];
         });
         it('Some headers, wip', () => {
-          initializer = new BoardStateInitializer('TEST')
+          initializer = new BoardStateInitializer()
             .issuesFactory(new EmptyIssuesFactory())
             .headerStateFactory(new TestHeaderStateFactory(states, ['H1', 'H2'], 2, 0));
           util
@@ -354,7 +354,7 @@ describe('Board headers tests', () => {
         });
 
         it('Deserialize same if no change to headers', () => {
-          initializer = new BoardStateInitializer('TEST')
+          initializer = new BoardStateInitializer()
             .issuesFactory(new EmptyIssuesFactory())
             .headerStateFactory(new TestHeaderStateFactory(states, ['H1', 'H2'], 2, 0));
           let original: BoardHeaders;
@@ -383,7 +383,7 @@ describe('Board headers tests', () => {
         {name: 'Analysis', header: 0},
         {name: 'Dev In Progress', header: 1},
         {name: 'More Work is needed', header: 1}];
-      const initializer: BoardStateInitializer = new BoardStateInitializer('TEST')
+      const initializer: BoardStateInitializer = new BoardStateInitializer()
         .issuesFactory(new EmptyIssuesFactory())
         .headerStateFactory(new TestHeaderStateFactory(states, ['Short Header', 'A much longer header'], 1, 0));
       util
@@ -528,7 +528,7 @@ describe('Board headers tests', () => {
     function setUpBoard(headerStateFactory: HeaderStateFactory, params?: Dictionary<string>): BoardViewObservableUtil {
       return new BoardViewObservableUtil(params)
         .updateBoardState(
-          new BoardStateInitializer('ONE')
+          new BoardStateInitializer()
             .headerStateFactory(headerStateFactory)
             .setRank('ONE', 1, 2, 3, 4, 5, 6, 7, 8, 9)
             .mapState('ONE', 'S1', '1-1')
@@ -1302,7 +1302,7 @@ describe('Board headers tests', () => {
         {name: 'S4', header: 1},
         {name: 'S5', header: 1},
         {name: 'S6'}];
-      return new BoardStateInitializer('TEST')
+      return new BoardStateInitializer()
         .issuesFactory(new EmptyIssuesFactory())
         .headerStateFactory(new TestHeaderStateFactory(states, ['H1', 'H2'], 2, 0));
 
@@ -1387,7 +1387,7 @@ describe('Board headers tests', () => {
 
       return new BoardViewObservableUtil({hidden: '4,5'})
         .updateBoardState(
-          new BoardStateInitializer('ONE')
+          new BoardStateInitializer()
             .headerStateFactory(headerStateFactory)
             .setRank('ONE', 1, 2, 3, 4, 5, 6, 7, 8, 9)
             .mapState('ONE', 'B1', '1-A')

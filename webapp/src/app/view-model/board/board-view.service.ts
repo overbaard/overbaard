@@ -682,13 +682,8 @@ class IssueTableBuilder {
       visibleIssues.push(0);
     }
 
-    const mainProj: BoardProject = this._currentBoardState.projects.boardProjects.get(this._currentBoardState.projects.owner);
-    this.addProjectIssues(
-      issues, totalIssues, visibleIssues, tableBuilder, rankViewBuilder, mainProj);
     this._currentBoardState.projects.boardProjects.forEach((project, key) => {
-      if (key !== this._currentBoardState.projects.owner) {
-        this.addProjectIssues(issues, totalIssues, visibleIssues, tableBuilder, rankViewBuilder, project);
-      }
+      this.addProjectIssues(issues, totalIssues, visibleIssues, tableBuilder, rankViewBuilder, project);
     });
 
     this._totalIssueCounts = List<number>(totalIssues);

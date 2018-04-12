@@ -29,7 +29,7 @@ describe('Issue detail view tests', () => {
     const issueFactory: SimpleIssueFactory = new SimpleIssueFactory();
     const headerFactory: HeaderStateFactory = new NumberedHeaderStateFactory(4);
     const init: BoardStateInitializer =
-      new BoardStateInitializer('ONE')
+      new BoardStateInitializer()
         .headerStateFactory(headerFactory)
         .mapState('ONE', 'S-1', '1-1')
         .mapState('ONE', 'S-2', '1-2')

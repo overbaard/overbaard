@@ -1,7 +1,6 @@
 {
   "name": "Test Downstream Project",
   "code": "TST",
-  "owning-project": "TDP",
   "states": [
     {"name": "S-A", "backlog":true},
     {"name": "S-B", "backlog":true},
@@ -31,8 +30,9 @@
       "field-id": 121212121213
     }
   ],
-  "projects": {
-    "TDP": {
+  "projects": [
+    {
+      "code": "TDP",
       "query-filter": null,
       "colour": "#4667CA",
       "custom": ["Tester", "Documenter"],
@@ -43,7 +43,8 @@
         "TDP-D" : "S-D"
       }
     },
-    "TBG": {
+    {
+      "code": "TBG",
       "query-filter": null,
       "colour": "#CA6746",
       "state-links": {
@@ -51,7 +52,7 @@
         "TBG-Y": "S-C"
       }
     }
-  },
+  ],
   "linked-projects": {
     "TUP": {
       "states": [

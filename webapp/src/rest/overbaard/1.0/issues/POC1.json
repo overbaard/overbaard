@@ -101,9 +101,9 @@
     ]
   },
   "projects" : {
-    "owner" : "FEAT",
-    "main" : {
-      "FEAT" : {
+    "main" : [
+      {
+        "code": "FEAT",
         "colour" : "#4667CA",
         "rank" : true,
         "state-links" : {
@@ -146,7 +146,8 @@
         ],
         "ranked": ["FEAT-1", "FEAT-2", "FEAT-3", "FEAT-4", "FEAT-5", "FEAT-6", "FEAT-7", "FEAT-8", "FEAT-9"]
       },
-      "BUG" : {
+      {
+        "code": "BUG",
         "colour" : "#CA6746",
         "rank" : true,
         "state-links" : {
@@ -161,7 +162,7 @@
         },
         "ranked" : []
       }
-    },
+    ],
     "linked" : {
       "US" : {
         "states" : ["Backlog", "Selected for Development", "In Progress", "Done"]

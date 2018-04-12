@@ -1,7 +1,6 @@
 {
   "name": "Test Downstream Project",
   "code": "TST",
-  "owning-project": "TDP",
   "states": [
     {"name": "S-A"},
     {"name": "S-B"},
@@ -19,8 +18,9 @@
     {"name": "bug", "colour": "colour-bug"},
     {"name": "feature", "colour": "colour-feature"}
   ],
-  "projects": {
-    "TDP": {
+  "projects": [
+    {
+      "code": "TDP",
       "query-filter": null,
       "colour": "#4667CA",
       "state-links": {
@@ -30,7 +30,8 @@
         "TDP-D" : "S-D"
       }
     },
-    "TBG": {
+    {
+      "code": "TBG",
       "query-filter": null,
       "colour": "#CA6746",
       "state-links": {
@@ -38,7 +39,8 @@
         "TBG-Y": "S-C"
       }
     }
-  },
+  ]
+  ,
   "linked-projects": {
     "TUP": {
       "states": [

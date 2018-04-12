@@ -5,7 +5,6 @@ import {CustomFieldState} from '../custom-field/custom-field.model';
 import {ColourTable} from '../../../../common/colour-table';
 
 export interface ProjectState {
-  owner: string;
   boardProjects: OrderedMap<string, BoardProject>;
   linkedProjects: Map<string, LinkedProject>;
   // Parallel tasks ordered by project
@@ -38,7 +37,6 @@ export interface ParallelTaskOption {
 }
 
 const DEFAULT_STATE: ProjectState = {
-  owner: null,
   boardProjects: OrderedMap<string, BoardProject>(),
   linkedProjects: Map<string, LinkedProject>(),
   parallelTasks: Map<string, List<ParallelTask>>()
@@ -92,10 +90,10 @@ const PARALLEL_TASK_OPTION_FACTORY = makeTypedFactory<ParallelTaskOption, Parall
 export const initialProjectState: ProjectState = STATE_FACTORY(DEFAULT_STATE);
 
 export class ProjectUtil {
-  static boardProjectFromJs(key: string, input: any): BoardProject {
+  static boardProjectFromJs(input: any): BoardProject {
     const boardStateNameToOwnStateName: Map<string, string> = Map<string, string>(input['state-links']);
     const projectInput: BoardProject = {
-      key: key,
+      key: input['code'],
       colour: input['colour'],
       canRank: input['rank'] ? input['rank'] : false,
       boardStateNameToOwnStateName: boardStateNameToOwnStateName
