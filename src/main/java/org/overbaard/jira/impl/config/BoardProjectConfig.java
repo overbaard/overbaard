@@ -178,8 +178,8 @@ public class BoardProjectConfig extends ProjectConfig {
     }
 
     @Override
-    ModelNode serializeModelNodeForBoard(ModelNode parent) {
-        ModelNode projectNode = super.serializeModelNodeForBoard(parent);
+    ModelNode serializeModelNodeForBoard(ModelNode parent, boolean addCode) {
+        ModelNode projectNode = super.serializeModelNodeForBoard(parent, addCode);
         ModelNode stateLinksNode = projectNode.get(Constants.STATE_LINKS);
         for (String state : boardStates.getStateNames()) {
             String myState = mapBoardStateOntoOwnState(state);

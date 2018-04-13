@@ -112,6 +112,13 @@ public class BoardManagerTest extends AbstractBoardTest {
             states.add(state.asString());
         }
         Assert.assertArrayEquals(new String[]{"TUP-A", "TUP-B", "TUP-C"}, states.toArray(new String[states.size()]));
+
+        Assert.assertTrue(boardNode.hasDefined(PROJECTS, LINKED, "TUP2", STATES));
+        List<String> states2 = new ArrayList<>();
+        for (ModelNode state : boardNode.get(PROJECTS, LINKED, "TUP2", STATES).asList()) {
+            states2.add(state.asString());
+        }
+        Assert.assertArrayEquals(new String[]{"TUP2-A", "TUP2-B", "TUP2-C"}, states2.toArray(new String[states.size()]));
     }
 
     @Test

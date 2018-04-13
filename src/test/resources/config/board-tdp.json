@@ -48,6 +48,13 @@
         "TUP-B",
         "TUP-C"
       ]
+    },
+    "TUP2": {
+      "states": [
+        "TUP2-A",
+        "TUP2-B",
+        "TUP2-C"
+      ]
     }
   }
 }

@@ -306,12 +306,12 @@ public class BoardConfig {
         final ModelNode main = projects.get(MAIN);
         main.setEmptyList();
         for (BoardProjectConfig project : boardProjects.values()) {
-            main.add(project.serializeModelNodeForBoard(main));
+            main.add(project.serializeModelNodeForBoard(main, true));
         }
         final ModelNode linked = projects.get(LINKED);
         linked.setEmptyObject();
         for (LinkedProjectConfig project : linkedProjects.values()) {
-            linked.set(project.getCode(), project.serializeModelNodeForBoard(linked));
+            linked.get(project.getCode()).set(project.serializeModelNodeForBoard(linked, false));
         }
     }
 
