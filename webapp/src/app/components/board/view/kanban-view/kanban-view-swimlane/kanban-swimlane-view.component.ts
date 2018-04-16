@@ -144,14 +144,25 @@ export class KanbanSwimlaneViewComponent implements OnInit, OnChanges {
         } else {
           visibleSwimlanes = <List<SwimlaneData>>this._swimlanes.slice(startIndex, endIndex + 1);
         }
+
         // console.log(`${startIndex}-${endIndex} ${beforePadding}/${afterPadding} ` +
         //   `${this._swimlanes.slice(startIndex, endIndex + 1).map(i => i.display).toArray()}`);
-        this._zone.run(() => {
-          this.visibleSwimlanes = visibleSwimlanes;
-          this.beforePadding = beforePadding;
-          this.afterPadding = afterPadding;
-          this._changeDetectorRef.markForCheck();
-        });
+
+        if (NgZone.isInAngularZone()) {
+          // When called from ngOnChanges, it will be in the angular zone, otherwise it is not
+          this.updateVisibleSwimlanes(visibleSwimlanes, beforePadding, afterPadding);
+        } else {
+          this._zone.run(() => {
+            this.updateVisibleSwimlanes(visibleSwimlanes, beforePadding, afterPadding);
+          });
+        }
       });
+  }
+
+  private updateVisibleSwimlanes(visibleSwimlanes: List<SwimlaneData>, beforePadding: number, afterPadding: number) {
+    this.visibleSwimlanes = visibleSwimlanes;
+    this.beforePadding = beforePadding;
+    this.afterPadding = afterPadding;
+    this._changeDetectorRef.markForCheck();
   }
 }

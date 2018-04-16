@@ -26,7 +26,6 @@ export class RankActions {
     for (const projectInput of input) {
       rankedIssueKeys.set(projectInput['code'], List<string>(projectInput['ranked']));
     }
-
     const payload: RankState = {
       rankedIssueKeys: rankedIssueKeys.asImmutable(),
     };

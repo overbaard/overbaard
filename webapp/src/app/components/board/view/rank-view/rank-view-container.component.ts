@@ -106,15 +106,26 @@ export class RankViewContainerComponent implements OnInit, OnChanges, OnDestroy 
         } else {
           visibleEntries = <List<RankViewEntry>>this.rankEntries.slice(startIndex, endIndex + 1);
         }
+
         // console.log(`${startIndex}-${endIndex} ${this.beforePadding}/${this.afterPadding} ` +
         //   `${this.rankEntries.slice(startIndex, endIndex + 1).map(r => r.issue.key).toArray()}`);
-        this._zone.run(() => {
-          this.visibleEntries = visibleEntries;
-          this.beforePadding = beforePadding;
-          this.afterPadding = afterPadding;
-          this._changeDetectorRef.markForCheck();
-        });
+
+        if (NgZone.isInAngularZone()) {
+          // When called from ngOnChanges, it will be in the angular zone, otherwise it is not
+          this.updateVisibleEntries(visibleEntries, beforePadding, afterPadding);
+        } else {
+          this._zone.run(() => {
+            this.updateVisibleEntries(visibleEntries, beforePadding, afterPadding);
+          });
+        }
       });
+  }
+
+  private updateVisibleEntries(visibleEntries: List<RankViewEntry>, beforePadding: number, afterPadding: number) {
+    this.visibleEntries = visibleEntries;
+    this.beforePadding = beforePadding;
+    this.afterPadding = afterPadding;
+    this._changeDetectorRef.markForCheck();
   }
 
   onUpdateParallelTask(event: UpdateParallelTaskEvent) {

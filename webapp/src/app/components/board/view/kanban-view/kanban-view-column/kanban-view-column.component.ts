@@ -146,12 +146,22 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
           // }
           visibleIssues = <List<BoardIssueView>>this.issues.slice(startIndex, endIndex + 1);
         }
-        this._zone.run(() => {
-          this.visibleIssues = visibleIssues;
-          this.beforePadding = beforePadding;
-          this.afterPadding = afterPadding;
-          this._changeDetectorRef.detectChanges();
-        });
+
+        if (NgZone.isInAngularZone()) {
+          // When called from ngOnChanges, it will be in the angular zone, otherwise it is not
+          this.updateVisibleIssues(visibleIssues, beforePadding, afterPadding);
+        } else {
+          this._zone.run(() => {
+            this.updateVisibleIssues(visibleIssues, beforePadding, afterPadding);
+          });
+        }
       });
+  }
+
+  private updateVisibleIssues(visibleIssues: List<BoardIssueView>, beforePadding: number, afterPadding: number) {
+    this.visibleIssues = visibleIssues;
+    this.beforePadding = beforePadding;
+    this.afterPadding = afterPadding;
+    this._changeDetectorRef.markForCheck();
   }
 }
