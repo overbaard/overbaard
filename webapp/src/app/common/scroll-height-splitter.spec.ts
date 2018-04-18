@@ -12,9 +12,10 @@ let callbackInfo: ScrollInfo;
 
 describe('Scroll Height Splitter Tests', () => {
   describe('Non-eager drop', () => {
-    const splitter: ScrollHeightSplitter<number> = ScrollHeightSplitter.create(false, n => n);
+    let splitter: ScrollHeightSplitter<number>;
     const containerHeight = 60;
     beforeEach(() => {
+      splitter = ScrollHeightSplitter.create(false, n => n);
       const list: List<number> = List<number>([20, 30, 20, 20, 30, 30]);
       splitter.updateList(list);
       expect(splitter.startPositions.toArray()).toEqual([

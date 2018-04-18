@@ -1,20 +1,26 @@
 import {
-  ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, NgZone, OnChanges, OnDestroy, OnInit,
-  Output, SimpleChange,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  NgZone,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  SimpleChange,
   SimpleChanges
 } from '@angular/core';
 import {BoardViewMode} from '../../../../model/board/user/board-view-mode';
-import {BoardViewModel} from '../../../../view-model/board/board-view';
 import {UpdateParallelTaskEvent} from '../../../../events/update-parallel-task.event';
-import {IssueSummaryLevel} from '../../../../model/board/user/issue-summary-level';
 import {IssueDetailState} from '../../../../model/board/user/issue-detail/issue-detail.model';
 import {Observable} from 'rxjs/Observable';
 import {RankViewEntry} from '../../../../view-model/board/rank-view-entry';
 import {List} from 'immutable';
 import {Subject} from 'rxjs/Subject';
-import {ScrollHeightSplitter, StartAndHeight} from '../../../../common/scroll-height-splitter';
-import {BoardIssueView} from '../../../../view-model/board/board-issue-view';
 import {takeUntil} from 'rxjs/operators';
+import {ScrollHeightSplitter} from '../../../../common/scroll-height-splitter';
 
 @Component({
   selector: 'app-rank-view-container',
@@ -88,7 +94,7 @@ export class RankViewContainerComponent implements OnInit, OnChanges, OnDestroy 
     const heightChange: SimpleChange = changes['boardBodyHeight'];
     if (heightChange && !heightChange.firstChange && heightChange.currentValue !== heightChange.previousValue) {
       requestAnimationFrame(() => {
-        this.calculateVisibleEntries(true);
+        this.calculateVisibleEntries();
       });
     }
   }

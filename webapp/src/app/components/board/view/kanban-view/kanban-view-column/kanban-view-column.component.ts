@@ -20,6 +20,7 @@ import {Subject} from 'rxjs/Subject';
 import {ScrollHeightSplitter} from '../../../../../common/scroll-height-splitter';
 import {Observable} from 'rxjs/Observable';
 import {takeUntil} from 'rxjs/operators';
+import {ScrollPositionAndHeight} from '../../../../../common/scroll-position-height';
 
 @Component({
   selector: 'app-kanban-view-column',
@@ -45,14 +46,11 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
   @Input()
   displayIssues = true;
 
-  @Input()
-  boardBodyHeight: number;
-
   /**
    * Values emitted here come from the ScrollListenerDirective and are OUTSIDE the angular zone.
    */
   @Input()
-  topOffsetObserver: Observable<number>;
+  scrollPositionObserver$: Observable<ScrollPositionAndHeight>;
 
   @Output()
   updateParallelTask: EventEmitter<UpdateParallelTaskEvent> = new EventEmitter<UpdateParallelTaskEvent>();
@@ -62,7 +60,7 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
   private _destroy$: Subject<void> = new Subject<void>();
 
   private _splitter: ScrollHeightSplitter<BoardIssueView> = ScrollHeightSplitter.create(false, bi => bi.calculatedTotalHeight);
-  private _scrollTop = 0;
+  private _scrollPosAndHeight = {scrollPos: -1, height: 0};
   visibleIssues: List<BoardIssueView>;
   beforePadding = 0;
   afterPadding = 0;
@@ -72,14 +70,14 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
-    if (this.topOffsetObserver) {
-      this.topOffsetObserver
+    if (this.scrollPositionObserver$) {
+      this.scrollPositionObserver$
         .pipe(
           takeUntil(this._destroy$)
         )
         .subscribe(
-          value => {
-            this._scrollTop = value;
+          scrollPosAndHeight => {
+            this._scrollPosAndHeight = scrollPosAndHeight;
             this.calculateVisibleEntries();
           }
         );
@@ -104,7 +102,7 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
     if (issuesChange && issuesChange.currentValue !== issuesChange.previousValue) {
       this._splitter.updateList(this.issues);
       // Force an update here since the underlying list has changed
-      if (this.topOffsetObserver) {
+      if (this.scrollPositionObserver$) {
         requestAnimationFrame(() => {
           this.calculateVisibleEntries(true);
         });
@@ -112,12 +110,6 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
         // Temp fix to get swimlanes working without virtual scrolling
         this.visibleIssues = this.issues;
       }
-    }
-    const heightChange: SimpleChange = changes['boardBodyHeight'];
-    if (heightChange && !heightChange.firstChange && heightChange.currentValue !== heightChange.previousValue) {
-      requestAnimationFrame(() => {
-        this.calculateVisibleEntries(true);
-      });
     }
   }
 
@@ -132,8 +124,8 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
 
   private calculateVisibleEntries(forceUpdate: boolean = false) {
     this._splitter.updateVirtualScrollInfo(
-      this._scrollTop,
-      this.boardBodyHeight,
+      this._scrollPosAndHeight.scrollPos,
+      this._scrollPosAndHeight.height,
       forceUpdate,
       (startIndex: number, endIndex: number, beforePadding: number, afterPadding: number) => {
         let visibleIssues: List<BoardIssueView>;
@@ -159,6 +151,7 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
   }
 
   private updateVisibleIssues(visibleIssues: List<BoardIssueView>, beforePadding: number, afterPadding: number) {
+    console.log('Update issues');
     this.visibleIssues = visibleIssues;
     this.beforePadding = beforePadding;
     this.afterPadding = afterPadding;

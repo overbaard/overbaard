@@ -22,7 +22,7 @@ export class KanbanNormalViewComponent implements OnInit {
    * Values emitted here come from the ScrollListenerDirective and are OUTSIDE the angular zone.
    */
   @Input()
-  topOffsetObserver: Observable<number>;
+  scrollPositionObserver$: Observable<number>;
 
   @Output()
   scrollTableBodyX: EventEmitter<number> = new EventEmitter<number>();

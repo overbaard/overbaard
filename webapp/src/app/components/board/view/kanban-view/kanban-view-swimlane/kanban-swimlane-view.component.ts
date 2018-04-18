@@ -21,6 +21,7 @@ import {ScrollHeightSplitter} from '../../../../../common/scroll-height-splitter
 import {BoardHeaders} from '../../../../../view-model/board/board-headers';
 import {Subject} from 'rxjs/Subject';
 import {takeUntil} from 'rxjs/operators';
+import {ScrollPositionAndHeight} from '../../../../../common/scroll-position-height';
 
 @Component({
   selector: 'app-kanban-swimlane-view',
@@ -46,10 +47,7 @@ export class KanbanSwimlaneViewComponent implements OnInit, OnChanges {
    * Values emitted here come from the ScrollListenerDirective and are OUTSIDE the angular zone.
    */
   @Input()
-  topOffsetObserver: Observable<number>;
-
-  @Input()
-  boardBodyHeight: number;
+  scrollPositionObserver$: Observable<ScrollPositionAndHeight>;
 
   @Output()
   scrollTableBodyX: EventEmitter<number> = new EventEmitter<number>();
@@ -75,11 +73,11 @@ export class KanbanSwimlaneViewComponent implements OnInit, OnChanges {
           return height;
       });
 
-  private _scrollTop = 0;
+  private _scrollPositionAndHeight: ScrollPositionAndHeight = {scrollPos: 0, height: 0};
   visibleSwimlanes: List<SwimlaneData>;
   beforePadding = 0;
   afterPadding = 0;
-  topOffsets: List<number>;
+  startAndHeights: List<StartAndHeight>;
 
 
 
@@ -87,13 +85,13 @@ export class KanbanSwimlaneViewComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
-    this.topOffsetObserver
+    this.scrollPositionObserver$
       .pipe(
         takeUntil(this._destroy$)
       )
       .subscribe(
-        value => {
-          this._scrollTop = value;
+        scrollPositionAndHeight => {
+          this._scrollPositionAndHeight = scrollPositionAndHeight;
           this.calculateVisibleEntries();
         }
       );
@@ -104,19 +102,12 @@ export class KanbanSwimlaneViewComponent implements OnInit, OnChanges {
     if (swimlaneInfoChange && swimlaneInfoChange.currentValue !== swimlaneInfoChange.previousValue) {
       this._swimlanes = List<SwimlaneData>(this.swimlaneInfo.swimlanes.values());
       this._splitter.updateList(this._swimlanes);
-      this.topOffsets = List<number>(this._splitter.startPositions.map(sp => sp.start));
+      this.startAndHeights = this._splitter.startPositions;
       // console.log('----> topOffsets' + JSON.stringify(this.topOffsets));
       requestAnimationFrame(() => {
         this.calculateVisibleEntries(true);
       });
     }
-    const heightChange: SimpleChange = changes['boardBodyHeight'];
-    if (heightChange && !heightChange.firstChange && heightChange.currentValue !== heightChange.previousValue) {
-      requestAnimationFrame(() => {
-        this.calculateVisibleEntries(true);
-      });
-    }
-
   }
 
   // trackBy is a hint to angular to be able to keep (i.e. don't destroy and recreate) as many components as possible
@@ -134,8 +125,8 @@ export class KanbanSwimlaneViewComponent implements OnInit, OnChanges {
 
   private calculateVisibleEntries(forceUpdate: boolean = false) {
     this._splitter.updateVirtualScrollInfo(
-      this._scrollTop,
-      this.boardBodyHeight,
+      this._scrollPositionAndHeight.scrollPos,
+      this._scrollPositionAndHeight.height,
       forceUpdate,
       (startIndex: number, endIndex: number, beforePadding: number, afterPadding: number) => {
         let visibleSwimlanes: List<SwimlaneData>;

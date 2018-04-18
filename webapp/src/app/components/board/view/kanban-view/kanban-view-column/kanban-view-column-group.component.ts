@@ -10,6 +10,7 @@ import {UpdateParallelTaskEvent} from '../../../../../events/update-parallel-tas
 import {IssueSummaryLevel} from '../../../../../model/board/user/issue-summary-level';
 import {IssueDetailState} from '../../../../../model/board/user/issue-detail/issue-detail.model';
 import {Observable} from 'rxjs/Observable';
+import {ScrollPositionAndHeight} from '../../../../../common/scroll-position-height';
 
 @Component({
   selector: 'app-kanban-view-column-group',
@@ -32,13 +33,11 @@ export class KanbanViewColumnGroupComponent implements OnInit, OnChanges {
   @Input()
   displayIssues = true;
 
-  @Input()
-  boardBodyHeight: number;
   /**
    * Values emitted here come from the ScrollListenerDirective and are OUTSIDE the angular zone.
    */
   @Input()
-  topOffsetObserver: Observable<number>;
+  scrollPositionObserver$: Observable<ScrollPositionAndHeight>;
 
   @Output()
   updateParallelTask: EventEmitter<UpdateParallelTaskEvent> = new EventEmitter<UpdateParallelTaskEvent>();

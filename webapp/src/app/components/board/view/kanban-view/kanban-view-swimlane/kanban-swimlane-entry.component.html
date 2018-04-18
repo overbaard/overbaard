@@ -26,7 +26,7 @@
       *ngFor="let header of headers.headersList ; trackBy: columnTrackByFn"
       [header]="header"
       [table]="swimlane.table"
-
+      [scrollPositionObserver$]="scrollPositionObserver$"
       [issueDetailState]="issueDetailState"
       [displayIssues]="!swimlane.collapsed"
       (updateParallelTask)="onUpdateParallelTask($event)"

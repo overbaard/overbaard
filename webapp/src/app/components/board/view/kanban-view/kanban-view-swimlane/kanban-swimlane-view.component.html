@@ -8,6 +8,8 @@
     [showEmpty]="swimlaneInfo.showEmpty"
     [headerTextOffset]="headerTextOffset"
     [issueDetailState]="issueDetailState"
+    [startAndHeight]="startAndHeights.get(i)"
+    [scrollPositionObserver$]="scrollPositionObserver$"
     (toggleCollapsedSwimlane)="onToggleCollapsedSwimlane($event)"
     (updateParallelTask)="onUpdateParallelTask($event)"
   ></app-kanban-swimlane-entry>

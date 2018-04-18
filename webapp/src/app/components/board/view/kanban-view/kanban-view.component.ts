@@ -1,13 +1,12 @@
-import {
-  ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, NgZone, OnDestroy, OnInit, Output,
-  SimpleChanges
-} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, NgZone, OnDestroy, OnInit, Output} from '@angular/core';
 import {FixedHeaderView} from '../fixed-header-view';
 import {BoardHeader} from '../../../../view-model/board/board-header';
 import {BoardViewMode} from '../../../../model/board/user/board-view-mode';
 import {UpdateParallelTaskEvent} from '../../../../events/update-parallel-task.event';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {Subject} from 'rxjs/Subject';
+import {ScrollPositionAndHeightSubject} from '../../../../common/scroll-position-height.subject';
+import {ScrollPositionAndHeight} from '../../../../common/scroll-position-height';
 
 @Component({
   selector: 'app-kanban-view',
@@ -29,7 +28,10 @@ export class KanbanViewComponent extends FixedHeaderView implements OnInit, OnDe
   @Output()
   updateParallelTask: EventEmitter<UpdateParallelTaskEvent> = new EventEmitter<UpdateParallelTaskEvent>();
 
+  private _lastScrollPosAndHeight: ScrollPositionAndHeight = {scrollPos: 0, height: 0};
+  // Events here happen OUTSIDE the angular zone
   scrollTopObserver$: Subject<number> = new BehaviorSubject<number>(0);
+  scrollPositionObserver$: ScrollPositionAndHeightSubject = new ScrollPositionAndHeightSubject();
 
 
   readonly viewMode =  BoardViewMode.KANBAN;
@@ -42,6 +44,27 @@ export class KanbanViewComponent extends FixedHeaderView implements OnInit, OnDe
 
   ngOnInit() {
     super.observeLeftScroll(this.destroy$);
+    this.scrollTopObserver$
+      .takeUntil(this.destroy$)
+      .subscribe(scrollPos => {
+        this.emitNewHeight(scrollPos, this.boardBodyHeight);
+      });
+  }
+
+  boardBodyHeightChanged() {
+    this._zone.runOutsideAngular(() => {
+      // Do this outside angular to have the same behaviour in all children consuming this observable
+      requestAnimationFrame(() => {
+        this.emitNewHeight(this._lastScrollPosAndHeight.scrollPos, this.boardBodyHeight);
+      });
+    });
+  }
+
+  private emitNewHeight(scrollPos: number, height: number) {
+    // Make a copy here, or weird things happen in the listeners
+    const copy: ScrollPositionAndHeight = {scrollPos: scrollPos, height: height};
+    this.scrollPositionObserver$.next(copy);
+    this._lastScrollPosAndHeight = copy;
   }
 
   ngOnDestroy(): void {
@@ -63,6 +86,4 @@ export class KanbanViewComponent extends FixedHeaderView implements OnInit, OnDe
   onUpdateParallelTask(event: UpdateParallelTaskEvent) {
     this.updateParallelTask.emit(event);
   }
-
-
 }

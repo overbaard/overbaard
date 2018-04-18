@@ -34,7 +34,7 @@ export class FixedHeaderView implements OnChanges {
   scrollLeftObserver$: Subject<number> = new BehaviorSubject<number>(0);
 
 
-  constructor(private _changeDetector: ChangeDetectorRef, private _zone: NgZone) {
+  constructor(private readonly _changeDetector: ChangeDetectorRef, protected readonly _zone: NgZone) {
   }
 
   protected observeLeftScroll(until$: Observable<void>) {
@@ -60,6 +60,10 @@ export class FixedHeaderView implements OnChanges {
     if (heightChange) {
       const height = heightChange.currentValue;
       this.boardBodyHeight = (height - TOOLBAR_HEIGHT - BOARD_HEADERS_HEIGHT);
+      this.boardBodyHeightChanged();
     }
+  }
+
+  boardBodyHeightChanged() {
   }
 }

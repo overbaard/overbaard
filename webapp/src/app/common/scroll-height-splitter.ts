@@ -8,6 +8,7 @@ export class ScrollHeightSplitter<T> {
   private _list: List<T>;
   private _startPositions: List<StartAndHeight>;
 
+  private _lastContainerHeight = -1;
   private _lastInfo: VirtualScrollInfo = INITIAL_SCROLL_INFO;
 
   static create<T>(eagerlyDrop: boolean, itemHeightGetter: (t: T) => number): ScrollHeightSplitter<T> {
@@ -49,9 +50,13 @@ export class ScrollHeightSplitter<T> {
       scrollPos = 0;
     }
 
-    if (force || this._lastInfo === INITIAL_SCROLL_INFO) {
-      this._lastInfo = this.binarySearchVirtualScrollInfos(scrollPos, containerHeight);
-      newInfoCallback(this._lastInfo.start, this._lastInfo.end, this._lastInfo.beforePadding, this._lastInfo.afterPadding);
+    if (force || this._lastContainerHeight !== containerHeight || this._lastInfo === INITIAL_SCROLL_INFO) {
+      const newInfo: VirtualScrollInfo = this.binarySearchVirtualScrollInfos(scrollPos, containerHeight);
+      if (!this.equalsScrollInfo(this._lastInfo, newInfo)) {
+        this._lastInfo = newInfo;
+        this._lastContainerHeight = containerHeight;
+        newInfoCallback(this._lastInfo.start, this._lastInfo.end, this._lastInfo.beforePadding, this._lastInfo.afterPadding);
+      }
       return;
     }
 
@@ -306,6 +311,18 @@ export class ScrollHeightSplitter<T> {
 
   private calculateEndPos(sah: StartAndHeight) {
     return sah.start + sah.height - 1;
+  }
+
+  private equalsScrollInfo(a: VirtualScrollInfo, b: VirtualScrollInfo) {
+    return a.scrollPos === b.scrollPos &&
+      a.start === b.start &&
+      a.beforePadding === b.beforePadding &&
+      a.afterPadding === b.afterPadding &&
+      a.newEntryLowMark === b.newEntryLowMark &&
+      a.newEntryHighMark === b.newEntryHighMark &&
+      a.dropIncrementMark === b.dropIncrementMark &&
+      a.dropDecrementMark === b.dropDecrementMark &&
+      a.isPastLast === b.isPastLast;
   }
 }
 
