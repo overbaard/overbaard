@@ -52,9 +52,10 @@ export class KanbanSwimlaneEntryComponent implements OnInit, OnChanges, OnDestro
   @Output()
   updateParallelTask: EventEmitter<UpdateParallelTaskEvent> = new EventEmitter<UpdateParallelTaskEvent>();
 
-  private _scrollPositionAndHeight: ScrollPositionAndHeight;
-  adjustedTopOffsetObserver$: Subject<number> = new BehaviorSubject<number>(0);
-  adjustedHeight: number;
+  private _scrollPositionAndHeight: ScrollPositionAndHeight = {scrollPos: -1, height: 0};
+
+  adjustedScrollPositionObserver$: Subject<ScrollPositionAndHeight> =
+    new BehaviorSubject<ScrollPositionAndHeight>(this._scrollPositionAndHeight);
 
   visible: boolean;
 
@@ -66,6 +67,7 @@ export class KanbanSwimlaneEntryComponent implements OnInit, OnChanges, OnDestro
   }
 
   ngOnInit() {
+    // console.log(`==== ${this.swimlane.key}  ${this.swimlane.headerHeight}  ${this.swimlane.calculatedTotalIssuesHeight} ${JSON.stringify(this.startAndHeight)}`);
     this.scrollPositionObserver$
       .takeUntil(this._destroy$)
       .subscribe(
@@ -82,9 +84,8 @@ export class KanbanSwimlaneEntryComponent implements OnInit, OnChanges, OnDestro
       this.visible = false;
     }
 
-    const heightChange: SimpleChange = changes['boardBodyHeight'];
     const startAndHeightChange: SimpleChange = changes['startAndHeight'];
-    if (heightChange || startAndHeightChange) {
+    if (startAndHeightChange) {
       this.calculateInternalOffset(false);
     }
   }
@@ -105,16 +106,29 @@ export class KanbanSwimlaneEntryComponent implements OnInit, OnChanges, OnDestro
 
   doCalculateInternalOffset() {
     let internalPosition = 0;
-    const tableStart = this._scrollPositionAndHeight.scrollPos + this.swimlane.headerHeight;
+    if (!this.swimlane) {
+      return;
+    }
+    const tableStart = this.startAndHeight.start + this.swimlane.headerHeight;
     if (this._scrollPositionAndHeight.scrollPos >= tableStart) {
       internalPosition = this._scrollPositionAndHeight.scrollPos - tableStart;
     }
 
-    const end: number = this._scrollPositionAndHeight.scrollPos + this._scrollPositionAndHeight.height;
+    const endVisible: number = this._scrollPositionAndHeight.scrollPos + this._scrollPositionAndHeight.height;
     let internalHeight = 0;
-    if (end >= tableStart + this.swimlane.calculatedTotalIssuesHeight) {
-      internalHeight = end - tableStart;
+    const endData: number = tableStart + this.swimlane.calculatedTotalIssuesHeight;
+
+    // console.log(`${this.swimlane.key} ts: ${tableStart}, ip: ${internalPosition}, ev: ${endVisible}, ed: ${endData}`);
+
+    if (endVisible >= endData) {
+      internalHeight = endData - tableStart - internalPosition;
+    } else {
+      internalHeight = endVisible - tableStart - internalPosition;
     }
+
+    // console.log(`adjusted: ${JSON.stringify(
+    //  {scrollPos: internalPosition, height: internalHeight, original: this._scrollPositionAndHeight})}`);
+    this.adjustedScrollPositionObserver$.next({scrollPos: internalPosition, height: internalHeight});
   }
 
 // trackBy is a hint to angular to be able to keep (i.e. don't destroy and recreate) as many components as possible

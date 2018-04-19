@@ -51,7 +51,7 @@ import org.overbaard.jira.impl.Constants;
 public class TestDataGenerator {
 
     private static final String MAIN_PROJECT_NAME = "MAIN";
-    private static final int NUMBER_STATES = 3;
+    private static final int NUMBER_STATES = 1;
     private static final int NUMBER_ASSIGNEES = 50;
     private static final int NUMBER_COMPONENTS = 50;
     private static final int NUMBER_LABELS = 40;
@@ -68,7 +68,7 @@ public class TestDataGenerator {
     //private static final int NUMBER_LINKED_PROJECT_STATES = 0;
     //private static final int NUMBER_LINKED_PROJECT_ENTRIES = 0;
 
-    private static final int NUMBER_ISSUES = 6;
+    private static final int NUMBER_ISSUES = 9;
 
     TestDataGenerator() {
     }

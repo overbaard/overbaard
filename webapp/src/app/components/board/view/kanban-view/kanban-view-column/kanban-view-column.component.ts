@@ -70,21 +70,16 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
-    if (this.scrollPositionObserver$) {
-      this.scrollPositionObserver$
-        .pipe(
-          takeUntil(this._destroy$)
-        )
-        .subscribe(
-          scrollPosAndHeight => {
-            this._scrollPosAndHeight = scrollPosAndHeight;
-            this.calculateVisibleEntries();
-          }
-        );
-    } else {
-      // Temp fix to get swimlanes working without virtual scrolling
-      this.visibleIssues = this.issues;
-    }
+    this.scrollPositionObserver$
+      .pipe(
+        takeUntil(this._destroy$)
+      )
+      .subscribe(
+        scrollPosAndHeight => {
+          this._scrollPosAndHeight = scrollPosAndHeight;
+          this.calculateVisibleEntries();
+        }
+      );
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -102,14 +97,9 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
     if (issuesChange && issuesChange.currentValue !== issuesChange.previousValue) {
       this._splitter.updateList(this.issues);
       // Force an update here since the underlying list has changed
-      if (this.scrollPositionObserver$) {
-        requestAnimationFrame(() => {
-          this.calculateVisibleEntries(true);
-        });
-      } else {/**/
-        // Temp fix to get swimlanes working without virtual scrolling
-        this.visibleIssues = this.issues;
-      }
+      requestAnimationFrame(() => {
+        this.calculateVisibleEntries(true);
+      });
     }
   }
 
@@ -139,6 +129,9 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
           visibleIssues = <List<BoardIssueView>>this.issues.slice(startIndex, endIndex + 1);
         }
 
+        // console.log(`Update issues ${startIndex} ${endIndex}`);
+
+
         if (NgZone.isInAngularZone()) {
           // When called from ngOnChanges, it will be in the angular zone, otherwise it is not
           this.updateVisibleIssues(visibleIssues, beforePadding, afterPadding);
@@ -151,7 +144,6 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
   }
 
   private updateVisibleIssues(visibleIssues: List<BoardIssueView>, beforePadding: number, afterPadding: number) {
-    console.log('Update issues');
     this.visibleIssues = visibleIssues;
     this.beforePadding = beforePadding;
     this.afterPadding = afterPadding;

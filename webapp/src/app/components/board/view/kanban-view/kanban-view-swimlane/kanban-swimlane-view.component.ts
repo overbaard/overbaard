@@ -75,6 +75,7 @@ export class KanbanSwimlaneViewComponent implements OnInit, OnChanges {
 
   private _scrollPositionAndHeight: ScrollPositionAndHeight = {scrollPos: 0, height: 0};
   visibleSwimlanes: List<SwimlaneData>;
+  startIndex = 0;
   beforePadding = 0;
   afterPadding = 0;
   startAndHeights: List<StartAndHeight>;
@@ -135,6 +136,7 @@ export class KanbanSwimlaneViewComponent implements OnInit, OnChanges {
         } else {
           visibleSwimlanes = <List<SwimlaneData>>this._swimlanes.slice(startIndex, endIndex + 1);
         }
+        this.startIndex = startIndex;
 
         // console.log(`${startIndex}-${endIndex} ${beforePadding}/${afterPadding} ` +
         //   `${this._swimlanes.slice(startIndex, endIndex + 1).map(i => i.display).toArray()}`);

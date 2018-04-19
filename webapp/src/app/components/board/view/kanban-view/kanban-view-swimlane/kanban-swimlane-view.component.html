@@ -8,7 +8,7 @@
     [showEmpty]="swimlaneInfo.showEmpty"
     [headerTextOffset]="headerTextOffset"
     [issueDetailState]="issueDetailState"
-    [startAndHeight]="startAndHeights.get(i)"
+    [startAndHeight]="startAndHeights.get(i + startIndex)"
     [scrollPositionObserver$]="scrollPositionObserver$"
     (toggleCollapsedSwimlane)="onToggleCollapsedSwimlane($event)"
     (updateParallelTask)="onUpdateParallelTask($event)"

@@ -52,11 +52,11 @@ export class ScrollHeightSplitter<T> {
 
     if (force || this._lastContainerHeight !== containerHeight || this._lastInfo === INITIAL_SCROLL_INFO) {
       const newInfo: VirtualScrollInfo = this.binarySearchVirtualScrollInfos(scrollPos, containerHeight);
-      if (!this.equalsScrollInfo(this._lastInfo, newInfo)) {
-        this._lastInfo = newInfo;
-        this._lastContainerHeight = containerHeight;
-        newInfoCallback(this._lastInfo.start, this._lastInfo.end, this._lastInfo.beforePadding, this._lastInfo.afterPadding);
+      if (this._lastInfo.start !== newInfo.start || this._lastInfo.end !== newInfo.end) {
+        newInfoCallback(newInfo.start, newInfo.end, newInfo.beforePadding, newInfo.afterPadding);
       }
+      this._lastInfo = newInfo;
+      this._lastContainerHeight = containerHeight;
       return;
     }
 
@@ -311,18 +311,6 @@ export class ScrollHeightSplitter<T> {
 
   private calculateEndPos(sah: StartAndHeight) {
     return sah.start + sah.height - 1;
-  }
-
-  private equalsScrollInfo(a: VirtualScrollInfo, b: VirtualScrollInfo) {
-    return a.scrollPos === b.scrollPos &&
-      a.start === b.start &&
-      a.beforePadding === b.beforePadding &&
-      a.afterPadding === b.afterPadding &&
-      a.newEntryLowMark === b.newEntryLowMark &&
-      a.newEntryHighMark === b.newEntryHighMark &&
-      a.dropIncrementMark === b.dropIncrementMark &&
-      a.dropDecrementMark === b.dropDecrementMark &&
-      a.isPastLast === b.isPastLast;
   }
 }
 
