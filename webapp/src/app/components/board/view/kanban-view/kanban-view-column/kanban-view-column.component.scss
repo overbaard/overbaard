@@ -19,3 +19,23 @@
   min-width: 40px;
   max-width: 40px;
 }
+
+// For some reason importing this from the global styles did not work
+$background-colour-primary: #757de8;
+$background-colour-accent: #ff79b0;
+
+@mixin diagonal-background($colour) {
+  background: repeating-linear-gradient(
+      45deg,
+      $colour,
+      $colour 10px,
+      #FFFFFF 10px,
+      #FFFFFF 20px
+  );
+}
+.diagonal-background-primary {
+  @include diagonal-background($background-colour-primary)
+}
+.diagonal-background-accent {
+  @include diagonal-background($background-colour-accent)
+}

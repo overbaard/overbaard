@@ -64,12 +64,14 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
   visibleIssues: List<BoardIssueView>;
   beforePadding = 0;
   afterPadding = 0;
+  backgroundPaddingClass: string;
 
   constructor(private _zone: NgZone, private _changeDetectorRef: ChangeDetectorRef) {
     // this.tmpColumnNo = KanbanViewColumnComponent.tempCounter++;
   }
 
   ngOnInit() {
+    this.backgroundPaddingClass = this.header.backlog ? 'diagonal-background-accent' : 'diagonal-background-primary';
     this.scrollPositionObserver$
       .pipe(
         takeUntil(this._destroy$)

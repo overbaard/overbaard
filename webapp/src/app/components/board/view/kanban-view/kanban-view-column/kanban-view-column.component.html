@@ -1,6 +1,6 @@
 <div *ngIf="header.visible" class="column visible">
   <div *ngIf="displayIssues">
-    <div [style.height.px]="beforePadding"></div>
+    <div [style.height.px]="beforePadding" [ngClass]="backgroundPaddingClass"></div>
     <!-- trackBy is a hint to angular to be able to keep (i.e. don't destroy and recreate) as many components as possible -->
     <app-board-issue
       *ngFor="let issue of visibleIssues ; trackBy: issueTrackByFn "
@@ -8,7 +8,7 @@
       [issueDetailState]="issueDetailState"
       (updateParallelTask)="onUpdateParallelTask($event)"
     ></app-board-issue>
-    <div [style.height.px]="afterPadding"></div>
+    <div [style.height.px]="afterPadding" [ngClass]="backgroundPaddingClass"></div>
   </div>
 </div>
 <div *ngIf="!header.visible" class="column invisible">
