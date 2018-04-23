@@ -6,11 +6,6 @@ import {Store} from '@ngrx/store';
 import {AppState} from '../../app-store';
 import {blacklistSelector, BoardActions} from '../../model/board/data/board.reducer';
 import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/operator/skipWhile';
-import 'rxjs/add/operator/takeUntil';
-import 'rxjs/add/operator/filter';
-import 'rxjs/add/observable/combineLatest';
-import 'rxjs/add/observable/of';
 import {Subject} from 'rxjs/Subject';
 import {UserSettingActions, userSettingSelector} from '../../model/board/user/user-setting.reducer';
 import {BoardViewModelService} from '../../view-model/board/board-view.service';
@@ -27,6 +22,7 @@ import {
 } from '../../model/global/progress-log/progress-log.reducer';
 import {MatDialog} from '@angular/material';
 import {BlacklistDialogComponent} from './blacklist/blacklist-dialog.component';
+import {filter, take, takeUntil} from 'rxjs/operators';
 
 
 @Component({
@@ -77,7 +73,9 @@ export class BoardComponent implements OnInit, OnDestroy {
     let userSettings: UserSettingState = null;
     this._store.dispatch(UserSettingActions.createInitialiseFromQueryString(this._route.snapshot.queryParams))
     this._store.select(userSettingSelector)
-      .take(1)
+      .pipe(
+        take(1)
+      )
       .subscribe(
         userSettingsValue => {
           let title = `Board ${userSettingsValue.boardCode}`;
@@ -99,15 +97,19 @@ export class BoardComponent implements OnInit, OnDestroy {
     this.userSettings$ = this._store.select<UserSettingState>(userSettingSelector);
 
     this._queryParamsService.getQueryParams()
-      .takeUntil(this._destroy$)
+      .pipe(
+        takeUntil(this._destroy$)
+      )
       .subscribe(queryString => {
         this.updateLink(queryString);
       });
 
     let shownBlacklstLogMessage = false;
     this._store.select(blacklistSelector)
-      .takeUntil(this._destroy$)
-      .filter((blacklist: BlacklistState) => BlacklistUtil.hasEntries(blacklist))
+      .pipe(
+        takeUntil(this._destroy$),
+        filter((blacklist: BlacklistState) => BlacklistUtil.hasEntries(blacklist))
+      )
       .subscribe(
         (blacklist: BlacklistState) => {
           if (!shownBlacklstLogMessage) {
@@ -144,9 +146,13 @@ export class BoardComponent implements OnInit, OnDestroy {
   onToggleBacklog(backlogHeader: BoardHeader) {
     // A decision about whether to pass up toggleVisibility or toggleBacklog is made in BoardHeaderGroupComponent
     this._store.dispatch(UserSettingActions.createToggleBacklog(backlogHeader));
-    this.userSettings$.take(1).subscribe(us => {
-      this.refreshBoardForBacklogToggle(us);
-    });
+    this.userSettings$
+      .pipe(
+        take(1)
+      )
+      .subscribe(us => {
+        this.refreshBoardForBacklogToggle(us);
+      });
   }
 
   onToggleVisibility(header: BoardHeader) {
@@ -169,9 +175,16 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   onSwitchViewMode() {
     // Update the view
-    this.userSettings$.take(1).subscribe(originalUs => {
+    this.userSettings$
+      .pipe(
+        take(1)
+      )
+      .subscribe(originalUs => {
       this._store.dispatch(UserSettingActions.createSwitchBoardViewAction());
-      this.userSettings$.take(1).subscribe(us => {
+      this.userSettings$.pipe(
+        take(1)
+      )
+      .subscribe(us => {
         if (us.showBacklog !== originalUs.showBacklog) {
           this.refreshBoardForBacklogToggle(us);
         }
@@ -195,10 +208,14 @@ export class BoardComponent implements OnInit, OnDestroy {
   }
 
   onUpdateParallelTask(event: UpdateParallelTaskEvent) {
-    this.userSettings$.take(1).subscribe(us => {
-      this._boardService.setParallelTaskOption(
-        us.boardCode, us.showBacklog, event.issueKey, event.taskName, event.taskIndex, event.optionName, event.selectedOptionIndex);
-    });
+    this.userSettings$
+      .pipe(
+        take(1)
+      )
+      .subscribe(us => {
+        this._boardService.setParallelTaskOption(
+          us.boardCode, us.showBacklog, event.issueKey, event.taskName, event.taskIndex, event.optionName, event.selectedOptionIndex);
+      });
   }
 
   onOpenSettings() {
@@ -231,7 +248,9 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   onClickBlacklist() {
     this._store.select(progressLogCurrentMessageSelector)
-      .take(1)
+      .pipe(
+        take(1)
+      )
       .subscribe(
         logEntry => {
           if (logEntry && logEntry.message === this._blacklistMsg) {

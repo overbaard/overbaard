@@ -1,4 +1,3 @@
-import {async} from '@angular/core/testing';
 import {BoardQueryParamsHandler} from './board-query-params.service';
 import {UserSettingState} from '../model/board/user/user-setting';
 import {Subject} from 'rxjs/Subject';
@@ -16,6 +15,7 @@ import {HeaderUtil, initialHeaderState} from '../model/board/data/header/header.
 import {HeaderState} from '../model/board/data/header/header.state';
 import {IssueSummaryLevel} from '../model/board/user/issue-summary-level';
 import {IssueDetailUtil} from '../model/board/user/issue-detail/issue-detail.model';
+import {take} from 'rxjs/operators';
 
 describe('Boards Query Parameters Service Tests', () => {
   const userSettingSubject: Subject<UserSettingState> = new BehaviorSubject<UserSettingState>(initialUserSettingState);
@@ -32,8 +32,12 @@ describe('Boards Query Parameters Service Tests', () => {
     userSettingState = userSettingReducer(initialUserSettingState, UserSettingActions.createInitialiseFromQueryString(params));
     userSettingSubject.next(userSettingState);
     urlObservable = handler.getBoardViewModel(boardSubject, userSettingSubject);
-    urlObservable.take(1).subscribe(s => {
-      expect(s).toBe(null);
+    urlObservable
+      .pipe(
+        take(1)
+      )
+      .subscribe(s => {
+        expect(s).toBe(null);
     });
   });
 
@@ -43,8 +47,12 @@ describe('Boards Query Parameters Service Tests', () => {
         mutable.showBacklog = true;
       });
       userSettingSubject.next(newSetting);
-      urlObservable.take(1).subscribe(s => {
-        expect(s).toBe('board=TST%26%3D1&bl=true');
+      urlObservable
+        .pipe(
+          take(1)
+        )
+        .subscribe(s => {
+          expect(s).toBe('board=TST%26%3D1&bl=true');
       })
     });
 
@@ -53,8 +61,12 @@ describe('Boards Query Parameters Service Tests', () => {
         mutable.viewId = 999;
       });
       boardSubject.next(newBoard);
-      urlObservable.take(1).subscribe(s => {
-        expect(s).toBe(null);
+      urlObservable
+        .pipe(
+          take(1)
+        )
+        .subscribe(s => {
+          expect(s).toBe(null);
       })
     });
   });
@@ -65,9 +77,13 @@ describe('Boards Query Parameters Service Tests', () => {
         mutable.boardCode = 'TEST&=123';
       });
       userSettingSubject.next(newSetting);
-      urlObservable.take(1).subscribe(s => {
-        const parsedState = userSettingStateFromQueryString(s);
-        expect(parsedState).toEqual(newSetting);
+      urlObservable
+        .pipe(
+          take(1)
+        )
+        .subscribe(s => {
+          const parsedState = userSettingStateFromQueryString(s);
+          expect(parsedState).toEqual(newSetting);
       })
     });
     it ('Minimal (explicit defaults)', () => {
@@ -81,9 +97,13 @@ describe('Boards Query Parameters Service Tests', () => {
         });
       });
       userSettingSubject.next(newSetting);
-      urlObservable.take(1).subscribe(s => {
-        const parsedState = userSettingStateFromQueryString(s);
-        expect(parsedState).toEqual(newSetting);
+      urlObservable
+        .pipe(
+          take(1)
+        )
+        .subscribe(s => {
+          const parsedState = userSettingStateFromQueryString(s);
+          expect(parsedState).toEqual(newSetting);
       });
     });
     it ('Everything apart from visibilities', () => {
@@ -99,7 +119,11 @@ describe('Boards Query Parameters Service Tests', () => {
         };
       });
       boardSubject.next(newBoard);
-      urlObservable.take(1).subscribe(s => {
+      urlObservable
+        .pipe(
+          take(1)
+        )
+        .subscribe(s => {
       });
       const newSetting: UserSettingState = UserSettingUtil.updateUserSettingState(userSettingState, mutable => {
         mutable.boardCode = 'TEST&=123';
@@ -130,12 +154,16 @@ describe('Boards Query Parameters Service Tests', () => {
         });
       });
       userSettingSubject.next(newSetting);
-      urlObservable.take(1).subscribe(s => {
-        const parsedState = userSettingStateFromQueryString(s);
-        // Immutable doesn't love equals comparison of nested things so convert to plain objects here
-        const parsedObject: Object = JSON.parse(JSON.stringify(parsedState));
-        const newSettingObject: Object = JSON.parse(JSON.stringify(newSetting));
-        expect(parsedObject).toEqual(JSON.parse(JSON.stringify(newSettingObject)));
+      urlObservable
+        .pipe(
+          take(1)
+        )
+        .subscribe(s => {
+          const parsedState = userSettingStateFromQueryString(s);
+          // Immutable doesn't love equals comparison of nested things so convert to plain objects here
+          const parsedObject: Object = JSON.parse(JSON.stringify(parsedState));
+          const newSettingObject: Object = JSON.parse(JSON.stringify(newSetting));
+          expect(parsedObject).toEqual(JSON.parse(JSON.stringify(newSettingObject)));
       });
     });
   });
@@ -165,33 +193,49 @@ describe('Boards Query Parameters Service Tests', () => {
               userSettingReducer(userSettingState,
                 UserSettingActions.createToggleVisibility(false, List<number>([1, 2, 3, 4])));
             userSettingSubject.next(userSettingState);
-            urlObservable.take(1).subscribe(s => {
-              expect(s).toContain('hidden=1,2,3,4');
-              expect(2).not.toContain('visible');
+            urlObservable
+              .pipe(
+                take(1)
+              )
+              .subscribe(s => {
+                expect(s).toContain('hidden=1,2,3,4');
+                expect(2).not.toContain('visible');
             });
             userSettingState =
               userSettingReducer(userSettingState,
                 UserSettingActions.createToggleVisibility(false, List<number>([5, 6, 7])));
             userSettingSubject.next(userSettingState);
-            urlObservable.take(1).subscribe(s => {
-              expect(s).toContain('visible=0,8');
-              expect(s).not.toContain('hidden');
+            urlObservable
+              .pipe(
+                take(1)
+              )
+              .subscribe(s => {
+                expect(s).toContain('visible=0,8');
+                expect(s).not.toContain('hidden');
             });
             userSettingState =
               userSettingReducer(userSettingState,
                 UserSettingActions.createToggleVisibility(true, List<number>([5, 6])));
             userSettingSubject.next(userSettingState);
-            urlObservable.take(1).subscribe(s => {
-              expect(s).toContain('visible=0,5,6,8');
-              expect(s).not.toContain('hidden');
+            urlObservable
+              .pipe(
+                take(1)
+              )
+              .subscribe(s => {
+                expect(s).toContain('visible=0,5,6,8');
+                expect(s).not.toContain('hidden');
             });
             userSettingState =
               userSettingReducer(userSettingState,
                 UserSettingActions.createToggleVisibility(true, List<number>([3, 4])));
             userSettingSubject.next(userSettingState);
-            urlObservable.take(1).subscribe(s => {
-              expect(s).toContain('hidden=1,2,7');
-              expect(s).not.toContain('visible');
+            urlObservable
+              .pipe(
+                take(1)
+              )
+              .subscribe(s => {
+                expect(s).toContain('hidden=1,2,7');
+                expect(s).not.toContain('visible');
             });
           })
         });
@@ -203,9 +247,13 @@ describe('Boards Query Parameters Service Tests', () => {
             }
             userSettingState = userSettingReducer(initialUserSettingState, UserSettingActions.createInitialiseFromQueryString(params));
             userSettingSubject.next(userSettingState);
-            urlObservable.take(1).subscribe(s => {
-              expect(s).toContain('hidden=1,2,3');
-              expect(s).not.toContain('visible');
+            urlObservable
+              .pipe(
+                take(1)
+              )
+              .subscribe(s => {
+                expect(s).toContain('hidden=1,2,3');
+                expect(s).not.toContain('visible');
             });
             board = BoardUtil.withMutations(initialBoardState, mutable => {
               mutable.viewId = 999;
@@ -219,33 +267,49 @@ describe('Boards Query Parameters Service Tests', () => {
               userSettingReducer(userSettingState,
                 UserSettingActions.createToggleVisibility(false, List<number>([4])));
             userSettingSubject.next(userSettingState);
-            urlObservable.take(1).subscribe(s => {
-              expect(s).toContain('hidden=1,2,3,4');
-              expect(s).not.toContain('visible');
+            urlObservable
+              .pipe(
+                take(1)
+              )
+              .subscribe(s => {
+                expect(s).toContain('hidden=1,2,3,4');
+                expect(s).not.toContain('visible');
             });
             userSettingState =
               userSettingReducer(userSettingState,
                 UserSettingActions.createToggleVisibility(false, List<number>([5, 6, 7])));
             userSettingSubject.next(userSettingState);
-            urlObservable.take(1).subscribe(s => {
-              expect(s).toContain('visible=0,8');
-              expect(s).not.toContain('hidden');
+            urlObservable
+              .pipe(
+                take(1)
+              )
+              .subscribe(s => {
+                expect(s).toContain('visible=0,8');
+                expect(s).not.toContain('hidden');
             });
             userSettingState =
               userSettingReducer(userSettingState,
                 UserSettingActions.createToggleVisibility(true, List<number>([5, 6])));
             userSettingSubject.next(userSettingState);
-            urlObservable.take(1).subscribe(s => {
-              expect(s).toContain('visible=0,5,6,8');
-              expect(s).not.toContain('hidden');
+            urlObservable
+              .pipe(
+                take(1)
+              )
+              .subscribe(s => {
+                expect(s).toContain('visible=0,5,6,8');
+                expect(s).not.toContain('hidden');
             });
             userSettingState =
               userSettingReducer(userSettingState,
                 UserSettingActions.createToggleVisibility(true, List<number>([3, 4])));
             userSettingSubject.next(userSettingState);
-            urlObservable.take(1).subscribe(s => {
-              expect(s).toContain('hidden=1,2,7');
-              expect(s).not.toContain('visible');
+            urlObservable
+              .pipe(
+                take(1)
+              )
+              .subscribe(s => {
+                expect(s).toContain('hidden=1,2,7');
+                expect(s).not.toContain('visible');
             });
           })
         });
@@ -257,9 +321,13 @@ describe('Boards Query Parameters Service Tests', () => {
             }
             userSettingState = userSettingReducer(initialUserSettingState, UserSettingActions.createInitialiseFromQueryString(params));
             userSettingSubject.next(userSettingState);
-            urlObservable.take(1).subscribe(s => {
-              expect(s).toContain('visible=1,2,3');
-              expect(s).not.toContain('hidden');
+            urlObservable
+              .pipe(
+                take(1)
+              )
+              .subscribe(s => {
+                expect(s).toContain('visible=1,2,3');
+                expect(s).not.toContain('hidden');
             });
             board = BoardUtil.withMutations(initialBoardState, mutable => {
               mutable.viewId = 999;
@@ -273,33 +341,49 @@ describe('Boards Query Parameters Service Tests', () => {
               userSettingReducer(userSettingState,
                 UserSettingActions.createToggleVisibility(true, List<number>([4])));
             userSettingSubject.next(userSettingState);
-            urlObservable.take(1).subscribe(s => {
-              expect(s).toContain('visible=1,2,3,4');
-              expect(s).not.toContain('hidden');
+            urlObservable
+              .pipe(
+                take(1)
+              )
+              .subscribe(s => {
+                expect(s).toContain('visible=1,2,3,4');
+                expect(s).not.toContain('hidden');
             });
             userSettingState =
               userSettingReducer(userSettingState,
                 UserSettingActions.createToggleVisibility(true, List<number>([5, 6, 7])));
             userSettingSubject.next(userSettingState);
-            urlObservable.take(1).subscribe(s => {
-              expect(s).toContain('hidden=0,8');
-              expect(s).not.toContain('visible');
+            urlObservable
+              .pipe(
+                take(1)
+              )
+              .subscribe(s => {
+                expect(s).toContain('hidden=0,8');
+                expect(s).not.toContain('visible');
             });
             userSettingState =
               userSettingReducer(userSettingState,
                 UserSettingActions.createToggleVisibility(false, List<number>([5, 6])));
             userSettingSubject.next(userSettingState);
-            urlObservable.take(1).subscribe(s => {
-              expect(s).toContain('hidden=0,5,6,8');
-              expect(s).not.toContain('visible');
+            urlObservable
+              .pipe(
+                take(1)
+              )
+              .subscribe(s => {
+                expect(s).toContain('hidden=0,5,6,8');
+                expect(s).not.toContain('visible');
             });
             userSettingState =
               userSettingReducer(userSettingState,
                 UserSettingActions.createToggleVisibility(false, List<number>([3, 4])));
             userSettingSubject.next(userSettingState);
-            urlObservable.take(1).subscribe(s => {
-              expect(s).toContain('visible=1,2,7');
-              expect(s).not.toContain('hidden');
+            urlObservable
+              .pipe(
+                take(1)
+              )
+              .subscribe(s => {
+                expect(s).toContain('visible=1,2,7');
+                expect(s).not.toContain('hidden');
             });
           })
         });
@@ -325,45 +409,65 @@ describe('Boards Query Parameters Service Tests', () => {
             userSettingReducer(userSettingState,
               UserSettingActions.createToggleVisibility(false, List<number>([5, 6, 7, 8])));
           userSettingSubject.next(userSettingState);
-          urlObservable.take(1).subscribe(s => {
-            expect(s).toContain('visible=2,3,4');
-            expect(s).not.toContain('hidden');
+          urlObservable
+            .pipe(
+              take(1)
+            )
+            .subscribe(s => {
+              expect(s).toContain('visible=2,3,4');
+              expect(s).not.toContain('hidden');
           });
 
           userSettingState = UserSettingUtil.updateUserSettingState(userSettingState, mutable => {
             mutable.showBacklog = true;
           });
           userSettingSubject.next(userSettingState);
-          urlObservable.take(1).subscribe(s => {
-            expect(s).toContain('hidden=5,6,7,8');
-            expect(s).not.toContain('visible');
+          urlObservable
+            .pipe(
+              take(1)
+            )
+            .subscribe(s => {
+              expect(s).toContain('hidden=5,6,7,8');
+              expect(s).not.toContain('visible');
           });
 
           userSettingState =
             userSettingReducer(userSettingState,
               UserSettingActions.createToggleVisibility(false, List<number>([2, 3, 4])));
           userSettingSubject.next(userSettingState);
-          urlObservable.take(1).subscribe(s => {
-            expect(s).toContain('visible=0,1');
-            expect(s).not.toContain('hidden');
+          urlObservable
+            .pipe(
+              take(1)
+            )
+            .subscribe(s => {
+              expect(s).toContain('visible=0,1');
+              expect(s).not.toContain('hidden');
           });
 
           userSettingState =
             userSettingReducer(userSettingState,
               UserSettingActions.createToggleVisibility(true, List<number>([0, 1, 2, 3, 4])));
           userSettingSubject.next(userSettingState);
-          urlObservable.take(1).subscribe(s => {
-            expect(s).toContain('hidden=5,6,7,8');
-            expect(s).not.toContain('visible');
+          urlObservable
+            .pipe(
+              take(1)
+            )
+            .subscribe(s => {
+              expect(s).toContain('hidden=5,6,7,8');
+              expect(s).not.toContain('visible');
           });
 
           userSettingState = UserSettingUtil.updateUserSettingState(userSettingState, mutable => {
             mutable.showBacklog = false;
           });
           userSettingSubject.next(userSettingState);
-          urlObservable.take(1).subscribe(s => {
-            expect(s).toContain('visible=2,3,4');
-            expect(s).not.toContain('hidden');
+          urlObservable
+            .pipe(
+              take(1)
+            )
+            .subscribe(s => {
+              expect(s).toContain('visible=2,3,4');
+              expect(s).not.toContain('hidden');
           });
         });
       });
@@ -376,9 +480,13 @@ describe('Boards Query Parameters Service Tests', () => {
           mutable.collapsedSwimlanes = Map<string, boolean>({'a': true, 'b': true, 'c': true, 'd': false});
         });
         userSettingSubject.next(userSettingState);
-        urlObservable.take(1).subscribe(s => {
-          expect(s).toContain('hidden-sl=a,b,c');
-          expect(s).not.toContain('visible-sl');
+        urlObservable
+          .pipe(
+            take(1)
+          )
+          .subscribe(s => {
+            expect(s).toContain('hidden-sl=a,b,c');
+            expect(s).not.toContain('visible-sl');
         });
 
         userSettingState = UserSettingUtil.updateUserSettingState(userSettingState, mutable => {
@@ -387,9 +495,13 @@ describe('Boards Query Parameters Service Tests', () => {
           mutable.collapsedSwimlanes = Map<string, boolean>({'a': false, 'b': false, 'c': false, 'd': true});
         });
         userSettingSubject.next(userSettingState);
-        urlObservable.take(1).subscribe(s => {
-          expect(s).toContain('visible-sl=a,b,c');
-          expect(s).not.toContain('hidden-sl');
+        urlObservable
+          .pipe(
+            take(1)
+          )
+          .subscribe(s => {
+            expect(s).toContain('visible-sl=a,b,c');
+            expect(s).not.toContain('hidden-sl');
         });
 
       })

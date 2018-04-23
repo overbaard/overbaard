@@ -29,7 +29,6 @@ import {BoardHeader} from './board-header';
 import {IssueTable} from './issue-table';
 import {BoardHeaders} from './board-headers';
 import {SwimlaneInfo} from './swimlane-info';
-import 'rxjs/add/observable/combineLatest';
 import {UserSettingState} from '../../model/board/user/user-setting';
 import {boardSelector} from '../../model/board/data/board.reducer';
 import {userSettingSelector} from '../../model/board/user/user-setting.reducer';
@@ -39,6 +38,7 @@ import {IssueDetailState} from '../../model/board/user/issue-detail/issue-detail
 import {Dictionary} from '../../common/dictionary';
 import {FontSizeTableService} from '../../services/font-size-table.service';
 import {IssueHeightCalculator} from './issue-height-calculator';
+import {combineLatest} from 'rxjs/observable/combineLatest';
 
 @Injectable()
 export class BoardViewModelService {
@@ -71,7 +71,7 @@ export class BoardViewModelHandler {
 
   getBoardViewModel(boardState$: Observable<BoardState>,
                     userSettingState$: Observable<UserSettingState>): Observable<BoardViewModel> {
-    return Observable.combineLatest(boardState$, userSettingState$, (boardState, userSettingState) => {
+    return combineLatest(boardState$, userSettingState$, (boardState, userSettingState) => {
       if (boardState === initialBoardState || userSettingState === initialUserSettingState) {
         return this._lastBoardView;
       }

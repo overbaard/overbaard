@@ -14,6 +14,7 @@ import {List} from 'immutable';
 import {Subject} from 'rxjs/Subject';
 import {ScrollHeightSplitter, VirtualScrollInfo, StartAndHeight} from '../../../../common/scroll-height-splitter';
 import {BoardIssueView} from '../../../../view-model/board/board-issue-view';
+import {takeUntil} from 'rxjs/operators';
 
 @Component({
   selector: 'app-rank-view-container',
@@ -36,7 +37,7 @@ export class RankViewContainerComponent implements OnInit, OnChanges, OnDestroy 
    * Values emitted here come from the ScrollListenerDirective and are OUTSIDE the angular zone.
    */
   @Input()
-  topOffsetObserver: Observable<number>;
+  topOffsetObserver$: Observable<number>;
 
   @Output()
   updateParallelTask: EventEmitter<UpdateParallelTaskEvent> = new EventEmitter<UpdateParallelTaskEvent>();
@@ -59,8 +60,10 @@ export class RankViewContainerComponent implements OnInit, OnChanges, OnDestroy 
   }
 
   ngOnInit() {
-    this.topOffsetObserver
-      .takeUntil(this._destroy$)
+    this.topOffsetObserver$
+      .pipe(
+        takeUntil(this._destroy$)
+      )
       .subscribe(
         value => {
           this._scrollTop = value;

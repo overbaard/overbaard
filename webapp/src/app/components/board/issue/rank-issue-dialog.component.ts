@@ -9,6 +9,7 @@ import {BoardIssue} from '../../../model/board/data/issue/board-issue';
 import {BoardState} from '../../../model/board/data/board';
 import {boardSelector} from '../../../model/board/data/board.reducer';
 import {userSettingSelector} from '../../../model/board/user/user-setting.reducer';
+import {take} from 'rxjs/operators';
 
 @Component({
   selector: 'app-rank-issue-dialog',
@@ -34,14 +35,18 @@ export class RankIssueDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.issues = List<BoardIssue>().withMutations(list => {
-      this._store.select(boardSelector).take(1).subscribe((board: BoardState) => {
-        this._rankCustomFieldId = board.rankCustomFieldId;
-        board.ranks.rankedIssueKeys.get(this.issue.projectCode).forEach(key => {
-          const curr: BoardIssue = board.issues.issues.get(key);
-          list.push(curr);
+      this._store.select(boardSelector)
+        .pipe(
+          take(1)
+        )
+        .subscribe((board: BoardState) => {
+          this._rankCustomFieldId = board.rankCustomFieldId;
+          board.ranks.rankedIssueKeys.get(this.issue.projectCode).forEach(key => {
+            const curr: BoardIssue = board.issues.issues.get(key);
+            list.push(curr);
+          });
         });
       });
-    });
   }
 
   onRankIssueBefore($event: MouseEvent, index: number) {
@@ -60,9 +65,13 @@ export class RankIssueDialogComponent implements OnInit {
       afterKey = this.issues.get(this.issues.size - 1).key;
     }
 
-    this._store.select(userSettingSelector).take(1).subscribe(us => {
-      this._boardService.rankIssue(
-        this._rankCustomFieldId, us.boardCode, this.issue, beforeKey, afterKey, () => this.dialogRef.close());
-    });
+    this._store.select(userSettingSelector)
+      .pipe(
+        take(1)
+      )
+      .subscribe(us => {
+        this._boardService.rankIssue(
+          this._rankCustomFieldId, us.boardCode, this.issue, beforeKey, afterKey, () => this.dialogRef.close());
+      });
   }
 }

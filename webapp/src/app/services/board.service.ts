@@ -2,9 +2,8 @@ import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {UrlService} from './url.service';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/operator/timeout';
-import 'rxjs/add/observable/throw';
-import 'rxjs/add/observable/timer';
+import { timer } from 'rxjs/observable/timer';
+import { _throw } from 'rxjs/observable/throw';
 import {Progress, ProgressLogService} from './progress-log.service';
 import {Subscription} from 'rxjs/Subscription';
 import {Store} from '@ngrx/store';
@@ -13,6 +12,8 @@ import {BoardActions, boardViewIdSelector} from '../model/board/data/board.reduc
 import {showBacklogSelector} from '../model/board/user/user-setting.reducer';
 import {BoardIssueView} from '../view-model/board/board-issue-view';
 import {HeaderActions} from '../model/board/data/header/header.reducer';
+import {catchError, take, tap, timeout} from 'rxjs/operators';
+import {combineLatest} from 'rxjs/observable/combineLatest';
 
 @Injectable()
 export class BoardService {
@@ -43,7 +44,9 @@ export class BoardService {
       BoardService._bigTimeout,
       () => {},
       this._http.get(path))
-      .take(1)
+      .pipe(
+        take(1)
+      )
       .subscribe(
         data => {
           // console.log(JSON.stringify(data, null, 2));
@@ -62,7 +65,9 @@ export class BoardService {
     const path: string = this._restUrlService.caclulateRestUrl(url);
     console.log('Loading help texts ' + path);
     return executeRequest(progress, BoardService._bigTimeout, () => {}, this._http.get(path))
-      .take(1)
+      .pipe(
+        take(1)
+      )
       .subscribe(
         data => {
           this._store.dispatch(HeaderActions.createLoadHelpTexts(data));
@@ -95,7 +100,9 @@ export class BoardService {
       this._http.put(path, JSON.stringify(payload), {
         headers : this.createHeaders()
       }))
-      .take(1)
+      .pipe(
+        take(1)
+      )
       .subscribe(
         data => {
           this.recreateChangePollerAndStartPolling(boardCode, backlog, true, 0);
@@ -120,7 +127,9 @@ export class BoardService {
       this._http.post(path, JSON.stringify(payload), {
         headers : this.createHeaders()
       }))
-      .take(1)
+      .pipe(
+        take(1)
+      )
       .subscribe(
         data => {
           success();
@@ -162,7 +171,9 @@ export class BoardService {
       this._http.put(path, JSON.stringify(payload), {
         headers : this.createHeaders()
       }))
-      .take(1)
+      .pipe(
+        take(1)
+      )
       .subscribe(
         data => {
           success();
@@ -182,13 +193,15 @@ export class BoardService {
     console.log('Getting transitions for issue ' + path);
     // Don't use executeRequest here to keep the progress open until we actually do the transition
     this._http.get(path)
-      .timeout(BoardService._smallTimeout)
-      .catch((err: HttpErrorResponse) => {
-        progress.errorResponse(err);
-        this.recreateChangePollerAndStartPolling(boardCode, showBacklog, true, 0);
-        return Observable.throw(err);
-      })
-      .take(1)
+      .pipe(
+        take(1),
+        timeout(BoardService._smallTimeout),
+        catchError((err: HttpErrorResponse) => {
+          progress.errorResponse(err);
+          this.recreateChangePollerAndStartPolling(boardCode, showBacklog, true, 0);
+          return _throw(err);
+        })
+      )
       .subscribe(data => {
         this.getTransitionsAndPerformMove(boardCode, showBacklog, progress, issue, boardState, ownState, success, data);
       });
@@ -229,7 +242,9 @@ export class BoardService {
       this._http.post(path, JSON.stringify(payload), {
         headers : this.createHeaders()
       }))
-      .take(1)
+      .pipe(
+        take(1)
+      )
       .subscribe(
         data => {
           success();
@@ -297,7 +312,7 @@ class ChangePoller {
     private _progressLog: ProgressLogService,
     private _showProgress: boolean) {
 
-    this._pollParameters$ = Observable.combineLatest(
+    this._pollParameters$ = combineLatest(
       this._store.select(boardViewIdSelector),
       this._store.select(showBacklogSelector),
       (viewId: number, showBacklog: boolean): PollParameters => {
@@ -342,10 +357,14 @@ class ChangePoller {
 
   pollBoard(initialWait: number = ChangePoller._pollTime) {
     if (!this._destroyed) {
-      this._pollParameters$.take(1).subscribe(
+      this._pollParameters$
+        .pipe(
+          take(1)
+        )
+        .subscribe(
         params => {
           if (!this._destroyed) {
-            this._currentPollTimerSubscription = Observable.timer(initialWait)
+            this._currentPollTimerSubscription = timer(initialWait)
               .subscribe(
                 success => {
                   if (!this._destroyed) {
@@ -378,8 +397,10 @@ class ChangePoller {
       const path: string = this._restUrlService.caclulateRestUrl(url);
       // Don't use execute request since we want to handle the errors differently
       this._currentPollTimerSubscription = this._http.get(path)
-        .timeout(BoardService._bigTimeout)
-        .take(1)
+        .pipe(
+          take(1),
+          timeout(BoardService._bigTimeout)
+        )
         .subscribe(
           data => {
             progress.complete();
@@ -417,17 +438,18 @@ interface PollParameters {
   showBacklog: boolean;
 }
 
-function executeRequest<T>(progress: Progress, timeout: number, errorCallback: () => void, observable: Observable<T>): Observable<T> {
-  let ret: Observable<T> = observable
-    .timeout(timeout);
-
-  ret = ret.do(d => progress.complete())
-
-  return ret.catch((err: HttpErrorResponse) => {
-    if (errorCallback) {
-      errorCallback();
-    }
-    progress.errorResponse(err);
-    return Observable.throw(err);
-  });
+function executeRequest<T>(progress: Progress, currentTimeout: number,
+                           errorCallback: () => void, observable: Observable<T>): Observable<T> {
+  return observable
+    .pipe(
+      timeout(currentTimeout),
+      tap(d => progress.complete()),
+      catchError((err: HttpErrorResponse) => {
+        if (errorCallback) {
+          errorCallback();
+        }
+        progress.errorResponse(err);
+        return _throw(err);
+      })
+    )
 }

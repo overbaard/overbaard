@@ -3,13 +3,7 @@ import {
   Renderer2
 } from '@angular/core';
 import {Subject} from 'rxjs/Subject';
-import 'rxjs/add/operator/throttleTime';
-import 'rxjs/add/operator/debounceTime';
-import 'rxjs/add/operator/merge';
-import 'rxjs/add/operator/distinctUntilChanged';
-import 'rxjs/add/operator/map';
 import 'rxjs/add/observable/fromEvent';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
 
 @Directive({

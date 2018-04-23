@@ -9,6 +9,7 @@ import {Map} from 'immutable';
 import {BoardState} from '../../../model/board/data/board';
 import {BoardService} from '../../../services/board.service';
 import {userSettingSelector} from '../../../model/board/user/user-setting.reducer';
+import {take} from 'rxjs/operators';
 
 @Component({
   selector: 'app-move-issue-dialog',
@@ -35,7 +36,11 @@ export class MoveIssueDialogComponent implements OnInit {
 
   ngOnInit(): void {
     let ownStateIndex = 0;
-    this._store.select(boardSelector).take(1).subscribe(
+    this._store.select(boardSelector)
+      .pipe(
+        take(1)
+      )
+      .subscribe(
       (board: BoardState) => {
         const projectState: BoardProject = board.projects.boardProjects.get(this.issue.projectCode);
         const stateMappings: Map<string, string> = projectState.boardStateNameToOwnStateName;
@@ -60,7 +65,9 @@ export class MoveIssueDialogComponent implements OnInit {
       return;
     }
     this._store.select(userSettingSelector)
-      .take(1)
+      .pipe(
+        take(1)
+      )
       .subscribe(userSetting => {
         this._boardService.moveIssue(
           userSetting.boardCode,

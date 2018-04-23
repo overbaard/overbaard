@@ -3,9 +3,6 @@ import {Store} from '@ngrx/store';
 import {AppState} from '../app-store';
 import {ProgressLogActions} from '../model/global/progress-log/progress-log.reducer';
 import {HttpErrorResponse} from '@angular/common/http';
-import {Set} from 'immutable';
-import {Dictionary} from '../common/dictionary';
-import {current} from 'codelyzer/util/syntaxKind';
 
 @Injectable()
 export class ProgressLogService {

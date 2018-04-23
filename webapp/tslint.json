@@ -2,6 +2,9 @@
   "rulesDirectory": [
     "node_modules/codelyzer"
   ],
+  "extends": [
+    "rxjs-tslint-rules"
+  ],
   "rules": {
     "callable-types": true,
     "class-name": true,
@@ -125,6 +128,8 @@
     "directive-class-suffix": true,
     "no-access-missing-member": true,
     "templates-use-public": true,
-    "invoke-injectable": true
+    "invoke-injectable": true,
+    "rxjs-add": { "severity": "error" },
+    "rxjs-no-unused-add": { "severity": "error" }
   }
 }

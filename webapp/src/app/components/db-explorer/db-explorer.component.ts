@@ -5,6 +5,7 @@ import {AppHeaderService} from '../../services/app-header.service';
 import {UrlService} from '../../services/url.service';
 import {Subject} from 'rxjs/Subject';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import {take, timeout} from 'rxjs/operators';
 
 /**
  * Backing class for functionality to explore the DB
@@ -36,8 +37,10 @@ export class DbExplorerComponent {
     const payload: any = {sql: this.sqlForm.value.sql};
 
     return this._httpClient.post(path, JSON.stringify(payload), {headers: headers})
-      .timeout(60000)
-      .take(1)
+      .pipe(
+        timeout(60000),
+        take(1),
+      )
       .subscribe(
         (data: string) => {
           console.log(data);

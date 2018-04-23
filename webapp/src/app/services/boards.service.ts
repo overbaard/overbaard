@@ -1,13 +1,10 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/operator/do';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/timeout';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/observable/throw';
 import {UrlService} from './url.service';
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {Progress, ProgressLogService} from './progress-log.service';
+import {catchError, map, tap, timeout} from 'rxjs/operators';
+import {_throw} from 'rxjs/observable/throw';
 
 @Injectable()
 export class BoardsService {
@@ -21,7 +18,9 @@ export class BoardsService {
     const path: string = this._restUrlService.caclulateRestUrl(
       summaryOnly ? UrlService.OVERBAARD_REST_PREFIX + '/boards' : UrlService.OVERBAARD_REST_PREFIX + '/boards?full=true');
     return this.executeRequest(progress, this._httpClient.get(path))
-      .map(r => summaryOnly ? r['configs'] : r);
+      .pipe(
+        map(r => summaryOnly ? r['configs'] : r)
+      );
   }
 
   loadBoardConfigJson(boardId: number): Observable<any> {
@@ -84,18 +83,16 @@ export class BoardsService {
   }
 
   private executeRequest<T>(progress: Progress, observable: Observable<T>): Observable<T> {
-    let ret: Observable<T> = observable
-      .timeout(this._timeout);
-
-    ret = ret.catch((response: HttpErrorResponse) => {
-      progress.errorResponse(response);
-      return Observable.throw(response);
-    });
-
-    ret = ret.do(d => {
-      progress.complete();
-    });
-
-    return ret;
+    return observable
+      .pipe(
+        timeout(this._timeout),
+        catchError((response: HttpErrorResponse) => {
+          progress.errorResponse(response);
+          return _throw(response);
+        }),
+        tap(s => {
+          progress.complete();
+        })
+      );
   }
 }

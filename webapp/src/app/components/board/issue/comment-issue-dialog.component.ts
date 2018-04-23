@@ -15,6 +15,7 @@ import {FormControl, FormGroup} from '@angular/forms';
 import {Observable} from 'rxjs/Observable';
 import {userSettingSelector} from '../../../model/board/user/user-setting.reducer';
 import {BoardService} from '../../../services/board.service';
+import {take} from 'rxjs/operators';
 
 @Component({
   selector: 'app-comment-issue-dialog',
@@ -49,7 +50,9 @@ export class CommentIssueDialogComponent implements OnInit {
 
   onSave() {
     this._store.select(userSettingSelector)
-      .take(1)
+      .pipe(
+        take(1)
+      )
       .subscribe(userSetting => {
         this._boardService.saveIssueComment(
           userSetting.boardCode,

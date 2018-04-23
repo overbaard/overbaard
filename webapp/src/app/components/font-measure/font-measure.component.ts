@@ -1,7 +1,4 @@
 import {AfterViewInit, ChangeDetectionStrategy, Component, OnInit, ViewChild} from '@angular/core';
-import 'rxjs/add/operator/take';
-import 'rxjs/add/observable/combineLatest';
-import 'rxjs/add/operator/catch';
 import {FontSizeTable, FontSizeTableService} from '../../services/font-size-table.service';
 import {Dictionary} from '../../common/dictionary';
 import {SAME_CHAR_WIDTH_LOOKUP_TABLE} from './lookup-table';

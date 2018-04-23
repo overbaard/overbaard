@@ -1,9 +1,4 @@
-import {
-  BoardStateInitializer,
-  BoardViewObservableUtil,
-  HeaderStateFactory,
-  IssuesFactory
-} from './board-view.common.spec';
+import {BoardStateInitializer, BoardViewObservableUtil, HeaderStateFactory, IssuesFactory} from './board-view.common.spec';
 import {HeaderActions, headerMetaReducer} from '../../model/board/data/header/header.reducer';
 import {DeserializeIssueLookupParams} from '../../model/board/data/issue/issue.model';
 import {HeaderState} from '../../model/board/data/header/header.state';
@@ -12,10 +7,8 @@ import {initialIssueDetailState, IssueDetailState} from '../../model/board/user/
 import {BoardHeaders} from './board-headers';
 import {IssueSummaryLevel} from '../../model/board/user/issue-summary-level';
 import {BoardIssueView} from './board-issue-view';
-import {BoardIssue} from '../../model/board/data/issue/board-issue';
-import {Record} from 'immutable';
-import {TypedRecord} from 'typed-immutable-record';
 import {BoardIssueViewRecord} from './board-issue-view.model';
+import {take} from 'rxjs/operators';
 
 describe('Issue detail view tests', () => {
 
@@ -48,7 +41,9 @@ describe('Issue detail view tests', () => {
 
     util
       .observer()
-      .take(1)
+      .pipe(
+        take(1)
+      )
       .subscribe(board => {
         headers = board.headers;
         table = board.issueTable;
@@ -63,7 +58,9 @@ describe('Issue detail view tests', () => {
         .getUserSettingUpdater()
         .updateIssueSummaryLevel(IssueSummaryLevel.HEADER_ONLY)
         .observer()
-        .take(1)
+        .pipe(
+          take(1)
+        )
         .subscribe(board => {
           expect(board.headers).toBe(headers);
           expect(board.issueTable).not.toBe(table);
@@ -76,7 +73,9 @@ describe('Issue detail view tests', () => {
         .getUserSettingUpdater()
         .updateIssueSummaryLevel(IssueSummaryLevel.SHORT_SUMMARY)
         .observer()
-        .take(1)
+        .pipe(
+          take(1)
+        )
         .subscribe(board => {
           expect(board.headers).toBe(headers);
           expect(board.issueTable).not.toBe(table);
@@ -89,7 +88,9 @@ describe('Issue detail view tests', () => {
         .getUserSettingUpdater()
         .updateSwimlane('project')
         .observer()
-        .take(1)
+        .pipe(
+          take(1)
+        )
         .subscribe(board => {
           expect(board.headers).toBe(headers);
           expect(board.issueTable).not.toBe(table);
@@ -101,7 +102,9 @@ describe('Issue detail view tests', () => {
         .getUserSettingUpdater()
         .updateIssueSummaryLevel(IssueSummaryLevel.HEADER_ONLY)
         .observer()
-        .take(1)
+        .pipe(
+          take(1)
+        )
         .subscribe(board => {
           expect(board.headers).toBe(headers);
           expect(board.issueTable).not.toBe(table);
@@ -114,7 +117,9 @@ describe('Issue detail view tests', () => {
         .getUserSettingUpdater()
         .updateIssueSummaryLevel(IssueSummaryLevel.SHORT_SUMMARY)
         .observer()
-        .take(1)
+        .pipe(
+          take(1)
+        )
         .subscribe(board => {
           expect(board.headers).toBe(headers);
           expect(board.issueTable).not.toBe(table);

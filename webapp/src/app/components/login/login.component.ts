@@ -1,6 +1,5 @@
 import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {BoardsService} from '../../services/boards.service';
-import 'rxjs/add/operator/take';
 import {UrlService} from '../../services/url.service';
 
 @Component({

@@ -1,7 +1,6 @@
 import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
 import {BoardsService} from '../../services/boards.service';
 import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/operator/catch';
 import {AppHeaderService} from '../../services/app-header.service';
 
 @Component({

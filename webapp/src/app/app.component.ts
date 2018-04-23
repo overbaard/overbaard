@@ -14,10 +14,9 @@ import {TOOLBAR_HEIGHT} from './common/view-constants';
 import {VersionService} from './services/version.service';
 import {UrlService} from './services/url.service';
 import {Subject} from 'rxjs/Subject';
-import 'rxjs/add/operator/takeUntil'
-import 'rxjs/add/operator/filter'
 import {LogEntry} from './model/global/progress-log/log-entry';
 import {Router} from '@angular/router';
+import {filter, take, takeUntil} from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -52,14 +51,18 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     this._store
       .select(progressLogCurrentMessageSelector)
-      .takeUntil(this.destroy$)
+      .pipe(
+        takeUntil(this.destroy$)
+      )
       .subscribe(logEntry => {
         this.handleLogEntry(logEntry);
       });
 
     this._store
       .select(notLoggedInSelector)
-      .takeUntil(this.destroy$)
+      .pipe(
+        takeUntil(this.destroy$)
+      )
       .subscribe(notLoggedIn => {
         if (notLoggedIn) {
           this._router.navigate(['/login']);
@@ -110,8 +113,10 @@ export class AppComponent implements OnInit, AfterViewInit {
 
       // Listen for externally dismissed messages
       this._store.select(externallyDismissFirstMessageSelector)
-        .takeUntil(dismissed)
-        .filter(isDismissed => isDismissed)
+        .pipe(
+          takeUntil(dismissed),
+          filter(isDismissed => isDismissed)
+        )
         .subscribe(
           data => {
             externallyDismissed = true;
@@ -121,7 +126,9 @@ export class AppComponent implements OnInit, AfterViewInit {
 
       // Listen for clicks on the dismiss button in the snackbar
       ref.afterDismissed()
-        .take(1)
+        .pipe(
+          take(1)
+        )
         .subscribe(data => {
         // Clear the message once we've finished displaying it
           this._store.dispatch(ProgressLogActions.createClearFirstMessage());

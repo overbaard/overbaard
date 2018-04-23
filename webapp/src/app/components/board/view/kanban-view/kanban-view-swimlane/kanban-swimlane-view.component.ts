@@ -1,19 +1,26 @@
 import {
-  ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, NgZone, OnChanges, OnInit,
-  Output, SimpleChange, SimpleChanges
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  NgZone,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChange,
+  SimpleChanges
 } from '@angular/core';
 import {SwimlaneData} from '../../../../../view-model/board/swimlane-data';
-import {BoardViewModel} from '../../../../../view-model/board/board-view';
 import {SwimlaneInfo} from '../../../../../view-model/board/swimlane-info';
 import {UpdateParallelTaskEvent} from '../../../../../events/update-parallel-task.event';
-import {IssueSummaryLevel} from '../../../../../model/board/user/issue-summary-level';
 import {IssueDetailState} from '../../../../../model/board/user/issue-detail/issue-detail.model';
 import {Observable} from 'rxjs/Observable';
 import {List} from 'immutable';
 import {ScrollHeightSplitter} from '../../../../../common/scroll-height-splitter';
-import {BoardIssueView} from '../../../../../view-model/board/board-issue-view';
 import {BoardHeaders} from '../../../../../view-model/board/board-headers';
 import {Subject} from 'rxjs/Subject';
+import {takeUntil} from 'rxjs/operators';
 
 @Component({
   selector: 'app-kanban-swimlane-view',
@@ -68,7 +75,9 @@ export class KanbanSwimlaneViewComponent implements OnInit, OnChanges {
 
   ngOnInit() {
     this.topOffsetObserver
-      .takeUntil(this._destroy$)
+      .pipe(
+        takeUntil(this._destroy$)
+      )
       .subscribe(
         value => {
           this._scrollTop = value;

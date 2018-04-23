@@ -2,12 +2,10 @@ import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {BoardsService} from '../../services/boards.service';
 import {AppHeaderService} from '../../services/app-header.service';
 import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/operator/take';
-import 'rxjs/add/observable/combineLatest';
-import 'rxjs/add/operator/catch';
 import {OrderedMap} from 'immutable';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {Subject} from 'rxjs/Subject';
+import {map, take} from 'rxjs/operators';
 
 @Component({
   selector: 'app-configuration',
@@ -49,8 +47,10 @@ export class ConfigurationComponent implements OnInit {
   private loadBoards() {
     // TODO log progress and errors
     this._boardsService.loadBoardsList(false)
-      .map<any, ConfigBoardsView>(data => this.toConfigBoardView(data))
-      .take(1)
+      .pipe(
+        map(data => this.toConfigBoardView(data)),
+        take(1),
+      )
       .subscribe(
         value => {
           this.rankCustomFieldIdForm = new FormGroup({
@@ -64,7 +64,7 @@ export class ConfigurationComponent implements OnInit {
     this.selected = id;
     // TODO progress and errors
     this.selectedBoardJson$ = this._boardsService.loadBoardConfigJson(id)
-      .map(data => this.formatAsJson(data));
+      .pipe(map(data => this.formatAsJson(data)));
   }
 
   onCloseBoardForEdit(id: number) {
@@ -92,8 +92,10 @@ export class ConfigurationComponent implements OnInit {
     console.log('Deleting board');
     // TODO progress and errors
     this._boardsService.deleteBoard(id)
-      .map<any, ConfigBoardsView>(data => this.toConfigBoardView(data))
-      .take(1)
+      .pipe(
+        map(data => this.toConfigBoardView(data)),
+        take(1)
+      )
       .subscribe(
         value => {
           this.config$.next(value)
@@ -112,20 +114,22 @@ export class ConfigurationComponent implements OnInit {
     }
     // TODO progress and errors
     this._boardsService.createBoard(json)
-      .map<any, ConfigBoardsView>(data => this.toConfigBoardView(data))
-      .take(1)
+      .pipe(
+        map<any, ConfigBoardsView>(data => this.toConfigBoardView(data)),
+        take(1)
+      )
       .subscribe(
         value => {
           this.config$.next(value)
           this.createForm.controls['createJson'].setValue('');
           });
 
-
-    this.config$.take(1)
-      .subscribe(
-        data => {
-        }
-      );
+    this.config$
+      .pipe(
+        take(1)
+      )
+      .subscribe(data => {
+      });
   }
 
   onSaveEditedBoard(boardJson: string) {
@@ -137,8 +141,10 @@ export class ConfigurationComponent implements OnInit {
     // TODO progress and errors
     console.log('Saved edited board')
     this._boardsService.saveBoard(this.selected, boardJson)
-      .map<any, ConfigBoardsView>(data => this.toConfigBoardView(data))
-      .take(1)
+      .pipe(
+        map<any, ConfigBoardsView>(data => this.toConfigBoardView(data)),
+        take(1)
+      )
       .subscribe(
         value => {
           this.config$.next(value)
@@ -148,7 +154,9 @@ export class ConfigurationComponent implements OnInit {
   onSaveCustomFieldId() {
     // TODO handle progress and errors
     this._boardsService.saveRankCustomFieldId(this.rankCustomFieldIdForm.value.rankCustomFieldId)
-      .take(1)
+      .pipe(
+        take(1)
+      )
       .subscribe(
         data => {
           // We need to subscribe here since http actions are cold observables
@@ -167,12 +175,12 @@ export class ConfigurationComponent implements OnInit {
   }
 
   private toConfigBoardView(data: any): ConfigBoardsView {
-    const map: OrderedMap<number, any> =
+    const boards: OrderedMap<number, any> =
       (<any[]>data['configs'])
         .reduce((om, boardCfg) => om.set(boardCfg['id'], boardCfg), OrderedMap<number, any>());
 
     return {
-      boards: map,
+      boards: boards,
       canEditRankCustomFieldId: data['rank-custom-field']['edit'],
       rankCustomFieldId: data['rank-custom-field']['id']
     };

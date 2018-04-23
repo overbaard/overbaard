@@ -3,7 +3,6 @@ import {
   SimpleChanges
 } from '@angular/core';
 import {BoardsService} from '../../services/boards.service';
-import 'rxjs/add/operator/take';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 
 @Component({

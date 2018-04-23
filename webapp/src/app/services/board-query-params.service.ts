@@ -1,6 +1,6 @@
 import {Store} from '@ngrx/store';
 import {AppState} from '../app-store';
-import {Observable} from 'rxjs/Observable';
+import {combineLatest} from 'rxjs/observable/combineLatest';
 import {boardSelector} from '../model/board/data/board.reducer';
 import {userSettingSelector} from '../model/board/user/user-setting.reducer';
 import {BoardState} from '../model/board/data/board';
@@ -12,6 +12,7 @@ import {BoardFilterState} from '../model/board/user/board-filter/board-filter.mo
 import {BoardViewMode} from '../model/board/user/board-view-mode';
 import {Injectable} from '@angular/core';
 import {IssueSummaryLevel} from '../model/board/user/issue-summary-level';
+import {Observable} from 'rxjs/Observable';
 
 @Injectable()
 export class BoardQueryParamsService {
@@ -39,7 +40,7 @@ export class BoardQueryParamsHandler {
 
   getBoardViewModel(boardState$: Observable<BoardState>,
                     userSettingState$: Observable<UserSettingState>): Observable<string> {
-    return Observable.combineLatest(boardState$, userSettingState$, (boardState, userSettingState) => {
+    return combineLatest(boardState$, userSettingState$, (boardState, userSettingState) => {
       const oldState: UserSettingState = this._lastUserSettingState;
       this._lastBoardState = boardState;
       this._lastUserSettingState = userSettingState;

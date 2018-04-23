@@ -1,19 +1,25 @@
 import {
-  ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, NgZone, OnChanges, OnInit, Output,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  NgZone,
+  OnChanges,
+  OnInit,
+  Output,
   SimpleChange,
   SimpleChanges
 } from '@angular/core';
-import {List, Map} from 'immutable';
+import {List} from 'immutable';
 import {BoardIssueView} from '../../../../../view-model/board/board-issue-view';
-import {IssueTable} from '../../../../../view-model/board/issue-table';
 import {BoardHeader} from '../../../../../view-model/board/board-header';
 import {UpdateParallelTaskEvent} from '../../../../../events/update-parallel-task.event';
-import {IssueSummaryLevel} from '../../../../../model/board/user/issue-summary-level';
 import {IssueDetailState} from '../../../../../model/board/user/issue-detail/issue-detail.model';
 import {Subject} from 'rxjs/Subject';
-import {ScrollHeightSplitter, StartAndHeight, VirtualScrollInfo} from '../../../../../common/scroll-height-splitter';
-import {RankViewEntry} from '../../../../../view-model/board/rank-view-entry';
+import {ScrollHeightSplitter} from '../../../../../common/scroll-height-splitter';
 import {Observable} from 'rxjs/Observable';
+import {takeUntil} from 'rxjs/operators';
 
 @Component({
   selector: 'app-kanban-view-column',
@@ -63,7 +69,9 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
   ngOnInit() {
     if (this.topOffsetObserver) {
       this.topOffsetObserver
-        .takeUntil(this._destroy$)
+        .pipe(
+          takeUntil(this._destroy$)
+        )
         .subscribe(
           value => {
             this._scrollTop = value;

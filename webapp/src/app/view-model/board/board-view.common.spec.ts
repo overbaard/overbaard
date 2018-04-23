@@ -1,6 +1,5 @@
 import {List, Map} from 'immutable';
 import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/operator/take';
 import {BoardViewModelHandler} from './board-view.service';
 import {initialUserSettingState} from '../../model/board/user/user-setting.model';
 import {BoardUtil, initialBoardState} from '../../model/board/data/board.model';
@@ -41,6 +40,7 @@ import {Action} from '@ngrx/store';
 import {IssueSummaryLevel} from '../../model/board/user/issue-summary-level';
 import {HeaderActions, headerMetaReducer} from '../../model/board/data/header/header.reducer';
 import {cloneObject} from '../../common/object-util';
+import {take} from 'rxjs/operators';
 
 export class BoardViewObservableUtil {
   private _service: BoardViewModelHandler = new BoardViewModelHandler(null);
@@ -62,7 +62,11 @@ export class BoardViewObservableUtil {
     this._userSettingState =
       userSettingReducer(this._userSettingState, UserSettingActions.createInitialiseFromQueryString(userSettingQueryParams));
     this._userSettingSubject$.next(this._userSettingState);
-    this._userSettingSubject$.take(1).subscribe(table => {
+    this._userSettingSubject$
+      .pipe(
+        take(1)
+      )
+      .subscribe(table => {
       // Consume the initial event with the empty table
     });
   }
@@ -326,12 +330,16 @@ export class UserSettingUpdater {
   }
 
   toggleBacklog(): BoardViewObservableUtil {
-    this._mainUtil.observer().take(1).subscribe(boardView => {
-      const backlogHeader: BoardHeader = boardView.headers.headersList.get(0);
-          expect(backlogHeader.backlog).toBe(true);
+    this._mainUtil.observer()
+      .pipe(
+        take(1)
+      )
+      .subscribe(boardView => {
+        const backlogHeader: BoardHeader = boardView.headers.headersList.get(0);
+            expect(backlogHeader.backlog).toBe(true);
 
-      return this.emitState(UserSettingActions.createToggleBacklog(backlogHeader));
-    });
+        return this.emitState(UserSettingActions.createToggleBacklog(backlogHeader));
+      });
 
     return this._mainUtil;
   }

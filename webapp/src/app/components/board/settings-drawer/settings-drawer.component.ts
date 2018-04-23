@@ -3,11 +3,6 @@ import {AppState} from '../../../app-store';
 import {Store} from '@ngrx/store';
 import {Dictionary} from '../../../common/dictionary';
 import {AbstractControl, FormControl, FormGroup} from '@angular/forms';
-import 'rxjs/add/operator/take';
-import 'rxjs/add/operator/takeUntil';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/debounceTime';
-import 'rxjs/add/observable/of';
 import {Observable} from 'rxjs/Observable';
 import {
   boardProjectsSelector, linkedProjectsSelector,
@@ -46,6 +41,7 @@ import {BoardViewMode} from '../../../model/board/user/board-view-mode';
 import {MatCheckboxChange, MatSliderChange} from '@angular/material';
 import {toIssueSummaryLevel} from '../../../model/board/user/issue-summary-level';
 import {FilterFormEntry} from '../../../common/filter-form-entry';
+import {debounceTime, filter, map, take, takeUntil} from 'rxjs/operators';
 
 @Component({
   selector: 'app-board-settings-drawer',
@@ -134,14 +130,20 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
 
 
     this.filterForm.valueChanges
-      .debounceTime(150)  // Timeout here for when we clear form to avoid costly recalculation of everything
-      .takeUntil(this._destroy$)
+      .pipe(
+        debounceTime(150),  // Timeout here for when we clear form to avoid costly recalculation of everything
+        takeUntil(this._destroy$)
+      )
       .subscribe(value => this.processFormValueChanges(value));
     this.swimlaneForm.valueChanges
-      .takeUntil(this._destroy$)
+      .pipe(
+        takeUntil(this._destroy$)
+      )
       .subscribe(value => this.processSwimlaneChange(value));
     this.viewModeForm.valueChanges
-      .takeUntil(this._destroy$)
+      .pipe(
+        takeUntil(this._destroy$)
+      )
       .subscribe(value => this.processViewModeChange(value));
 
     this.swimlaneList = this.filterList
@@ -149,7 +151,9 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
       .map(fa => FilterFormEntry(fa.key, fa.display));
 
     this._store.select(linkedProjectsSelector)
-      .take(1)
+      .pipe(
+        take(1)
+      )
       .subscribe(
         linkedProjects => {
           this.hasLinkedIssues = linkedProjects && linkedProjects.size > 0;
@@ -166,8 +170,10 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
                                        mapper: (t: T) => FilterFormEntry[],
                                        setFilterGetter: () => Set<string>) {
     observable
-      .take(1)
-      .map(v => mapper(v))
+      .pipe(
+        take(1),
+        map(v => mapper(v))
+      )
       .subscribe(
         filterFormEntries => {
           this.createGroup(filterFormEntries, filter, setFilterGetter);
@@ -179,7 +185,9 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
                                   observable: Observable<OrderedMap<string,
                                     OrderedMap<string, CustomField>>>) {
     observable
-      .take(1)
+      .pipe(
+        take(1)
+      )
       .subscribe(
         customFields => {
           customFields.forEach((fields, key) => {
@@ -194,7 +202,9 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
 
   private createParallelTaskGroup(filterState: BoardFilterState, observable: Observable<OrderedMap<string, List<ParallelTask>>>) {
     observable
-      .take(1)
+      .pipe(
+        take(1)
+      )
       .subscribe(
         parallelTasks => {
           if (parallelTasks.size === 0) {

@@ -3,6 +3,7 @@ import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {UrlService} from '../../services/url.service';
 import {Component, OnInit} from '@angular/core';
 import {List, Map} from 'immutable';
+import {timeout} from 'rxjs/operators';
 
 @Component({
     selector: 'app-access-log',
@@ -25,7 +26,9 @@ export class AccessLogViewComponent implements OnInit {
     const path: string = this._urlService.caclulateRestUrl(url);
     const progress: Progress = this._progressLog.startUserAction();
     return this._http.get(path)
-      .timeout(60000)
+      .pipe(
+        timeout(60000)
+      )
       .subscribe(
         (data: AccessEntry[]) => {
           const accessLogData: AccessLogData = this.processRawAcceessLog(data);

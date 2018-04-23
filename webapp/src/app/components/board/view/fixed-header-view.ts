@@ -9,6 +9,7 @@ import {IssueDetailState} from '../../../model/board/user/issue-detail/issue-det
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {Subject} from 'rxjs/Subject';
 import {Observable} from 'rxjs/Observable';
+import {takeUntil} from 'rxjs/operators';
 
 export class FixedHeaderView implements OnChanges {
 
@@ -38,7 +39,9 @@ export class FixedHeaderView implements OnChanges {
 
   protected observeLeftScroll(until$: Observable<void>) {
     this.scrollLeftObserver$
-      .takeUntil(until$)
+      .pipe(
+        takeUntil(until$)
+      )
       .subscribe(
         value => {
           const leftOffset: number = value * -1;
