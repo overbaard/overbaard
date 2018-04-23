@@ -1,7 +1,4 @@
 import {List} from 'immutable';
-import {SwimlaneData} from '../view-model/board/swimlane-data';
-import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
-import {BoardViewModel} from '../view-model/board/board-view';
 
 export class ScrollHeightSplitter<T> {
 
@@ -52,7 +49,7 @@ export class ScrollHeightSplitter<T> {
 
     if (force || this._lastContainerHeight !== containerHeight || this._lastInfo === INITIAL_SCROLL_INFO) {
       const newInfo: VirtualScrollInfo = this.binarySearchVirtualScrollInfos(scrollPos, containerHeight);
-      if (this._lastInfo.start !== newInfo.start || this._lastInfo.end !== newInfo.end) {
+      if (force || this._lastInfo.start !== newInfo.start || this._lastInfo.end !== newInfo.end) {
         newInfoCallback(newInfo.start, newInfo.end, newInfo.beforePadding, newInfo.afterPadding);
       }
       this._lastInfo = newInfo;
