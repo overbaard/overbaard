@@ -1,18 +1,9 @@
 import {ChangeDetectionStrategy, Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
-import {
-  BoardProject, ParallelTask, ParallelTaskOption,
-  ProjectState
-} from '../../../model/board/data/project/project.model';
 import {BoardIssueView} from '../../../view-model/board/board-issue-view';
 import {Store} from '@ngrx/store';
 import {AppState} from '../../../app-store';
-import {boardSelector} from '../../../model/board/data/board.reducer';
-import {boardProjectsSelector} from '../../../model/board/data/project/project.reducer';
-import {Map, OrderedMap} from 'immutable';
-import {BoardState} from '../../../model/board/data/board';
 import {FormControl, FormGroup} from '@angular/forms';
-import {Observable} from 'rxjs/Observable';
 import {userSettingSelector} from '../../../model/board/user/user-setting.reducer';
 import {BoardService} from '../../../services/board.service';
 import {take} from 'rxjs/operators';

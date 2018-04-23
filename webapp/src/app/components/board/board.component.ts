@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, ElementRef, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {AppHeaderService} from '../../services/app-header.service';
 import {BoardService} from '../../services/board.service';
@@ -16,10 +16,7 @@ import {BoardViewMode} from '../../model/board/user/board-view-mode';
 import {BoardQueryParamsService} from '../../services/board-query-params.service';
 import {UpdateParallelTaskEvent} from '../../events/update-parallel-task.event';
 import {BlacklistState, BlacklistUtil} from '../../model/board/data/blacklist/blacklist.model';
-import {
-  ProgressLogActions,
-  progressLogCurrentMessageSelector
-} from '../../model/global/progress-log/progress-log.reducer';
+import {ProgressLogActions, progressLogCurrentMessageSelector} from '../../model/global/progress-log/progress-log.reducer';
 import {MatDialog} from '@angular/material';
 import {BlacklistDialogComponent} from './blacklist/blacklist-dialog.component';
 import {filter, take, takeUntil} from 'rxjs/operators';

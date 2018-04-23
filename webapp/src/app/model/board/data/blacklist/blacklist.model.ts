@@ -1,6 +1,5 @@
 import {List} from 'immutable';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
-import {PriorityState} from '../priority/priority.model';
 
 export interface BlacklistState {
   states: List<string>;

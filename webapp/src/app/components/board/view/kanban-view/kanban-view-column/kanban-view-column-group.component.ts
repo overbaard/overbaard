@@ -1,13 +1,18 @@
 import {
-  ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange,
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChange,
   SimpleChanges
 } from '@angular/core';
-import {List, Map} from 'immutable';
+import {List} from 'immutable';
 import {BoardIssueView} from '../../../../../view-model/board/board-issue-view';
-import {IssueTable} from '../../../../../view-model/board/issue-table';
 import {BoardHeader} from '../../../../../view-model/board/board-header';
 import {UpdateParallelTaskEvent} from '../../../../../events/update-parallel-task.event';
-import {IssueSummaryLevel} from '../../../../../model/board/user/issue-summary-level';
 import {IssueDetailState} from '../../../../../model/board/user/issue-detail/issue-detail.model';
 import {Observable} from 'rxjs/Observable';
 import {ScrollPositionAndHeight} from '../../../../../common/scroll-position-height';

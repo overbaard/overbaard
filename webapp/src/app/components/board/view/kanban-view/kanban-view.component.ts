@@ -7,6 +7,7 @@ import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {Subject} from 'rxjs/Subject';
 import {ScrollPositionAndHeightSubject} from '../../../../common/scroll-position-height.subject';
 import {ScrollPositionAndHeight} from '../../../../common/scroll-position-height';
+import {takeUntil} from 'rxjs/operators';
 
 @Component({
   selector: 'app-kanban-view',
@@ -45,7 +46,9 @@ export class KanbanViewComponent extends FixedHeaderView implements OnInit, OnDe
   ngOnInit() {
     super.observeLeftScroll(this.destroy$);
     this.scrollTopObserver$
-      .takeUntil(this.destroy$)
+      .pipe(
+        takeUntil(this.destroy$)
+      )
       .subscribe(scrollPos => {
         this.emitNewHeight(scrollPos, this.boardBodyHeight);
       });

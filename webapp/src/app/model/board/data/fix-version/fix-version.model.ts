@@ -1,6 +1,5 @@
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {List} from 'immutable';
-import {LabelState} from '../label/label.model';
 
 
 export interface FixVersionState {

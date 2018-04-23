@@ -1,15 +1,12 @@
 import {enableDebugTools} from '@angular/platform-browser';
-
-const __webpack_public_path__ = calculatePublicPath();
-console.log('Calculated webpack public path: ' + __webpack_public_path__);
-
-
-import {ComponentRef, enableProdMode} from '@angular/core';
+import {enableProdMode} from '@angular/core';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 
 import {AppModule} from './app/app.module';
 import {environment} from './environments/environment';
 
+const __webpack_public_path__ = calculatePublicPath();
+console.log('Calculated webpack public path: ' + __webpack_public_path__);
 
 
 function calculatePublicPath(): string {

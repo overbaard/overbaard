@@ -6,7 +6,6 @@
  */
 import {List, Map} from 'immutable';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
-import {ProjectState} from '../project/project.model';
 
 export interface RankState {
   rankedIssueKeys: Map<string, List<string>>;

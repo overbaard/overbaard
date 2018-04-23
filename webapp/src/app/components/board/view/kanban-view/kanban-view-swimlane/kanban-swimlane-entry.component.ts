@@ -1,18 +1,26 @@
 import {
-  ChangeDetectionStrategy, Component, EventEmitter, Input, NgZone, OnChanges, OnDestroy, OnInit, Output, SimpleChange,
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  NgZone,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  SimpleChange,
   SimpleChanges
-} from "@angular/core";
+} from '@angular/core';
 import {SwimlaneData} from '../../../../../view-model/board/swimlane-data';
-import {BoardViewModel} from '../../../../../view-model/board/board-view';
 import {UpdateParallelTaskEvent} from '../../../../../events/update-parallel-task.event';
-import {IssueSummaryLevel} from '../../../../../model/board/user/issue-summary-level';
 import {IssueDetailState} from '../../../../../model/board/user/issue-detail/issue-detail.model';
 import {BoardHeaders} from '../../../../../view-model/board/board-headers';
-import {StartAndHeight} from "../../../../../common/scroll-height-splitter";
-import {Observable} from "rxjs/Observable";
-import {Subject} from "rxjs/Subject";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {StartAndHeight} from '../../../../../common/scroll-height-splitter';
+import {Observable} from 'rxjs/Observable';
+import {Subject} from 'rxjs/Subject';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {ScrollPositionAndHeight} from '../../../../../common/scroll-position-height';
+import {takeUntil} from 'rxjs/operators';
 
 @Component({
   selector: 'app-kanban-swimlane-entry',
@@ -69,7 +77,9 @@ export class KanbanSwimlaneEntryComponent implements OnInit, OnChanges, OnDestro
   ngOnInit() {
     // console.log(`==== ${this.swimlane.key}  ${this.swimlane.headerHeight}  ${this.swimlane.calculatedTotalIssuesHeight} ${JSON.stringify(this.startAndHeight)}`);
     this.scrollPositionObserver$
-      .takeUntil(this._destroy$)
+      .pipe(
+        takeUntil(this._destroy$)
+      )
       .subscribe(
         scrollPositionAndHeight => {
           this._scrollPositionAndHeight = scrollPositionAndHeight;

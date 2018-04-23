@@ -12,10 +12,7 @@ import {
   PRIORITY_ATTRIBUTES,
   PROJECT_ATTRIBUTES,
 } from './board-filter.constants';
-import {
-  INITIALISE_SETTINGS_FROM_QUERYSTRING,
-  InitialiseFromQueryStringAction
-} from '../initialise-from-querystring.action';
+import {INITIALISE_SETTINGS_FROM_QUERYSTRING, InitialiseFromQueryStringAction} from '../initialise-from-querystring.action';
 import {AppState} from '../../../../app-store';
 import {UserSettingState} from '../user-setting';
 

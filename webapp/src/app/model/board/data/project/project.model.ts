@@ -1,7 +1,6 @@
 import {List, Map, OrderedMap} from 'immutable';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {HeaderState} from '../header/header.state';
-import {CustomFieldState} from '../custom-field/custom-field.model';
 import {ColourTable} from '../../../../common/colour-table';
 
 export interface ProjectState {

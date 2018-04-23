@@ -1,13 +1,4 @@
-import {
-  ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit,
-  Output, SimpleChange, SimpleChanges
-} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material';
-import {ParallelTask, ParallelTaskOption} from '../../../model/board/data/project/project.model';
-import {ParallelTaskSelectorComponent} from './parallel-task-selector.component';
-import {BoardIssueView} from '../../../view-model/board/board-issue-view';
-import {BOARD_HEADERS_HEIGHT, TOOLBAR_HEIGHT} from '../../../common/view-constants';
-import {UpdateParallelTaskEvent} from '../../../events/update-parallel-task.event';
+import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
 import {LinkedIssue} from '../../../model/board/data/issue/linked-issue';
 import {UrlService} from '../../../services/url.service';
 

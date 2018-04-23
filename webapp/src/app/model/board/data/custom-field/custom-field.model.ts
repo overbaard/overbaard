@@ -1,6 +1,5 @@
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {OrderedMap} from 'immutable';
-import {FixVersionState} from '../fix-version/fix-version.model';
 
 
 export interface CustomFieldState {

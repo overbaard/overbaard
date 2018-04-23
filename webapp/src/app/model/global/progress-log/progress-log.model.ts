@@ -1,4 +1,3 @@
-
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {ProgressLogState} from './progress-log';
 import {LogEntry} from './log-entry';

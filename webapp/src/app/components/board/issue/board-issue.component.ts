@@ -1,14 +1,14 @@
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
-  Component, ElementRef,
+  Component,
   EventEmitter,
   Input,
   OnChanges,
   OnInit,
   Output,
   SimpleChange,
-  SimpleChanges, ViewChild
+  SimpleChanges
 } from '@angular/core';
 import {BoardIssueView} from '../../../view-model/board/board-issue-view';
 import {Assignee, NO_ASSIGNEE} from '../../../model/board/data/assignee/assignee.model';

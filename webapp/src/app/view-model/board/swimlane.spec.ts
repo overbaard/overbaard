@@ -1,7 +1,4 @@
-import {
-  BoardStateInitializer, BoardViewObservableUtil, HeaderStateFactory,
-  IssuesFactory
-} from './board-view.common.spec';
+import {BoardStateInitializer, BoardViewObservableUtil, HeaderStateFactory, IssuesFactory} from './board-view.common.spec';
 import {Dictionary} from '../../common/dictionary';
 import {DeserializeIssueLookupParams} from '../../model/board/data/issue/issue.model';
 import {HeaderState} from '../../model/board/data/header/header.state';

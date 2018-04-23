@@ -4,11 +4,9 @@ import {Priority} from '../priority/priority.model';
 import {IssueType} from '../issue-type/issue-type.model';
 import {fromJS, List, Map, OrderedMap, OrderedSet} from 'immutable';
 import {CustomField} from '../custom-field/custom-field.model';
-import {BoardProject, LinkedProject, ParallelTask, ParallelTaskOption} from '../project/project.model';
+import {BoardProject, LinkedProject, ParallelTask} from '../project/project.model';
 import {cloneObject} from '../../../../common/object-util';
 import {BoardIssue} from './board-issue';
-import {Issue} from './issue';
-import {BlacklistState, BlacklistStateRecord} from '../blacklist/blacklist.model';
 import {LinkedIssue} from './linked-issue';
 import {ColourTable} from '../../../../common/colour-table';
 

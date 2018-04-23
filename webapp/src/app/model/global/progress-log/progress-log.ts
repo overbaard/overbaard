@@ -1,4 +1,4 @@
-import {List, OrderedMap} from 'immutable';
+import {List} from 'immutable';
 import {LogEntry} from './log-entry';
 
 export interface ProgressLogState {

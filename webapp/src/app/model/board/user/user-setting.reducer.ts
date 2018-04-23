@@ -4,10 +4,7 @@ import {List, Map} from 'immutable';
 import {initialUserSettingState, UserSettingUtil} from './user-setting.model';
 import {boardFilterMetaReducer} from './board-filter/board-filter.reducer';
 import {BoardHeader} from '../../../view-model/board/board-header';
-import {
-  INITIALISE_SETTINGS_FROM_QUERYSTRING,
-  InitialiseFromQueryStringAction
-} from './initialise-from-querystring.action';
+import {INITIALISE_SETTINGS_FROM_QUERYSTRING, InitialiseFromQueryStringAction} from './initialise-from-querystring.action';
 import {UserSettingState} from './user-setting';
 import {AppState} from '../../../app-store';
 import {BoardViewMode} from './board-view-mode';

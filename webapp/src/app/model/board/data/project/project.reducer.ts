@@ -1,12 +1,5 @@
 import {Action, createSelector} from '@ngrx/store';
-import {
-  BoardProject,
-  initialProjectState,
-  LinkedProject,
-  ParallelTask,
-  ProjectState,
-  ProjectUtil
-} from './project.model';
+import {BoardProject, initialProjectState, LinkedProject, ParallelTask, ProjectState, ProjectUtil} from './project.model';
 import {List, Map, OrderedMap} from 'immutable';
 import {AppState} from '../../../../app-store';
 import {cloneObject} from '../../../../common/object-util';

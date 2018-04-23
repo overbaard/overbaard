@@ -11,7 +11,9 @@ import {
   MatMenuModule,
   MatProgressSpinnerModule,
   MatSelectModule,
-  MatSidenavModule, MatSliderModule, MatSnackBarModule,
+  MatSidenavModule,
+  MatSliderModule,
+  MatSnackBarModule,
   MatToolbarModule,
   MatTooltipModule
 } from '@angular/material';

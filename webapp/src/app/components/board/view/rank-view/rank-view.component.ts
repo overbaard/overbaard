@@ -1,13 +1,16 @@
 import {
-  AfterViewInit,
-  ChangeDetectionStrategy, ChangeDetectorRef,
-  Component, ElementRef,
-  EventEmitter, NgZone,
-  OnChanges, OnDestroy,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  NgZone,
+  OnChanges,
+  OnDestroy,
   OnInit,
-  Output, Renderer2,
+  Output,
+  Renderer2,
   SimpleChange,
-  SimpleChanges, ViewChild
+  SimpleChanges
 } from '@angular/core';
 import {FixedHeaderView} from '../fixed-header-view';
 import {BoardViewMode} from '../../../../model/board/user/board-view-mode';

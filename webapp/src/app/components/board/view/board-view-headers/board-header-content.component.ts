@@ -1,5 +1,12 @@
 import {
-  ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange,
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChange,
   SimpleChanges
 } from '@angular/core';
 import {BoardHeader} from '../../../../view-model/board/board-header';

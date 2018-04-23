@@ -1,9 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Store} from '@ngrx/store';
 import {AppState} from '../../app-store';
-import {
-  BoardViewModelUtil, initialBoardViewModel, initialIssueTable
-} from './board-view.model';
+import {BoardViewModelUtil, initialBoardViewModel, initialIssueTable} from './board-view.model';
 import {Observable} from 'rxjs/Observable';
 import {BoardState} from '../../model/board/data/board';
 import {initialUserSettingState} from '../../model/board/user/user-setting.model';
@@ -12,8 +10,13 @@ import {List, Map, OrderedMap, OrderedSet, Set} from 'immutable';
 import {HeaderState} from '../../model/board/data/header/header.state';
 import {BoardIssueView} from './board-issue-view';
 import {
-  ASSIGNEE_ATTRIBUTES, COMPONENT_ATTRIBUTES, FIX_VERSION_ATTRIBUTES,
-  ISSUE_TYPE_ATTRIBUTES, LABEL_ATTRIBUTES, NONE_FILTER_KEY, PRIORITY_ATTRIBUTES,
+  ASSIGNEE_ATTRIBUTES,
+  COMPONENT_ATTRIBUTES,
+  FIX_VERSION_ATTRIBUTES,
+  ISSUE_TYPE_ATTRIBUTES,
+  LABEL_ATTRIBUTES,
+  NONE_FILTER_KEY,
+  PRIORITY_ATTRIBUTES,
   PROJECT_ATTRIBUTES
 } from '../../model/board/user/board-filter/board-filter.constants';
 import {CustomField} from '../../model/board/data/custom-field/custom-field.model';

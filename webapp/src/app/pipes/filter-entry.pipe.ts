@@ -1,4 +1,4 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import {Pipe, PipeTransform} from '@angular/core';
 import {FilterFormEntry} from '../common/filter-form-entry';
 
 @Pipe({name: 'formEntryFilter'})

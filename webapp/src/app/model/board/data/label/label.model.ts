@@ -1,6 +1,5 @@
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {List} from 'immutable';
-import {PriorityState} from '../priority/priority.model';
 
 
 export interface LabelState {

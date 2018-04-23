@@ -1,6 +1,5 @@
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {OrderedMap} from 'immutable';
-import {IssueTypeState} from '../issue-type/issue-type.model';
 
 
 export interface PriorityState {

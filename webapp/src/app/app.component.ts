@@ -1,4 +1,4 @@
-import {AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {AppState} from './app-store';
 import {Store} from '@ngrx/store';
 import {Observable} from 'rxjs/Observable';
@@ -9,7 +9,7 @@ import {
   progressLogCurrentMessageSelector,
   progressLogLoadingSelector
 } from './model/global/progress-log/progress-log.reducer';
-import {MatSnackBar, MatSnackBarConfig, MatSnackBarRef, MatToolbar, SimpleSnackBar} from '@angular/material';
+import {MatSnackBar, MatSnackBarConfig, MatSnackBarRef, SimpleSnackBar} from '@angular/material';
 import {TOOLBAR_HEIGHT} from './common/view-constants';
 import {VersionService} from './services/version.service';
 import {UrlService} from './services/url.service';

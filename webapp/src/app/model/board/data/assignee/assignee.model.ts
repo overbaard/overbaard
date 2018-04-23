@@ -1,6 +1,5 @@
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {OrderedMap} from 'immutable';
-import {BoardState} from '../board';
 
 export interface AssigneeState {
   assignees: OrderedMap<string, Assignee>;

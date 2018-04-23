@@ -3,7 +3,6 @@ import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {Map} from 'immutable';
 import {UserSettingState} from './user-setting';
 import {BoardViewMode} from './board-view-mode';
-import {IssueSummaryLevel} from './issue-summary-level';
 import {initialIssueDetailState} from './issue-detail/issue-detail.model';
 
 const DEFAULT_STATE: UserSettingState = {

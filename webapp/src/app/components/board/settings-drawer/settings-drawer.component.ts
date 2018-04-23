@@ -1,13 +1,10 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {AppState} from '../../../app-store';
 import {Store} from '@ngrx/store';
 import {Dictionary} from '../../../common/dictionary';
 import {AbstractControl, FormControl, FormGroup} from '@angular/forms';
 import {Observable} from 'rxjs/Observable';
-import {
-  boardProjectsSelector, linkedProjectsSelector,
-  parallelTasksSelector
-} from '../../../model/board/data/project/project.reducer';
+import {boardProjectsSelector, linkedProjectsSelector, parallelTasksSelector} from '../../../model/board/data/project/project.reducer';
 import {BoardFilterState} from '../../../model/board/user/board-filter/board-filter.model';
 import {List, OrderedMap, Set} from 'immutable';
 import {issuesTypesSelector} from '../../../model/board/data/issue-type/issue-type.reducer';
@@ -19,13 +16,13 @@ import {fixVersionsSelector} from '../../../model/board/data/fix-version/fix-ver
 import {
   ASSIGNEE_ATTRIBUTES,
   COMPONENT_ATTRIBUTES,
+  CURRENT_USER_FILTER_KEY,
   FilterAttributes,
   FilterAttributesUtil,
   FIX_VERSION_ATTRIBUTES,
   ISSUE_TYPE_ATTRIBUTES,
   LABEL_ATTRIBUTES,
   NONE_FILTER_KEY,
-  CURRENT_USER_FILTER_KEY,
   PARALLEL_TASK_ATTRIBUTES,
   PRIORITY_ATTRIBUTES,
   PROJECT_ATTRIBUTES

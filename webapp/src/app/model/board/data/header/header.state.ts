@@ -1,5 +1,4 @@
-import {List, Map, OrderedMap} from 'immutable';
-import {_Header} from './header';
+import {List, Map} from 'immutable';
 
 export interface HeaderState {
   states: List<string>;
