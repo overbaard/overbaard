@@ -8,6 +8,7 @@ import 'rxjs/add/observable/fromEvent';
 })
 export class ScrollListenerDirective implements OnInit, OnDestroy, AfterViewInit {
 
+  private static readonly supportsPassive: boolean = ScrollListenerDirective.initSupportsPassive();
   /**
    * Values emitted on this observer are OUTSIDE the angular zone.
    * If null the left value is not emitted.
@@ -22,8 +23,21 @@ export class ScrollListenerDirective implements OnInit, OnDestroy, AfterViewInit
   @Input()
   scrollTopObserver: Subject<number>;
 
-  private _disposeScrollHandler: () => void | undefined;
+  private _scrollOpts: any = ScrollListenerDirective.supportsPassive ? { passive: true } : false;
 
+  private static initSupportsPassive(): boolean {
+    let supportsPassive = false;
+    try {
+      const opts = Object.defineProperty({}, 'passive', {
+        get: function() {
+          supportsPassive = true;
+        }
+      });
+      window.addEventListener('testPassive', null, opts);
+      window.removeEventListener('testPassive', null, opts);
+    } catch (e) {}
+    return supportsPassive;
+  }
 
   private refreshHandler = () => {
     this.refresh();
@@ -39,26 +53,22 @@ export class ScrollListenerDirective implements OnInit, OnDestroy, AfterViewInit
   }
 
   ngOnDestroy(): void {
-    this.removeParentEventHandlers();
+    this.removeParentEventHandlers(this._ref.nativeElement);
   }
 
   ngAfterViewInit(): void {
     this.refresh();
   }
 
-  private addParentEventHandlers(parentScroll: Element) {
-    this.removeParentEventHandlers();
+  private addParentEventHandlers(parentScroll: HTMLElement) {
+    this.removeParentEventHandlers(parentScroll);
     this._zone.runOutsideAngular(() => {
-      this._disposeScrollHandler =
-        this._renderer.listen(parentScroll, 'scroll', this.refreshHandler);
+      parentScroll.addEventListener('scroll', this.refreshHandler, this._scrollOpts);
     });
   }
 
-  private removeParentEventHandlers() {
-    if (this._disposeScrollHandler) {
-      this._disposeScrollHandler();
-      this._disposeScrollHandler = undefined;
-    }
+  private removeParentEventHandlers(parentScroll: HTMLElement) {
+    parentScroll.removeEventListener('scroll', this.refreshHandler, this._scrollOpts);
   }
 
   private refresh() {
@@ -95,4 +105,5 @@ export class ScrollListenerDirective implements OnInit, OnDestroy, AfterViewInit
       });
     }
   }
+
 }
