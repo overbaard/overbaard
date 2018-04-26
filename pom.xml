@@ -388,12 +388,14 @@
         <profile>
             <!--
                 Since building the ui is slightly time-consuming, and not all changes necessarily affect the ui, turn on
-                building the ui explicitly by running 'atlas-package -Dob.ui'
+		building the ui explicitly by running 'atlas-package -Dob.ui.dev'.
+
+                This is faster than the production build as it does not perform all optimisations at build time.
             -->
             <id>Build the UI</id>
             <activation>
                 <property>
-                    <name>ob.ui</name>
+                    <name>ob.ui.dev</name>
                 </property>
             </activation>
             <build>
@@ -424,12 +426,12 @@
                 !!!! USE THIS FOR PRODUCTION BUILDS - IT RESULTS IN A MUCH SMALLER SIZE!!!!
 
                 Since building the ui this way is very time-consuming, and not all changes necessarily affect the ui, turn on
-                building the ui explicitly by running 'atlas-package -Dob.ui.aot'
+                building the ui explicitly by running 'atlas-package -Dob.ui'
             -->
             <id>Build the UI with AOT</id>
             <activation>
                 <property>
-                    <name>ob.ui.aot</name>
+                    <name>ob.ui</name>
                 </property>
             </activation>
             <build>
