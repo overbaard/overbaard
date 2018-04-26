@@ -9,14 +9,14 @@
 <div id="board-body"
      [style.height.px]="boardBodyHeight"
      appScrollListener
-     [scrollTopObserver]="scrollTopObserver$">
+     [scrollTopObserver]="scrollTopObserver$"
+     [scrollLeftObserver]="scrollLeftObserver$"
+  >
   <app-kanban-normal-view
     *ngIf="!board.issueTable.swimlaneInfo"
     [board]="board"
     (updateParallelTask)="onUpdateParallelTask($event)"
     [scrollPositionObserver$]="scrollPositionObserver$"
-    appScrollListener
-    [scrollLeftObserver]="scrollLeftObserver$"
   ></app-kanban-normal-view>
   <app-kanban-swimlane-view
     *ngIf="board.issueTable.swimlaneInfo"
@@ -27,7 +27,5 @@
     (toggleCollapsedSwimlane)="onToggleCollapsedSwimlane($event)"
     (updateParallelTask)="onUpdateParallelTask($event)"
     [scrollPositionObserver$]="scrollPositionObserver$"
-    appScrollListener
-    [scrollLeftObserver]="scrollLeftObserver$"
   ></app-kanban-swimlane-view>
 </div>
