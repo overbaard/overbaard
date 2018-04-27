@@ -12,7 +12,7 @@
           </mat-select>
         </mat-form-field>
       </div>
-      <div [formGroup]="swimlaneForm" #f="ngForm">
+      <div [formGroup]="swimlaneForm" #f="ngForm" *ngIf="userSettings.viewMode === enumViewMode.KANBAN">
         <mat-form-field>
           <mat-select formControlName="swimlane" placeholder="Swimlane">
             <!-- Don't set a value for the undefined one -->
