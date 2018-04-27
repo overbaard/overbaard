@@ -163,7 +163,7 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
   }
 
   private createGroupFromObservable<T>(observable: Observable<T>,
-                                       filter: FilterAttributes,
+                                       filterAttributes: FilterAttributes,
                                        mapper: (t: T) => FilterFormEntry[],
                                        setFilterGetter: () => Set<string>) {
     observable
@@ -173,7 +173,7 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
       )
       .subscribe(
         filterFormEntries => {
-          this.createGroup(filterFormEntries, filter, setFilterGetter);
+          this.createGroup(filterFormEntries, filterAttributes, setFilterGetter);
         }
       );
   }
@@ -245,11 +245,11 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
       );
   }
 
-  private createGroup(filterFormEntries: FilterFormEntry[], filter: FilterAttributes, setFilterGetter: () => Set<string>) {
-    if (filter.hasNone) {
+  private createGroup(filterFormEntries: FilterFormEntry[], filterAttributes: FilterAttributes, setFilterGetter: () => Set<string>) {
+    if (filterAttributes.hasNone) {
       filterFormEntries.unshift(FilterFormEntry(this.none, 'None'));
     }
-    if (filter === ASSIGNEE_ATTRIBUTES) {
+    if (filterAttributes === ASSIGNEE_ATTRIBUTES) {
       filterFormEntries.unshift(FilterFormEntry(this.currentUser, 'Current User'));
     }
     let set: Set<string> = setFilterGetter();
@@ -264,36 +264,36 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
       group.addControl(entry.key, control);
     });
 
-    this.filterEntries[filter.key] = filterFormEntries;
-    this.filterEntryDictionary[filter.key] = filterFormEntryDictionary;
-    this.filterForm.addControl(filter.key, group);
+    this.filterEntries[filterAttributes.key] = filterFormEntries;
+    this.filterEntryDictionary[filterAttributes.key] = filterFormEntryDictionary;
+    this.filterForm.addControl(filterAttributes.key, group);
   }
 
-  onOpenFilterPane(filter: FilterAttributes) {
-    this.filtersToDisplay = filter;
-    this.currentFilterEntries = this.filterEntries[filter.key];
+  onOpenFilterPane(filterAttributes: FilterAttributes) {
+    this.filtersToDisplay = filterAttributes;
+    this.currentFilterEntries = this.filterEntries[filterAttributes.key];
     this.filterSearch = null;
   }
 
-  onCloseFilterPanel(filter: FilterAttributes) {
-    if (this.filtersToDisplay === filter) {
+  onCloseFilterPanel(filterAttributes: FilterAttributes) {
+    if (this.filtersToDisplay === filterAttributes) {
       this.filtersToDisplay = null;
     }
   }
 
 
-  onClearFilter(event: MouseEvent, filter: FilterAttributes) {
+  onClearFilter(event: MouseEvent, filterAttributes: FilterAttributes) {
     event.preventDefault();
     event.stopPropagation();
     // This gets cleared by processFormValueChanges
-    this.bulkUpdateFilter = filter;
-    const set: Set<string> = this.getNonParallelTaskSet(filter);
-    const group: FormGroup = <FormGroup>this.filterForm.controls[filter.key];
+    this.bulkUpdateFilter = filterAttributes;
+    const set: Set<string> = this.getNonParallelTaskSet(filterAttributes);
+    const group: FormGroup = <FormGroup>this.filterForm.controls[filterAttributes.key];
     if (set) {
       set.forEach(k => group.controls[k].setValue(false));
     }
 
-    if (filter === PARALLEL_TASK_ATTRIBUTES) {
+    if (filterAttributes === PARALLEL_TASK_ATTRIBUTES) {
       this.userSettings.filters.parallelTask.forEach((ptSet, key) => {
         const taskGroup: FormGroup = <FormGroup>group.controls[key];
         ptSet.forEach(k => taskGroup.controls[k].setValue(false));
@@ -301,10 +301,10 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
     }
   }
 
-  onInvertFilter(filter: FilterAttributes) {
-    this.bulkUpdateFilter = filter;
-    const group: FormGroup = <FormGroup>this.filterForm.controls[filter.key];
-    if (filter !== PARALLEL_TASK_ATTRIBUTES) {
+  onInvertFilter(filterAttributes: FilterAttributes) {
+    this.bulkUpdateFilter = filterAttributes;
+    const group: FormGroup = <FormGroup>this.filterForm.controls[filterAttributes.key];
+    if (filterAttributes !== PARALLEL_TASK_ATTRIBUTES) {
       this.invertSelection(group);
     } else {
       this.userSettings.filters.parallelTask.forEach((ptSet, key) => {
@@ -322,10 +322,10 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
     }
   }
 
-  onSelectAllFilter(filter: FilterAttributes) {
-    this.bulkUpdateFilter = filter;
-    const group: FormGroup = <FormGroup>this.filterForm.controls[filter.key];
-    if (filter !== PARALLEL_TASK_ATTRIBUTES) {
+  onSelectAllFilter(filterAttributes: FilterAttributes) {
+    this.bulkUpdateFilter = filterAttributes;
+    const group: FormGroup = <FormGroup>this.filterForm.controls[filterAttributes.key];
+    if (filterAttributes !== PARALLEL_TASK_ATTRIBUTES) {
       this.selectAll(group);
     } else {
       this.userSettings.filters.parallelTask.forEach((ptSet, key) => {
@@ -343,11 +343,11 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
 
   processFormValueChanges(value: any) {
     // bulkUpdateFilter is set by the onXXXFilter()
-    const filter: FilterAttributes = this.bulkUpdateFilter ? this.bulkUpdateFilter : this.filtersToDisplay;
-    const obj: Object = value[filter.key];
-    this._store.dispatch(BoardFilterActions.createUpdateFilter(filter, obj));
+    const filterAttributes: FilterAttributes = this.bulkUpdateFilter ? this.bulkUpdateFilter : this.filtersToDisplay;
+    const obj: Object = value[filterAttributes.key];
+    this._store.dispatch(BoardFilterActions.createUpdateFilter(filterAttributes, obj));
     this.filterForm.reset(value);
-    this.filterTooltips[filter.key] = null;
+    this.filterTooltips[filterAttributes.key] = null;
     this.bulkUpdateFilter = null;
   }
 
