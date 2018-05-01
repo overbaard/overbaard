@@ -157,6 +157,7 @@
                 <ng-template #parallelTasksForm>
                   <div formGroupName="{{entry.key}}">
                     <div class="mat-h4">{{entry.display}}</div>
+                    <!-- WebStorm incorrectly picks this out as an error -->
                     <div *ngFor="let childEntry of entry.children">
                       <mat-checkbox formControlName="{{childEntry.key}}">{{childEntry.display}}</mat-checkbox>
                     </div>
