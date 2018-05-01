@@ -1,0 +1,38 @@
+language: node_js
+node_js:
+  - "9"
+dist: trusty
+sudo: required
+
+addons:
+  chrome: stable
+
+
+env:
+  global:
+    - TEST_DIR=webapp
+    - export ROOT_DIR=$PWD
+    - export FULL_TEST_DIR=$ROOT_DIR/$TEST_DIR
+
+install:
+  - echo In Install
+  - cd $FULL_TEST_DIR
+  - npm install -g @angular/cli
+  - npm install
+
+before_script:
+  - echo In Before Script
+  # - cd $TEST_DIR
+  # - export PATH=$PATH:$PWD/node_modules/@angular/cli/bin
+
+cache:
+  directories:
+    - $TEST_DIR/node_modules
+
+script:
+  - echo In Script
+  - cd $FULL_TEST_DIR
+  - ng lint
+  - npm run test:travis-headless
+  - echo "Tests done!!!!"
+  - ng build --prod --aot
