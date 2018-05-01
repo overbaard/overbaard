@@ -124,7 +124,7 @@ export function issueMetaReducer(state: IssueState = initialIssueState, action: 
     default:
       return state;
   }
-};
+}
 
 
 interface ChangeIssuesPayload {

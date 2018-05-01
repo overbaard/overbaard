@@ -72,7 +72,7 @@ export function headerMetaReducer(state: HeaderState = initialHeaderState, actio
       const payload: any = (<LoadHelpTextsAction>action).payload;
       return HeaderUtil.withMutations(state, (mutable => {
         mutable.helpTexts = Map<string, string>(payload);
-      }))
+      }));
     }
   }
   return state;

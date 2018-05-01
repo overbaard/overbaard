@@ -71,7 +71,7 @@ export class FontMeasureTableComponent implements OnInit, AfterViewInit {
     console.log(Object.keys(groups).length);
 
     const lookupTable: Dictionary<string> = this.createLookupTable(groups);
-    console.log(lookupTable)
+    console.log(lookupTable);
     console.log(JSON.stringify(lookupTable));
 
     // Leave this commented out so we can easily reenable

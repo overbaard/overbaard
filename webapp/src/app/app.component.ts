@@ -29,7 +29,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   readonly toolbarHeight: number = TOOLBAR_HEIGHT;
 
   loading$: Observable<boolean>;
-  version$: Observable<string>
+  version$: Observable<string>;
 
   private destroy$: Subject<void> = new Subject<void>();
 

@@ -40,5 +40,5 @@ export class PriorityUtil {
       mutate(mutable);
     });
   }
-};
+}
 

@@ -45,7 +45,7 @@ export function priorityMetaReducer(state: PriorityState = initialPriorityState,
     default:
       return state;
   }
-};
+}
 
 const getPrioritiesState = (state: AppState) => state.board.priorities;
 const getPriorities = (state: PriorityState) => state.priorities;

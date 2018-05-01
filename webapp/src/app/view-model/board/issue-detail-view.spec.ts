@@ -201,5 +201,5 @@ function checkIssues(original: IssueTable, current: IssueTable) {
         }
       }
     });
-  })
+  });
 }

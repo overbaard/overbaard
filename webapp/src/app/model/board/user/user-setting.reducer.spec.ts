@@ -22,7 +22,7 @@ describe('User setting reducer tests', () => {
         UserSettingActions.createInitialiseFromQueryString(qs));
       const settingChecker: SettingChecker = new SettingChecker();
       settingChecker.boardCode = 'TEST';
-      settingChecker.check(state)
+      settingChecker.check(state);
     });
     it ('Swimlane and project filter', () => {
       // Just test a few filter fields, the board filter reducer tests test this properly
@@ -42,7 +42,7 @@ describe('User setting reducer tests', () => {
       settingChecker.filterChecker.project = ['P1'];
       settingChecker.swimlane = 'assignee';
       settingChecker.issueSummaryLevel = IssueSummaryLevel.HEADER_ONLY;
-      settingChecker.check(state)
+      settingChecker.check(state);
     });
     it ('With Querystring, bl=false and visible columns', () => {
       // Just test a few filter fields, the board filter reducer tests test this properly
@@ -73,7 +73,7 @@ describe('User setting reducer tests', () => {
       settingChecker.issueSummaryLevel = IssueSummaryLevel.SHORT_SUMMARY_NO_AVATAR;
       settingChecker.parallelTasks = false;
       settingChecker.linkedIssues = false;
-      settingChecker.check(state)
+      settingChecker.check(state);
     });
     it ('With Querystring, bl=true and hidden columns', () => {
       // Just test a few filter fields, the board filter reducer tests test this properly
@@ -95,17 +95,17 @@ describe('User setting reducer tests', () => {
       settingChecker.showBacklog = true;
       settingChecker.swimlane = 'project';
       settingChecker.filterChecker.project = ['P1'];
-      settingChecker.visibleColumns = {2: false, 6: false, 8: false}
+      settingChecker.visibleColumns = {2: false, 6: false, 8: false};
       settingChecker.collapsedSwimlanes = {d: true, e: true, f: true};
       settingChecker.defaultSwimlaneCollapsed = false;
       settingChecker.issueSummaryLevel = IssueSummaryLevel.SHORT_SUMMARY;
 
-      settingChecker.check(state)
+      settingChecker.check(state);
     });
   });
 
   describe('Update tests', () => {
-    let state: UserSettingState
+    let state: UserSettingState;
     beforeEach(() => {
       const qs: Dictionary<string> = {
         board: 'TEST'
@@ -153,7 +153,7 @@ describe('User setting reducer tests', () => {
       state = userSettingReducer(state, UserSettingActions.createUpdateShowLinkedIssues(true));
       checker.linkedIssues = true;
       checker.check(state);
-    })
+    });
     it ('Update swimlane', () => {
       state = userSettingReducer(state, UserSettingActions.createUpdateSwimlane('project'));
       const checker: SettingChecker = new SettingChecker();
@@ -622,7 +622,7 @@ describe('User setting reducer tests', () => {
           helpText: null
         };
       }
-    })
+    });
   });
 });
 
@@ -655,7 +655,7 @@ class SettingChecker {
   check(state: UserSettingState) {
     expect(state.boardCode).toEqual(this.boardCode);
     expect(state.showBacklog).toEqual(this.showBacklog);
-    expect(state.forceBacklog).toEqual(this.forceBacklog)
+    expect(state.forceBacklog).toEqual(this.forceBacklog);
     if (!this.swimlane) {
       expect(state.swimlane).toBeFalsy();
     } else {

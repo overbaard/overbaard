@@ -430,7 +430,7 @@ describe('Board headers tests', () => {
             });
         });
       });
-    })
+    });
   });
 
   describe('Abbreviations', () => {
@@ -1568,7 +1568,7 @@ describe('Board headers tests', () => {
             new HeaderChecker('S6').stateIndices(7).counts(1, 1));
           original = headers;
         });
-    })
+    });
 
     it ('Empty help texts', () => {
       util.getBoardStateUpdater().setHelpTexts({}).emit()
@@ -1802,7 +1802,7 @@ class HeaderChecker {
     expect(header.stateIndices.toArray()).toEqual(this._stateIndices, header.name);
     expect(header.visible).toBe(this._visible, header.name);
     expect(header.totalIssues).toBe(this._totalIssues, header.name);
-    expect(header.visibleIssues).toBe(this._visibleIssues, header.name)
+    expect(header.visibleIssues).toBe(this._visibleIssues, header.name);
     if (!this._states) {
       expect(header.category).toBe(false, header.name);
       expect(header.states).toBeFalsy(header.name);

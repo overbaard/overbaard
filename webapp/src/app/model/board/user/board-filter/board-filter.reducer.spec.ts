@@ -67,7 +67,7 @@ describe('BoardFilter reducer tests', () => {
   });
 
   describe('Update tests', () => {
-    let state: BoardFilterState
+    let state: BoardFilterState;
     beforeEach(() => {
       const qs: Dictionary<string> = {
         project: 'P1',

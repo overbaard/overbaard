@@ -65,7 +65,7 @@ export function labelMetaReducer(state: LabelState = initialLabelState, action: 
     default:
       return state;
   }
-};
+}
 
 
 const getLabelsState = (state: AppState) => state.board.labels;

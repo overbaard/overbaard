@@ -11,7 +11,7 @@ const DEFAULT_ISSUE_DETAIL_STATE: IssueDetailState = {
   issueSummaryLevel: IssueSummaryLevel.FULL,
   parallelTasks: true,
   linkedIssues: true
-}
+};
 
 interface IssueDetailStateRecord extends TypedRecord<IssueDetailStateRecord>, IssueDetailState {
 }

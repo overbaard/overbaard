@@ -46,7 +46,7 @@ export function issueTypeMetaReducer(state: IssueTypeState = initialIssueTypeSta
     default:
       return state;
   }
-};
+}
 
 const getIssueTypesState = (state: AppState) => state.board.issueTypes;
 const getTypes = (state: IssueTypeState) => state.types;

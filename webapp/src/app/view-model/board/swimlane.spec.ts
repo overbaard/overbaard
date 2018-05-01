@@ -2184,7 +2184,7 @@ class BoardChecker {
 
     const invisibleIssueSet: Set<string> = Set<string>(this._expectedInvisible);
     const expectedVisible: string[][] = this._expectedTable.map(
-      col => col.filter(k => !invisibleIssueSet.contains(k)))
+      col => col.filter(k => !invisibleIssueSet.contains(k)));
 
 
     const actualTable: string[][] = [];
@@ -2387,7 +2387,7 @@ class SwimlaneIssueFactory implements IssuesFactory {
 
       const data: any = this._issues[key];
       for (const override of Object.keys(data)) {
-        isssue[override] = data[override]
+        isssue[override] = data[override];
       }
 
       input[key] = isssue;

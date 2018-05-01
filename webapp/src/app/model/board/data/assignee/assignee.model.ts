@@ -84,6 +84,6 @@ export class AssigneeUtil {
     }
     return ret.toUpperCase();
   }
-};
+}
 
 

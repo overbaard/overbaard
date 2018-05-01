@@ -121,7 +121,7 @@ describe('Board reducer tests', () => {
       expect(boardState.viewId).toBe(10);
       expect(boardState.currentUser).toBe('bob');
       expect(boardState.rankCustomFieldId).toBe(12345);
-      expect(boardState.jiraUrl).toBe('http://jira.example.com/')
+      expect(boardState.jiraUrl).toBe('http://jira.example.com/');
 
       // Do some sanity checking of the contents. The individual reducer tests do in-depth checking
 

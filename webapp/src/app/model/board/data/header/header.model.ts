@@ -9,7 +9,7 @@ const DEFAULT_STATE: HeaderState = {
   categories: List<string>(),
   stateToCategoryMappings: List<number>(),
   backlog: 0
-}
+};
 
 interface HeaderStateRecord extends TypedRecord<HeaderStateRecord>, HeaderState {
 }

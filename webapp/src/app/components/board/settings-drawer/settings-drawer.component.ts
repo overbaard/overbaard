@@ -155,7 +155,7 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
         linkedProjects => {
           this.hasLinkedIssues = linkedProjects && linkedProjects.size > 0;
         }
-      )
+      );
   }
 
   ngOnDestroy() {
@@ -219,7 +219,7 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
             tasksForProject.forEach((parallelTask: ParallelTask) => {
               if (done[parallelTask.name]) {
                 return;
-              };
+              }
               done[parallelTask.name] = true;
 
               const options: FilterFormEntry[] = new Array<FilterFormEntry>(parallelTask.options.size);

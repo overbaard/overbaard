@@ -122,4 +122,4 @@ describe('Issue Size Calculator Tests', () => {
       return LineFitter.create(words, wordWidths, maxLines, character => 1, line =>  lineWidth);
     }
   });
-})
+});

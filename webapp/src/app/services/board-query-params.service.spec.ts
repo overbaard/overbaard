@@ -28,7 +28,7 @@ describe('Boards Query Parameters Service Tests', () => {
     // Do the initial load of the settings that happens in the board component and which gets ignored
     const params: Dictionary<string> = {
       board: 'TST&=1'
-    }
+    };
     userSettingState = userSettingReducer(initialUserSettingState, UserSettingActions.createInitialiseFromQueryString(params));
     userSettingSubject.next(userSettingState);
     urlObservable = handler.getBoardViewModel(boardSubject, userSettingSubject);
@@ -53,7 +53,7 @@ describe('Boards Query Parameters Service Tests', () => {
         )
         .subscribe(s => {
           expect(s).toBe('board=TST%26%3D1&bl=true');
-      })
+      });
     });
 
     it ('Board State only is ignored', () => {
@@ -67,7 +67,7 @@ describe('Boards Query Parameters Service Tests', () => {
         )
         .subscribe(s => {
           expect(s).toBe(null);
-      })
+      });
     });
   });
 
@@ -84,7 +84,7 @@ describe('Boards Query Parameters Service Tests', () => {
         .subscribe(s => {
           const parsedState = userSettingStateFromQueryString(s);
           expect(parsedState).toEqual(newSetting);
-      })
+      });
     });
     it ('Minimal (explicit defaults)', () => {
       const newSetting: UserSettingState = UserSettingUtil.updateUserSettingState(userSettingState, mutable => {
@@ -132,7 +132,7 @@ describe('Boards Query Parameters Service Tests', () => {
         mutable.issueDetail = IssueDetailUtil.updateIssueDetailState(mutable.issueDetail, issueDetail => {
           issueDetail.issueSummaryLevel = IssueSummaryLevel.SHORT_SUMMARY_NO_AVATAR;
           issueDetail.parallelTasks = false;
-        })
+        });
         mutable.forceBacklog = true;
         mutable.swimlane = 'project'; // Not really valid when we use rank but still
         mutable.filters = BoardFilterUtil.updateBoardFilterState(initialBoardFilterState, mutable2 => {
@@ -237,14 +237,14 @@ describe('Boards Query Parameters Service Tests', () => {
                 expect(s).toContain('hidden=1,2,7');
                 expect(s).not.toContain('visible');
             });
-          })
+          });
         });
         describe('initialized with hidden columns', () => {
           beforeEach(() => {
             const params: Dictionary<string> = {
               board: 'TST&=1',
               hidden: '1,2,3'
-            }
+            };
             userSettingState = userSettingReducer(initialUserSettingState, UserSettingActions.createInitialiseFromQueryString(params));
             userSettingSubject.next(userSettingState);
             urlObservable
@@ -311,14 +311,14 @@ describe('Boards Query Parameters Service Tests', () => {
                 expect(s).toContain('hidden=1,2,7');
                 expect(s).not.toContain('visible');
             });
-          })
+          });
         });
         describe('initialized with visible columns', () => {
           beforeEach(() => {
             const params: Dictionary<string> = {
               board: 'TST&=1',
               visible: '1,2,3'
-            }
+            };
             userSettingState = userSettingReducer(initialUserSettingState, UserSettingActions.createInitialiseFromQueryString(params));
             userSettingSubject.next(userSettingState);
             urlObservable
@@ -385,7 +385,7 @@ describe('Boards Query Parameters Service Tests', () => {
                 expect(s).toContain('visible=1,2,7');
                 expect(s).not.toContain('hidden');
             });
-          })
+          });
         });
       });
 
@@ -504,7 +504,7 @@ describe('Boards Query Parameters Service Tests', () => {
             expect(s).not.toContain('hidden-sl');
         });
 
-      })
+      });
     });
   });
 

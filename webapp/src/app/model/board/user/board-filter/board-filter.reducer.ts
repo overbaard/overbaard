@@ -50,7 +50,7 @@ export function boardFilterMetaReducer(state: BoardFilterState = initialBoardFil
         fixVersion: qsAction.parseBooleanFilter('fix-version'),
         customField: qsAction.parseCustomFieldFilters(),
         parallelTask: qsAction.parseParallelTaskFilters()
-      }
+      };
       for (const key of Object.keys(filters)) {
         if (filters[key].size > 0) {
           return BoardFilterUtil.fromObject(filters);
@@ -67,31 +67,31 @@ export function boardFilterMetaReducer(state: BoardFilterState = initialBoardFil
         }
         switch (payload.filter) {
           case PROJECT_ATTRIBUTES: {
-            mutable.project = createSelectedFieldsSet(payload.data)
+            mutable.project = createSelectedFieldsSet(payload.data);
             break;
           }
           case ISSUE_TYPE_ATTRIBUTES: {
-            mutable.issueType = createSelectedFieldsSet(payload.data)
+            mutable.issueType = createSelectedFieldsSet(payload.data);
             break;
           }
           case PRIORITY_ATTRIBUTES: {
-            mutable.priority = createSelectedFieldsSet(payload.data)
+            mutable.priority = createSelectedFieldsSet(payload.data);
             break;
           }
           case ASSIGNEE_ATTRIBUTES: {
-            mutable.assignee = createSelectedFieldsSet(payload.data)
+            mutable.assignee = createSelectedFieldsSet(payload.data);
             break;
           }
           case COMPONENT_ATTRIBUTES: {
-            mutable.component = createSelectedFieldsSet(payload.data)
+            mutable.component = createSelectedFieldsSet(payload.data);
             break;
           }
           case LABEL_ATTRIBUTES: {
-            mutable.label = createSelectedFieldsSet(payload.data)
+            mutable.label = createSelectedFieldsSet(payload.data);
             break;
           }
           case FIX_VERSION_ATTRIBUTES: {
-            mutable.fixVersion = createSelectedFieldsSet(payload.data)
+            mutable.fixVersion = createSelectedFieldsSet(payload.data);
             break;
           }
           case PARALLEL_TASK_ATTRIBUTES: {

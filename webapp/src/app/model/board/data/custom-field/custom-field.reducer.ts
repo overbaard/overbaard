@@ -92,7 +92,7 @@ export function customFieldMetaReducer(state: CustomFieldState = initialCustomFi
     default:
       return state;
   }
-};
+}
 
 
 const getCustomFieldsState = (state: AppState) => state.board.customFields;

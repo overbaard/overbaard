@@ -42,6 +42,6 @@ export class IssueTypeUtil {
       mutate(mutable);
     });
   }
-};
+}
 
 

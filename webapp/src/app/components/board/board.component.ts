@@ -68,7 +68,7 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     let userSettings: UserSettingState = null;
-    this._store.dispatch(UserSettingActions.createInitialiseFromQueryString(this._route.snapshot.queryParams))
+    this._store.dispatch(UserSettingActions.createInitialiseFromQueryString(this._route.snapshot.queryParams));
     this._store.select(userSettingSelector)
       .pipe(
         take(1)

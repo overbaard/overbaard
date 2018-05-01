@@ -36,7 +36,7 @@ export class AllFilters {
     this._priority = new SimpleFilter(PRIORITY_ATTRIBUTES, boardFilters.priority);
     this._issueType = new SimpleFilter(ISSUE_TYPE_ATTRIBUTES, boardFilters.issueType);
     this._assignee = new AssigneeFilter(ASSIGNEE_ATTRIBUTES, boardFilters.assignee, currentUser);
-    this._component = new MultiSelectFilter(COMPONENT_ATTRIBUTES, boardFilters.component)
+    this._component = new MultiSelectFilter(COMPONENT_ATTRIBUTES, boardFilters.component);
     this._label = new MultiSelectFilter(LABEL_ATTRIBUTES, boardFilters.label);
     this._fixVersion = new MultiSelectFilter(FIX_VERSION_ATTRIBUTES, boardFilters.fixVersion);
     this._customFieldFilters = Map<string, SimpleFilter>().withMutations(mutable => {

@@ -54,7 +54,7 @@ export function assigneeMetaReducer(state: AssigneeState = initialAssigneeState,
     default:
       return state;
   }
-};
+}
 
 function addAssignees(state: AssigneeState, added: Assignee[], sort: boolean): AssigneeState {
   let assignees = state.assignees;

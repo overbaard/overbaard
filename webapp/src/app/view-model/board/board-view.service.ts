@@ -166,9 +166,9 @@ class BoardViewBuilder {
       issueTable !== this._oldBoardView.issueTable ||
       newIssueDetail !== this._oldBoardView.issueDetail) {
       return BoardViewModelUtil.updateBoardViewModel(this._oldBoardView, model => {
-        model.headers = newHeaders,
-        model.issueTable = issueTable,
-        model.issueDetail = newIssueDetail
+        model.headers = newHeaders;
+        model.issueTable = issueTable;
+        model.issueDetail = newIssueDetail;
       });
     } else {
       return this._oldBoardView;
@@ -288,7 +288,7 @@ class HeadersBuilder {
 
     const updatedStateValues: Map<number, boolean> =
       this._currentUserSettingState.columnVisibilities
-        .filter((v, k) => {return this.calculateVisibility(this._oldUserSettingState, k) !== v}).toMap();
+        .filter((v, k) => this.calculateVisibility(this._oldUserSettingState, k) !== v).toMap();
     const updatedStates: Map<number, BoardHeader> = Map<number, BoardHeader>().asMutable();
     updatedStateValues.forEach((v, k) => {
       const header: BoardHeader = BoardViewModelUtil.updateBoardHeader(statesList.get(k), mutable => {
@@ -809,7 +809,8 @@ class SwimlaneInfoBuilder {
         boardState.projects.boardProjects.forEach(
           p => {
             builderMap.set(p.key,
-              new SwimlaneDataBuilder(p.key, p.key, states, collapsed(userSettingState, p.key), existingInfo))});
+              new SwimlaneDataBuilder(p.key, p.key, states, collapsed(userSettingState, p.key), existingInfo));
+          });
         issueMatcher = ((issue, dataBuilders) => [dataBuilders.get(issue.projectCode)]);
         builderNone = null;
         break;
@@ -817,7 +818,7 @@ class SwimlaneInfoBuilder {
         boardState.issueTypes.types.forEach(
           t => {
             builderMap.set(
-              t.name, new SwimlaneDataBuilder(t.name, t.name, states, collapsed(userSettingState, t.name), existingInfo))
+              t.name, new SwimlaneDataBuilder(t.name, t.name, states, collapsed(userSettingState, t.name), existingInfo));
           });
         issueMatcher = ((issue, dataBuilders) => [dataBuilders.get(issue.type.name)]);
         builderNone = null;
@@ -826,7 +827,7 @@ class SwimlaneInfoBuilder {
         boardState.priorities.priorities.forEach(
           p => {
             builderMap.set(p.name,
-              new SwimlaneDataBuilder(p.name, p.name, states, collapsed(userSettingState, p.name), existingInfo))
+              new SwimlaneDataBuilder(p.name, p.name, states, collapsed(userSettingState, p.name), existingInfo));
           });
         issueMatcher = ((issue, dataBuilders) => [dataBuilders.get(issue.priority.name)]);
         builderNone = null;
@@ -835,7 +836,7 @@ class SwimlaneInfoBuilder {
         boardState.assignees.assignees.forEach(
           a => {
             builderMap.set(a.key,
-              new SwimlaneDataBuilder(a.key, a.name, states, collapsed(userSettingState, a.key), existingInfo))
+              new SwimlaneDataBuilder(a.key, a.name, states, collapsed(userSettingState, a.key), existingInfo));
           });
         issueMatcher = ((issue, dataBuilders) =>
           [dataBuilders.get(issue.assignee === NO_ASSIGNEE ? NONE_FILTER_KEY : issue.assignee.key)]);
@@ -843,7 +844,7 @@ class SwimlaneInfoBuilder {
       case COMPONENT_ATTRIBUTES.key:
         boardState.components.components.forEach(
           c => {
-            builderMap.set(c, new SwimlaneDataBuilder(c, c, states, collapsed(userSettingState, c), existingInfo))
+            builderMap.set(c, new SwimlaneDataBuilder(c, c, states, collapsed(userSettingState, c), existingInfo));
           });
         issueMatcher = ((issue, dataBuilders) => this.multiStringMatcher(issue.components, dataBuilders));
         break;
@@ -851,7 +852,7 @@ class SwimlaneInfoBuilder {
         boardState.labels.labels.forEach(
           l => {
             builderMap.set(l,
-              new SwimlaneDataBuilder(l, l, states, collapsed(userSettingState, l), existingInfo))
+              new SwimlaneDataBuilder(l, l, states, collapsed(userSettingState, l), existingInfo));
           });
         issueMatcher = ((issue, dataBuilders) => this.multiStringMatcher(issue.labels, dataBuilders));
         break;
@@ -859,7 +860,7 @@ class SwimlaneInfoBuilder {
         boardState.fixVersions.versions.forEach(
           f => {
             builderMap.set(f,
-              new SwimlaneDataBuilder(f, f, states, collapsed(userSettingState, f), existingInfo))
+              new SwimlaneDataBuilder(f, f, states, collapsed(userSettingState, f), existingInfo));
           });
         issueMatcher = ((issue, dataBuilders) => this.multiStringMatcher(issue.fixVersions, dataBuilders));
         break;
@@ -869,7 +870,7 @@ class SwimlaneInfoBuilder {
           customFields.forEach(
             f => {
               builderMap.set(f.key,
-                new SwimlaneDataBuilder(f.key, f.value, states, collapsed(userSettingState, f.key), existingInfo))
+                new SwimlaneDataBuilder(f.key, f.value, states, collapsed(userSettingState, f.key), existingInfo));
             });
           issueMatcher = ((issue, dataBuilders) => {
             const issueField: CustomField = issue.customFields.get(userSettingState.swimlane);
@@ -1088,7 +1089,7 @@ class SwimlaneDataBuilder {
       this._visibleIssuesCount,
       this._collapsed,
       maxColumnHeight);
-  };
+  }
 
   updateCollapsed() {
     // This code path is only used when the swimlanes have been populated already. So if the visibility was changed we need

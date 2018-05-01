@@ -18,7 +18,7 @@ export class CommentIssueDialogComponent implements OnInit {
 
   issue: BoardIssueView;
   commentForm: FormGroup;
-  private _boardService: BoardService
+  private _boardService: BoardService;
 
   constructor(
     public dialogRef: MatDialogRef<CommentIssueDialogComponent>,
@@ -58,5 +58,5 @@ export class CommentIssueDialogComponent implements OnInit {
 export interface StateInfo {
   boardState: string;
   ownState: string;
-  currentState: boolean
+  currentState: boolean;
 }

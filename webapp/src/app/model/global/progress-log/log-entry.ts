@@ -1,4 +1,4 @@
 export interface LogEntry {
-  message: string,
-  error: boolean
+  message: string;
+  error: boolean;
 }
