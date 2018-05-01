@@ -29,6 +29,6 @@ export class VersionService {
             progress.errorResponse(response);
             return _throw(response);
           })
-        )
+        );
     }
 }

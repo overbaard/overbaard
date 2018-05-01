@@ -108,7 +108,7 @@ describe('Issue reducer tests', () => {
         .check();
 
       checkIssueChanges(issueState,
-        {'ISSUE-1': IssueChange.NEW, 'ISSUE-2': IssueChange.NEW, 'ISSUE-3': IssueChange.NEW, 'ISSUE-4': IssueChange.NEW})
+        {'ISSUE-1': IssueChange.NEW, 'ISSUE-2': IssueChange.NEW, 'ISSUE-3': IssueChange.NEW, 'ISSUE-4': IssueChange.NEW});
     });
 
     it('Deserialize same state', () => {
@@ -116,7 +116,7 @@ describe('Issue reducer tests', () => {
         issueState,
         IssueActions.createDeserializeIssuesAction(getTestIssuesInput(), lookupParams));
       expect(state.issues).toBe(issueState.issues);
-      checkIssueChanges(state, {})
+      checkIssueChanges(state, {});
     });
 
 

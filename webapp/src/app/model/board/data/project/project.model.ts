@@ -31,8 +31,8 @@ export interface ParallelTask {
 }
 
 export interface ParallelTaskOption {
-  name: string,
-  colour: string
+  name: string;
+  colour: string;
 }
 
 const DEFAULT_STATE: ProjectState = {
@@ -62,7 +62,7 @@ const DEFAULT_PARALLEL_TASK: ParallelTask = {
 const DEFAULT_PARALLEL_TASK_OPTION: ParallelTaskOption = {
   name: null,
   colour: null
-}
+};
 
 
 interface ProjectStateRecord extends TypedRecord<ProjectStateRecord>, ProjectState {

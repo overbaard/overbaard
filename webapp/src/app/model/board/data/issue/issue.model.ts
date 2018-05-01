@@ -58,7 +58,7 @@ const DEFAULT_LINKED_ISSUE: LinkedIssue = {
 const DEFAULT_ISSUE_CHANGE_INFO: IssueChangeInfo = {
   key: null,
   change: null
-}
+};
 
 
 interface BoardIssueRecord extends TypedRecord<BoardIssueRecord>, BoardIssue {
@@ -460,7 +460,7 @@ export class IssueUtil {
     const index: number = key.lastIndexOf('-');
     return key.substring(0, index);
   }
-};
+}
 
 
 

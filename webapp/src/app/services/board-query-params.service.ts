@@ -55,7 +55,7 @@ export class BoardQueryParamsHandler {
             params.push('view=rv');
           }
           if (userSettingState.issueDetail.issueSummaryLevel !== IssueSummaryLevel.FULL) {
-            params.push(`isl=${userSettingState.issueDetail.issueSummaryLevel}`)
+            params.push(`isl=${userSettingState.issueDetail.issueSummaryLevel}`);
           }
           if (!userSettingState.issueDetail.parallelTasks) {
             params.push('vpt=false');

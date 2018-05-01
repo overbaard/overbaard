@@ -81,7 +81,7 @@ export class BoardActions {
   static createChanges(input: any) {
     if (input['changes']) {
       return new ProcessBoardChangesAction(input['changes']);
-    };
+    }
     return new DeserializeBoardAction(null, input);
   }
 }
@@ -232,7 +232,7 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
     case LOAD_HELP_TEXTS: {
       return BoardUtil.withMutations(state, mutable => {
         mutable.headers = headerMetaReducer(mutable.headers, action);
-      })
+      });
     }
     default:
       return state;

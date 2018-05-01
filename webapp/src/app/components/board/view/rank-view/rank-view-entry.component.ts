@@ -13,7 +13,7 @@ import {IssueDetailState} from '../../../../model/board/user/issue-detail/issue-
 export class RankViewEntryComponent implements OnInit {
 
   @Input()
-  rankEntry: RankViewEntry
+  rankEntry: RankViewEntry;
 
   // Just an array here to be able to do 'for s of states; let i = index' in the template
   @Input()

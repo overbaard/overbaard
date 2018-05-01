@@ -8,5 +8,5 @@ export interface SwimlaneData {
   visibleIssues: number;
   collapsed: boolean;
   headerHeight: number;
-  calculatedTotalIssuesHeight: number
+  calculatedTotalIssuesHeight: number;
 }

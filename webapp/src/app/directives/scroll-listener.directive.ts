@@ -40,7 +40,7 @@ export class ScrollListenerDirective implements OnInit, OnDestroy, AfterViewInit
 
   private refreshHandler = () => {
     this.refresh();
-  };
+  }
 
   constructor(private _ref: ElementRef,
               private readonly _renderer: Renderer2,
@@ -99,7 +99,7 @@ export class ScrollListenerDirective implements OnInit, OnDestroy, AfterViewInit
     if (observer) {
       requestAnimationFrame((timestamp: any) => {
         this._zone.runOutsideAngular(() => {
-          observer.next(pos)
+          observer.next(pos);
         });
       });
     }

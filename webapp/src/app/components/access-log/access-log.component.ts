@@ -44,7 +44,7 @@ export class AccessLogViewComponent implements OnInit {
           }
           progress.logError(msg);
         }
-      )
+      );
   }
 
   private processRawAcceessLog(data: AccessEntry[]): AccessLogData {
@@ -70,7 +70,7 @@ export class AccessLogViewComponent implements OnInit {
       summaries: summaries,
       lastTime: lastTime,
       firstTime: firstTime
-    }
+    };
   }
 }
 

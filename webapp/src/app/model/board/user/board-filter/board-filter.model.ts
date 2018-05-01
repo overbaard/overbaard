@@ -23,7 +23,7 @@ const DEFAULT_STATE: BoardFilterState = {
   fixVersion: Set<string>(),
   customField: Map<string, Set<string>>(),
   parallelTask: Map<string, Set<string>>()
-}
+};
 
 interface BoardFilterStateRecord extends TypedRecord<BoardFilterStateRecord>, BoardFilterState {
 }

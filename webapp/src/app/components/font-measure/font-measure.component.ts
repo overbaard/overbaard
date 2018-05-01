@@ -28,7 +28,7 @@ export class FontMeasureComponent implements OnInit, AfterViewInit {
   // done by the browser.
   readonly testStrings: string[] = []; // e.g. ['string 1', 'string 2']
   readonly testTextSize = 12;
-  readonly testStyle: any  = {'font-size': `${this.testTextSize}px`}
+  readonly testStyle: any  = {'font-size': `${this.testTextSize}px`};
 
   // Generated using FontMeasureTable
   private _sameCharLookupTable: Dictionary<string> = SAME_CHAR_WIDTH_LOOKUP_TABLE;

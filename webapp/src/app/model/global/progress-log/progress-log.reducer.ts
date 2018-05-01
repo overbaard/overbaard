@@ -134,7 +134,7 @@ export const progressLogSelector = (state: AppState) => state.progressLog;
 const getLoading = (state: ProgressLogState) => state.loading > 0;
 const getCurrentMessage = (state: ProgressLogState) => {
   return state.messages.size > 0 ? state.messages.get(0) : null;
-}
+};
 const getNotLoggedIn = (state: ProgressLogState) => state.notLoggedIn;
 const getExternallyDismissFirstMessage = (state: ProgressLogState) => state.externallyDismissFirstMessage;
 export const progressLogLoadingSelector = createSelector(progressLogSelector, getLoading);

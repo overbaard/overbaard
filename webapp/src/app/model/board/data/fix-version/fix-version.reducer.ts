@@ -61,8 +61,8 @@ export function fixVersionMetaReducer(state: FixVersionState = initialFixVersion
     default:
       return state;
   }
-};
+}
 
-const getFixVersionsState = (state: AppState) => state.board.fixVersions
+const getFixVersionsState = (state: AppState) => state.board.fixVersions;
 const getFixVersions = (state: FixVersionState) => state.versions;
 export const fixVersionsSelector = createSelector(getFixVersionsState, getFixVersions);

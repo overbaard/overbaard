@@ -27,7 +27,7 @@ export const initialAppState: AppState = {
   progressLog: initialProgressLogState,
   board: initialBoardState,
   userSettings: initialUserSettingState
-}
+};
 
 /**
  * By default, @ngrx/store uses combineReducers with the reducer map to compose

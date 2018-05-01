@@ -64,7 +64,7 @@ export function blacklistMetaReducer(state: BlacklistState = initialBlacklistSta
     default:
       return state;
   }
-};
+}
 
 function updateState(
   state: BlacklistState, issues: List<string>,

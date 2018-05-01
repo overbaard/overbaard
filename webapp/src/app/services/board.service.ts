@@ -91,7 +91,7 @@ export class BoardService {
     const payload = {
       'task-index': taskIndex,
       'option-index': selectedOptionIndex
-    }
+    };
 
     executeRequest(
       progress,
@@ -451,5 +451,5 @@ function executeRequest<T>(progress: Progress, currentTimeout: number,
         progress.errorResponse(err);
         return _throw(err);
       })
-    )
+    );
 }

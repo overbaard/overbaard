@@ -109,7 +109,7 @@ export class KanbanSwimlaneEntryComponent implements OnInit, OnChanges, OnDestro
     if (scrollChange) {
       this._zone.runOutsideAngular(() => {
         this.doCalculateInternalOffset();
-      })
+      });
     } else {
       this.doCalculateInternalOffset();
     }

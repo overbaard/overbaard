@@ -39,7 +39,7 @@ export class ScrollHeightSplitter<T> {
           const height: number = this._itemHeightGetter(item);
           mutable.push({start: current, height: height});
           current += height;
-        })
+        });
       });
     }
   }

@@ -63,7 +63,7 @@ export function componentMetaReducer(state: ComponentState = initialComponentSta
     default:
       return state;
   }
-};
+}
 
 const getComponentsState = (state: AppState) => state.board.components;
 const getComponents = (state: ComponentState) => state.components;

@@ -239,16 +239,16 @@ describe('Apply filter tests', () => {
         const issue: BoardIssueView = emptyIssue();
         issue.customFields = Map<string, CustomField>({1: {key: 'C1-1', value: 'One One'}});
         expect(filtersFromQs({'cf.1': 'C1-1', 'cf.2': 'C2-2'}).filterVisible(issue)).toBe(false);
-      })
+      });
       it ('Non match, zero out of one', () => {
         const issue: BoardIssueView = emptyIssue();
         issue.customFields = Map<string, CustomField>({1: {key: 'C1-2', value: 'One Two'}});
         expect(filtersFromQs({'cf.1': 'C1-1'}).filterVisible(issue)).toBe(false);
-      })
+      });
       it ('Non match, no custom field in issue', () => {
         const issue: BoardIssueView = emptyIssue();
         expect(filtersFromQs({'cf.1': 'C1-1'}).filterVisible(issue)).toBe(false);
-      })
+      });
       it ('Non match (none)', () => {
         const issue: BoardIssueView = emptyIssue();
         issue.customFields = Map<string, CustomField>({1: {key: 'C1-1', value: 'One One'}});
@@ -278,7 +278,7 @@ describe('Apply filter tests', () => {
           boardProjects: null,
           linkedProjects: null,
           parallelTasks: tasks
-        }
+        };
         issue.selectedParallelTasks = List<number>([0, 1]);
       });
       it ('Matches one', () => {
@@ -350,6 +350,6 @@ describe('Apply filter tests', () => {
       ownStateName: null,
       calculatedTotalHeight: 0,
       summaryLines: List<string>()
-    }
+    };
   }
 });

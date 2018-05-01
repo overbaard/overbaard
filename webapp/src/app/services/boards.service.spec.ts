@@ -39,12 +39,12 @@ xdescribe('Boards Service', () => {
       .flush({
       'configs': getBordsListSummary()});
     httpMock.verify();
-  })
+  });
 
   it('Get Boards 401', () => {
     service.loadBoardsList(true)
       .subscribe(
-        data => { expect(data).toBeFalsy() },
+        data => { expect(data).toBeFalsy(); },
         error => {
           expect((<HttpErrorResponse>error).status).toBe(401);
           }

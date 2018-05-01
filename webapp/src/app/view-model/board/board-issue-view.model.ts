@@ -72,6 +72,6 @@ export class BoardIssueViewUtil {
   static updateVisibility(issue: BoardIssueView, visible: boolean): BoardIssueView {
     return (<BoardIssueViewRecord>issue).withMutations(mutable => {
       mutable.visible = visible;
-    })
+    });
   }
 }

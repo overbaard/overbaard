@@ -30,7 +30,7 @@ export class ConfigurationComponent implements OnInit {
   createError: string;
 
   // For saving the rank id
-  rankCustomFieldIdForm: FormGroup
+  rankCustomFieldIdForm: FormGroup;
 
   constructor(private _boardsService: BoardsService,
               appHeaderService: AppHeaderService) {
@@ -98,7 +98,7 @@ export class ConfigurationComponent implements OnInit {
       )
       .subscribe(
         value => {
-          this.config$.next(value)
+          this.config$.next(value);
           this.selected = -1;
         }
       );
@@ -120,7 +120,7 @@ export class ConfigurationComponent implements OnInit {
       )
       .subscribe(
         value => {
-          this.config$.next(value)
+          this.config$.next(value);
           this.createForm.controls['createJson'].setValue('');
           });
 
@@ -133,13 +133,13 @@ export class ConfigurationComponent implements OnInit {
   }
 
   onSaveEditedBoard(boardJson: string) {
-    console.log('Saving edited board')
+    console.log('Saving edited board');
     if (!this.checkJson(boardJson)) {
       this.editError = 'Contents must be valid json';
       return;
     }
     // TODO progress and errors
-    console.log('Saved edited board')
+    console.log('Saved edited board');
     this._boardsService.saveBoard(this.selected, boardJson)
       .pipe(
         map<any, ConfigBoardsView>(data => this.toConfigBoardView(data)),
@@ -147,7 +147,7 @@ export class ConfigurationComponent implements OnInit {
       )
       .subscribe(
         value => {
-          this.config$.next(value)
+          this.config$.next(value);
         });
   }
 
@@ -161,7 +161,7 @@ export class ConfigurationComponent implements OnInit {
         data => {
           // We need to subscribe here since http actions are cold observables
         }
-      )
+      );
   }
 
 

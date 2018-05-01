@@ -154,7 +154,7 @@ describe('Header reducer tests', () => {
 
       it('With help texts', () => {
         const headerState: HeaderState =
-          headerMetaReducer(initialHeaderState, HeaderActions.createLoadHelpTexts({'S1': 'Help1', 'S2': 'Help2'}))
+          headerMetaReducer(initialHeaderState, HeaderActions.createLoadHelpTexts({'S1': 'Help1', 'S2': 'Help2'}));
         expect(headerState.states.toArray()).toEqual([]);
         expect(headerState.helpTexts.toObject()).toEqual({'S1': 'Help1', 'S2': 'Help2'});
 

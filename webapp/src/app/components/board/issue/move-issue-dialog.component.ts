@@ -84,5 +84,5 @@ export class MoveIssueDialogComponent implements OnInit {
 export interface StateInfo {
   boardState: string;
   ownState: string;
-  currentState: boolean
+  currentState: boolean;
 }

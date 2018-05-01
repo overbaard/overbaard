@@ -37,7 +37,7 @@ const materialModules: Array<Type<any>> = [
   MatSelectModule,
   MatSliderModule,
   MatToolbarModule,
-  MatTooltipModule]
+  MatTooltipModule];
 
 @NgModule({
   imports: materialModules,

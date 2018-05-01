@@ -27,7 +27,7 @@ export class BoardConfigurationComponent implements OnInit, OnChanges {
   canEdit: boolean;
 
   @Input()
-  boardName: string
+  boardName: string;
 
   @Input()
   jsonError: string;
@@ -71,7 +71,7 @@ export class BoardConfigurationComponent implements OnInit, OnChanges {
             }
           return null;
         }]))
-      })
+      });
     }
     event.preventDefault();
   }

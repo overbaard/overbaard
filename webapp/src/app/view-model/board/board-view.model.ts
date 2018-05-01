@@ -13,7 +13,7 @@ import {initialIssueDetailState} from '../../model/board/user/issue-detail/issue
 
 const DEFAULT_BOARD_HEADERS: BoardHeaders = {
   headersList: List<BoardHeader>()
-}
+};
 
 const DEFAULT_BOARD_VIEW: BoardViewModel = {
   headers: null,    // The initial state will have this set to initialBoardHeaders, declared below
@@ -34,7 +34,7 @@ const DEFAULT_BOARD_HEADER: BoardHeader = {
   totalIssues: 0,
   visibleIssues: 0,
   helpText: null
-}
+};
 
 const DEFAULT_ISSUE_TABLE: IssueTable = {
   issues: Map<string, BoardIssueView>(),
@@ -66,7 +66,7 @@ const DEFAULT_RANK_VIEW_ENTRY: RankViewEntry = {
   issue: null,
   boardIndex: 0,
   calculatedTotalHeight: 0
-}
+};
 
 interface BoardViewModelRecord extends TypedRecord<BoardViewModelRecord>, BoardViewModel {
 }
@@ -128,13 +128,13 @@ export class BoardViewModelUtil {
   static updateSwimlaneInfo(swimlaneInfo: SwimlaneInfo, mutate: (swimlaneInfo: SwimlaneInfo) => any): SwimlaneInfo {
     return (<SwimlaneInfoRecord>swimlaneInfo).withMutations(mutable => {
       return mutate(mutable);
-    })
+    });
   }
 
   static updateSwimlaneData(swimlaneData: SwimlaneData, mutate: (swimlaneData: SwimlaneData) => any): SwimlaneData {
     return (<SwimlaneDataRecord>swimlaneData).withMutations(mutable => {
       return mutate(mutable);
-    })
+    });
   }
 
   static createBoardHeaders(headers: List<BoardHeader>) {
@@ -190,7 +190,7 @@ export class BoardViewModelUtil {
     const state: SwimlaneInfo = {
       showEmpty: showEmpty,
       swimlanes: swimlanes
-    }
+    };
     return SWIMLANE_INFO_STATE_FACTORY(state);
   }
 

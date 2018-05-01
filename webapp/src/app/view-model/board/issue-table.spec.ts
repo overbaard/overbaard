@@ -151,7 +151,7 @@ describe('Issue Table observer tests', () => {
             .observer()
             .take(1)
             .subscribe(board => {
-              const checker: BoardChecker = new BoardChecker([[], ['ONE-2', 'ONE-1'], [], ['ONE-4', 'ONE-3']])
+              const checker: BoardChecker = new BoardChecker([[], ['ONE-2', 'ONE-1'], [], ['ONE-4', 'ONE-3']]);
               if (rank) {
                 checker.rankOrder('ONE-4', 'ONE-3', 'ONE-2', 'ONE-1');
               }
@@ -587,7 +587,7 @@ describe('Issue Table observer tests', () => {
                 const checker: BoardChecker =
                   new BoardChecker([['ONE-1'], ['ONE-2'], ['ONE-5', 'ONE-6', 'ONE-3'], ['ONE-4', 'ONE-7']]);
                 if (rank) {
-                  checker.rankOrder('ONE-1', 'ONE-2', 'ONE-4', 'ONE-5', 'ONE-6', 'ONE-7', 'ONE-3')
+                  checker.rankOrder('ONE-1', 'ONE-2', 'ONE-4', 'ONE-5', 'ONE-6', 'ONE-7', 'ONE-3');
                 }
                 checker.checkBoard(board);
                 checkSameColumns(original, board, 0, 1, 3);
@@ -1093,16 +1093,16 @@ describe('Switch View Mode (effect on Backlog) Tests', () => {
         .mapState('ONE', 'S-2', '1-2')
         .mapState('ONE', 'S-3', '1-3');
     if (loadBacklog) {
-      init.setRank('ONE', 1, 2, 3, 4, 5, 6)
+      init.setRank('ONE', 1, 2, 3, 4, 5, 6);
     } else {
-      init.setRank('ONE', 3, 4, 5, 6)
-    };
+      init.setRank('ONE', 3, 4, 5, 6);
+    }
     const issueFactory: SimpleIssueFactory = new SimpleIssueFactory();
     if (loadBacklog) {
       issueFactory
         .addIssue('ONE-1', 0)
         .addIssue('ONE-2', 0);
-    };
+    }
     issueFactory
       .addIssue('ONE-3', 1)
       .addIssue('ONE-4', 1)
@@ -1221,7 +1221,7 @@ class BoardChecker {
     // Get rid of all the invisible issues from the 'expected' table
     const invisibleIssueSet: Set<string> = Set<string>(this._invisibleIssues);
     const expectedVisible: string[][] = this._expected.map(
-      col => col.filter(k => !invisibleIssueSet.contains(k)))
+      col => col.filter(k => !invisibleIssueSet.contains(k)));
 
     // We are not changing the issue details in this test
     expect(board.issueDetail).toBe(initialIssueDetailState);
@@ -1261,7 +1261,7 @@ class BoardChecker {
     } else {
       const expectedVisibleRank: string[] = this._rankOrder.filter(k => !invisibleIssueSet.contains(k));
       // Work out the board index from the issue table
-      const issueDictionary: Dictionary<number> = {}
+      const issueDictionary: Dictionary<number> = {};
       issueTable.table.forEach((state, boardIndex) => {
         state.forEach(issue => issueDictionary[issue.key] = boardIndex);
       });
@@ -1284,7 +1284,7 @@ class BoardChecker {
       header.stateIndices.forEach(i => {
         expectedTotal += totalIssueCounts[i];
         expectedVisible += visibleIssueCounts[i];
-      })
+      });
       expect(total).toBe(expectedTotal);
       expect(visible).toBe(expectedVisible);
 
