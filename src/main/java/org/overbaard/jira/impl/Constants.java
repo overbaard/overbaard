@@ -68,6 +68,7 @@ public class Constants {
     public static final String OVERBAARD_VERSION = "overbaard-version";
     public static final String OWNER = "owner";
     public static final String PARALLEL_TASKS = "parallel-tasks";
+    //public static final String PARALLEL_TASK_GROUPS = "parallel-task-groups";
     public static final String PRIORITIES = "priorities";
     public static final String PRIORITY = "priority";
     public static final String PROJECTS = "projects";

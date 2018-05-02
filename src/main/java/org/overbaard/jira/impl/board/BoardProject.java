@@ -27,11 +27,14 @@ import org.jboss.dmr.ModelNode;
 import org.overbaard.jira.OverbaardLogger;
 import org.overbaard.jira.api.NextRankedIssueUtil;
 import org.overbaard.jira.api.ProjectParallelTaskOptionsLoader;
+import org.overbaard.jira.impl.Constants;
 import org.overbaard.jira.impl.JiraInjectables;
 import org.overbaard.jira.impl.config.BoardProjectConfig;
 import org.overbaard.jira.impl.config.CustomFieldConfig;
 import org.overbaard.jira.impl.config.LinkedProjectConfig;
-import org.overbaard.jira.impl.Constants;
+import org.overbaard.jira.impl.config.ParallelTaskCustomFieldConfig;
+import org.overbaard.jira.impl.config.ParallelTaskGroupPosition;
+import org.overbaard.jira.impl.config.ProjectParallelTaskConfig;
 
 import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.bc.project.component.ProjectComponent;
@@ -115,8 +118,14 @@ public class BoardProject {
 
         if (parallelTaskValues.size() > 0) {
             ModelNode parallelTasks = parent.get(Constants.PARALLEL_TASKS).setEmptyList();
-            getParallelTaskValues().values().forEach(
-                    sortedCustomFieldValues -> sortedCustomFieldValues.serialize(parallelTasks));
+            for (ProjectParallelTaskConfig group : this.projectConfig.getParallelTaskGroupsConfig().getGroups()) {
+                ModelNode groupNode = new ModelNode().setEmptyList();
+                for (ParallelTaskCustomFieldConfig cfg : group.getConfigs().values()) {
+                    SortedParallelTaskFieldOptions options = parallelTaskValues.get(cfg.getName());
+                    options.serialize(groupNode);
+                }
+                parallelTasks.add(groupNode);
+            }
         }
     }
 
@@ -376,11 +385,13 @@ public class BoardProject {
         Issue createIssue(String issueKey, String issueType, String priority, String summary,
                           Assignee assignee, Set<MultiSelectNameOnlyValue.Component> issueComponents,
                           Set<MultiSelectNameOnlyValue.Label> labels, Set<MultiSelectNameOnlyValue.FixVersion> fixVersions, String state,
-                          Map<String, CustomFieldValue> customFieldValues, Map<Integer, Integer> parallelTaskValues) throws SearchException {
+                          Map<String, CustomFieldValue> customFieldValues,
+                          Map<ParallelTaskGroupPosition, Integer> parallelTaskGroupValues) throws SearchException {
             OverbaardLogger.LOGGER.debug("BoardProject.Updater.createIssue - {}", issueKey);
             newIssue = Issue.createForCreateEvent(
                     this, issueKey, state, summary, issueType, priority,
-                    assignee, issueComponents, labels, fixVersions, customFieldValues, parallelTaskValues);
+                    assignee, issueComponents, labels, fixVersions, customFieldValues,
+                    parallelTaskGroupValues);
             OverbaardLogger.LOGGER.debug("BoardProject.Updater.createIssue - created {}", newIssue);
 
             if (newIssue != null) {
@@ -393,11 +404,11 @@ public class BoardProject {
                           Assignee issueAssignee, Set<MultiSelectNameOnlyValue.Component> issueComponents,
                           Set<MultiSelectNameOnlyValue.Label> labels, Set<MultiSelectNameOnlyValue.FixVersion> fixVersions, boolean reranked,
                           String state, Map<String, CustomFieldValue> customFieldValues,
-                          Map<Integer, Integer> parallelTaskValues) throws SearchException {
+                          Map<ParallelTaskGroupPosition, Integer> parallelTaskGroupValues) throws SearchException {
             OverbaardLogger.LOGGER.debug("BoardProject.Updater.updateIssue - {}, rankOrStateChanged: {}", existing.getKey(), reranked);
             newIssue = existing.copyForUpdateEvent(this, existing, issueType, priority,
                     summary, issueAssignee, issueComponents, labels, fixVersions,
-                    state, customFieldValues, parallelTaskValues);
+                    state, customFieldValues, parallelTaskGroupValues);
             OverbaardLogger.LOGGER.debug("BoardProject.Updater - updated issue {} to {}. Reranked: {}", existing, newIssue, reranked);
             if (reranked) {
                 rankedIssueKeys = rankIssues(existing.getKey());

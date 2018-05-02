@@ -23,10 +23,12 @@ import java.util.Map;
 
 import org.jboss.dmr.ModelNode;
 import org.overbaard.jira.OverbaardLogger;
-import org.overbaard.jira.impl.config.CustomFieldConfig;
-import org.overbaard.jira.impl.config.ParallelTaskConfig;
-import org.overbaard.jira.impl.config.ParallelTaskCustomFieldConfig;
 import org.overbaard.jira.impl.Constants;
+import org.overbaard.jira.impl.config.CustomFieldConfig;
+import org.overbaard.jira.impl.config.ParallelTaskCustomFieldConfig;
+import org.overbaard.jira.impl.config.ParallelTaskGroupPosition;
+import org.overbaard.jira.impl.config.ProjectParallelTaskConfig;
+import org.overbaard.jira.impl.config.ProjectParallelTaskGroupsConfig;
 
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.customfields.option.LazyLoadedOption;
@@ -70,21 +72,22 @@ public class CustomFieldValue {
     }
 
     static void loadParallelTaskValues(BoardProject.Accessor project, Issue issue, org.overbaard.jira.impl.board.Issue.Builder builder) {
-        if (project.getConfig().getParallelTaskConfig() == null) {
+        if (project.getConfig().getParallelTaskGroupsConfig() == null) {
             return;
         }
-        ParallelTaskConfig parallelTaskConfig = project.getConfig().getParallelTaskConfig();
+        final ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig = project.getConfig().getParallelTaskGroupsConfig();
+
 
         Map<String, SortedParallelTaskFieldOptions> parallelTaskValues = project.getParallelTaskValues();
         for (Map.Entry<String, SortedParallelTaskFieldOptions> fieldEntry : parallelTaskValues.entrySet()) {
-            CustomFieldConfig customFieldConfig = parallelTaskConfig.getConfigs().getForOverbaardName(fieldEntry.getKey());
+            CustomFieldConfig customFieldConfig = parallelTaskGroupsConfig.getConfigs().getForOverbaardName(fieldEntry.getKey());
             String value = getParallelTaskCustomFieldValue(issue, customFieldConfig.getJiraCustomField(), fieldEntry.getKey());
             if (value == null) {
                 continue;
             }
             final int optionIndex = fieldEntry.getValue().getIndex(value);
-            final int taskFieldIndex = parallelTaskConfig.getIndex(fieldEntry.getKey());
-            builder.setParallelTaskFieldValue(taskFieldIndex, optionIndex);
+            final ParallelTaskGroupPosition position = parallelTaskGroupsConfig.getPosition(fieldEntry.getKey());
+            builder.setParallelTaskFieldValue(position, optionIndex);
         }
     }
 
@@ -132,30 +135,32 @@ public class CustomFieldValue {
         return fields.size() > 0 ? fields : Collections.emptyMap();
     }
 
-    static Map<Integer, Integer> loadParallelTaskValues(boolean create, final BoardProject.Accessor project, final Map<Long, String> customFieldValues) {
-        final Map<Integer, Integer> parallelTaskValues = new HashMap<>();
+    static Map<ParallelTaskGroupPosition, Integer> loadParallelTaskGroupValues(boolean create, final BoardProject.Accessor project, final Map<Long, String> customFieldValues) {
+        final Map<ParallelTaskGroupPosition, Integer> parallelTaskValues = new HashMap<>();
 
-        if (project.getConfig().getParallelTaskConfig() == null) {
+        ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig = project.getConfig().getParallelTaskGroupsConfig();
+
+        if (parallelTaskGroupsConfig == null) {
             return Collections.emptyMap();
         }
 
-        ParallelTaskConfig parallelTaskConfig = project.getConfig().getParallelTaskConfig();
+        List<ProjectParallelTaskConfig> groups = parallelTaskGroupsConfig.getConfigGroups();
+        for (int groupIndex = 0 ; groupIndex < groups.size() ; groupIndex++) {
 
-        if (parallelTaskConfig == null) {
-            return Collections.emptyMap();
-        }
+            ProjectParallelTaskConfig parallelTaskConfig = groups.get(groupIndex);
 
-        for (ParallelTaskCustomFieldConfig customFieldConfig : parallelTaskConfig.getConfigs().values()) {
-            String value = customFieldValues.get(customFieldConfig.getId());
+            for (ParallelTaskCustomFieldConfig customFieldConfig : parallelTaskConfig.getConfigs().values()) {
+                String value = customFieldValues.get(customFieldConfig.getId());
 
-            if (value != null) {
-                int fieldIndex = parallelTaskConfig.getIndex(customFieldConfig.getName());
-                SortedParallelTaskFieldOptions options = project.getParallelTaskValues().get(customFieldConfig.getName());
-                int optionIndex = options.getIndex(value);
-                parallelTaskValues.put(fieldIndex, optionIndex);
-            } else if (create) {
-                int fieldIndex = parallelTaskConfig.getIndex(customFieldConfig.getName());
-                parallelTaskValues.put(fieldIndex, 0);
+                if (value != null) {
+                    int taskIndex = parallelTaskConfig.getIndex(customFieldConfig.getName());
+                    SortedParallelTaskFieldOptions options = project.getParallelTaskValues().get(customFieldConfig.getName());
+                    int optionIndex = options.getIndex(value);
+                    parallelTaskValues.put(new ParallelTaskGroupPosition(groupIndex, taskIndex), optionIndex);
+                } else if (create) {
+                    int taskIndex = parallelTaskConfig.getIndex(customFieldConfig.getName());
+                    parallelTaskValues.put(new ParallelTaskGroupPosition(groupIndex, taskIndex), 0);
+                }
             }
         }
         return parallelTaskValues;

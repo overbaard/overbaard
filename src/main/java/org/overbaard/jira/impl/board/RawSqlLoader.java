@@ -22,9 +22,9 @@ import java.sql.Types;
 import java.util.function.Function;
 
 import org.jboss.dmr.ModelNode;
-import org.overbaard.jira.OverbaardValidationException;
 import org.ofbiz.core.entity.jdbc.SQLProcessor;
 import org.osgi.framework.BundleReference;
+import org.overbaard.jira.OverbaardValidationException;
 
 /**
  * @author Kabir Khan

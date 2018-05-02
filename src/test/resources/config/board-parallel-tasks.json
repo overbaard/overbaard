@@ -31,6 +31,12 @@
           "type": "parallel-task-progress",
           "field-id": 121212121213,
           "display": "DS"
+        },
+        {
+          "name": "Documentation",
+          "type": "parallel-task-progress",
+          "field-id": 121212121214,
+          "display": "DC"
         }
       ]
   },
@@ -39,7 +45,9 @@
       "code": "TDP",
       "query-filter": null,
       "colour": "#4667CA",
-      "parallel-tasks": ["Upstream", "Downstream"],
+      "parallel-tasks": [
+        ["Upstream", "Downstream"],
+        ["Documentation"]],
       "state-links": {
         "TDP-A" : "S-A",
         "TDP-B" : "S-B",

@@ -16,11 +16,13 @@
 package org.overbaard.jira.impl.board;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.jboss.dmr.ModelNode;
@@ -31,6 +33,7 @@ import org.overbaard.jira.impl.OverbaardIssueEvent;
 import org.overbaard.jira.impl.board.MultiSelectNameOnlyValue.Component;
 import org.overbaard.jira.impl.board.MultiSelectNameOnlyValue.FixVersion;
 import org.overbaard.jira.impl.board.MultiSelectNameOnlyValue.Label;
+import org.overbaard.jira.impl.config.ParallelTaskGroupPosition;
 
 
 /**
@@ -438,7 +441,7 @@ public class BoardChangeRegistry {
         private Boolean backlogEndState;
 
         private Map<String, CustomFieldValue> customFieldValues;
-        private Map<Integer, Integer> parallelTaskValues;
+        private Map<ParallelTaskGroupPosition, Integer> parallelTaskGroupValues;
 
         private IssueChange(String projectCode, String issueKey, Boolean backlogState) {
             this.projectCode = projectCode;
@@ -582,11 +585,11 @@ public class BoardChangeRegistry {
                 }
                 customFieldValues.entrySet().forEach(entry -> this.customFieldValues.put(entry.getKey(), entry.getValue()));
             }
-            if (boardChange.getParallelTaskValues() != null) {
-                if (this.parallelTaskValues == null) {
-                    this.parallelTaskValues = new HashMap<>();
+            if (boardChange.getParallelTaskGroupValues() != null) {
+                if (this.parallelTaskGroupValues == null) {
+                    this.parallelTaskGroupValues = new HashMap<>();
                 }
-                parallelTaskValues.putAll(boardChange.getParallelTaskValues());
+                parallelTaskGroupValues.putAll(boardChange.getParallelTaskGroupValues());
             }
         }
 
@@ -636,10 +639,8 @@ public class BoardChangeRegistry {
                     if (customFieldValues != null) {
                         customFieldValues.forEach((key,value)-> output.get(Constants.CUSTOM, key).set(value.getKey()));
                     }
-                    if (parallelTaskValues != null) {
-                        for (int i = 0 ; i < parallelTaskValues.size() ; i++) {
-                            output.get(Constants.PARALLEL_TASKS).add(parallelTaskValues.get(i));
-                        }
+                    if (parallelTaskGroupValues != null) {
+                        output.get(Constants.PARALLEL_TASKS).set(populateParallelTaskGroupsForCreate());
                     }
                     output.get(Constants.STATE).set(state);
                     break;
@@ -672,8 +673,14 @@ public class BoardChangeRegistry {
                             output.get(Constants.CUSTOM, key).set(fieldKey);
                         });
                     }
-                    if (parallelTaskValues != null) {
-                        parallelTaskValues.forEach((key, value) -> output.get(Constants.PARALLEL_TASKS, key.toString()).set(value));
+                    if (parallelTaskGroupValues != null) {
+                        parallelTaskGroupValues.forEach((pos, value) -> {
+                            output.get(
+                                    Constants.PARALLEL_TASKS,
+                                    String.valueOf(pos.getGroupIndex()),
+                                    String.valueOf(pos.getTaskIndex()))
+                                    .set(value);
+                        });
                     }
                     if (state != null) {
                         output.get(Constants.STATE).set(state);
@@ -697,6 +704,39 @@ public class BoardChangeRegistry {
                     break;
             }
             return output;
+        }
+
+        private ModelNode populateParallelTaskGroupsForCreate() {
+            TreeMap<ParallelTaskGroupPosition, Integer> sortedValues = new TreeMap<>(new Comparator<ParallelTaskGroupPosition>() {
+                @Override
+                public int compare(ParallelTaskGroupPosition o1, ParallelTaskGroupPosition o2) {
+                    if (o1.getGroupIndex() == o2.getGroupIndex()) {
+                        return o1.getTaskIndex() < o2.getTaskIndex() ? -1 : 1;
+                    }
+                    return o1.getGroupIndex() < o2.getGroupIndex() ? -1 : 1;
+                }
+            });
+            sortedValues.putAll(parallelTaskGroupValues);
+
+            ModelNode groupsTable = new ModelNode().setEmptyList();
+            ModelNode currentGroup = null;
+            int lastGroupIndex = -1;
+            for (Map.Entry<ParallelTaskGroupPosition, Integer> entry : sortedValues.entrySet()) {
+                ParallelTaskGroupPosition position = entry.getKey();
+                if (position.getGroupIndex() != lastGroupIndex) {
+                    if (currentGroup != null) {
+                        groupsTable.add(currentGroup);
+                    }
+                    lastGroupIndex = position.getGroupIndex();
+                    currentGroup = new ModelNode().setEmptyList();
+
+                }
+                currentGroup.add(entry.getValue());
+            }
+            if (currentGroup != null) {
+                groupsTable.add(currentGroup);
+            }
+            return groupsTable;
         }
     }
 

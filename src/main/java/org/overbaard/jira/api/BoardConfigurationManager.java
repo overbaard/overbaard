@@ -18,9 +18,9 @@ package org.overbaard.jira.api;
 import java.util.List;
 
 import org.jboss.dmr.ModelNode;
+import org.overbaard.jira.OverbaardPermissionException;
 import org.overbaard.jira.OverbaardValidationException;
 import org.overbaard.jira.impl.config.BoardConfig;
-import org.overbaard.jira.OverbaardPermissionException;
 
 import com.atlassian.jira.user.ApplicationUser;
 

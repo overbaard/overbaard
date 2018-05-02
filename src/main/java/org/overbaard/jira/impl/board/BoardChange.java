@@ -24,6 +24,7 @@ import org.overbaard.jira.impl.OverbaardIssueEvent;
 import org.overbaard.jira.impl.board.MultiSelectNameOnlyValue.Component;
 import org.overbaard.jira.impl.board.MultiSelectNameOnlyValue.FixVersion;
 import org.overbaard.jira.impl.board.MultiSelectNameOnlyValue.Label;
+import org.overbaard.jira.impl.config.ParallelTaskGroupPosition;
 
 /**
  * Contains the details of a change to the board, which the clients will apply when polling for changes since their
@@ -62,7 +63,7 @@ public class BoardChange {
     private final Boolean backlogState;
     private final Map<String, CustomFieldValue> customFieldValues;
     private final Map<String, CustomFieldValue> newCustomFieldValues;
-    private final Map<Integer, Integer> parallelTaskValues;
+    private final Map<ParallelTaskGroupPosition, Integer> parallelTaskGroupValues;
     private final Boolean fromBacklogState;
 
 
@@ -74,7 +75,7 @@ public class BoardChange {
                         Boolean fromBacklogState, Boolean backlogState,
                         Map<String, CustomFieldValue> customFieldValues,
                         Map<String, CustomFieldValue> newCustomFieldValues,
-                        Map<Integer, Integer> parallelTaskValues) {
+                        Map<ParallelTaskGroupPosition, Integer> parallelTaskGroupValues) {
         this.view = view;
         this.event = event;
         this.newAssignee = newAssignee;
@@ -90,7 +91,7 @@ public class BoardChange {
         this.backlogState = backlogState;
         this.customFieldValues = customFieldValues;
         this.newCustomFieldValues = newCustomFieldValues;
-        this.parallelTaskValues = parallelTaskValues;
+        this.parallelTaskGroupValues = parallelTaskGroupValues;
     }
 
     long getTime() {
@@ -161,8 +162,8 @@ public class BoardChange {
         return newCustomFieldValues;
     }
 
-    public Map<Integer, Integer> getParallelTaskValues() {
-        return parallelTaskValues;
+    public Map<ParallelTaskGroupPosition, Integer> getParallelTaskGroupValues() {
+        return parallelTaskGroupValues;
     }
 
     public static class Builder {
@@ -191,7 +192,7 @@ public class BoardChange {
         private Boolean fromBacklogState;
         private Boolean backlogState;
         private Map<String, CustomFieldValue> customFieldValues;
-        private Map<Integer, Integer> parallelTaskValues;
+        private Map<ParallelTaskGroupPosition, Integer> parallelTaskGroupValues;
 
         Builder(BoardChangeRegistry registry, int view, OverbaardIssueEvent event) {
             this.registry = registry;
@@ -264,18 +265,17 @@ public class BoardChange {
             return this;
         }
 
-        public Builder setParallelTaskValues(Map<Integer, Integer> parallelTaskValues) {
-            this.parallelTaskValues = Collections.unmodifiableMap(parallelTaskValues);
+        public Builder setParallelTaskGroupValues(Map<ParallelTaskGroupPosition, Integer> parallelTaskGroupValues) {
+            this.parallelTaskGroupValues = parallelTaskGroupValues;
             return this;
         }
-
 
         public void buildAndRegister() {
             BoardChange change = new BoardChange(
                     view, event, newAssignee, newComponents, newLabels, newFixVersions, addedBlacklistState,
                     addedBlacklistPriority, addedBlacklistIssueType, addedBlacklistIssue, deletedBlacklistIssue,
                     fromBacklogState, backlogState, customFieldValues, newCustomFieldValues,
-                    parallelTaskValues);
+                    parallelTaskGroupValues);
             registry.registerChange(change);
         }
 

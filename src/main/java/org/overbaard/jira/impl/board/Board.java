@@ -34,6 +34,7 @@ import org.jboss.dmr.ModelNode;
 import org.overbaard.jira.OverbaardLogger;
 import org.overbaard.jira.api.NextRankedIssueUtil;
 import org.overbaard.jira.api.ProjectParallelTaskOptionsLoader;
+import org.overbaard.jira.impl.Constants;
 import org.overbaard.jira.impl.JiraInjectables;
 import org.overbaard.jira.impl.OverbaardIssueEvent;
 import org.overbaard.jira.impl.board.MultiSelectNameOnlyValue.Component;
@@ -43,8 +44,8 @@ import org.overbaard.jira.impl.config.BoardConfig;
 import org.overbaard.jira.impl.config.BoardProjectConfig;
 import org.overbaard.jira.impl.config.CustomFieldConfig;
 import org.overbaard.jira.impl.config.LinkedProjectConfig;
+import org.overbaard.jira.impl.config.ParallelTaskGroupPosition;
 import org.overbaard.jira.impl.util.IndexedMap;
-import org.overbaard.jira.impl.Constants;
 
 import com.atlassian.jira.avatar.Avatar;
 import com.atlassian.jira.bc.project.component.ProjectComponent;
@@ -646,8 +647,8 @@ public class Board {
             final BoardProject.Updater projectUpdater = project.updater(jiraInjectables, nextRankedIssueUtil, this, boardOwner);
             final Map<String, CustomFieldValue> customFieldValues
                     = CustomFieldValue.loadCustomFieldValues(projectUpdater, evtDetail.getCustomFieldValues());
-            final Map<Integer, Integer> parallelTaskValues
-                    = CustomFieldValue.loadParallelTaskValues(create, projectUpdater, evtDetail.getCustomFieldValues());
+            final Map<ParallelTaskGroupPosition, Integer> parallelTaskGroupValues
+                    = CustomFieldValue.loadParallelTaskGroupValues(create, projectUpdater, evtDetail.getCustomFieldValues());
 
             final Issue existingIssue;
             final Issue newIssue;
@@ -657,7 +658,7 @@ public class Board {
                 newIssue = projectUpdater.createIssue(event.getIssueKey(), evtDetail.getIssueType(),
                         evtDetail.getPriority(), evtDetail.getSummary(), issueAssignee,
                         issueComponents, issueLabels, issueFixVersions,
-                        evtDetail.getState(), customFieldValues, parallelTaskValues);
+                        evtDetail.getState(), customFieldValues, parallelTaskGroupValues);
             } else {
                 existingIssue = board.allIssues.get(event.getIssueKey());
                 if (existingIssue == null) {
@@ -678,7 +679,7 @@ public class Board {
                     newIssue = projectUpdater.updateIssue(existingIssue, evtDetail.getIssueType(),
                             evtDetail.getPriority(), evtDetail.getSummary(), issueAssignee,
                             issueComponents, issueLabels, issueFixVersions,
-                            evtDetail.isReranked(), evtDetail.getState(), customFieldValues, parallelTaskValues);
+                            evtDetail.isReranked(), evtDetail.getState(), customFieldValues, parallelTaskGroupValues);
                 }
             }
 
@@ -754,8 +755,8 @@ public class Board {
                     if (newIssue != null) {
                         changeBuilder.setBacklogState(project.isBacklogState(newIssue.getState()));
                     }
-                    if (parallelTaskValues.size() > 0) {
-                        changeBuilder.setParallelTaskValues(parallelTaskValues);
+                    if (parallelTaskGroupValues.size() > 0) {
+                        changeBuilder.setParallelTaskGroupValues(parallelTaskGroupValues);
                     }
                     OverbaardLogger.LOGGER.debug("Board.Updater.handleCreateOrUpdateIssue - Registering change");
                     changeBuilder.buildAndRegister();

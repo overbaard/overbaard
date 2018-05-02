@@ -25,6 +25,8 @@ import java.util.Set;
 
 import javax.inject.Named;
 
+import org.ofbiz.core.entity.GenericEntityException;
+import org.ofbiz.core.entity.GenericValue;
 import org.overbaard.jira.OverbaardLogger;
 import org.overbaard.jira.api.BoardManager;
 import org.overbaard.jira.api.NextRankedIssueUtil;
@@ -32,8 +34,6 @@ import org.overbaard.jira.impl.board.CustomFieldUtil;
 import org.overbaard.jira.impl.board.CustomFieldValue;
 import org.overbaard.jira.impl.config.CustomFieldConfig;
 import org.overbaard.jira.impl.config.ParallelTaskCustomFieldConfig;
-import org.ofbiz.core.entity.GenericEntityException;
-import org.ofbiz.core.entity.GenericValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -43,7 +43,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.atlassian.core.util.map.EasyMap;
 import com.atlassian.event.api.EventListener;
 import com.atlassian.event.api.EventPublisher;
-//import com.atlassian.greenhopper.service.lexorank.balance.LexoRankBalanceEvent;
 import com.atlassian.greenhopper.service.lexorank.balance.LexoRankChangeEvent;
 import com.atlassian.jira.bc.project.component.ProjectComponent;
 import com.atlassian.jira.event.issue.IssueEvent;
@@ -57,6 +56,8 @@ import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.project.version.Version;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+
+//import com.atlassian.greenhopper.service.lexorank.balance.LexoRankBalanceEvent;
 
 /**
  * The listener listening to issue events, and delegating relevant ones to the issue table.
@@ -370,7 +371,9 @@ public class OverbaardIssueEventListener implements InitializingBean, Disposable
                         customFieldValues = new HashMap<>();
                     }
                     for (ParallelTaskCustomFieldConfig cfg : parallelTaskConfigs) {
-                        customFieldValues.put(cfg.getId(), (String) change.get(CHANGE_LOG_NEW_VALUE));
+                        if (cfg.getJiraCustomField().getName().equals(field)) {
+                            customFieldValues.put(cfg.getId(), (String) change.get(CHANGE_LOG_NEW_VALUE));
+                        }
                     }
                 }
             }

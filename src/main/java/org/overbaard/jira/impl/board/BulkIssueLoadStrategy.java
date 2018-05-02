@@ -22,13 +22,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.ofbiz.core.entity.jdbc.SQLProcessor;
+import org.osgi.framework.BundleReference;
 import org.overbaard.jira.OverbaardLogger;
 import org.overbaard.jira.impl.config.CustomFieldConfig;
 import org.overbaard.jira.impl.config.CustomFieldRegistry;
-import org.overbaard.jira.impl.config.ParallelTaskConfig;
 import org.overbaard.jira.impl.config.ParallelTaskCustomFieldConfig;
-import org.ofbiz.core.entity.jdbc.SQLProcessor;
-import org.osgi.framework.BundleReference;
+import org.overbaard.jira.impl.config.ParallelTaskGroupPosition;
+import org.overbaard.jira.impl.config.ProjectParallelTaskConfig;
+import org.overbaard.jira.impl.config.ProjectParallelTaskGroupsConfig;
 
 /**
  * <p>Bulk loads up things like custom fields using a direct sql query.</p>
@@ -70,10 +72,10 @@ class BulkIssueLoadStrategy implements IssueLoadStrategy {
             customFieldContexts.put(customFieldConfig.getId(), ctx);
         }
 
-        if (project.getConfig().getParallelTaskConfig() != null) {
+        if (project.getConfig().getParallelTaskGroupsConfig() != null) {
             //These have the options loaded already on project load, so there is no need for the context which does the caching
-            final ParallelTaskConfig parallelTaskConfig = project.getConfig().getParallelTaskConfig();
-            CustomFieldRegistry<ParallelTaskCustomFieldConfig> registry = parallelTaskConfig.getConfigs();
+            final ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig = project.getConfig().getParallelTaskGroupsConfig();
+            CustomFieldRegistry<ParallelTaskCustomFieldConfig> registry = parallelTaskGroupsConfig.getConfigs();
 
             registry.values().forEach(parallelTaskCustomFieldConfig ->
                     parallelTaskFields.put(parallelTaskCustomFieldConfig.getId(), parallelTaskCustomFieldConfig));
@@ -81,7 +83,7 @@ class BulkIssueLoadStrategy implements IssueLoadStrategy {
     }
 
     static BulkIssueLoadStrategy create(BoardProject.Builder project) {
-        if (project.getConfig().getCustomFieldNames().size() == 0 || project.getConfig().getParallelTaskConfig() == null) {
+        if (project.getConfig().getCustomFieldNames().size() == 0 || project.getConfig().getParallelTaskGroupsConfig() == null) {
             //There are no custom fields or parallel tasks so we are not needed
             return null;
         }
@@ -175,15 +177,15 @@ class BulkIssueLoadStrategy implements IssueLoadStrategy {
 
             Map<String, SortedParallelTaskFieldOptions> parallelTaskValues = project.getParallelTaskValues();
             SortedParallelTaskFieldOptions options = parallelTaskValues.get(parallelTaskFieldConfig.getName());
-            ParallelTaskConfig parallelTaskConfig = project.getConfig().getParallelTaskConfig();
+            ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig = project.getConfig().getParallelTaskGroupsConfig();
 
             Integer optionIndex = options.getIndex(stringValue);
             if (optionIndex == null) {
                 optionIndex = 0;
             }
 
-            final int taskFieldIndex = parallelTaskConfig.getIndex(parallelTaskFieldConfig.getName());
-            builder.setParallelTaskFieldValue(taskFieldIndex, optionIndex);
+            final ParallelTaskGroupPosition position = parallelTaskGroupsConfig.getPosition(parallelTaskFieldConfig.getName());
+            builder.setParallelTaskFieldValue(position, optionIndex);
         }
     }
 

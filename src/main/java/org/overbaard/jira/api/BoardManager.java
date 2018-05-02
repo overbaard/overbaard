@@ -109,5 +109,5 @@ public interface BoardManager {
      */
     Set<ParallelTaskCustomFieldConfig> getParallelTaskFieldsForCreateEvent(String projectCode);
 
-    void updateParallelTaskForIssue(ApplicationUser user, String boardCode, String issueKey, int taskIndex, int optionIndex) throws SearchException;
+    void updateParallelTaskForIssue(ApplicationUser user, String boardCode, String issueKey, int groupIndex, int taskIndex, int optionIndex) throws SearchException;
 }

@@ -20,9 +20,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.jboss.dmr.ModelNode;
+import org.overbaard.jira.impl.Constants;
 import org.overbaard.jira.impl.config.ParallelTaskCustomFieldConfig;
 import org.overbaard.jira.impl.util.IndexedMap;
-import org.overbaard.jira.impl.Constants;
 
 /**
  * The sorted parallel field options for a project

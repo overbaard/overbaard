@@ -156,10 +156,11 @@ public class RestEndpoint {
             @PathParam("issueKey") String issueKey, String body) throws SearchException {
 
         ModelNode bodyNode = ModelNode.fromJSONString(body);
+        int groupIndex = bodyNode.get("group-index").asInt();
         int taskIndex = bodyNode.get("task-index").asInt();
         int optionIndex = bodyNode.get("option-index").asInt();
 
-        jiraFacade.updateParallelTaskForIssue(getUser(), boardCode, issueKey, taskIndex, optionIndex);
+        jiraFacade.updateParallelTaskForIssue(getUser(), boardCode, issueKey, groupIndex, taskIndex, optionIndex);
         return createResponse("{}");
     }
 
