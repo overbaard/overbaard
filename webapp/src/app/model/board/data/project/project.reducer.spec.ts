@@ -35,23 +35,37 @@ export function getTestProjectsInput(): any {
             'P2-1'
           ],
           'parallel-tasks' : [
-            {
-              name : 'X Parallel Task',
-              display : 'X',
-              options : [
-                'One',
-                'Two',
-                'Three',
-                'Four']
-            },
-            {
-              name : 'Y Parallel Task',
-              display : 'Y',
-              options : [
-                'Uno',
-                'Dos',
-                'Tres']
-            }]
+            [
+              {
+                name : 'X Parallel Task',
+                display : 'X',
+                options : [
+                  'One',
+                  'Two',
+                  'Three',
+                  'Four']
+              },
+              {
+                name : 'Y Parallel Task',
+                display : 'Y',
+                options : [
+                  'Uno',
+                  'Dos',
+                  'Tres']
+              }
+            ],
+            [
+              {
+                name : 'Z Parallel Task',
+                display : 'Z',
+                options : [
+                  'Ein',
+                  'Zwei',
+                  'Drei',
+                  'Vier']
+              }
+            ]
+          ]
         }
       ],
       linked: {
@@ -122,10 +136,20 @@ describe('Projects reducer tests', () => {
 
       // Parallel tasks
       expect(projectState.parallelTasks.get('P1')).not.toEqual(jasmine.anything());
-      const parallelTasks: List<ParallelTask> = projectState.parallelTasks.get('P2');
+      const parallelTasks: List<List<ParallelTask>> = projectState.parallelTasks.get('P2');
       expect(parallelTasks.size).toBe(2);
-
+      expect(parallelTasks.get(0).size).toBe(2);
+      checkParallelTask(parallelTasks.getIn([0, 0]), 'X Parallel Task', 'X', ['One', 'Two', 'Three', 'Four']);
+      checkParallelTask(parallelTasks.getIn([0, 1]), 'Y Parallel Task', 'Y', ['Uno', 'Dos', 'Tres']);
+      expect(parallelTasks.get(1).size).toBe(1);
+      checkParallelTask(parallelTasks.getIn([1, 0]), 'Z Parallel Task', 'Z', ['Ein', 'Zwei', 'Drei', 'Vier']);
     });
+
+    function checkParallelTask(pt: ParallelTask, name: string, display: string, options: string[]) {
+      expect(pt.name).toEqual(name);
+      expect(pt.display).toEqual(display);
+      expect(pt.options.map(o => o.name).toArray()).toEqual(options);
+    }
 
     it('Deserialize same', () => {
       const projectStateA: ProjectState = projectMetaReducer(

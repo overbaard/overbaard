@@ -61,14 +61,14 @@ export function getTestBoardsInput(): any {
               'P1-1',
               'P1-2'
             ],
-            'parallel-tasks' : [
+            'parallel-tasks' : [[
               {
                 name : 'PT A',
                 display : 'A',
                 options : [
                   'One',
                   'Two']
-              }]
+              }]]
           }
         ],
         linked: {
@@ -90,7 +90,7 @@ export function getTestBoardsInput(): any {
           components: [1],
           labels: [0, 1],
           custom: {'Custom-1': 0, 'Custom-2': 1},
-          'parallel-tasks': [0],
+          'parallel-tasks': [[0]],
           'linked-issues': [
             {
               key : 'L1-1',
@@ -104,7 +104,7 @@ export function getTestBoardsInput(): any {
           summary: 'Issue two',
           priority: 1,
           type: 1,
-          'parallel-tasks': [1]
+          'parallel-tasks': [[1]]
         }
       },
       blacklist: getTestBlacklistInput()
@@ -184,7 +184,7 @@ describe('Board reducer tests', () => {
         .customField('Custom-1', 'c1-A', 'First C1')
         .customField('Custom-2', 'c2-B', 'Second C2')
         .addLinkedIssue('L1-1', 'Linked 1', 1, 'L1-2')
-        .selectedParallelTaskOptions(0)
+        .selectedParallelTaskOptions([0])
         .check();
       const issue2 = issues.get('P1-2');
       expect(issue2.key).toEqual('P1-2');

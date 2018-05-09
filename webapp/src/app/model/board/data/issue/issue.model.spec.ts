@@ -226,7 +226,7 @@ describe('Issue unit tests', () => {
 
     it('Parallel Tasks', () => {
       input['key'] = 'P2-100'; // The parallel tasks are set up in the 'P2' project
-      input['parallel-tasks'] = [2, 1];
+      input['parallel-tasks'] = [[2, 1], [3]];
       const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
       new IssueChecker(issue,
         lookupParams.issueTypes.get('task'),
@@ -234,7 +234,7 @@ describe('Issue unit tests', () => {
         lookupParams.assignees.get('bob'),
         'Issue summary', 4)
         .key('P2-100')
-        .selectedParallelTaskOptions(2, 1)
+        .selectedParallelTaskOptions([2, 1], [3])
         .check();
     });
   });
@@ -501,7 +501,7 @@ describe('Issue unit tests', () => {
         const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
         // Clear a custom field
         const updated = updateIssue(issue, {
-          key: 'P2-1', 'parallel-tasks': {'1': 2, '0': 1}
+          key: 'P2-1', 'parallel-tasks': {'0': {'1': 2, '0': 1}, '1': {'0': 0}}
         });
 
         new IssueChecker(updated,
@@ -510,16 +510,16 @@ describe('Issue unit tests', () => {
           lookupParams.assignees.get('bob'),
           'Issue summary', 4)
           .key('P2-1')
-          .selectedParallelTaskOptions(1, 2)
+          .selectedParallelTaskOptions([1, 2], [0])
           .check();
       });
 
       it ('Parallel tasks', () => {
-        input['parallel-tasks'] = [0, 0];
+        input['parallel-tasks'] = [[0, 0], [1]];
         const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
 
         let updated = updateIssue(issue, {
-          key: 'P2-1', 'parallel-tasks': {'1': 2}
+          key: 'P2-1', 'parallel-tasks': {'0': {'1': 2}, '1': {'0': 3}}
         });
 
         new IssueChecker(updated,
@@ -528,12 +528,12 @@ describe('Issue unit tests', () => {
           lookupParams.assignees.get('bob'),
           'Issue summary', 4)
           .key('P2-1')
-          .selectedParallelTaskOptions(0, 2)
+          .selectedParallelTaskOptions([0, 2], [3])
           .check();
 
         // Check setting it back to zero again works too
         updated = updateIssue(updated, {
-          key: 'P2-1', 'parallel-tasks': {'1': 0}
+          key: 'P2-1', 'parallel-tasks': {'0': {'1': 0}}
         });
         new IssueChecker(updated,
           lookupParams.issueTypes.get('task'),
@@ -541,7 +541,7 @@ describe('Issue unit tests', () => {
           lookupParams.assignees.get('bob'),
           'Issue summary', 4)
           .key('P2-1')
-          .selectedParallelTaskOptions(0, 0)
+          .selectedParallelTaskOptions([0, 0], [3])
           .check();
 
       });
@@ -578,7 +578,7 @@ describe('Issue unit tests', () => {
           labels: ['L-10', 'L-20'],
           'fix-versions': ['F-10', 'F-20'],
           custom: {'Custom-1': 'c1-C', 'Custom-2': 'c2-B'},
-          'parallel-tasks': {'1': 2, '0': 1}
+          'parallel-tasks': {'0': {'1': 2, '0': 1}, '1': {'0': 3}}
         });
         new IssueChecker(newIssue,
           lookupParams.issueTypes.get('bug'),
@@ -591,7 +591,7 @@ describe('Issue unit tests', () => {
           .fixVersions('F-10', 'F-20')
           .customField('Custom-1', 'c1-C', 'Third C1')
           .customField('Custom-2', 'c2-B', 'Second C2')
-          .selectedParallelTaskOptions(1, 2)
+          .selectedParallelTaskOptions([1, 2], [3])
           .check();
       });
     });
@@ -621,7 +621,7 @@ export class IssueChecker {
   private _labels: string[];
   private _fixVersions: string[];
   private _customFields: Dictionary<CustomField>;
-  private _parallelTasks: number[];
+  private _parallelTasks: number[][];
 
 
 
@@ -673,7 +673,7 @@ export class IssueChecker {
     return this;
   }
 
-  selectedParallelTaskOptions(...selectedOptions: number[]): IssueChecker {
+  selectedParallelTaskOptions(...selectedOptions: number[][]): IssueChecker {
     this._parallelTasks = selectedOptions;
     return this;
   }
@@ -742,8 +742,10 @@ export class IssueChecker {
     }
 
     if (this._parallelTasks) {
-      const options: List<number> = this._issue.selectedParallelTasks;
-      expect(options.toArray()).toEqual(this._parallelTasks);
+      expect(this._issue.parallelTasks).toEqual(jasmine.anything());
+      const options: List<List<number>> = this._issue.selectedParallelTasks;
+      const arrOpts: number[][] = options.map(group => group.toArray()).toArray();
+      expect(arrOpts).toEqual(this._parallelTasks);
     } else {
       expect(this._issue.selectedParallelTasks).not.toEqual(jasmine.anything());
     }

@@ -76,7 +76,7 @@ export class BoardService {
   }
 
   setParallelTaskOption(boardCode: string, backlog: boolean, issueKey: string, taskName: string,
-                        taskIndex: number, selectedOptionName: string, selectedOptionIndex: number) {
+                        groupIndex: number, taskIndex: number, selectedOptionName: string, selectedOptionIndex: number) {
 
     // Cancel any background polling
     // Cancel any background polling
@@ -89,6 +89,7 @@ export class BoardService {
       UrlService.OVERBAARD_REST_PREFIX + '/issues/' + boardCode + '/parallel/' + issueKey);
     console.log('Updating parallel task ' + path);
     const payload = {
+      'group-index': groupIndex,
       'task-index': taskIndex,
       'option-index': selectedOptionIndex
     };

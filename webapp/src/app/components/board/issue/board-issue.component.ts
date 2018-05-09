@@ -22,7 +22,7 @@ import {CommentIssueDialogComponent} from './comment-issue-dialog.component';
 import {BoardService} from '../../../services/board.service';
 import {RankIssueDialogComponent} from './rank-issue-dialog.component';
 import {BoardViewMode} from '../../../model/board/user/board-view-mode';
-import {ParallelTask, ParallelTaskOption} from '../../../model/board/data/project/project.model';
+import {ParallelTask, ParallelTaskOption, ParallelTaskPosition} from "../../../model/board/data/project/project.model";
 import {LinkedIssue} from '../../../model/board/data/issue/linked-issue';
 
 @Component({
@@ -52,6 +52,8 @@ export class BoardIssueComponent implements OnInit, OnChanges, AfterViewInit {
 
   viewModeEnum = BoardViewMode;
 
+  // TODO Temporary workaround while we decide how to handle this in the UI
+  tmpPositions: ParallelTaskPosition[];
 
   constructor(public menuDialog: MatDialog, private _boardService: BoardService/*, private _elementRef: ElementRef*/) { }
 
@@ -62,6 +64,15 @@ export class BoardIssueComponent implements OnInit, OnChanges, AfterViewInit {
     const issue: SimpleChange = changes['issue'];
     if (issue && issue.currentValue !== issue.previousValue) {
       this.cardTooltip = null;
+      if (this.issue.parallelTasks) {
+        this.tmpPositions = [];
+        this.issue.parallelTasks.forEach((group, groupIndex) => {
+          group.forEach((pt, taskIndex) => {
+            this.tmpPositions.push({groupIndex: groupIndex, taskIndex: taskIndex});
+          });
+        });
+
+      }
     }
   }
 
@@ -128,12 +139,14 @@ export class BoardIssueComponent implements OnInit, OnChanges, AfterViewInit {
 
       if (this.issue.parallelTasks) {
         tooltip += '\n';
-        this.issue.parallelTasks.forEach((pt, i) => {
-          const selectedIndex: number = this.issue.selectedParallelTasks.get(i);
-          const option: ParallelTaskOption = pt.options.get(selectedIndex);
-          tooltip +=
-            `${pt.name}: ${option.name}
+        this.issue.parallelTasks.forEach((group, groupIndex) => {
+          group.forEach((pt, taskIndex) => {
+            const selectedIndex: number = this.issue.selectedParallelTasks.getIn([groupIndex, taskIndex]);
+            const option: ParallelTaskOption = pt.options.get(selectedIndex);
+            tooltip +=
+              `${pt.name}: ${option.name}
             `;
+          });
         });
       }
 
@@ -189,8 +202,8 @@ export class BoardIssueComponent implements OnInit, OnChanges, AfterViewInit {
     });
   }
 
-  parallelTaskTrackByFn(index: number, pt: ParallelTask) {
-    return index;
+  parallelTaskTrackByFn(pos: ParallelTaskPosition, pt: ParallelTask) {
+    return pos;
   }
 
   linkedIssueTrackByFn(index: number, li: LinkedIssue) {

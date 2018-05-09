@@ -114,29 +114,46 @@ export class IssueHeightCalculator {
 
   private calculateParallelTaskLines(): number {
     const extraWidth = 3; // 3px right margin
-    return this.calculateExtraInfoLines(
-      this._issueDetail.parallelTasks, extraWidth, this._boardIssue.parallelTasks, pt => pt.display);
+
+    if (!this._issueDetail.parallelTasks || !this._boardIssue.parallelTasks || this._boardIssue.parallelTasks.size === 0) {
+      return 0;
+    }
+
+    // TODO Revisit once we have decided the layout
+    const lookup: FontSizeTable = this._fontSizeTable.getTable('14px');
+    let lines = 1;
+    let currentWidth = 0;
+    this._boardIssue.parallelTasks.forEach(group => {
+      group.forEach(parallelTask => {
+        const word: string = parallelTask.display;
+        let wordSize = 0;
+        for (let ci = 0 ; ci < word.length ; ci++) {
+          wordSize += lookup.getWidth(word.charAt(ci));
+        }
+        wordSize += extraWidth;
+        if (currentWidth + wordSize > IssueHeightCalculator.ISSUE_SUMMARY_WIDTH) {
+          lines++;
+          currentWidth = 0;
+        }
+        currentWidth += wordSize;
+      });
+    });
+    return lines;
   }
 
 
   private calculateLinkedIssueLines(): number {
     const extraWidth = 5; // 5px right margin
-    return this.calculateExtraInfoLines(
-      this._issueDetail.linkedIssues, extraWidth, this._boardIssue.linkedIssues, li => li.key);
-  }
 
-  private calculateExtraInfoLines<T>(detailSetting: boolean, extraWidth: number,
-                                     list: List<T>, textGetter: (t: T) => string): number {
-
-    if (!detailSetting || !list || list.size === 0) {
+    if (!this._issueDetail.linkedIssues || !this._boardIssue.linkedIssues || this._boardIssue.linkedIssues.size === 0) {
       return 0;
     }
 
     const lookup: FontSizeTable = this._fontSizeTable.getTable('14px');
     let lines = 1;
     let currentWidth = 0;
-    list.forEach(infoItem => {
-      const word: string = textGetter(infoItem);
+    this._boardIssue.linkedIssues.forEach(linkedIssue => {
+      const word: string = linkedIssue.key;
       let wordSize = 0;
       for (let ci = 0 ; ci < word.length ; ci++) {
         wordSize += lookup.getWidth(word.charAt(ci));

@@ -17,7 +17,7 @@ import {BoardIssueView} from './board-issue-view';
 import {List, Map, Set} from 'immutable';
 import {NO_ASSIGNEE} from '../../model/board/data/assignee/assignee.model';
 import {CustomField} from '../../model/board/data/custom-field/custom-field.model';
-import {ParallelTask, ProjectState} from '../../model/board/data/project/project.model';
+import {ParallelTask, ParallelTaskPosition, ProjectState, ProjectUtil} from '../../model/board/data/project/project.model';
 
 export class AllFilters {
   private _project: SimpleFilter;
@@ -29,7 +29,7 @@ export class AllFilters {
   private _fixVersion: MultiSelectFilter;
   private _customFieldFilters: Map<string, SimpleFilter>;
   private _parallelTaskFilters: Map<string, SimpleFilter>;
-  private _parallelTaskFilterIndicesByProject: Map<string, Map<string, number>>;
+  private _parallelTaskFilterPositionsByProject: Map<string, Map<string, ParallelTaskPosition>>;
 
   constructor(boardFilters: BoardFilterState, projectState: ProjectState, currentUser: string) {
     this._project = new SimpleFilter(PROJECT_ATTRIBUTES, boardFilters.project);
@@ -51,19 +51,19 @@ export class AllFilters {
         }
       });
     });
-    this._parallelTaskFilterIndicesByProject = Map<string, Map<string, number>>().withMutations(mutable => {
-      projectState.parallelTasks.forEach((list, project) => {
-        if (list.size > 0) {
-          mutable.set(project, this.createParallelTaskIndices(list));
-        }
+    this._parallelTaskFilterPositionsByProject = Map<string, Map<string, ParallelTaskPosition>>().withMutations(mutable => {
+      projectState.parallelTasks.forEach((groups, project) => {
+          mutable.set(project, this.createParallelTaskIndices(groups));
       });
     });
   }
 
-  private createParallelTaskIndices(tasksForProject: List<ParallelTask>): Map<string, number> {
-    return Map<string, number>().withMutations(mutable => {
-      tasksForProject.forEach((task, index) => {
-        mutable.set(task.display, index);
+  private createParallelTaskIndices(groupsForProject: List<List<ParallelTask>>): Map<string, ParallelTaskPosition> {
+    return Map<string, ParallelTaskPosition>().withMutations(mutable => {
+      groupsForProject.forEach((group, groupIndex) => {
+        group.forEach((task, taskIndex) => {
+          mutable.set(task.display, ProjectUtil.createParallelTaskPosition(groupIndex, taskIndex));
+        });
       });
     });
   }
@@ -119,12 +119,15 @@ export class AllFilters {
 
   private filterVisibleParallelTasks(issue: BoardIssueView): boolean {
     let visible = true;
-    const indicesForProject: Map<string, number> = this._parallelTaskFilterIndicesByProject.get(issue.projectCode);
+    const positionsForProject: Map<string, ParallelTaskPosition> = this._parallelTaskFilterPositionsByProject.get(issue.projectCode);
     this._parallelTaskFilters.forEach((f, k) => {
-      if (indicesForProject) {
-        const index: number = indicesForProject.get(k);
+      if (positionsForProject) {
+        const pos: ParallelTaskPosition = positionsForProject.get(k);
         if (!issue.parallelTasks ||
-          !f.doFilter(issue.parallelTasks.get(index).options.get(issue.selectedParallelTasks.get(index)).name)) {
+          !f.doFilter(
+            issue.parallelTasks
+              .getIn([pos.groupIndex, pos.taskIndex])
+              .options.get(issue.selectedParallelTasks.getIn([pos.groupIndex, pos.taskIndex])).name)) {
           visible = false;
           return false;
         }

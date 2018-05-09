@@ -7,7 +7,7 @@ export interface ProjectState {
   boardProjects: OrderedMap<string, BoardProject>;
   linkedProjects: Map<string, LinkedProject>;
   // Parallel tasks ordered by project
-  parallelTasks: Map<string, List<ParallelTask>>;
+  parallelTasks: Map<string, List<List<ParallelTask>>>;
 }
 
 export interface BaseProject {
@@ -35,10 +35,15 @@ export interface ParallelTaskOption {
   colour: string;
 }
 
+export interface ParallelTaskPosition {
+  groupIndex: number;
+  taskIndex: number;
+}
+
 const DEFAULT_STATE: ProjectState = {
   boardProjects: OrderedMap<string, BoardProject>(),
   linkedProjects: Map<string, LinkedProject>(),
-  parallelTasks: Map<string, List<ParallelTask>>()
+  parallelTasks: Map<string, List<List<ParallelTask>>>()
 };
 
 const DEFAULT_BOARD_PROJECT: BoardProject = {
@@ -64,6 +69,11 @@ const DEFAULT_PARALLEL_TASK_OPTION: ParallelTaskOption = {
   colour: null
 };
 
+const DEFAULT_PARALLEL_TASK_POSITION: ParallelTaskPosition = {
+  groupIndex: -1,
+  taskIndex: -1
+};
+
 
 interface ProjectStateRecord extends TypedRecord<ProjectStateRecord>, ProjectState {
 }
@@ -80,11 +90,15 @@ interface ParallelTaskRecord extends TypedRecord<ParallelTaskRecord>, ParallelTa
 interface ParallelTaskOptionRecord extends TypedRecord<ParallelTaskOptionRecord>, ParallelTaskOption {
 }
 
+interface ParallelTaskPositionRecord extends TypedRecord<ParallelTaskPositionRecord>, ParallelTaskPosition {
+}
+
 const STATE_FACTORY = makeTypedFactory<ProjectState, ProjectStateRecord>(DEFAULT_STATE);
 const BOARD_PROJECT_FACTORY = makeTypedFactory<BoardProject, BoardProjectRecord>(DEFAULT_BOARD_PROJECT);
 const LINKED_PROJECT_FACTORY = makeTypedFactory<LinkedProject, LinkedProjectRecord>(DEFAULT_LINKED_PROJECT);
 const PARALLEL_TASK_FACTORY = makeTypedFactory<ParallelTask, ParallelTaskRecord>(DEFAULT_PARALLEL_TASK);
 const PARALLEL_TASK_OPTION_FACTORY = makeTypedFactory<ParallelTaskOption, ParallelTaskOptionRecord>(DEFAULT_PARALLEL_TASK_OPTION);
+const PARALLEL_TASK_POSITION_FACTORY = makeTypedFactory<ParallelTaskPosition, ParallelTaskPositionRecord>(DEFAULT_PARALLEL_TASK_POSITION);
 
 export const initialProjectState: ProjectState = STATE_FACTORY(DEFAULT_STATE);
 
@@ -143,5 +157,9 @@ export class ProjectUtil {
     });
 
     return ownToBoard;
+  }
+
+  static createParallelTaskPosition(groupIndex: number, taskIndex: number): ParallelTaskPosition {
+    return PARALLEL_TASK_POSITION_FACTORY({groupIndex: groupIndex, taskIndex: taskIndex});
   }
 }

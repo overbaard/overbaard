@@ -71,9 +71,9 @@
       <div *ngIf="issue.selectedParallelTasks && issueDetailState.parallelTasks" class="parallel-tasks-container">
         <!-- Display of the parallel tasks -->
         <app-parallel-task
-          *ngFor="let pt of issue.parallelTasks ; let i = index ; trackBy: parallelTaskTrackByFn"
+          *ngFor="let pos of tmpPositions ; trackBy: parallelTaskTrackByFn"
           [issue]="issue"
-          [taskIndex]="i"
+          [tmpParallelTaskPosition]="pos"
           (updateParallelTask)="onUpdateParallelTask($event)"
         ></app-parallel-task>
       </div>

@@ -192,7 +192,7 @@ export class BoardStateInitializer {
     return {
       boardProjects: projects,
       linkedProjects: Map<string, LinkedProject>(),
-      parallelTasks: Map<string, List<ParallelTask>>()
+      parallelTasks: Map<string, List<List<ParallelTask>>>()
     };
   }
 
