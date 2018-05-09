@@ -16,11 +16,8 @@
 
 package org.overbaard.jira.impl.config;
 
-import static org.overbaard.jira.impl.Constants.DISPLAY;
-
 import java.util.Map;
 
-import org.jboss.dmr.ModelNode;
 import org.overbaard.jira.impl.util.IndexedMap;
 
 /**

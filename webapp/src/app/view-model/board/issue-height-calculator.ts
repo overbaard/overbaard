@@ -15,6 +15,7 @@ export class IssueHeightCalculator {
 
   private static readonly LINKED_ISSUE_HEIGHT = 19;
   private static readonly PARALLEL_TASK_HEIGHT = 19;
+  private static readonly PARALLEL_TASK_GROUP_SPACER = 5;
 
   private _issueDetail: IssueDetailState;
   private _summaryCalcConfig: SummaryCalulationConfig;
@@ -119,11 +120,13 @@ export class IssueHeightCalculator {
       return 0;
     }
 
-    // TODO Revisit once we have decided the layout
     const lookup: FontSizeTable = this._fontSizeTable.getTable('14px');
     let lines = 1;
     let currentWidth = 0;
-    this._boardIssue.parallelTasks.forEach(group => {
+    this._boardIssue.parallelTasks.forEach((group, groupIndex) => {
+      if (groupIndex > 0) {
+        currentWidth += IssueHeightCalculator.PARALLEL_TASK_GROUP_SPACER;
+      }
       group.forEach(parallelTask => {
         const word: string = parallelTask.display;
         let wordSize = 0;

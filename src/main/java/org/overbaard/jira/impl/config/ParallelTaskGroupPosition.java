@@ -1,7 +1,5 @@
 package org.overbaard.jira.impl.config;
 
-import org.overbaard.jira.impl.util.IndexedMap;
-
 /**
  * @author <a href="mailto:kabir.khan@jboss.com">Kabir Khan</a>
  */

@@ -14,7 +14,10 @@ import {UpdateParallelTaskEvent} from '../../../events/update-parallel-task.even
 export class ParallelTaskComponent implements OnInit {
 
   @Input()
-  tmpParallelTaskPosition: ParallelTaskPosition;
+  groupIndex: number;
+
+  @Input()
+  taskIndex: number;
 
   @Input()
   issue: BoardIssueView;
@@ -29,12 +32,12 @@ export class ParallelTaskComponent implements OnInit {
   }
 
   get parallelTask(): ParallelTask {
-    return this.issue.parallelTasks.getIn([this.tmpParallelTaskPosition.groupIndex, this.tmpParallelTaskPosition.taskIndex]);
+    return this.issue.parallelTasks.getIn([this.groupIndex, this.taskIndex]);
   }
 
   get selectedOption(): ParallelTaskOption {
     return this.parallelTask.options.get(
-      this.issue.selectedParallelTasks.getIn([this.tmpParallelTaskPosition.groupIndex, this.tmpParallelTaskPosition.taskIndex]));
+      this.issue.selectedParallelTasks.getIn([this.groupIndex, this.taskIndex]));
   }
 
   onOpenDialog(event: MouseEvent) {
@@ -52,8 +55,8 @@ export class ParallelTaskComponent implements OnInit {
       if (option && option !== this.selectedOption) {
         this.updateParallelTask.emit({
           issueKey: this.issue.key,
-          groupIndex: this.tmpParallelTaskPosition.groupIndex,
-          taskIndex: this.tmpParallelTaskPosition.taskIndex,
+          groupIndex: this.groupIndex,
+          taskIndex: this.taskIndex,
           selectedOptionIndex: index,
           taskName: this.parallelTask.name,
           optionName: option.name

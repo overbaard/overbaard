@@ -69,13 +69,22 @@
     </div>
     <ng-template #extraInfo>
       <div *ngIf="issue.selectedParallelTasks && issueDetailState.parallelTasks" class="parallel-tasks-container">
-        <!-- Display of the parallel tasks -->
-        <app-parallel-task
-          *ngFor="let pos of tmpPositions ; trackBy: parallelTaskTrackByFn"
-          [issue]="issue"
-          [tmpParallelTaskPosition]="pos"
-          (updateParallelTask)="onUpdateParallelTask($event)"
-        ></app-parallel-task>
+        <div
+          *ngFor="let group of issue.selectedParallelTasks ; let groupIndex = index ; trackBy: parallelTaskGroupTrackByFn"
+          class="parallel-tasks-group">
+          <div
+            *ngIf="groupIndex > 0"
+            class="new-pt-group-space">
+
+          </div>
+          <app-parallel-task
+            *ngFor="let pt of group ; let taskIndex = index ; trackBy: parallelTaskTrackByFn"
+            [issue]="issue"
+            [groupIndex]="groupIndex"
+            [taskIndex]="taskIndex"
+            (updateParallelTask)="onUpdateParallelTask($event)"
+          ></app-parallel-task>
+        </div>
       </div>
       <div *ngIf="hasLinkedIssues && issueDetailState.linkedIssues"  class="linked-issues-container">
         <app-linked-issue
