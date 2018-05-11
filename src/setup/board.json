@@ -38,7 +38,7 @@
       "query-filter": null,
       "colour": "#4667CA",
       "state-links": {
-        "Done": "Done",
+        "DONE": "Done",
         "Selected for Development": "Selected for Development",
         "In Progress": "In Progress",
         "Backlog": "Backlog"
@@ -49,7 +49,7 @@
       "query-filter": null,
       "colour": "#CA6746",
       "state-links": {
-        "Done": "Done",
+        "DONE": "Done",
         "Selected for Development": "Selected for Development",
         "In Progress": "In Progress",
         "Backlog": "Backlog"
