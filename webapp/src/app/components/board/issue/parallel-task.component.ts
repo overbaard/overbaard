@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {MatDialog} from '@angular/material';
-import {ParallelTask, ParallelTaskOption} from '../../../model/board/data/project/project.model';
+import {ParallelTask, ParallelTaskOption, ParallelTaskPosition} from '../../../model/board/data/project/project.model';
 import {ParallelTaskSelectorComponent} from './parallel-task-selector.component';
 import {BoardIssueView} from '../../../view-model/board/board-issue-view';
 import {UpdateParallelTaskEvent} from '../../../events/update-parallel-task.event';
@@ -12,6 +12,9 @@ import {UpdateParallelTaskEvent} from '../../../events/update-parallel-task.even
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ParallelTaskComponent implements OnInit {
+
+  @Input()
+  groupIndex: number;
 
   @Input()
   taskIndex: number;
@@ -29,11 +32,12 @@ export class ParallelTaskComponent implements OnInit {
   }
 
   get parallelTask(): ParallelTask {
-    return this.issue.parallelTasks.get(this.taskIndex);
+    return this.issue.parallelTasks.getIn([this.groupIndex, this.taskIndex]);
   }
 
   get selectedOption(): ParallelTaskOption {
-    return this.parallelTask.options.get(this.issue.selectedParallelTasks.get(this.taskIndex));
+    return this.parallelTask.options.get(
+      this.issue.selectedParallelTasks.getIn([this.groupIndex, this.taskIndex]));
   }
 
   onOpenDialog(event: MouseEvent) {
@@ -51,6 +55,7 @@ export class ParallelTaskComponent implements OnInit {
       if (option && option !== this.selectedOption) {
         this.updateParallelTask.emit({
           issueKey: this.issue.key,
+          groupIndex: this.groupIndex,
           taskIndex: this.taskIndex,
           selectedOptionIndex: index,
           taskName: this.parallelTask.name,

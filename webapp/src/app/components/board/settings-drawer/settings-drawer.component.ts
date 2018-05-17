@@ -197,7 +197,7 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
       );
   }
 
-  private createParallelTaskGroup(filterState: BoardFilterState, observable: Observable<OrderedMap<string, List<ParallelTask>>>) {
+  private createParallelTaskGroup(filterState: BoardFilterState, observable: Observable<OrderedMap<string, List<List<ParallelTask>>>>) {
     observable
       .pipe(
         take(1)
@@ -214,27 +214,29 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
           const done: Dictionary<boolean> = {};
           const parallelTasksGroup: FormGroup = new FormGroup({});
 
-          parallelTasks.forEach((tasksForProject => {
+          parallelTasks.forEach((groupsForProject => {
+            groupsForProject.forEach(tasksForProject => {
             // TODO if we have different options for different projects, we should merge those here if that becomes needed
-            tasksForProject.forEach((parallelTask: ParallelTask) => {
-              if (done[parallelTask.name]) {
-                return;
-              }
-              done[parallelTask.name] = true;
+              tasksForProject.forEach((parallelTask: ParallelTask) => {
+                if (done[parallelTask.name]) {
+                  return;
+                }
+                done[parallelTask.name] = true;
 
-              const options: FilterFormEntry[] = new Array<FilterFormEntry>(parallelTask.options.size);
-              const taskGroup: FormGroup = new FormGroup({});
+                const options: FilterFormEntry[] = new Array<FilterFormEntry>(parallelTask.options.size);
+                const taskGroup: FormGroup = new FormGroup({});
 
-              parallelTask.options.forEach((option, i) => {
-                options[i] = FilterFormEntry(option.name, option.name);
-                const filteredOptions: Set<string> = filterState.parallelTask.get(parallelTask.display);
-                taskGroup.addControl(option.name, new FormControl(!!filteredOptions && filteredOptions.contains(option.name)));
+                parallelTask.options.forEach((option, i) => {
+                  options[i] = FilterFormEntry(option.name, option.name);
+                  const filteredOptions: Set<string> = filterState.parallelTask.get(parallelTask.display);
+                  taskGroup.addControl(option.name, new FormControl(!!filteredOptions && filteredOptions.contains(option.name)));
+                });
+
+                const entry = FilterFormEntry(parallelTask.display, parallelTask.name, options);
+                filterFormEntryDictionary[entry.key] = entry;
+                filterFormEntries.push(entry);
+                parallelTasksGroup.addControl(parallelTask.display, taskGroup);
               });
-
-              const entry = FilterFormEntry(parallelTask.display, parallelTask.name, options);
-              filterFormEntryDictionary[entry.key] = entry;
-              filterFormEntries.push(entry);
-              parallelTasksGroup.addControl(parallelTask.display, taskGroup);
             });
           }));
 

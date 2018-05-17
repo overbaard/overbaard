@@ -259,17 +259,17 @@ describe('Apply filter tests', () => {
       let projectState: ProjectState;
       const issue: BoardIssueView = emptyIssue();
       beforeEach(() => {
-        const tasks: Map<string, List<ParallelTask>> = Map<string, List<ParallelTask>>().withMutations(map => {
-          const projectTasks: List<ParallelTask> = List<ParallelTask>([
+        const tasks: Map<string, List<List<ParallelTask>>> = Map<string, List<List<ParallelTask>>>().withMutations(map => {
+          const projectTasks: List<List<ParallelTask>> = List<List<ParallelTask>>([
             {
               name: 'Community Docs',
               display: 'CD',
-              options: ['One', 'Two', 'Three']
+              options: [['One', 'Two', 'Three']]
             },
             {
               name: 'Test Development',
               display: 'TD',
-              options: ['Uno', 'Dos', 'Tres']
+              options: [['Uno', 'Dos', 'Tres']]
             }
           ]);
           map.set('ISSUE', projectTasks);
@@ -279,7 +279,7 @@ describe('Apply filter tests', () => {
           linkedProjects: null,
           parallelTasks: tasks
         };
-        issue.selectedParallelTasks = List<number>([0, 1]);
+        issue.selectedParallelTasks = List<List<number>>([0, 1]);
       });
       it ('Matches one', () => {
         expect(filtersFromQs({'pt.CD': 'One'}).filterVisible(issue)).toBe(true);
@@ -320,7 +320,7 @@ describe('Apply filter tests', () => {
     const projectState = {
         boardProjects: null,
         linkedProjects: null,
-        parallelTasks: Map<string, List<ParallelTask>>()
+        parallelTasks: Map<string, List<List<ParallelTask>>>()
       };
 
     const boardFilters: BoardFilterState =

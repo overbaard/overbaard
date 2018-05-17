@@ -18,8 +18,8 @@ package org.overbaard.jira.impl.config;
 
 import org.jboss.dmr.ModelNode;
 import org.overbaard.jira.OverbaardValidationException;
-import org.overbaard.jira.impl.JiraInjectables;
 import org.overbaard.jira.impl.Constants;
+import org.overbaard.jira.impl.JiraInjectables;
 
 import com.atlassian.jira.issue.CustomFieldManager;
 import com.atlassian.jira.issue.fields.CustomField;

@@ -96,7 +96,7 @@ export class DeserializeIssueLookupParams {
   private _fixVersions: List<string> = List<string>();
   private _customFields: OrderedMap<string, OrderedMap<string, CustomField>> = OrderedMap<string, OrderedMap<string, CustomField>>();
   private _customFieldsListMap: OrderedMap<string, List<CustomField>>;
-  private _parallelTasks: Map<string, List<ParallelTask>> = Map<string, List<ParallelTask>>();
+  private _parallelTasks: Map<string, List<List<ParallelTask>>> = Map<string, List<List<ParallelTask>>>();
   private _boardProjects: Map<string, BoardProject> = Map<string, BoardProject>();
   private _linkedProjects: Map<string, LinkedProject> = Map<string, LinkedProject>();
   private _boardStates: List<string>;
@@ -138,7 +138,7 @@ export class DeserializeIssueLookupParams {
     return this;
   }
 
-  setParallelTasks(value: Map<string, List<ParallelTask>>): DeserializeIssueLookupParams {
+  setParallelTasks(value: Map<string, List<List<ParallelTask>>>): DeserializeIssueLookupParams {
     this._parallelTasks = value;
     return this;
   }
@@ -220,7 +220,7 @@ export class DeserializeIssueLookupParams {
     return this._customFieldsListMap;
   }
 
-  get parallelTasks(): Map<string, List<ParallelTask>> {
+  get parallelTasks(): Map<string, List<List<ParallelTask>>> {
     return this._parallelTasks;
   }
 
@@ -304,9 +304,10 @@ export class IssueUtil {
     }
 
     if (input['parallel-tasks']) {
-      const parallelTasksInput: number[] = input['parallel-tasks'];
+      const selectedParallelTasks: List<List<number>> =
+        List<List<number>>((<number[][]>input['parallel-tasks']).map(group => List<number>(group)));
       input['parallelTasks'] = params.parallelTasks.get(projectCode);
-      input['selectedParallelTasks'] = List<number>(parallelTasksInput);
+      input['selectedParallelTasks'] = List<List<number>>(selectedParallelTasks);
       delete input['parallel-tasks'];
     }
 
@@ -348,15 +349,29 @@ export class IssueUtil {
         }
       });
     }
-    let selectedParallelTasks: List<number>;
+    let selectedParallelTasks: List<List<number>>;
     if (input['parallel-tasks']) {
+
       const parallelTasksInput: Object = input['parallel-tasks'];
-      const parallelTasks: List<ParallelTask> = params.parallelTasks.get(projectCode);
-      const selected: number[] = new Array<number>(parallelTasks.size);
-      for (const indexKey of Object.keys(parallelTasksInput)) {
-        selected[Number(indexKey)] = parallelTasksInput[indexKey];
+      const parallelTasks: List<List<ParallelTask>> = params.parallelTasks.get(projectCode);
+      const selected: List<number>[] = new Array<List<number>>(parallelTasks.size);
+
+      for (let groupIndex = 0 ; groupIndex < parallelTasks.size ; groupIndex++) {
+
+        const groupKey = String(groupIndex);
+        const group = new Array<number>(parallelTasks.get(groupIndex).size);
+        const groupInput = parallelTasksInput[groupKey];
+
+        if (groupInput) {
+          for (const taskKey of Object.keys(groupInput)) {
+            const taskIndex = Number(taskKey);
+            group[taskIndex] = groupInput[taskKey];
+          }
+        }
+
+        selected[groupIndex] = List<number>(group);
       }
-      selectedParallelTasks = List<number>(selected);
+      selectedParallelTasks = List<List<number>>(selected);
     }
     return {
       key: key,
@@ -370,7 +385,7 @@ export class IssueUtil {
       labels: IssueUtil.getClearableStringSet(input, 'clear-labels', 'labels'),
       fixVersions: IssueUtil.getClearableStringSet(input, 'clear-fix-versions', 'fix-versions'),
       customFields: customFields,
-      parallelTasks: null,
+      parallelTasks: params.parallelTasks.get(projectCode),
       selectedParallelTasks: selectedParallelTasks,
       linkedIssues: null // This isn't settable from the events at the moment, and only happens on full board refresh
     };
@@ -395,12 +410,16 @@ export class IssueUtil {
               }
             });
           } else if (key === 'selectedParallelTasks') {
-              mutable.selectedParallelTasks = mutable.selectedParallelTasks ? mutable.selectedParallelTasks : List<number>();
-              change.selectedParallelTasks.forEach((v, i) => {
-                if (!isNaN(v)) {
-                  mutable.selectedParallelTasks = mutable.selectedParallelTasks.set(i, v);
-                }
+              mutable.selectedParallelTasks = mutable.selectedParallelTasks ? mutable.selectedParallelTasks : List<List<number>>();
+
+              change.selectedParallelTasks.forEach((group, groupIndex) => {
+                group.forEach((v, taskIndex) => {
+                  if (!isNaN(v)) {
+                    mutable.selectedParallelTasks = mutable.selectedParallelTasks.setIn([groupIndex, taskIndex], v);
+                  }
+                });
               });
+
           } else {
             mutable.set(key, value);
           }

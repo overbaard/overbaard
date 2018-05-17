@@ -15,7 +15,6 @@
  */
 package org.overbaard.jira.impl;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -47,8 +46,8 @@ import org.overbaard.jira.impl.board.SortedParallelTaskFieldOptions;
 import org.overbaard.jira.impl.config.BoardConfig;
 import org.overbaard.jira.impl.config.BoardProjectConfig;
 import org.overbaard.jira.impl.config.CustomFieldConfig;
-import org.overbaard.jira.impl.config.ParallelTaskConfig;
 import org.overbaard.jira.impl.config.ParallelTaskCustomFieldConfig;
+import org.overbaard.jira.impl.config.ProjectParallelTaskGroupsConfig;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -99,7 +98,7 @@ public class BoardManagerImpl implements BoardManager, InitializingBean, Disposa
     }
 
     @Override
-    public void updateParallelTaskForIssue(ApplicationUser user, String boardCode, String issueKey, int taskIndex, int optionIndex) throws SearchException {
+    public void updateParallelTaskForIssue(ApplicationUser user, String boardCode, String issueKey, int groupIndex, int taskIndex, int optionIndex) throws SearchException {
         //Don't do anything to any of the cached boards, the Jira event mechanism will trigger an event when we update
         // the issue, which in turn will end up in our event listener to update the caches for the active boards.
 
@@ -114,8 +113,9 @@ public class BoardManagerImpl implements BoardManager, InitializingBean, Disposa
 
         final String projectCode = issueKey.substring(0, issueKey.indexOf("-"));
 
-        final ParallelTaskConfig parallelTaskConfig = board.getConfig().getBoardProject(projectCode).getParallelTaskConfig();
-        final ParallelTaskCustomFieldConfig taskFieldConfig = parallelTaskConfig.forIndex(taskIndex);
+        final ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig =
+                board.getConfig().getBoardProject(projectCode).getParallelTaskGroupsConfig();
+        final ParallelTaskCustomFieldConfig taskFieldConfig = parallelTaskGroupsConfig.forPosition(groupIndex, taskIndex);
         final CustomField customField = taskFieldConfig.getJiraCustomField();
 
         final BoardProject boardProject = board.getBoardProject(projectCode);
@@ -148,7 +148,7 @@ public class BoardManagerImpl implements BoardManager, InitializingBean, Disposa
 
                     //currentField is most likely not set, look for the field in the current configuration
                     ParallelTaskCustomFieldConfig parallelTaskField =
-                            parallelTaskConfig.getConfigs().getForJiraId(currentField.getIdAsLong());
+                            parallelTaskGroupsConfig.forPosition(groupIndex, taskIndex);
                     if (parallelTaskField != null) {
                         //Since the field is not set, guess the default value (i.e. the first one in the list)
                         //Later if this is not satisfactory, we can use the Jira SDK to figure
@@ -308,17 +308,9 @@ public class BoardManagerImpl implements BoardManager, InitializingBean, Disposa
                     @Override
                     public Set<ParallelTaskCustomFieldConfig> apply(BoardConfig boardConfig, Set<ParallelTaskCustomFieldConfig> result) {
                         BoardProjectConfig projectConfig = boardConfig.getBoardProject(projectCode);
-                        if (projectConfig != null && projectConfig.getParallelTaskConfig() != null) {
-                            ParallelTaskConfig parallelTaskConfig = projectConfig.getParallelTaskConfig();
-                            if (parallelTaskConfig != null) {
-                                ParallelTaskCustomFieldConfig config = parallelTaskConfig.getCustomFieldObjectForJiraName(jiraCustomFieldName);
-                                if (config != null) {
-                                    if (result == null) {
-                                        result = new HashSet<>();
-                                    }
-                                    result.add(config);
-                                }
-                            }
+                        if (projectConfig != null && projectConfig.getParallelTaskGroupsConfig() != null) {
+                            ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig = projectConfig.getParallelTaskGroupsConfig();
+                            return new HashSet<>(parallelTaskGroupsConfig.getFieldConfigs());
                         }
                         return result;
                     }
@@ -333,17 +325,9 @@ public class BoardManagerImpl implements BoardManager, InitializingBean, Disposa
                     @Override
                     public Set<ParallelTaskCustomFieldConfig> apply(BoardConfig boardConfig, Set<ParallelTaskCustomFieldConfig> result) {
                         BoardProjectConfig projectConfig = boardConfig.getBoardProject(projectCode);
-                        if (projectConfig != null && projectConfig.getParallelTaskConfig() != null) {
-                            ParallelTaskConfig parallelTaskConfig = projectConfig.getParallelTaskConfig();
-                            if (parallelTaskConfig != null) {
-                                Collection<ParallelTaskCustomFieldConfig> configs = parallelTaskConfig.getConfigs().values();
-                                if (configs.size() > 0) {
-                                    if (result == null) {
-                                        result = new HashSet<>();
-                                    }
-                                    result.addAll(configs);
-                                }
-                            }
+                        if (projectConfig != null && projectConfig.getParallelTaskGroupsConfig() != null) {
+                            ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig = projectConfig.getParallelTaskGroupsConfig();
+                            return new HashSet<>(parallelTaskGroupsConfig.getFieldConfigs());
                         }
                         return result;
                     }

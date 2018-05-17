@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import {BoardIssueView} from '../../../view-model/board/board-issue-view';
 import {Assignee, NO_ASSIGNEE} from '../../../model/board/data/assignee/assignee.model';
-import {Set} from 'immutable';
+import {List, Set} from 'immutable';
 import {MatDialog} from '@angular/material';
 import {UpdateParallelTaskEvent} from '../../../events/update-parallel-task.event';
 import {IssueSummaryLevel} from '../../../model/board/user/issue-summary-level';
@@ -51,7 +51,6 @@ export class BoardIssueComponent implements OnInit, OnChanges, AfterViewInit {
   cardTooltip: string;
 
   viewModeEnum = BoardViewMode;
-
 
   constructor(public menuDialog: MatDialog, private _boardService: BoardService/*, private _elementRef: ElementRef*/) { }
 
@@ -128,12 +127,14 @@ export class BoardIssueComponent implements OnInit, OnChanges, AfterViewInit {
 
       if (this.issue.parallelTasks) {
         tooltip += '\n';
-        this.issue.parallelTasks.forEach((pt, i) => {
-          const selectedIndex: number = this.issue.selectedParallelTasks.get(i);
-          const option: ParallelTaskOption = pt.options.get(selectedIndex);
-          tooltip +=
-            `${pt.name}: ${option.name}
+        this.issue.parallelTasks.forEach((group, groupIndex) => {
+          group.forEach((pt, taskIndex) => {
+            const selectedIndex: number = this.issue.selectedParallelTasks.getIn([groupIndex, taskIndex]);
+            const option: ParallelTaskOption = pt.options.get(selectedIndex);
+            tooltip +=
+              `${pt.name}: ${option.name}
             `;
+          });
         });
       }
 
@@ -189,8 +190,12 @@ export class BoardIssueComponent implements OnInit, OnChanges, AfterViewInit {
     });
   }
 
-  parallelTaskTrackByFn(index: number, pt: ParallelTask) {
-    return index;
+  parallelTaskGroupTrackByFn(groupIndex: number, pt: List<ParallelTask>) {
+    return groupIndex;
+  }
+
+  parallelTaskTrackByFn(taskIndex: number, pt: ParallelTask) {
+    return taskIndex;
   }
 
   linkedIssueTrackByFn(index: number, li: LinkedIssue) {

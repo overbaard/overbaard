@@ -78,7 +78,7 @@ public class BoardConfig {
     private final List<String> issueTypeNames;
 
     private final CustomFieldRegistry<CustomFieldConfig> customFields;
-    private final ParallelTaskConfig parallelTaskConfig;
+    private final BoardParallelTaskConfig parallelTaskConfig;
 
     private BoardConfig(int id, String code, String name, String owningUserKey,
                         long rankCustomFieldId,
@@ -86,7 +86,7 @@ public class BoardConfig {
                         Map<String, BoardProjectConfig> boardProjects, Map<String, LinkedProjectConfig> linkedProjects,
                         Map<String, NameAndColour> priorities, Map<String, NameAndColour> issueTypes,
                         CustomFieldRegistry<CustomFieldConfig> customFields,
-                        ParallelTaskConfig parallelTaskConfig) {
+                        BoardParallelTaskConfig parallelTaskConfig) {
 
         this.id = id;
         this.code = code;
@@ -130,7 +130,7 @@ public class BoardConfig {
         final BoardStates boardStates = BoardStates.loadBoardStates(boardNode.get(STATES));
         final CustomFieldRegistry<CustomFieldConfig> customFields =
                 new CustomFieldRegistry<>(Collections.unmodifiableMap(loadCustomFields(jiraInjectables, boardNode)));
-        final ParallelTaskConfig parallelTaskConfig = loadParallelTasks(jiraInjectables, customFields, boardNode);
+        final BoardParallelTaskConfig parallelTaskConfig = loadBoardParallelTasks(jiraInjectables, customFields, boardNode);
 
         final ModelNode projects = Util.getRequiredChild(boardNode, "Group", boardName, PROJECTS);
         if (projects.getType() != ModelType.LIST) {
@@ -181,10 +181,10 @@ public class BoardConfig {
         return Collections.emptyMap();
     }
 
-    private static ParallelTaskConfig loadParallelTasks(JiraInjectables jiraInjectables, CustomFieldRegistry<CustomFieldConfig> customFields, ModelNode boardNode) {
+    private static BoardParallelTaskConfig loadBoardParallelTasks(JiraInjectables jiraInjectables, CustomFieldRegistry<CustomFieldConfig> customFields, ModelNode boardNode) {
         if (boardNode.hasDefined(PARALLEL_TASKS, FIELDS)) {
             ModelNode parallelTasks = boardNode.get(PARALLEL_TASKS, FIELDS);
-            ParallelTaskConfig config = ParallelTaskConfig.load(jiraInjectables, customFields, parallelTasks);
+            BoardParallelTaskConfig config = BoardParallelTaskConfig.load(jiraInjectables, customFields, parallelTasks);
             if (config.getConfigs().size() > 0) {
                 return config;
             }

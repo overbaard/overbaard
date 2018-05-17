@@ -145,9 +145,9 @@ public class OverbaardFacadeImpl implements JiraFacade, InitializingBean, Dispos
     }
 
     @Override
-    public void updateParallelTaskForIssue(ApplicationUser user, String boardCode, String issueKey, int taskIndex, int optionIndex) throws SearchException{
+    public void updateParallelTaskForIssue(ApplicationUser user, String boardCode, String issueKey, int groupIndex, int taskIndex, int optionIndex) throws SearchException{
         try {
-            boardManager.updateParallelTaskForIssue(user, boardCode, issueKey, taskIndex, optionIndex);
+            boardManager.updateParallelTaskForIssue(user, boardCode, issueKey, groupIndex, taskIndex, optionIndex);
         } catch (Exception e) {
             //Last parameter is the exception (it does not match a {} entry)
             OverbaardLogger.LOGGER.debug("BoardManagerImpl.handleEvent - Error updating board {}", boardCode, e);

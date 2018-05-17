@@ -65,6 +65,7 @@ import org.overbaard.jira.impl.board.ProjectParallelTaskOptionsLoaderBuilder;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.overbaard.jira.impl.config.ParallelTaskGroupPosition;
 
 import com.atlassian.jira.issue.search.SearchException;
 
@@ -691,6 +692,7 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
     public void testCreateIssuesParallelTasks()throws Exception {
         final Long upstreamId = 121212121212L;
         final Long downstreamId = 121212121213L;
+        final Long documentationId = 121212121214L;
         setupInitialBoard("config/board-parallel-tasks.json", new AdditionalSetup() {
             @Override
             public void setupIssues() {
@@ -706,6 +708,9 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
                                 .addCustomFieldOption("TDP", downstreamId, "TD", "TODO")
                                 .addCustomFieldOption("TDP", downstreamId, "IP", "In Progress")
                                 .addCustomFieldOption("TDP", downstreamId, "D", "Done")
+                                .addCustomFieldOption("TDP", documentationId, "TD", "TODO")
+                                .addCustomFieldOption("TDP", documentationId, "W", "Writing")
+                                .addCustomFieldOption("TDP", documentationId, "P", "Published")
                                 .build()
                 );
             }
@@ -715,6 +720,7 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
         Map<Long, String> customFieldValues = new HashMap<>();
         customFieldValues.put(upstreamId, "IP");
         customFieldValues.put(downstreamId, "D");
+        customFieldValues.put(documentationId, "TD");
         OverbaardIssueEvent create = createEventBuilder("TDP-8", IssueType.BUG, Priority.HIGH, "Eight")
                 .assignee("kabir")
                 .state("TDP-D")
@@ -724,7 +730,7 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
         ModelNode changes = getChangesJson(0, 1, new NewRankChecker().rank(7, "TDP-8"));
         checkDeletes(changes);
         checkUpdates(changes);
-        checkAdds(changes, new AddIssueData("TDP-8", IssueType.BUG, Priority.HIGH, "Eight", "TDP-D", "kabir").checkers(new ParallelTaskFieldValueChecker(true, 1, 2)));
+        checkAdds(changes, new AddIssueData("TDP-8", IssueType.BUG, Priority.HIGH, "Eight", "TDP-D", "kabir").checkers(new ParallelTaskGroupsValueChecker(true, new int[]{1, 2}, new int[]{0})));
 
         //Create another issue with no parallel tasks, we should default to the default value
         customFieldValues = new HashMap<>();
@@ -737,7 +743,7 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
         changes = getChangesJson(1, 2, new NewRankChecker().rank(8, "TDP-9"));
         checkDeletes(changes);
         checkUpdates(changes);
-        checkAdds(changes, new AddIssueData("TDP-9", IssueType.BUG, Priority.HIGH, "Nine", "TDP-D", "kabir").checkers(new ParallelTaskFieldValueChecker(true, 0, 0)));
+        checkAdds(changes, new AddIssueData("TDP-9", IssueType.BUG, Priority.HIGH, "Nine", "TDP-D", "kabir").checkers(new ParallelTaskGroupsValueChecker(true, new int[]{0, 0}, new int[]{0})));
 
         //Create another issue with null parallel tasks, we should default to the default value
         customFieldValues = null;
@@ -750,7 +756,7 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
         changes = getChangesJson(2, 3, new NewRankChecker().rank(9, "TDP-10"));
         checkDeletes(changes);
         checkUpdates(changes);
-        checkAdds(changes, new AddIssueData("TDP-10", IssueType.BUG, Priority.HIGH, "Ten", "TDP-D", "kabir").checkers(new ParallelTaskFieldValueChecker(true, 0, 0)));
+        checkAdds(changes, new AddIssueData("TDP-10", IssueType.BUG, Priority.HIGH, "Ten", "TDP-D", "kabir").checkers(new ParallelTaskGroupsValueChecker(true, new int[]{0, 0}, new int[]{0})));
 
         //Create an issue in a project with no parallel tasks set up
         create = createEventBuilder("TBG-4", IssueType.FEATURE, Priority.LOW, "Four")
@@ -760,13 +766,14 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
         changes = getChangesJson(3, 4, new NewRankChecker().rank(3, "TBG-4"));
         checkDeletes(changes);
         checkUpdates(changes);
-        checkAdds(changes, new AddIssueData("TBG-4", IssueType.FEATURE, Priority.LOW, "Four", "TBG-X", null).checkers(ParallelTaskFieldValueChecker.NONE));
+        checkAdds(changes, new AddIssueData("TBG-4", IssueType.FEATURE, Priority.LOW, "Four", "TBG-X", null).checkers(ParallelTaskGroupsValueChecker.NONE));
     }
 
     @Test
     public void testUpdateIssueParallelTasks() throws Exception {
         final Long upstreamId = 121212121212L;
         final Long downstreamId = 121212121213L;
+        final Long documentationId = 121212121214L;
         setupInitialBoard("config/board-parallel-tasks.json", new AdditionalSetup() {
             @Override
             public void setupIssues() {
@@ -782,6 +789,9 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
                                 .addCustomFieldOption("TDP", downstreamId, "TD", "TODO")
                                 .addCustomFieldOption("TDP", downstreamId, "IP", "In Progress")
                                 .addCustomFieldOption("TDP", downstreamId, "D", "Done")
+                                .addCustomFieldOption("TDP", documentationId, "TD", "TODO")
+                                .addCustomFieldOption("TDP", documentationId, "W", "Writing")
+                                .addCustomFieldOption("TDP", documentationId, "P", "Published")
                                 .build()
                 );
             }
@@ -793,20 +803,21 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
         OverbaardIssueEvent update = updateEventBuilder("TDP-1").customFieldValues(customFieldValues).buildAndRegister();
         boardManager.handleEvent(update, nextRankedIssueUtil);
         ModelNode changes = getChangesJson(0, 1);
-        checkUpdates(changes, new UpdateIssueData("TDP-1").checkers(new ParallelTaskFieldValueChecker(false, 2, -1)));
+        checkUpdates(changes, new UpdateIssueData("TDP-1").checkers(new ParallelTaskGroupsValueChecker(false, new int[]{2, -1}, new int[]{-1})));
 
         customFieldValues = new HashMap<>();
         customFieldValues.put(upstreamId, "IP");
         customFieldValues.put(downstreamId, "D");
+        customFieldValues.put(documentationId, "TD");
         update = updateEventBuilder("TDP-2").customFieldValues(customFieldValues).buildAndRegister();
         boardManager.handleEvent(update, nextRankedIssueUtil);
         changes = getChangesJson(0, 2);
         checkUpdates(changes,
-                new UpdateIssueData("TDP-1").checkers(new ParallelTaskFieldValueChecker(false, 2, -1)),
-                new UpdateIssueData("TDP-2").checkers(new ParallelTaskFieldValueChecker(false, 1, 2)));
+                new UpdateIssueData("TDP-1").checkers(new ParallelTaskGroupsValueChecker(false, new int[]{2, -1}, new int[]{-1})),
+                new UpdateIssueData("TDP-2").checkers(new ParallelTaskGroupsValueChecker(false, new int[]{1, 2}, new int[]{0})));
         changes = getChangesJson(1, 2);
         checkUpdates(changes,
-                new UpdateIssueData("TDP-2").checkers(new ParallelTaskFieldValueChecker(false, 1, 2)));
+                new UpdateIssueData("TDP-2").checkers(new ParallelTaskGroupsValueChecker(false, new int[]{1, 2}, new int[]{0})));
 
 
         //Update an issue which does not have parallel task fields
@@ -817,23 +828,23 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
         boardManager.handleEvent(update, nextRankedIssueUtil);
         changes = getChangesJson(0, 3);
         checkUpdates(changes,
-                new UpdateIssueData("TDP-1").checkers(new ParallelTaskFieldValueChecker(false, 2, -1)),
-                new UpdateIssueData("TDP-2").checkers(new ParallelTaskFieldValueChecker(false, 1, 2)),
-                new UpdateIssueData("TBG-1").type(IssueType.BUG).checkers(ParallelTaskFieldValueChecker.NONE));
+                new UpdateIssueData("TDP-1").checkers(new ParallelTaskGroupsValueChecker(false, new int[]{2, -1}, new int[]{-1})),
+                new UpdateIssueData("TDP-2").checkers(new ParallelTaskGroupsValueChecker(false, new int[]{1, 2}, new int[]{0})),
+                new UpdateIssueData("TBG-1").type(IssueType.BUG).checkers(ParallelTaskGroupsValueChecker.NONE));
         changes = getChangesJson(1, 3);
         checkUpdates(changes,
-                new UpdateIssueData("TDP-2").checkers(new ParallelTaskFieldValueChecker(false, 1, 2)),
-                new UpdateIssueData("TBG-1").type(IssueType.BUG).checkers(ParallelTaskFieldValueChecker.NONE));
+                new UpdateIssueData("TDP-2").checkers(new ParallelTaskGroupsValueChecker(false, new int[]{1, 2}, new int[]{0})),
+                new UpdateIssueData("TBG-1").type(IssueType.BUG).checkers(ParallelTaskGroupsValueChecker.NONE));
         changes = getChangesJson(2, 3);
         checkUpdates(changes,
-                new UpdateIssueData("TBG-1").type(IssueType.BUG).checkers(ParallelTaskFieldValueChecker.NONE));
-
+                new UpdateIssueData("TBG-1").type(IssueType.BUG).checkers(ParallelTaskGroupsValueChecker.NONE));
     }
 
     @Test
     public void testCreateAndUpdateIssuesParallelTasks()throws Exception {
         final Long upstreamId = 121212121212L;
         final Long downstreamId = 121212121213L;
+        final Long documentationId = 121212121214L;
         setupInitialBoard("config/board-parallel-tasks.json", new AdditionalSetup() {
             @Override
             public void setupIssues() {
@@ -849,6 +860,9 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
                                 .addCustomFieldOption("TDP", downstreamId, "TD", "TODO")
                                 .addCustomFieldOption("TDP", downstreamId, "IP", "In Progress")
                                 .addCustomFieldOption("TDP", downstreamId, "D", "Done")
+                                .addCustomFieldOption("TDP", documentationId, "TD", "TODO")
+                                .addCustomFieldOption("TDP", documentationId, "W", "Writing")
+                                .addCustomFieldOption("TDP", documentationId, "P", "Published")
                                 .build()
                 );
             }
@@ -858,6 +872,7 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
         Map<Long, String> customFieldValues = new HashMap<>();
         customFieldValues.put(upstreamId, "IP");
         customFieldValues.put(downstreamId, "D");
+        customFieldValues.put(documentationId, "TD");
         OverbaardIssueEvent create = createEventBuilder("TDP-8", IssueType.BUG, Priority.HIGH, "Eight")
                 .assignee("kabir")
                 .state("TDP-D")
@@ -867,20 +882,21 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
         ModelNode changes = getChangesJson(0, 1, new NewRankChecker().rank(7, "TDP-8"));
         checkDeletes(changes);
         checkUpdates(changes);
-        checkAdds(changes, new AddIssueData("TDP-8", IssueType.BUG, Priority.HIGH, "Eight", "TDP-D", "kabir").checkers(new ParallelTaskFieldValueChecker(true, 1, 2)));
+        checkAdds(changes, new AddIssueData("TDP-8", IssueType.BUG, Priority.HIGH, "Eight", "TDP-D", "kabir").checkers(new ParallelTaskGroupsValueChecker(true, new int[]{1, 2}, new int[]{0})));
 
         customFieldValues = new HashMap<>();
         customFieldValues.put(upstreamId, "M");
         customFieldValues.put(downstreamId, "TD");
+        customFieldValues.put(documentationId, "W");
         OverbaardIssueEvent update = updateEventBuilder("TDP-8").customFieldValues(customFieldValues).buildAndRegister();
         boardManager.handleEvent(update, nextRankedIssueUtil);
         changes = getChangesJson(0, 2, new NewRankChecker().rank(7, "TDP-8"));
-        checkAdds(changes, new AddIssueData("TDP-8", IssueType.BUG, Priority.HIGH, "Eight", "TDP-D", "kabir").checkers(new ParallelTaskFieldValueChecker(true, 2, 0)));
+        checkAdds(changes, new AddIssueData("TDP-8", IssueType.BUG, Priority.HIGH, "Eight", "TDP-D", "kabir").checkers(new ParallelTaskGroupsValueChecker(true, new int[]{2, 0}, new int[]{1})));
         checkDeletes(changes);
         checkUpdates(changes);
         changes = getChangesJson(1, 2);
         checkAdds(changes);
-        checkUpdates(changes, new UpdateIssueData("TDP-8").checkers(new ParallelTaskFieldValueChecker(false, 2, 0)));
+        checkUpdates(changes, new UpdateIssueData("TDP-8").checkers(new ParallelTaskGroupsValueChecker(false, new int[]{2, 0}, new int[]{1})));
         checkDeletes(changes);
     }
 
@@ -1855,7 +1871,7 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
         //Default to the none checkers, unless the user overrides
         checkerMap.put(TesterChecker.class, TesterChecker.NONE);
         checkerMap.put(DocumenterChecker.class, DocumenterChecker.NONE);
-        checkerMap.put(ParallelTaskFieldValueChecker.class, ParallelTaskFieldValueChecker.NONE);
+        checkerMap.put(ParallelTaskGroupsValueChecker.class, ParallelTaskGroupsValueChecker.NONE);
         boolean hasCustom = false;
         for (IssueChecker checker : expected.issueCheckers) {
             Class<? extends IssueChecker> clazz = checker.getClass();
@@ -2130,47 +2146,62 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
         }
     }
 
-    static class ParallelTaskFieldValueChecker implements IssueChecker {
-        static final ParallelTaskFieldValueChecker NONE = new ParallelTaskFieldValueChecker(true, null);
+    static class ParallelTaskGroupsValueChecker implements IssueChecker {
+        static final ParallelTaskGroupsValueChecker NONE = new ParallelTaskGroupsValueChecker(true, null);
 
         private final boolean add;
-        private final int[] values;
+        private final int[][] expected;
 
-        public ParallelTaskFieldValueChecker(boolean add, int...values) {
+        public ParallelTaskGroupsValueChecker(boolean add, int[]... expected) {
             this.add = add;
-            this.values = values;
+            this.expected = expected;
         }
 
         @Override
         public void check(ModelNode issue) {
-            if (values == null) {
+            if (expected == null) {
                 Assert.assertFalse(issue.hasDefined(PARALLEL_TASKS));
             } else {
                 Assert.assertTrue(issue.hasDefined(PARALLEL_TASKS));
                 ModelNode tasksNode = issue.get(PARALLEL_TASKS);
                 if (add) {
-                    List<ModelNode> tasks = tasksNode.asList();
-                    Assert.assertEquals(values.length, tasks.size());
-                    for (int i = 0 ; i < values.length ; i++) {
-                        Assert.assertEquals(values[i], tasks.get(i).asInt());
-                    }
-                } else {
-                    Map<Integer, Integer> map = new HashMap<>();
-                    for (int i = 0 ; i < values.length ; i++) {
-                        if (values[i] >= 0) {
-                            map.put(i, values[i]);
+                    List<ModelNode> values = tasksNode.asList();
+                    Assert.assertEquals(expected.length, values.size());
+                    for (int i = 0 ; i < expected.length ; i++) {
+                        List<ModelNode> group = values.get(i).asList();
+                        Assert.assertEquals(expected[i].length, group.size());
+                        for (int j = 0 ; j < expected[i].length ; j++){
+                            Assert.assertEquals(expected[i][j], group.get(j).asInt());
                         }
                     }
-                    Assert.assertEquals(map.size(), tasksNode.keys().size());
-                    for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
-                        ModelNode node = tasksNode.get(entry.getKey().toString());
-                        Assert.assertTrue(node.isDefined());
-                        Assert.assertEquals(entry.getValue().intValue(), node.asInt());
+                } else {
+                    Map<ParallelTaskGroupPosition, Integer> map = new HashMap<>();
+                    for (String groupKey : tasksNode.keys()) {
+                        ModelNode groupNode = tasksNode.get(groupKey);
+                        for (String taskKey : groupNode.keys()) {
+                            ParallelTaskGroupPosition position =
+                                    new ParallelTaskGroupPosition(Integer.valueOf(groupKey), Integer.valueOf(taskKey));
+                            map.put(position, groupNode.get(taskKey).asInt());
+                        }
                     }
+
+                    for (int groupIndex = 0 ; groupIndex < expected.length ; groupIndex++) {
+                        for (int taskIndex = 0 ; taskIndex < expected[groupIndex].length ; taskIndex++) {
+                            int expectedValue = expected[groupIndex][taskIndex];
+                            Integer actualValue = map.get(new ParallelTaskGroupPosition(groupIndex, taskIndex));
+                            if (expectedValue >= 0) {
+                                Assert.assertEquals(expectedValue, actualValue.intValue());
+                            } else {
+                                Assert.assertNull(actualValue);
+                            }
+                        }
+                    }
+
                 }
             }
         }
     }
+
 
     interface AdditionalSetup extends AdditionalBuilderInit {
         void setupIssues();

@@ -18,7 +18,7 @@ export class ProjectActions {
   static createDeserializeProjects(input: any): DeserializeProjectsAction {
     const boardProjects: OrderedMap<string, BoardProject> = OrderedMap<string, BoardProject>().asMutable();
     const linkedProjects: Map<string, LinkedProject> = Map<string, LinkedProject>().asMutable();
-    const parallelTasks: Map<string, List<ParallelTask>> = Map<string, List<ParallelTask>>().asMutable();
+    const parallelTasks: Map<string, List<List<ParallelTask>>> = Map<string, List<List<ParallelTask>>>().asMutable();
 
     const mainInput: any = input['main'];
 
@@ -29,11 +29,18 @@ export class ProjectActions {
       if (parallelTasksInput) {
         // Something makes this read-only so clone it
         parallelTasksInput = cloneObject(parallelTasksInput);
-        for (let i = 0 ; i < parallelTasksInput.length ; i++) {
-          const task: ParallelTask = ProjectUtil.parallelTaskFromJs(parallelTasksInput[i]);
-          parallelTasksInput[i] = task;
-          parallelTasks.set(project.key, List<ParallelTask>(parallelTasksInput));
-        }
+        const tasks: List<List<ParallelTask>> = List<List<ParallelTask>>().withMutations(mutableTasks => {
+          for (let groupIndex = 0 ; groupIndex < parallelTasksInput.length ; groupIndex++) {
+            const group: any[] = parallelTasksInput[groupIndex];
+            for (let taskIndex = 0 ; taskIndex < group.length ; taskIndex++) {
+              const task: ParallelTask = ProjectUtil.parallelTaskFromJs(group[taskIndex]);
+              group[taskIndex] = task;
+            }
+            const groupList: List<ParallelTask> = List<ParallelTask>(group);
+            mutableTasks.push(groupList);
+          }
+        });
+        parallelTasks.set(project.key, tasks);
       }
     }
 
@@ -79,7 +86,7 @@ export function projectMetaReducer(state: ProjectState = initialProjectState, ac
 const getProjectState = (state: AppState): ProjectState => state.board.projects;
 const getBoardProjects = (state: ProjectState): OrderedMap<string, BoardProject> => state.boardProjects;
 const getLinkedProjects = (state: ProjectState): Map<string, LinkedProject> => state.linkedProjects;
-const getParallelTasks = (state: ProjectState): OrderedMap<string, List<ParallelTask>> => state.parallelTasks;
+const getParallelTasks = (state: ProjectState): OrderedMap<string, List<List<ParallelTask>>> => state.parallelTasks;
 export const boardProjectsSelector = createSelector(getProjectState, getBoardProjects);
 export const parallelTasksSelector = createSelector(getProjectState, getParallelTasks);
 export const linkedProjectsSelector = createSelector(getProjectState, getLinkedProjects);

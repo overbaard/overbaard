@@ -128,8 +128,9 @@ public interface JiraFacade
      * @param user the currently logged in used
      * @param boardCode
      * @param issueKey
-     * @param taskIndex the index of the task within the issue's project's config
+     * @param groupIndex the index of the parallel task group within the issue's projects config
+     * @param taskIndex the index of the task within the group
      * @param optionIndex the index of the option within the task
      */
-    void updateParallelTaskForIssue(ApplicationUser user, String boardCode, String issueKey, int taskIndex, int optionIndex) throws SearchException;
+    void updateParallelTaskForIssue(ApplicationUser user, String boardCode, String issueKey, int groupIndex, int taskIndex, int optionIndex) throws SearchException;
 }

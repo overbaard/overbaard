@@ -26,8 +26,9 @@ import org.overbaard.jira.api.ProjectParallelTaskOptionsLoader;
 import org.overbaard.jira.impl.JiraInjectables;
 import org.overbaard.jira.impl.config.BoardConfig;
 import org.overbaard.jira.impl.config.BoardProjectConfig;
-import org.overbaard.jira.impl.config.ParallelTaskConfig;
 import org.overbaard.jira.impl.config.ParallelTaskCustomFieldConfig;
+import org.overbaard.jira.impl.config.ProjectParallelTaskConfig;
+import org.overbaard.jira.impl.config.ProjectParallelTaskGroupsConfig;
 
 import com.atlassian.jira.issue.customfields.option.Option;
 import com.atlassian.jira.issue.customfields.option.Options;
@@ -44,9 +45,9 @@ public class ProjectParallelTaskOptionsLoaderImpl implements ProjectParallelTask
 
     public Map<String, SortedParallelTaskFieldOptions> loadValues(JiraInjectables jiraInjectables, BoardConfig boardConfig, BoardProjectConfig projectConfig) {
         Map<String, SortedParallelTaskFieldOptions> parallelTaskValues = new LinkedHashMap<>();
-        ParallelTaskConfig parallelTaskConfig = projectConfig.getParallelTaskConfig();
-        if (parallelTaskConfig != null) {
-            for (ParallelTaskCustomFieldConfig config : parallelTaskConfig.getConfigs().values()) {
+        ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig = projectConfig.getParallelTaskGroupsConfig();
+        if (parallelTaskGroupsConfig != null) {
+            for (ParallelTaskCustomFieldConfig config : parallelTaskGroupsConfig.getConfigs().values()) {
                 CustomField customField = config.getJiraCustomField();
                 Project jiraProject = jiraInjectables.getProjectManager().getProjectByCurrentKey(projectConfig.getCode());
 

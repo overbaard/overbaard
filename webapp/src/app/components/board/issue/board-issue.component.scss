@@ -94,11 +94,19 @@ img.avatar {
 .parallel-tasks-container {
   @extend .extra-info-base;
 }
+.parallel-tasks-group {
+  border-top: 1px solid white;
+  display: flex;
+}
+.new-pt-group-space {
+  min-width: 5px;
+}
 .linked-issues-container {
   @extend .extra-info-base;
 }
 .mat-button-ripple {
 }
+
 
 /**
 This needs styling in the global styles.scss as mentioned in

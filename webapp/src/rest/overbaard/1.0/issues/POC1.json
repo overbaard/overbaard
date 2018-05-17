@@ -127,22 +127,45 @@
           "Done" : "Done"
         },
         "parallel-tasks" : [
-          {
-            "name" : "Community Docs",
-            "display" : "CD",
-            "options" : [
-              "TODO",
-              "Done"]
-          },
-          {
-            "name" : "Test Development",
-            "display" : "TD",
-            "options" : [
-              "TODO",
-              "In Progress",
-              "Review",
-              "Merged"]
-          }
+          [
+
+            {
+              "name" : "Analysis Document",
+              "display" : "AD",
+              "options" : [
+                "TODO",
+                "In Progress",
+                "Review",
+                "Approved"]
+            },
+            {
+              "name" : "Test Plan",
+              "display" : "TP",
+              "options" : [
+                "TODO",
+                "In Progress",
+                "Review",
+                "Merged"]
+            }
+          ],
+          [
+            {
+              "name" : "Community Docs",
+              "display" : "CD",
+              "options" : [
+                "TODO",
+                "Done"]
+            },
+            {
+              "name" : "Test Development",
+              "display" : "TD",
+              "options" : [
+                "TODO",
+                "In Progress",
+                "Review",
+                "Merged"]
+            }
+          ]
         ],
         "ranked": ["FEAT-1", "FEAT-2", "FEAT-3", "FEAT-4", "FEAT-5", "FEAT-6", "FEAT-7", "FEAT-8", "FEAT-9"]
       },
@@ -184,7 +207,7 @@
       "labels": [0, 1],
       "assignee": 1,
       "custom": {"User Custom Field": 0, "Version Custom Field": 1},
-      "parallel-tasks": [0, 1],
+      "parallel-tasks": [[0, 1], [0, 1]],
       "linked-issues" : [
         {
           "key" : "US-1",
@@ -209,7 +232,7 @@
       "labels": [1, 2],
       "assignee": 1,
       "custom": {"User Custom Field": 1, "Version Custom Field": 0},
-      "parallel-tasks": [1, 3],
+      "parallel-tasks": [[2, 0], [1, 3]],
       "linked-issues" : [
         {
           "key" : "US-3",
@@ -230,7 +253,7 @@
       "priority": 2,
       "type": 0,
       "assignee": 0,
-      "parallel-tasks": [1, 2],
+      "parallel-tasks": [[3, 2], [1, 2]],
       "linked-issues" : [
         {
           "key" : "US-5",

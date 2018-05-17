@@ -16,8 +16,8 @@ export interface BoardIssue extends Issue {
   labels: OrderedSet<string>;
   fixVersions: OrderedSet<string>;
   customFields: Map<string, CustomField>;
-  parallelTasks: List<ParallelTask>;
-  selectedParallelTasks: List<number>;
+  parallelTasks: List<List<ParallelTask>>;
+  selectedParallelTasks: List<List<number>>;
   linkedIssues: List<LinkedIssue>;
   ownState: number;
 

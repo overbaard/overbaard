@@ -45,7 +45,7 @@ public class BoardProjectConfig extends ProjectConfig {
     private final Set<String> ownDoneStateNames;
 
     private final List<String> customFieldNames;
-    private final ParallelTaskConfig parallelTaskConfig;
+    private final ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig;
 
     private BoardProjectConfig(final BoardStates boardStates,
                                final String code, final String queryFilter,
@@ -53,14 +53,14 @@ public class BoardProjectConfig extends ProjectConfig {
                                final Map<String, String> ownToBoardStates,
                                final Map<String, String> boardToOwnStates,
                                final List<String> customFieldNames,
-                               final ParallelTaskConfig parallelTaskConfig) {
+                               final ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig) {
         super(code, states);
         this.boardStates = boardStates;
         this.queryFilter = queryFilter;
         this.colour = colour;
         this.boardToOwnStates = boardToOwnStates;
         this.ownToBoardStates = ownToBoardStates;
-        this.parallelTaskConfig = parallelTaskConfig;
+        this.parallelTaskGroupsConfig = parallelTaskGroupsConfig;
 
         Set<String> ownDoneStateNames = new HashSet<>();
         for (String boardDoneState : boardStates.getDoneStates()) {
@@ -74,7 +74,7 @@ public class BoardProjectConfig extends ProjectConfig {
     }
 
     static BoardProjectConfig load(final BoardStates boardStates, ModelNode project,
-                                   CustomFieldRegistry<CustomFieldConfig> customFieldConfigs, ParallelTaskConfig parallelTaskConfig) {
+                                   CustomFieldRegistry<CustomFieldConfig> customFieldConfigs, BoardParallelTaskConfig parallelTaskConfig) {
         String projectCode = Util.getRequiredChild(project, "Project", null, Constants.CODE).asString();
         String colour = Util.getRequiredChild(project, "Project", projectCode, Constants.COLOUR).asString();
         ModelNode statesLinks = Util.getRequiredChild(project, "Project", projectCode, Constants.STATE_LINKS);
@@ -116,24 +116,36 @@ public class BoardProjectConfig extends ProjectConfig {
             }
         }
 
-        final ParallelTaskConfig projectParallelTaskConfig;
+        final ProjectParallelTaskGroupsConfig projectParallelTaskGroupsConfig;
         if (project.hasDefined(Constants.PARALLEL_TASKS)) {
-            ModelNode parallelTasks = project.get(Constants.PARALLEL_TASKS);
-            if (parallelTasks.getType() != ModelType.LIST) {
-                throw new OverbaardValidationException("The \"parallel-tasks\" element of project \"" + projectCode + "\" must be an array");
+            ModelNode parallelTaskGroups = project.get(Constants.PARALLEL_TASKS);
+            if (parallelTaskGroups.getType() != ModelType.LIST) {
+                throw new OverbaardValidationException("The \"parallel-task-groups\" element of project \"" + projectCode + "\" must be an array");
             }
-            Map<String, ParallelTaskCustomFieldConfig> fieldConfigs = new LinkedHashMap<>();
-            for (ModelNode parallelTask : parallelTasks.asList()) {
-                ParallelTaskCustomFieldConfig fieldConfig = parallelTaskConfig.getConfigs().getForOverbaardName(parallelTask.asString());
-                if (fieldConfig == null) {
-                    throw new OverbaardValidationException("The \"parallel-tasks\" element of project \"" + projectCode + "\" " +
-                            "references a parallel task '" + parallelTask.asString() + "' which does not exist in the global parallel-tasks fields list");
+            List<Map<String, ParallelTaskCustomFieldConfig>> fieldConfigs = new ArrayList<>();
+
+            for (ModelNode parallelTaskGroup : parallelTaskGroups.asList()) {
+                if (parallelTaskGroups.getType() != ModelType.LIST) {
+                    throw new OverbaardValidationException("The \"parallel-task-groups\" element of project \"" + projectCode + "\" must be an array");
                 }
-                fieldConfigs.put(fieldConfig.getName(), fieldConfig);
+                Map<String, ParallelTaskCustomFieldConfig> groupFieldConfigs = new LinkedHashMap<>();
+                boolean first = true;
+                for (ModelNode parallelTask : parallelTaskGroup.asList()) {
+                    ParallelTaskCustomFieldConfig fieldConfig = parallelTaskConfig.getConfigs().getForOverbaardName(parallelTask.asString());
+                    if (fieldConfig == null) {
+                        throw new OverbaardValidationException("The \"parallel-task-groups\" element of project \"" + projectCode + "\" " +
+                                "references a parallel task '" + parallelTask.asString() + "' which does not exist in the global parallel-tasks fields list");
+                    }
+                    groupFieldConfigs.put(fieldConfig.getName(), fieldConfig);
+                    if (first) {
+                        fieldConfigs.add(groupFieldConfigs);
+                        first = false;
+                    }
+                }
             }
-            projectParallelTaskConfig = fieldConfigs.size() > 0 ? new ParallelTaskConfig(fieldConfigs) : null;
+            projectParallelTaskGroupsConfig = new ProjectParallelTaskGroupsConfig(fieldConfigs);
         } else {
-            projectParallelTaskConfig = null;
+            projectParallelTaskGroupsConfig = null;
         }
 
         return new BoardProjectConfig(boardStates, projectCode, loadQueryFilter(project), colour,
@@ -141,7 +153,7 @@ public class BoardProjectConfig extends ProjectConfig {
                 Collections.unmodifiableMap(ownToBoardStates),
                 Collections.unmodifiableMap(boardToOwnStates),
                 Collections.unmodifiableList(customFieldNames),
-                projectParallelTaskConfig);
+                projectParallelTaskGroupsConfig);
     }
 
 
@@ -202,10 +214,15 @@ public class BoardProjectConfig extends ProjectConfig {
             }
         }
 
-        if (parallelTaskConfig != null) {
-            ModelNode parallelTasksNode = projectNode.get(Constants.PARALLEL_TASKS).setEmptyList();
-            for (ParallelTaskCustomFieldConfig parallelTaskCustomFieldConfig : parallelTaskConfig.getConfigs().values()) {
-                parallelTasksNode.add(parallelTaskCustomFieldConfig.getName());
+        if (parallelTaskGroupsConfig != null) {
+            ModelNode parallelTaskGroupsNode = projectNode.get(Constants.PARALLEL_TASKS).setEmptyList();
+
+            for (ProjectParallelTaskConfig ptCfg : parallelTaskGroupsConfig.getGroups()) {
+                ModelNode group = new ModelNode().setEmptyList();
+                for (ParallelTaskCustomFieldConfig parallelTaskCustomFieldConfig : ptCfg.getConfigs().values()) {
+                    group.add(parallelTaskCustomFieldConfig.getName());
+                }
+                parallelTaskGroupsNode.add(group);
             }
         }
 
@@ -243,8 +260,7 @@ public class BoardProjectConfig extends ProjectConfig {
         return customFieldNames;
     }
 
-    public ParallelTaskConfig getParallelTaskConfig() {
-        return parallelTaskConfig;
+    public ProjectParallelTaskGroupsConfig getParallelTaskGroupsConfig() {
+        return parallelTaskGroupsConfig;
     }
-
 }

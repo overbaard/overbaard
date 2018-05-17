@@ -1825,6 +1825,7 @@ public class BoardManagerTest extends AbstractBoardTest {
     public void testLoadBoardWithParallelTasks() throws Exception {
         final Long upstreamId = 121212121212L;
         final Long downstreamId = 121212121213L;
+        final Long documentationId = 121212121214L;
         initializeMocks("config/board-parallel-tasks.json", new AdditionalBuilderInit() {
             @Override
             public void initialise(BoardManagerBuilder boardManagerBuilder) {
@@ -1836,6 +1837,9 @@ public class BoardManagerTest extends AbstractBoardTest {
                                 .addCustomFieldOption("TDP", downstreamId, "TD", "TODO")
                                 .addCustomFieldOption("TDP", downstreamId, "IP", "In Progress")
                                 .addCustomFieldOption("TDP", downstreamId, "D", "Done")
+                                .addCustomFieldOption("TDP", documentationId, "TD", "TODO")
+                                .addCustomFieldOption("TDP", documentationId, "W", "Writing")
+                                .addCustomFieldOption("TDP", documentationId, "P", "Published")
                                 .build()
                 );
             }
@@ -1846,10 +1850,12 @@ public class BoardManagerTest extends AbstractBoardTest {
                 .assignee("kabir").buildAndRegister();      //1
         issueRegistry.setParallelTaskField("TDP-1", upstreamId, "IP");
         issueRegistry.setParallelTaskField("TDP-1", downstreamId, "IP");
+        issueRegistry.setParallelTaskField("TDP-1", documentationId, "W");
         issueRegistry.issueBuilder("TDP", "task", "high", "Two", "TDP-B")
                 .assignee("kabir").buildAndRegister();      //2
         issueRegistry.setParallelTaskField("TDP-2", upstreamId, "M");
         issueRegistry.setParallelTaskField("TDP-2", downstreamId, "TD");
+        issueRegistry.setParallelTaskField("TDP-2", documentationId, "P");
         issueRegistry.issueBuilder("TDP", "task", "high", "Three", "TDP-C")
                 .assignee("kabir").buildAndRegister();      //3
         issueRegistry.issueBuilder("TBG", "task", "high", "One", "TBG-X")
@@ -1861,13 +1867,28 @@ public class BoardManagerTest extends AbstractBoardTest {
         Assert.assertEquals(ModelType.LIST, parallelTasksNode.getType());
         List<ModelNode> parallelTasks = parallelTasksNode.asList();
         Assert.assertEquals(2, parallelTasks.size());
-        checkParallelTaskFieldOptions(parallelTasks.get(0), "US", "Upstream", "Not Started", "In Progress", "Merged");
-        checkParallelTaskFieldOptions(parallelTasks.get(1), "DS", "Downstream", "TODO", "In Progress", "Done");
+        ModelNode groupNode1 = parallelTasks.get(0);
+        Assert.assertEquals(ModelType.LIST, groupNode1.getType());
+        List<ModelNode> groupTasks1 = groupNode1.asList();
+        checkParallelTaskFieldOptions(groupTasks1.get(0), "US", "Upstream", "Not Started", "In Progress", "Merged");
+        checkParallelTaskFieldOptions(groupTasks1.get(1), "DS", "Downstream", "TODO", "In Progress", "Done");
+        ModelNode groupNode2 = parallelTasks.get(1);
+        Assert.assertEquals(ModelType.LIST, groupNode2.getType());
+        List<ModelNode> groupTasks2 = groupNode2.asList();
+        checkParallelTaskFieldOptions(groupTasks2.get(0), "DC", "Documentation", "TODO", "Writing", "Published");
 
+
+        /*
+                  "name": "Documentation",
+          "type": "parallel-task-progress",
+          "field-id": 121212121214,
+          "display": "DC"
+
+         */
         ModelNode allIssues = getIssuesCheckingSize(boardNode, 4);
-        checkIssue(allIssues, "TDP-1", IssueType.TASK, Priority.HIGH, "One", 0, new AssigneeChecker(0), new ParallelTaskFieldValueChecker(1, 1));
-        checkIssue(allIssues, "TDP-2", IssueType.TASK, Priority.HIGH, "Two", 1, new AssigneeChecker(0), new ParallelTaskFieldValueChecker(2, 0));
-        checkIssue(allIssues, "TDP-3", IssueType.TASK, Priority.HIGH, "Three", 2, new AssigneeChecker(0), new ParallelTaskFieldValueChecker(0, 0));
+        checkIssue(allIssues, "TDP-1", IssueType.TASK, Priority.HIGH, "One", 0, new AssigneeChecker(0), new ParallelTaskGroupValueChecker(new int[]{1, 1}, new int[]{1}));
+        checkIssue(allIssues, "TDP-2", IssueType.TASK, Priority.HIGH, "Two", 1, new AssigneeChecker(0), new ParallelTaskGroupValueChecker(new int[]{2, 0}, new int[]{2}));
+        checkIssue(allIssues, "TDP-3", IssueType.TASK, Priority.HIGH, "Three", 2, new AssigneeChecker(0), new ParallelTaskGroupValueChecker(new int[]{0, 0}, new int[]{0}));
         checkIssue(allIssues, "TBG-1", IssueType.TASK, Priority.HIGH, "One", 0, new AssigneeChecker(0));
         checkProjectRankedIssues(boardNode, "TDP", 1, 2, 3);
         checkProjectRankedIssues(boardNode, "TBG", 1);
@@ -1878,6 +1899,7 @@ public class BoardManagerTest extends AbstractBoardTest {
     public void testAddIssuesWithParallelTasks() throws Exception {
         final Long upstreamId = 121212121212L;
         final Long downstreamId = 121212121213L;
+        final Long documentationId = 121212121214L;
         initializeMocks("config/board-parallel-tasks.json", new AdditionalBuilderInit() {
             @Override
             public void initialise(BoardManagerBuilder boardManagerBuilder) {
@@ -1889,6 +1911,9 @@ public class BoardManagerTest extends AbstractBoardTest {
                                 .addCustomFieldOption("TDP", downstreamId, "TD", "TODO")
                                 .addCustomFieldOption("TDP", downstreamId, "IP", "In Progress")
                                 .addCustomFieldOption("TDP", downstreamId, "D", "Done")
+                                .addCustomFieldOption("TDP", documentationId, "TD", "TODO")
+                                .addCustomFieldOption("TDP", documentationId, "W", "Writing")
+                                .addCustomFieldOption("TDP", documentationId, "P", "Published")
                                 .build()
                 );
             }
@@ -1899,10 +1924,12 @@ public class BoardManagerTest extends AbstractBoardTest {
                 .assignee("kabir").buildAndRegister();  //1
         issueRegistry.setParallelTaskField("TDP-1", upstreamId, "IP");
         issueRegistry.setParallelTaskField("TDP-1", downstreamId, "IP");
+        issueRegistry.setParallelTaskField("TDP-1", documentationId, "TD");
         issueRegistry.issueBuilder("TDP", "task", "high", "Two", "TDP-B")
                 .assignee("kabir").buildAndRegister();     //2
         issueRegistry.setParallelTaskField("TDP-2", upstreamId, "M");
         issueRegistry.setParallelTaskField("TDP-2", downstreamId, "TD");
+        issueRegistry.setParallelTaskField("TDP-2", documentationId, "W");
         issueRegistry.issueBuilder("TDP", "task", "high", "Three", "TDP-C")
                 .assignee("kabir").buildAndRegister(); //3
         issueRegistry.issueBuilder("TBG", "task", "high", "One", "TBG-X")
@@ -1915,6 +1942,7 @@ public class BoardManagerTest extends AbstractBoardTest {
         Map<Long, String> customFieldValues = new HashMap<>();
         customFieldValues.put(upstreamId, "M");
         customFieldValues.put(downstreamId, "IP");
+        customFieldValues.put(documentationId, "P");
         OverbaardIssueEvent create = createEventBuilder("TDP-4", IssueType.FEATURE, Priority.HIGH, "Four")
                 .assignee("kabir")
                 .state("TDP-D")
@@ -1924,10 +1952,10 @@ public class BoardManagerTest extends AbstractBoardTest {
         ModelNode boardNode = getJson(1, new BoardAssigneeChecker("kabir"));
 
         ModelNode allIssues = getIssuesCheckingSize(boardNode, 5);
-        checkIssue(allIssues, "TDP-1", IssueType.TASK, Priority.HIGH, "One", 0, new AssigneeChecker(0), new ParallelTaskFieldValueChecker(1, 1));
-        checkIssue(allIssues, "TDP-2", IssueType.TASK, Priority.HIGH, "Two", 1, new AssigneeChecker(0), new ParallelTaskFieldValueChecker(2, 0));
-        checkIssue(allIssues, "TDP-3", IssueType.TASK, Priority.HIGH, "Three", 2, new AssigneeChecker(0), new ParallelTaskFieldValueChecker(0, 0));
-        checkIssue(allIssues, "TDP-4", IssueType.FEATURE, Priority.HIGH, "Four", 3, new AssigneeChecker(0), new ParallelTaskFieldValueChecker(2, 1));
+        checkIssue(allIssues, "TDP-1", IssueType.TASK, Priority.HIGH, "One", 0, new AssigneeChecker(0), new ParallelTaskGroupValueChecker(new int[]{1, 1}, new int[]{0}));
+        checkIssue(allIssues, "TDP-2", IssueType.TASK, Priority.HIGH, "Two", 1, new AssigneeChecker(0), new ParallelTaskGroupValueChecker(new int[]{2, 0}, new int[]{1}));
+        checkIssue(allIssues, "TDP-3", IssueType.TASK, Priority.HIGH, "Three", 2, new AssigneeChecker(0), new ParallelTaskGroupValueChecker(new int[]{0, 0}, new int[]{0}));
+        checkIssue(allIssues, "TDP-4", IssueType.FEATURE, Priority.HIGH, "Four", 3, new AssigneeChecker(0), new ParallelTaskGroupValueChecker(new int[]{2, 1}, new int[]{2}));
         checkIssue(allIssues, "TBG-1", IssueType.TASK, Priority.HIGH, "One", 0, new AssigneeChecker(0));
         checkProjectRankedIssues(boardNode, "TDP", 1, 2, 3, 4);
         checkProjectRankedIssues(boardNode, "TBG", 1);
@@ -1943,11 +1971,11 @@ public class BoardManagerTest extends AbstractBoardTest {
         boardNode = getJson(2, new BoardAssigneeChecker("kabir"));
 
         allIssues = getIssuesCheckingSize(boardNode, 6);
-        checkIssue(allIssues, "TDP-1", IssueType.TASK, Priority.HIGH, "One", 0, new AssigneeChecker(0), new ParallelTaskFieldValueChecker(1, 1));
-        checkIssue(allIssues, "TDP-2", IssueType.TASK, Priority.HIGH, "Two", 1, new AssigneeChecker(0), new ParallelTaskFieldValueChecker(2, 0));
-        checkIssue(allIssues, "TDP-3", IssueType.TASK, Priority.HIGH, "Three", 2, new AssigneeChecker(0), new ParallelTaskFieldValueChecker(0, 0));
-        checkIssue(allIssues, "TDP-4", IssueType.FEATURE, Priority.HIGH, "Four", 3, new AssigneeChecker(0), new ParallelTaskFieldValueChecker(2, 1));
-        checkIssue(allIssues, "TDP-5", IssueType.FEATURE, Priority.HIGH, "Five", 3, new AssigneeChecker(0), new ParallelTaskFieldValueChecker(0, 0));
+        checkIssue(allIssues, "TDP-1", IssueType.TASK, Priority.HIGH, "One", 0, new AssigneeChecker(0), new ParallelTaskGroupValueChecker(new int[]{1, 1}, new int[]{0}));
+        checkIssue(allIssues, "TDP-2", IssueType.TASK, Priority.HIGH, "Two", 1, new AssigneeChecker(0), new ParallelTaskGroupValueChecker(new int[]{2, 0}, new int[]{1}));
+        checkIssue(allIssues, "TDP-3", IssueType.TASK, Priority.HIGH, "Three", 2, new AssigneeChecker(0), new ParallelTaskGroupValueChecker(new int[]{0, 0}, new int[]{0}));
+        checkIssue(allIssues, "TDP-4", IssueType.FEATURE, Priority.HIGH, "Four", 3, new AssigneeChecker(0), new ParallelTaskGroupValueChecker(new int[]{2, 1}, new int[]{2}));
+        checkIssue(allIssues, "TDP-5", IssueType.FEATURE, Priority.HIGH, "Five", 3, new AssigneeChecker(0), new ParallelTaskGroupValueChecker(new int[]{0, 0}, new int[]{0}));
         checkIssue(allIssues, "TBG-1", IssueType.TASK, Priority.HIGH, "One", 0, new AssigneeChecker(0));
         checkProjectRankedIssues(boardNode, "TDP", 1, 2, 3, 4, 5);
         checkProjectRankedIssues(boardNode, "TBG", 1);
@@ -1960,11 +1988,11 @@ public class BoardManagerTest extends AbstractBoardTest {
         boardManager.handleEvent(create, nextRankedIssueUtil);
         boardNode = getJson(3, new BoardAssigneeChecker("kabir"));
         allIssues = getIssuesCheckingSize(boardNode, 7);
-        checkIssue(allIssues, "TDP-1", IssueType.TASK, Priority.HIGH, "One", 0, new AssigneeChecker(0), new ParallelTaskFieldValueChecker(1, 1));
-        checkIssue(allIssues, "TDP-2", IssueType.TASK, Priority.HIGH, "Two", 1, new AssigneeChecker(0), new ParallelTaskFieldValueChecker(2, 0));
-        checkIssue(allIssues, "TDP-3", IssueType.TASK, Priority.HIGH, "Three", 2, new AssigneeChecker(0), new ParallelTaskFieldValueChecker(0, 0));
-        checkIssue(allIssues, "TDP-4", IssueType.FEATURE, Priority.HIGH, "Four", 3, new AssigneeChecker(0), new ParallelTaskFieldValueChecker(2, 1));
-        checkIssue(allIssues, "TDP-5", IssueType.FEATURE, Priority.HIGH, "Five", 3, new AssigneeChecker(0), new ParallelTaskFieldValueChecker(0, 0));
+        checkIssue(allIssues, "TDP-1", IssueType.TASK, Priority.HIGH, "One", 0, new AssigneeChecker(0), new ParallelTaskGroupValueChecker(new int[]{1, 1}, new int[]{0}));
+        checkIssue(allIssues, "TDP-2", IssueType.TASK, Priority.HIGH, "Two", 1, new AssigneeChecker(0), new ParallelTaskGroupValueChecker(new int[]{2, 0}, new int[]{1}));
+        checkIssue(allIssues, "TDP-3", IssueType.TASK, Priority.HIGH, "Three", 2, new AssigneeChecker(0), new ParallelTaskGroupValueChecker(new int[]{0, 0}, new int[]{0}));
+        checkIssue(allIssues, "TDP-4", IssueType.FEATURE, Priority.HIGH, "Four", 3, new AssigneeChecker(0), new ParallelTaskGroupValueChecker(new int[]{2, 1}, new int[]{2}));
+        checkIssue(allIssues, "TDP-5", IssueType.FEATURE, Priority.HIGH, "Five", 3, new AssigneeChecker(0), new ParallelTaskGroupValueChecker(new int[]{0, 0}, new int[]{0}));
         checkIssue(allIssues, "TBG-1", IssueType.TASK, Priority.HIGH, "One", 0, new AssigneeChecker(0));
         checkIssue(allIssues, "TBG-2", IssueType.FEATURE, Priority.HIGH, "Two", 0, new AssigneeChecker(0));
         checkProjectRankedIssues(boardNode, "TDP", 1, 2, 3, 4, 5);
@@ -1977,6 +2005,7 @@ public class BoardManagerTest extends AbstractBoardTest {
     public void testUpdateIssuesWithParallelTasks() throws Exception {
         final Long upstreamId = 121212121212L;
         final Long downstreamId = 121212121213L;
+        final Long documentationId = 121212121214L;
         initializeMocks("config/board-parallel-tasks.json", new AdditionalBuilderInit() {
             @Override
             public void initialise(BoardManagerBuilder boardManagerBuilder) {
@@ -1988,6 +2017,9 @@ public class BoardManagerTest extends AbstractBoardTest {
                                 .addCustomFieldOption("TDP", downstreamId, "TD", "TODO")
                                 .addCustomFieldOption("TDP", downstreamId, "IP", "In Progress")
                                 .addCustomFieldOption("TDP", downstreamId, "D", "Done")
+                                .addCustomFieldOption("TDP", documentationId, "TD", "TODO")
+                                .addCustomFieldOption("TDP", documentationId, "W", "Writing")
+                                .addCustomFieldOption("TDP", documentationId, "P", "Published")
                                 .build()
                 );
             }
@@ -1998,10 +2030,12 @@ public class BoardManagerTest extends AbstractBoardTest {
                 .assignee("kabir").buildAndRegister();      //1
         issueRegistry.setParallelTaskField("TDP-1", upstreamId, "IP");
         issueRegistry.setParallelTaskField("TDP-1", downstreamId, "IP");
+        issueRegistry.setParallelTaskField("TDP-1", documentationId, "P");
         issueRegistry.issueBuilder("TDP", "task", "high", "Two", "TDP-B")
                 .assignee("kabir").buildAndRegister();      //2
         issueRegistry.setParallelTaskField("TDP-2", upstreamId, "M");
         issueRegistry.setParallelTaskField("TDP-2", downstreamId, "TD");
+        issueRegistry.setParallelTaskField("TDP-2", documentationId, "W");
         issueRegistry.issueBuilder("TDP", "task", "high", "Three", "TDP-C")
                 .assignee("kabir").buildAndRegister();      //3
         issueRegistry.issueBuilder("TBG", "task", "high", "One", "TBG-X")
@@ -2019,9 +2053,9 @@ public class BoardManagerTest extends AbstractBoardTest {
         ModelNode boardNode = getJson(1, new BoardAssigneeChecker("kabir"));
 
         ModelNode allIssues = getIssuesCheckingSize(boardNode, 4);
-        checkIssue(allIssues, "TDP-1", IssueType.TASK, Priority.HIGH, "One", 0, new AssigneeChecker(0), new ParallelTaskFieldValueChecker(2, 1));
-        checkIssue(allIssues, "TDP-2", IssueType.TASK, Priority.HIGH, "Two", 1, new AssigneeChecker(0), new ParallelTaskFieldValueChecker(2, 0));
-        checkIssue(allIssues, "TDP-3", IssueType.TASK, Priority.HIGH, "Three", 2, new AssigneeChecker(0), new ParallelTaskFieldValueChecker(0, 0));
+        checkIssue(allIssues, "TDP-1", IssueType.TASK, Priority.HIGH, "One", 0, new AssigneeChecker(0), new ParallelTaskGroupValueChecker(new int[]{2, 1}, new int[]{2}));
+        checkIssue(allIssues, "TDP-2", IssueType.TASK, Priority.HIGH, "Two", 1, new AssigneeChecker(0), new ParallelTaskGroupValueChecker(new int[]{2, 0}, new int[]{1}));
+        checkIssue(allIssues, "TDP-3", IssueType.TASK, Priority.HIGH, "Three", 2, new AssigneeChecker(0), new ParallelTaskGroupValueChecker(new int[]{0, 0}, new int[]{0}));
         checkIssue(allIssues, "TBG-1", IssueType.TASK, Priority.HIGH, "One", 0, new AssigneeChecker(0));
         checkProjectRankedIssues(boardNode, "TDP", 1, 2, 3);
         checkProjectRankedIssues(boardNode, "TBG", 1);
@@ -2030,14 +2064,15 @@ public class BoardManagerTest extends AbstractBoardTest {
         customFieldValues = new HashMap<>();
         customFieldValues.put(upstreamId, "IP");
         customFieldValues.put(downstreamId, "D");
+        customFieldValues.put(documentationId, "TD");
         update = updateEventBuilder("TDP-1").customFieldValues(customFieldValues).buildAndRegister();
         boardManager.handleEvent(update, nextRankedIssueUtil);
         boardNode = getJson(2, new BoardAssigneeChecker("kabir"));
 
         allIssues = getIssuesCheckingSize(boardNode, 4);
-        checkIssue(allIssues, "TDP-1", IssueType.TASK, Priority.HIGH, "One", 0, new AssigneeChecker(0), new ParallelTaskFieldValueChecker(1, 2));
-        checkIssue(allIssues, "TDP-2", IssueType.TASK, Priority.HIGH, "Two", 1, new AssigneeChecker(0), new ParallelTaskFieldValueChecker(2, 0));
-        checkIssue(allIssues, "TDP-3", IssueType.TASK, Priority.HIGH, "Three", 2, new AssigneeChecker(0), new ParallelTaskFieldValueChecker(0, 0));
+        checkIssue(allIssues, "TDP-1", IssueType.TASK, Priority.HIGH, "One", 0, new AssigneeChecker(0), new ParallelTaskGroupValueChecker(new int[]{1, 2}, new int[]{0}));
+        checkIssue(allIssues, "TDP-2", IssueType.TASK, Priority.HIGH, "Two", 1, new AssigneeChecker(0), new ParallelTaskGroupValueChecker(new int[]{2, 0}, new int[]{1}));
+        checkIssue(allIssues, "TDP-3", IssueType.TASK, Priority.HIGH, "Three", 2, new AssigneeChecker(0), new ParallelTaskGroupValueChecker(new int[]{0, 0}, new int[]{0}));
         checkIssue(allIssues, "TBG-1", IssueType.TASK, Priority.HIGH, "One", 0, new AssigneeChecker(0));
         checkProjectRankedIssues(boardNode, "TDP", 1, 2, 3);
         checkProjectRankedIssues(boardNode, "TBG", 1);
@@ -2351,7 +2386,7 @@ public class BoardManagerTest extends AbstractBoardTest {
         checkerMap.put(FixVersionsChecker.class, FixVersionsChecker.NONE);
         checkerMap.put(TesterChecker.class, TesterChecker.NONE);
         checkerMap.put(DocumenterChecker.class, DocumenterChecker.NONE);
-        checkerMap.put(ParallelTaskFieldValueChecker.class, ParallelTaskFieldValueChecker.NONE);
+        checkerMap.put(ParallelTaskGroupValueChecker.class, ParallelTaskGroupValueChecker.NONE);
         for (IssueChecker checker : issueCheckers) {
             checkerMap.put(checker.getClass(), checker);
         }
@@ -2398,12 +2433,13 @@ public class BoardManagerTest extends AbstractBoardTest {
         }
     }
 
-    private static class ParallelTaskFieldValueChecker implements IssueChecker {
-        static final ParallelTaskFieldValueChecker NONE = new ParallelTaskFieldValueChecker(null);
 
-        private int[] expected;
+    private static class ParallelTaskGroupValueChecker implements IssueChecker {
+        static final ParallelTaskGroupValueChecker NONE = new ParallelTaskGroupValueChecker(null);
 
-        ParallelTaskFieldValueChecker(int...expected) {
+        private int[][] expected;
+
+        ParallelTaskGroupValueChecker(int[]... expected) {
             this.expected = expected;
         }
 
@@ -2416,12 +2452,15 @@ public class BoardManagerTest extends AbstractBoardTest {
                 List<ModelNode> values = issue.get(PARALLEL_TASKS).asList();
                 Assert.assertEquals(expected.length, values.size());
                 for (int i = 0 ; i < expected.length ; i++) {
-                    Assert.assertEquals(expected[i], values.get(i).asInt());
+                    List<ModelNode> group = values.get(i).asList();
+                    Assert.assertEquals(expected[i].length, group.size());
+                    for (int j = 0 ; j < expected[i].length ; j++){
+                        Assert.assertEquals(expected[i][j], group.get(j).asInt());
+                    }
                 }
             }
         }
     }
-
     private static class AssigneeChecker implements IssueChecker {
         static final AssigneeChecker NONE = new AssigneeChecker(-1);
         private int expected;

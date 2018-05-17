@@ -23,10 +23,12 @@ import java.util.Map;
 import org.overbaard.jira.api.ProjectParallelTaskOptionsLoader;
 import org.overbaard.jira.impl.JiraInjectables;
 import org.overbaard.jira.impl.config.BoardConfig;
+import org.overbaard.jira.impl.config.BoardParallelTaskConfig;
 import org.overbaard.jira.impl.config.BoardProjectConfig;
-import org.overbaard.jira.impl.config.ParallelTaskConfig;
 import org.overbaard.jira.impl.config.ParallelTaskCustomFieldConfig;
 import org.junit.Assert;
+import org.overbaard.jira.impl.config.ProjectParallelTaskConfig;
+import org.overbaard.jira.impl.config.ProjectParallelTaskGroupsConfig;
 
 import com.atlassian.jira.issue.fields.CustomField;
 
@@ -49,13 +51,13 @@ public class ProjectParallelTaskOptionsLoaderBuilder {
             public Map<String, SortedParallelTaskFieldOptions> loadValues(JiraInjectables jiraInjectables, BoardConfig boardConfig, BoardProjectConfig projectConfig) {
                 Map<String, SortedParallelTaskFieldOptions> parallelTaskValues = new LinkedHashMap<>();
 
-                ParallelTaskConfig parallelTaskConfig = projectConfig.getParallelTaskConfig();
+                ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig = projectConfig.getParallelTaskGroupsConfig();
 
-                if (parallelTaskConfig != null) {
+                if (parallelTaskGroupsConfig != null) {
                     Map<Long, Map<String, String>> optionsByCustomField = customFieldOptionsByProject.get(projectConfig.getCode());
                     Assert.assertNotNull(optionsByCustomField);
 
-                    for (ParallelTaskCustomFieldConfig config : parallelTaskConfig.getConfigs().values()) {
+                    for (ParallelTaskCustomFieldConfig config : parallelTaskGroupsConfig.getConfigs().values()) {
                         CustomField customField = config.getJiraCustomField();
 
                         Map<String, String> options = optionsByCustomField.get(config.getId());
