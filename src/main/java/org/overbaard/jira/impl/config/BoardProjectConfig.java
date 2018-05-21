@@ -34,15 +34,9 @@ import org.overbaard.jira.impl.Constants;
 /** Abstract base class for project configurations of projects whose issues should appear as cards on the board.
  * @author Kabir Khan
  */
-public class BoardProjectConfig extends ProjectConfig {
-    private final BoardStates boardStates;
+public class BoardProjectConfig extends ProjectConfig<BoardProjectStateMapper> {
     private final String queryFilter;
     private final String colour;
-    private final Map<String, String> ownToBoardStates;
-    /** Maps the owner states onto our states */
-    private final Map<String, String> boardToOwnStates;
-
-    private final Set<String> ownDoneStateNames;
 
     private final List<String> customFieldNames;
     private final ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig;
@@ -54,22 +48,10 @@ public class BoardProjectConfig extends ProjectConfig {
                                final Map<String, String> boardToOwnStates,
                                final List<String> customFieldNames,
                                final ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig) {
-        super(code, states);
-        this.boardStates = boardStates;
+        super(code, new BoardProjectStateMapper(boardStates, states, ownToBoardStates, boardToOwnStates));
         this.queryFilter = queryFilter;
         this.colour = colour;
-        this.boardToOwnStates = boardToOwnStates;
-        this.ownToBoardStates = ownToBoardStates;
         this.parallelTaskGroupsConfig = parallelTaskGroupsConfig;
-
-        Set<String> ownDoneStateNames = new HashSet<>();
-        for (String boardDoneState : boardStates.getDoneStates()) {
-            String ownDoneState = boardToOwnStates.get(boardDoneState);
-            if (ownDoneState != null) {
-                ownDoneStateNames.add(ownDoneState);
-            }
-        }
-        this.ownDoneStateNames = Collections.unmodifiableSet(ownDoneStateNames);
         this.customFieldNames = customFieldNames;
     }
 
@@ -176,25 +158,13 @@ public class BoardProjectConfig extends ProjectConfig {
         return colour;
     }
 
-    public Integer mapOwnStateOntoBoardStateIndex(String state) {
-        String boardState = mapOwnStateOntoBoardState(state);
-        return boardStates.getStateIndex(boardState);
+    ModelNode serializeModelNodeForBoard() {
+        ModelNode projectNode = new ModelNode();
+        projectNode.get(Constants.CODE).set(code);
 
-    }
-    public String mapBoardStateOntoOwnState(String boardState) {
-        return boardToOwnStates.get(boardState);
-    }
-
-    public String mapOwnStateOntoBoardState(String state) {
-        return ownToBoardStates.get(state);
-    }
-
-    @Override
-    ModelNode serializeModelNodeForBoard(ModelNode parent, boolean addCode) {
-        ModelNode projectNode = super.serializeModelNodeForBoard(parent, addCode);
         ModelNode stateLinksNode = projectNode.get(Constants.STATE_LINKS);
-        for (String state : boardStates.getStateNames()) {
-            String myState = mapBoardStateOntoOwnState(state);
+        for (String state : projectStates.getStateNames()) {
+            String myState = projectStates.mapBoardStateOntoOwnState(state);
             stateLinksNode.get(state).set(myState == null ? new ModelNode() : new ModelNode(myState));
         }
         projectNode.get(Constants.COLOUR).set(colour);
@@ -228,31 +198,10 @@ public class BoardProjectConfig extends ProjectConfig {
 
         final ModelNode stateLinksNode = projectNode.get(Constants.STATE_LINKS);
         stateLinksNode.setEmptyObject();
-        for (Map.Entry<String, String> entry : ownToBoardStates.entrySet()) {
+        for (Map.Entry<String, String> entry : projectStates.getOwnToBoardStates().entrySet()) {
             stateLinksNode.get(entry.getKey()).set(entry.getValue());
         }
         return projectNode;
-    }
-
-    public boolean isBacklogState(String ownState) {
-        return isBacklogState(mapOwnStateOntoBoardStateIndex(ownState));
-    }
-
-    public boolean isDoneState(String ownState) {
-        Integer boardStateIndex = mapOwnStateOntoBoardStateIndex(ownState);
-        return boardStateIndex == null ? false : isDoneState(boardStateIndex);
-    }
-
-    private boolean isBacklogState(int boardStateIndex) {
-        return boardStates.isBacklogState(boardStateIndex);
-    }
-
-    public boolean isDoneState(int boardStateIndex) {
-        return boardStates.isDoneState(boardStateIndex);
-    }
-
-    public Set<String> getOwnDoneStateNames() {
-        return ownDoneStateNames;
     }
 
     public List<String> getCustomFieldNames() {

@@ -227,7 +227,7 @@ public class Board {
 
     public boolean isBacklogIssue(BoardProjectConfig projectConfig, String issueKey) {
         Issue issue = allIssues.get(issueKey);
-        int boardIndex = projectConfig.mapOwnStateOntoBoardStateIndex(issue.getState());
+        int boardIndex = projectConfig.getProjectStates().mapOwnStateOntoBoardStateIndex(issue.getState());
         if (boardConfig.isBacklogState(boardIndex)) {
             return true;
         }

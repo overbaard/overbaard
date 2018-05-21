@@ -98,7 +98,7 @@ public abstract class Issue {
     private ModelNode getBaseModelNode() {
         ModelNode issueNode = new ModelNode();
         issueNode.get(Constants.KEY).set(key);
-        issueNode.get(Constants.STATE).set(project.getStateIndex(state));
+        issueNode.get(Constants.STATE).set(project.getProjectStates().getStateIndex(state));
         issueNode.get(Constants.SUMMARY).set(summary);
         return issueNode;
     }
@@ -128,7 +128,6 @@ public abstract class Issue {
      * @param labels                  the labels
      * @param fixVersions             the fix versions
      * @param customFieldValues       the custom field values
-     * @param parallelTaskValues      the parallel task values
      * @param parallelTaskGroupValues the parallel task group values
      * @return the issue
      */

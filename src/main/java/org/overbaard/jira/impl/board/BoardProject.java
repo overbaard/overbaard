@@ -152,11 +152,11 @@ public class BoardProject {
     }
 
     public boolean isBacklogState(String state) {
-        return projectConfig.isBacklogState(state);
+        return projectConfig.getProjectStates().isBacklogState(state);
     }
 
     public boolean isDoneState(String state) {
-        return projectConfig.isDoneState(state);
+        return projectConfig.getProjectStates().isDoneState(state);
     }
 
     public String getCode() {
@@ -179,8 +179,8 @@ public class BoardProject {
                                         SearchService searchService, Consumer<JqlQueryBuilder> queryAddition) {
         JqlQueryBuilder queryBuilder = JqlQueryBuilder.newBuilder();
         queryBuilder.where().project(projectConfig.getCode());
-        if (projectConfig.getOwnDoneStateNames().size() > 0) {
-            queryBuilder.where().and().not().addStringCondition("status", projectConfig.getOwnDoneStateNames());
+        if (projectConfig.getProjectStates().getOwnDoneStateNames().size() > 0) {
+            queryBuilder.where().and().not().addStringCondition("status", projectConfig.getProjectStates().getOwnDoneStateNames());
         }
         queryBuilder.orderBy().addSortForFieldName("Rank", SortOrder.ASC, true);
         if (projectConfig.getQueryFilter() != null) {
@@ -228,7 +228,7 @@ public class BoardProject {
         }
 
         Integer getStateIndexRecordingMissing(String issueKey, String stateName) {
-            final Integer index = projectConfig.getStateIndex(stateName);
+            final Integer index = projectConfig.getProjectStates().getStateIndex(stateName);
             if (index == null) {
                 board.addMissingState(issueKey, stateName);
             } else {
@@ -506,7 +506,7 @@ public class BoardProject {
         }
 
         Integer getStateIndexRecordingMissing(String projectCode, String issueKey, String stateName) {
-            final Integer index = linkedProjectConfig.getStateIndex(stateName);
+            final Integer index = linkedProjectConfig.getProjectStates().getStateIndex(stateName);
             if (index == null) {
                 board.addMissingState(issueKey, stateName);
             }
