@@ -230,9 +230,24 @@ public class BoardConfigurationManagerTest {
         Assert.assertNotNull(boardConfig);
         ModelNode serialized = boardConfig.serializeModelNodeForConfig();
         Assert.assertEquals(original, serialized);
-
-
     }
+
+    @Test
+    public void testLoadConfigurationWithIssueTypeOverrides() throws IOException {
+        BoardConfigurationManagerBuilder cfgManagerBuilder = new BoardConfigurationManagerBuilder()
+                .addConfigActiveObjectsFromFile("config/board-issue-type-override-state-links.json")
+                .addSettingActiveObject(RANK_CUSTOM_FIELD_ID, "10000");
+        BoardConfigurationManager cfgManager = cfgManagerBuilder.build();
+
+        ModelNode original = BoardConfigurationManagerBuilder.loadConfig("config/board-issue-type-override-state-links.json");
+        original.protect();
+
+        BoardConfig boardConfig = cfgManager.getBoardConfigForBoardDisplay(null, "TST");
+        Assert.assertNotNull(boardConfig);
+        ModelNode serialized = boardConfig.serializeModelNodeForConfig();
+        Assert.assertEquals(original, serialized);
+    }
+
 
     private void loadBadConfiguration(ModelNode original, StateModifier... modifiers) throws IOException {
         try {

@@ -1,9 +1,15 @@
 package org.overbaard.jira.impl.config;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+
+import org.jboss.dmr.ModelNode;
+import org.jboss.dmr.Property;
+import org.overbaard.jira.impl.Constants;
 
 /**
  * @author <a href="mailto:kabir.khan@jboss.com">Kabir Khan</a>
@@ -37,11 +43,38 @@ public class BoardProjectStateMapper extends ProjectStateList {
         this.ownDoneStateNames = Collections.unmodifiableSet(ownDoneStateNames);
     }
 
+    static BoardProjectStateMapper load(ModelNode statesLinks, BoardStates boardStates) {
+        Map<String, String> ownToBoardStates = new LinkedHashMap<>();
+        Map<String, String> boardToOwnStates = new HashMap<>();
+        for (Property prop : statesLinks.asPropertyList()) {
+            final String ownState = prop.getName();
+            final String boardState = prop.getValue().asString();
+            ownToBoardStates.put(ownState, boardState);
+            boardToOwnStates.put(boardState, ownState);
+        }
+
+        int i = 0;
+        Map<String, Integer> states = new LinkedHashMap<>();
+        for (String boardState : boardStates.getStateNames()) {
+            final String ownState = boardToOwnStates.get(boardState);
+            if (ownState != null) {
+                states.put(ownState, i++);
+            }
+        }
+
+        return new BoardProjectStateMapper(
+                boardStates,
+                Collections.unmodifiableMap(states),
+                Collections.unmodifiableMap(ownToBoardStates),
+                Collections.unmodifiableMap(boardToOwnStates));
+    }
+
     public Integer mapOwnStateOntoBoardStateIndex(String state) {
         String boardState = mapOwnStateOntoBoardState(state);
         return boardStates.getStateIndex(boardState);
 
     }
+
     public String mapBoardStateOntoOwnState(String boardState) {
         return boardToOwnStates.get(boardState);
     }
@@ -73,6 +106,25 @@ public class BoardProjectStateMapper extends ProjectStateList {
 
     boolean isDoneState(int boardStateIndex) {
         return boardStates.isDoneState(boardStateIndex);
+    }
+
+    ModelNode serializeModelNodeForConfig() {
+        ModelNode stateLinksNode = new ModelNode();
+        for (Map.Entry<String, String> entry : ownToBoardStates.entrySet()) {
+            stateLinksNode.get(entry.getKey()).set(entry.getValue());
+        }
+        return stateLinksNode;
+    }
+
+    ModelNode serializeModelNodeForBoard() {
+        ModelNode stateLinks = new ModelNode();
+        for (String state : boardStates.getStateNames()) {
+            String myState = mapBoardStateOntoOwnState(state);
+            if (myState != null) {
+                stateLinks.get(state).set(new ModelNode(myState));
+            }
+        }
+        return stateLinks;
     }
 
 }

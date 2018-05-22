@@ -66,6 +66,8 @@ public class Constants {
     public static final String NEW = "new";
     public static final String OPTIONS = "options";
     public static final String OVERBAARD_VERSION = "overbaard-version";
+    public static final String OVERRIDES = "overrides";
+    public static final String OVERRIDE = "override";
     public static final String OWNER = "owner";
     public static final String PARALLEL_TASKS = "parallel-tasks";
     //public static final String PARALLEL_TASK_GROUPS = "parallel-task-groups";
