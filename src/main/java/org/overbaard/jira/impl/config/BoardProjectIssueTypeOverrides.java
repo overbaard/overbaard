@@ -7,6 +7,7 @@ import static org.overbaard.jira.impl.Constants.STATE_LINKS;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -35,6 +36,17 @@ public class BoardProjectIssueTypeOverrides {
         return modelNode;
     }
 
+
+    public ModelNode serializeModelNodeForBoard() {
+        ModelNode modelNode = new ModelNode();
+        if (stateLinksConfigOverrides.size() > 0) {
+            for (StateLinksConfigOverride override : stateLinksConfigOverrides) {
+                modelNode.get(STATE_LINKS).add(override.serializeModelNodeForBoard());
+            }
+        }
+        return modelNode;
+    }
+
     static BoardProjectIssueTypeOverrides load(ModelNode overridesNode, BoardStates boardStates, String projectCode, Set<String> existingIssueTypes) {
         List<StateLinksConfigOverride> stateLinksConfigOverrides = new ArrayList<>();
         if (overridesNode.isDefined()) {
@@ -56,10 +68,18 @@ public class BoardProjectIssueTypeOverrides {
             throw new OverbaardValidationException("'overrides/state-links' for " + projectCode + " should be an array");
         }
 
+        Set<String> issueTypes = new HashSet<>();
         for (ModelNode override : stateLinksNode.asList()) {
-            overrides.add(StateLinksConfigOverride.load(override, boardStates, projectCode, existingIssueTypes));
+            StateLinksConfigOverride linksOverride = StateLinksConfigOverride.load(override, boardStates, projectCode, existingIssueTypes);
+            for (String issueType : linksOverride.getIssueTypes()) {
+                if (!issueTypes.add(issueType)) {
+                    throw new OverbaardValidationException("Issue type '" + issueType + "' appears more than once in 'overrides/state-links' for " + projectCode);
+                }
+            }
+            overrides.add(linksOverride);
         }
     }
+
 
 
     private static abstract class IssueTypeConfigOverride {
@@ -69,7 +89,19 @@ public class BoardProjectIssueTypeOverrides {
             this.issueTypes = issueTypes;
         }
 
+        public List<String> getIssueTypes() {
+            return issueTypes;
+        }
+
         ModelNode serializeModelNodeForConfig() {
+            return createEmptyNodeWithIssueTypesList();
+        }
+
+        ModelNode serializeModelNodeForBoard() {
+            return createEmptyNodeWithIssueTypesList();
+        }
+
+        private ModelNode createEmptyNodeWithIssueTypesList() {
             ModelNode list = new ModelNode();
             for (String type : issueTypes) {
                 list.add(type);
@@ -100,6 +132,7 @@ public class BoardProjectIssueTypeOverrides {
             }
             return types;
         }
+
     }
 
 
@@ -116,6 +149,12 @@ public class BoardProjectIssueTypeOverrides {
         ModelNode serializeModelNodeForConfig() {
             ModelNode override = super.serializeModelNodeForConfig();
             override.get(OVERRIDE).set(stateMapper.serializeModelNodeForConfig());
+            return override;
+        }
+
+        ModelNode serializeModelNodeForBoard() {
+            ModelNode override = super.serializeModelNodeForBoard();
+            override.get(OVERRIDE).set(stateMapper.serializeModelNodeForBoard());
             return override;
         }
 

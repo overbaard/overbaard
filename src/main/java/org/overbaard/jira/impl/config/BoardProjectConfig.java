@@ -147,6 +147,12 @@ public class BoardProjectConfig extends ProjectConfig<BoardProjectStateMapper> {
         projectNode.get(Constants.STATE_LINKS).set(projectStates.serializeModelNodeForBoard());
 
         projectNode.get(Constants.COLOUR).set(colour);
+
+        final ModelNode issueTypeOverrides = this.issueTypeOverrides.serializeModelNodeForBoard();
+        if (issueTypeOverrides.isDefined()) {
+            projectNode.get(Constants.OVERRIDES).set(issueTypeOverrides);
+        }
+
         return projectNode;
     }
 

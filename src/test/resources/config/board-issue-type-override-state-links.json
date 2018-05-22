@@ -38,7 +38,16 @@
               "TDP-B" : "S-C",
               "TDP-C" : "S-D"
             }
+          },
+          {
+            "issue-types": ["feature"],
+            "override": {
+              "TDP-B" : "S-A",
+              "TDP-C" : "S-B",
+              "TDP-D" : "S-D"
+            }
           }
+
         ]
       }
     },

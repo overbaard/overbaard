@@ -109,6 +109,7 @@ public class BoardProjectStateMapper extends ProjectStateList {
     }
 
     ModelNode serializeModelNodeForConfig() {
+        // Here we use ownState -> boardState
         ModelNode stateLinksNode = new ModelNode();
         for (Map.Entry<String, String> entry : ownToBoardStates.entrySet()) {
             stateLinksNode.get(entry.getKey()).set(entry.getValue());
@@ -117,6 +118,7 @@ public class BoardProjectStateMapper extends ProjectStateList {
     }
 
     ModelNode serializeModelNodeForBoard() {
+        // Here we use boardState -> ownState
         ModelNode stateLinks = new ModelNode();
         for (String state : boardStates.getStateNames()) {
             String myState = mapBoardStateOntoOwnState(state);

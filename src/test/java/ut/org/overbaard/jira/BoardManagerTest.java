@@ -37,6 +37,8 @@ import static org.overbaard.jira.impl.Constants.LINKED;
 import static org.overbaard.jira.impl.Constants.MAIN;
 import static org.overbaard.jira.impl.Constants.NAME;
 import static org.overbaard.jira.impl.Constants.OPTIONS;
+import static org.overbaard.jira.impl.Constants.OVERRIDE;
+import static org.overbaard.jira.impl.Constants.OVERRIDES;
 import static org.overbaard.jira.impl.Constants.PARALLEL_TASKS;
 import static org.overbaard.jira.impl.Constants.PRIORITIES;
 import static org.overbaard.jira.impl.Constants.PRIORITY;
@@ -45,6 +47,7 @@ import static org.overbaard.jira.impl.Constants.RANK;
 import static org.overbaard.jira.impl.Constants.RANKED;
 import static org.overbaard.jira.impl.Constants.STATE;
 import static org.overbaard.jira.impl.Constants.STATES;
+import static org.overbaard.jira.impl.Constants.STATE_LINKS;
 import static org.overbaard.jira.impl.Constants.SUMMARY;
 import static org.overbaard.jira.impl.Constants.TYPE;
 import static org.overbaard.jira.impl.Constants.VALUE;
@@ -99,6 +102,81 @@ public class BoardManagerTest extends AbstractBoardTest {
         Assert.assertFalse(boardNode.hasDefined(BACKLOG));
         //The last 2 states are 'done' states (they must always be at the end)
         Assert.assertEquals(2, boardNode.get(DONE).asInt());
+    }
+
+    @Test
+    public void testProjectStateLinksNoOverrides() throws Exception {
+        ModelNode boardNode = getJson(0);
+        // Check the project state-links and that there are no overrides for the projects in this board
+        final ModelNode tdp = getProjectFromBoardNode(boardNode, "TDP");
+        final ModelNode tdpLinks = tdp.get(STATE_LINKS);
+        Assert.assertEquals(4, tdpLinks.keys().size());
+        Assert.assertEquals("TDP-A", tdpLinks.get("S-A").asString());
+        Assert.assertEquals("TDP-B", tdpLinks.get("S-B").asString());
+        Assert.assertEquals("TDP-C", tdpLinks.get("S-C").asString());
+        Assert.assertEquals("TDP-D", tdpLinks.get("S-D").asString());
+
+        final ModelNode tbg = getProjectFromBoardNode(boardNode, "TBG");
+        final ModelNode tbgLinks = tbg.get(STATE_LINKS);
+        Assert.assertEquals(2, tbgLinks.keys().size());
+        Assert.assertEquals("TBG-X", tbgLinks.get("S-B").asString());
+        Assert.assertEquals("TBG-Y", tbgLinks.get("S-C").asString());
+
+        // No overrides set up
+        Assert.assertFalse(tdp.hasDefined(OVERRIDES));
+        Assert.assertFalse(tbg.hasDefined(OVERRIDES));
+    }
+
+    @Test
+    public void testProjectStateLinksWithOverrides() throws Exception {
+        initializeMocks("config/board-issue-type-override-state-links.json");
+        ModelNode boardNode = getJson(0);
+        // Check the project state-links and that there are no overrides for the projects in this board
+        final ModelNode tdp = getProjectFromBoardNode(boardNode, "TDP");
+        final ModelNode tdpLinks = tdp.get(STATE_LINKS);
+        Assert.assertEquals(4, tdpLinks.keys().size());
+        Assert.assertEquals("TDP-A", tdpLinks.get("S-A").asString());
+        Assert.assertEquals("TDP-B", tdpLinks.get("S-B").asString());
+        Assert.assertEquals("TDP-C", tdpLinks.get("S-C").asString());
+        Assert.assertEquals("TDP-D", tdpLinks.get("S-D").asString());
+
+
+        final ModelNode tbg = getProjectFromBoardNode(boardNode, "TBG");
+        final ModelNode tbgLinks = tbg.get(STATE_LINKS);
+        Assert.assertEquals(2, tbgLinks.keys().size());
+        Assert.assertEquals("TBG-X", tbgLinks.get("S-B").asString());
+        Assert.assertEquals("TBG-Y", tbgLinks.get("S-C").asString());
+
+        // Check the issue type overrides for the TDP project
+        final ModelNode tdpOverridesNode = tdp.get(OVERRIDES, STATE_LINKS);
+        Assert.assertEquals(ModelType.LIST, tdpOverridesNode.getType());
+        final List<ModelNode> tdpOverrides = tdpOverridesNode.asList();
+        Assert.assertEquals(2, tdpOverrides.size());
+
+        final ModelNode taskBugOverrides = tdpOverrides.get(0);
+        final List<ModelNode> taskBugIssueTypes = tdpOverrides.get(0).get(ISSUE_TYPES).asList();
+        Assert.assertEquals(2, taskBugIssueTypes.size());
+        Assert.assertEquals("task", taskBugIssueTypes.get(0).asString());
+        Assert.assertEquals("bug", taskBugIssueTypes.get(1).asString());
+        final ModelNode taskBugLinks = tdpOverrides.get(0).get(OVERRIDE);
+        Assert.assertEquals(3, taskBugLinks.keys().size());
+        Assert.assertEquals("TDP-A", taskBugLinks.get("S-A").asString());
+        Assert.assertEquals("TDP-B", taskBugLinks.get("S-C").asString());
+        Assert.assertEquals("TDP-C", taskBugLinks.get("S-D").asString());
+
+
+        final List<ModelNode> featureIssueTypes = tdpOverrides.get(1).get(ISSUE_TYPES).asList();
+        Assert.assertEquals(1, featureIssueTypes.size());
+        Assert.assertEquals("feature", featureIssueTypes.get(0).asString());
+        final ModelNode featureLinks = tdpOverrides.get(1).get(OVERRIDE);
+        Assert.assertEquals(3, featureLinks.keys().size());
+        Assert.assertEquals("TDP-B", featureLinks.get("S-A").asString());
+        Assert.assertEquals("TDP-C", featureLinks.get("S-B").asString());
+        Assert.assertEquals("TDP-D", featureLinks.get("S-D").asString());
+
+
+        // No overrides set up
+        Assert.assertFalse(tbg.hasDefined(OVERRIDES));
     }
 
     @Test
