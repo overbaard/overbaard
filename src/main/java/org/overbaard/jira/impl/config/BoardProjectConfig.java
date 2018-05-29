@@ -199,4 +199,31 @@ public class BoardProjectConfig extends ProjectConfig<BoardProjectStateMapper> {
     public ProjectParallelTaskGroupsConfig getParallelTaskGroupsConfig() {
         return parallelTaskGroupsConfig;
     }
+
+    @Override
+    public BoardProjectStateMapper getOverriddenOrProjectStates(String issueType) {
+        if (issueTypeOverrides != null) {
+            BoardProjectStateMapper states = issueTypeOverrides.getStateLinksOverride(issueType);
+            if (states != null) {
+                return states;
+            }
+        }
+        return projectStates;
+    }
+
+    /**
+     * This should not be called normally {@link #getOverriddenOrProjectStates(String)} should be preferred
+     * @return the project state mapper
+     */
+    public BoardProjectStateMapper getProjectStateLinks() {
+        return projectStates;
+    }
+
+    /**
+     * This should not be called normally {@link #getOverriddenOrProjectStates(String)} should be preferred
+     * @return the overridden state mappers by issue types
+     */
+    public Map<String, BoardProjectStateMapper> getIssueTypeStateLinksOverrides() {
+        return issueTypeOverrides.getStateLinkOverrides();
+    }
 }

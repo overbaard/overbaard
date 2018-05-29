@@ -30,6 +30,7 @@ import org.overbaard.jira.api.ProjectParallelTaskOptionsLoader;
 import org.overbaard.jira.impl.Constants;
 import org.overbaard.jira.impl.JiraInjectables;
 import org.overbaard.jira.impl.config.BoardProjectConfig;
+import org.overbaard.jira.impl.config.BoardProjectStateMapper;
 import org.overbaard.jira.impl.config.CustomFieldConfig;
 import org.overbaard.jira.impl.config.LinkedProjectConfig;
 import org.overbaard.jira.impl.config.ParallelTaskCustomFieldConfig;
@@ -42,6 +43,7 @@ import com.atlassian.jira.issue.CustomFieldManager;
 import com.atlassian.jira.issue.link.IssueLinkManager;
 import com.atlassian.jira.issue.search.SearchException;
 import com.atlassian.jira.issue.search.SearchResults;
+import com.atlassian.jira.jql.builder.JqlClauseBuilder;
 import com.atlassian.jira.jql.builder.JqlQueryBuilder;
 import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.project.Project;
@@ -151,12 +153,12 @@ public class BoardProject {
         return new Updater(jiraInjectables, nextRankedIssueUtil, boardUpdater, this, boardOwner);
     }
 
-    public boolean isBacklogState(String state) {
-        return projectConfig.getProjectStates().isBacklogState(state);
+    public boolean isBacklogState(String issueType, String state) {
+        return projectConfig.getOverriddenOrProjectStates(issueType).isBacklogState(state);
     }
 
-    public boolean isDoneState(String state) {
-        return projectConfig.getProjectStates().isDoneState(state);
+    public boolean isDoneState(String issueType, String state) {
+        return projectConfig.getOverriddenOrProjectStates(issueType).isDoneState(state);
     }
 
     public String getCode() {
@@ -178,10 +180,9 @@ public class BoardProject {
     public static Query initialiseQuery(BoardProjectConfig projectConfig, ApplicationUser boardOwner,
                                         SearchService searchService, Consumer<JqlQueryBuilder> queryAddition) {
         JqlQueryBuilder queryBuilder = JqlQueryBuilder.newBuilder();
-        queryBuilder.where().project(projectConfig.getCode());
-        if (projectConfig.getProjectStates().getOwnDoneStateNames().size() > 0) {
-            queryBuilder.where().and().not().addStringCondition("status", projectConfig.getProjectStates().getOwnDoneStateNames());
-        }
+
+        addJqlStateFiltering(projectConfig, queryBuilder);
+
         queryBuilder.orderBy().addSortForFieldName("Rank", SortOrder.ASC, true);
         if (projectConfig.getQueryFilter() != null) {
             final SearchService.ParseResult parseResult = searchService.parseQuery(
@@ -200,6 +201,65 @@ public class BoardProject {
         }
 
         return queryBuilder.buildQuery();
+    }
+
+    private static void addJqlStateFiltering(BoardProjectConfig projectConfig, JqlQueryBuilder queryBuilder) {
+
+        // Process the overrides
+        Map<String, Set<String>> issueOverrideDoneStateNames = new HashMap<>();
+        for (Map.Entry<String, BoardProjectStateMapper> entry : projectConfig.getIssueTypeStateLinksOverrides().entrySet()) {
+            issueOverrideDoneStateNames.put(entry.getKey(), entry.getValue().getOwnDoneStateNames());
+        }
+
+        //Add the project
+        JqlClauseBuilder clauseBuilder = queryBuilder.where();
+        queryBuilder.where().project(projectConfig.getCode());
+
+
+        // Do the outer bracket if we have issue overrides
+        boolean hasIssueOverrides = issueOverrideDoneStateNames.size() > 0;
+        if (hasIssueOverrides) {
+            clauseBuilder.and().sub();
+        }
+
+        // Do the filtering by state names and issue types for the project non-overridden issue types
+        boolean mainProjectHasOwnDoneStateNames = projectConfig.getProjectStateLinks().getOwnDoneStateNames().size() > 0;
+        boolean firstClause = true;
+        if (mainProjectHasOwnDoneStateNames || hasIssueOverrides) {
+            if (!hasIssueOverrides) {
+                clauseBuilder.and();
+            }
+            clauseBuilder.sub();
+            if (mainProjectHasOwnDoneStateNames) {
+                clauseBuilder.not().addStringCondition("status", projectConfig.getProjectStateLinks().getOwnDoneStateNames());
+                firstClause = false;
+            }
+            if (hasIssueOverrides) {
+                if (!firstClause) {
+                    clauseBuilder.and();
+                }
+                clauseBuilder.not().addStringCondition("type", issueOverrideDoneStateNames.keySet());
+            }
+
+            clauseBuilder.endsub();
+        }
+
+        // Now do the overrides
+        for (Map.Entry<String, Set<String>> override : issueOverrideDoneStateNames.entrySet()) {
+            clauseBuilder.or();
+            Set<String> doneStateNames = override.getValue();
+            clauseBuilder.sub();
+            clauseBuilder.addStringCondition("type", override.getKey());
+            if (doneStateNames.size() > 0) {
+                clauseBuilder.and();
+                clauseBuilder.not().addStringCondition("status", projectConfig.getProjectStateLinks().getOwnDoneStateNames());
+            }
+            clauseBuilder.endsub();
+        }
+
+        if (hasIssueOverrides) {
+            clauseBuilder.endsub();
+        }
     }
 
     public static abstract class Accessor {
@@ -227,8 +287,8 @@ public class BoardProject {
             return board.getIssueTypeIndexRecordingMissing(issueKey, issueTypeName);
         }
 
-        Integer getStateIndexRecordingMissing(String issueKey, String stateName) {
-            final Integer index = projectConfig.getProjectStates().getStateIndex(stateName);
+        Integer getStateIndexRecordingMissing(String issueKey, String issueType, String stateName) {
+            final Integer index = projectConfig.getOverriddenOrProjectStates(issueType).getStateIndex(stateName);
             if (index == null) {
                 board.addMissingState(issueKey, stateName);
             } else {
@@ -505,8 +565,8 @@ public class BoardProject {
             return linkedProjectConfig;
         }
 
-        Integer getStateIndexRecordingMissing(String projectCode, String issueKey, String stateName) {
-            final Integer index = linkedProjectConfig.getProjectStates().getStateIndex(stateName);
+        Integer getStateIndexRecordingMissing(String issueKey, String issueType, String stateName) {
+            final Integer index = linkedProjectConfig.getOverriddenOrProjectStates(issueType).getStateIndex(stateName);
             if (index == null) {
                 board.addMissingState(issueKey, stateName);
             }
@@ -515,20 +575,6 @@ public class BoardProject {
 
         public String getCode() {
             return linkedProjectConfig.getCode();
-        }
-    }
-
-    static class SingleLoadedIssueWrapper {
-        private final com.atlassian.jira.issue.Issue jiraIssue;
-        private final Issue issue;
-
-        public SingleLoadedIssueWrapper(com.atlassian.jira.issue.Issue jiraIssue, Issue issue) {
-            this.jiraIssue = jiraIssue;
-            this.issue = issue;
-        }
-
-        Issue getIssue() {
-            return issue;
         }
     }
 }

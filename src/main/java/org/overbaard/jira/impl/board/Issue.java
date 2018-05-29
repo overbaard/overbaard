@@ -17,7 +17,6 @@
 package org.overbaard.jira.impl.board;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -31,7 +30,6 @@ import org.overbaard.jira.impl.Constants;
 import org.overbaard.jira.impl.config.BoardConfig;
 import org.overbaard.jira.impl.config.BoardProjectConfig;
 import org.overbaard.jira.impl.config.LinkedProjectConfig;
-import org.overbaard.jira.impl.config.ParallelTaskCustomFieldConfig;
 import org.overbaard.jira.impl.config.ParallelTaskGroupPosition;
 import org.overbaard.jira.impl.config.ProjectConfig;
 import org.overbaard.jira.impl.config.ProjectParallelTaskConfig;
@@ -53,13 +51,15 @@ public abstract class Issue {
     private final String state;
     private final Integer stateIndex;
     private final String summary;
+    private final String issueTypeName;
 
-    Issue(ProjectConfig project, String key, String state, Integer stateIndex, String summary) {
+    Issue(ProjectConfig project, String key, String state, Integer stateIndex, String issueTypeName, String summary) {
         this.project = project;
         this.key = key;
         this.state = state;
         this.stateIndex = stateIndex;
         this.summary = summary;
+        this.issueTypeName = issueTypeName;
     }
 
     public String getKey() {
@@ -82,6 +82,10 @@ public abstract class Issue {
         return stateIndex;
     }
 
+    public String getIssueTypeName() {
+        return issueTypeName;
+    }
+
     boolean hasLinkedIssues() {
         return false;
     }
@@ -98,7 +102,7 @@ public abstract class Issue {
     private ModelNode getBaseModelNode() {
         ModelNode issueNode = new ModelNode();
         issueNode.get(Constants.KEY).set(key);
-        issueNode.get(Constants.STATE).set(project.getProjectStates().getStateIndex(state));
+        issueNode.get(Constants.STATE).set(project.getOverriddenOrProjectStates(issueTypeName).getStateIndex(state));
         issueNode.get(Constants.SUMMARY).set(summary);
         return issueNode;
     }
@@ -137,7 +141,7 @@ public abstract class Issue {
                                       Map<String, CustomFieldValue> customFieldValues,
                                       Map<ParallelTaskGroupPosition, Integer> parallelTaskGroupValues) {
         Builder builder = new Builder(project, issueKey);
-        builder.setState(state);
+        builder.setState(issueType, state);
         builder.setSummary(summary);
         builder.setIssueType(issueType);
         builder.setPriority(priority);
@@ -248,7 +252,8 @@ public abstract class Issue {
         }
         if (state != null) {
             changed = true;
-            builder.setState(state);
+            String currentIssueType = issueType != null ? issueType : existing.getIssueTypeName();
+            builder.setState(currentIssueType, state);
         }
         if (customFieldValues.size() > 0) {
             changed = true;
@@ -280,12 +285,12 @@ public abstract class Issue {
         private final List<List<Integer>> parallelTaskFieldGroupValues;
 
         public BoardIssue(BoardProjectConfig project, String key, String state, Integer stateIndex, String summary,
-                          Integer issueTypeIndex, Integer priorityIndex, Assignee assignee,
+                          Integer issueTypeIndex, String issueTypeName, Integer priorityIndex, Assignee assignee,
                           Set<MultiSelectNameOnlyValue.Component> components, Set<MultiSelectNameOnlyValue.Label> labels, Set<MultiSelectNameOnlyValue.FixVersion> fixVersions,
                           List<LinkedIssue> linkedIssues,
                           Map<String, CustomFieldValue> customFieldValues,
                           List<List<Integer>> parallelTaskFieldGroupValues) {
-            super(project, key, state, stateIndex, summary);
+            super(project, key, state, stateIndex, issueTypeName, summary);
             this.issueTypeIndex = issueTypeIndex;
             this.priorityIndex = priorityIndex;
             this.assignee = assignee;
@@ -357,8 +362,8 @@ public abstract class Issue {
     }
 
     private static class LinkedIssue extends Issue {
-        public LinkedIssue(LinkedProjectConfig project, String key, String state, Integer stateIndex, String summary) {
-            super(project, key, state, stateIndex, summary);
+        public LinkedIssue(LinkedProjectConfig project, String key, String state, Integer stateIndex, String issueTypeName, String summary) {
+            super(project, key, state, stateIndex, issueTypeName, summary);
         }
 
         @Override
@@ -381,6 +386,7 @@ public abstract class Issue {
         private Set<MultiSelectNameOnlyValue.Label> labels;
         private Set<MultiSelectNameOnlyValue.FixVersion> fixVersions;
         private Integer issueTypeIndex;
+        private String issueTypeName;
         private Integer priorityIndex;
         private String state;
         private Integer stateIndex;
@@ -417,6 +423,7 @@ public abstract class Issue {
             this.labels = existing.labels;
             this.fixVersions = existing.fixVersions;
             this.issueTypeIndex = existing.issueTypeIndex;
+            this.issueTypeName = existing.getIssueTypeName();
             this.priorityIndex = existing.priorityIndex;
             this.state = existing.getState();
             this.stateIndex = existing.getStateIndex();
@@ -440,7 +447,7 @@ public abstract class Issue {
             fixVersions = project.getFixVersions(issue.getFixVersions());
             setIssueType(issue.getIssueTypeObject().getName());
             setPriority(issue.getPriorityObject().getName());
-            setState(issue.getStatusObject().getName());
+            setState(this.issueTypeName, issue.getStatusObject().getName());
 
             //Load the custom fields
             issueLoadStrategy.handle(issue, this);
@@ -491,6 +498,9 @@ public abstract class Issue {
 
         private Builder setIssueType(String issueTypeName) {
             this.issueTypeIndex = project.getIssueTypeIndexRecordingMissing(issueKey, issueTypeName);
+            if (this.issueTypeIndex != null) {
+                this.issueTypeName = project.getBoard().getConfig().getIssueTypeName(this.issueTypeIndex);
+            }
             return this;
         }
 
@@ -499,9 +509,9 @@ public abstract class Issue {
             return this;
         }
 
-        private Builder setState(String stateName) {
+        private Builder setState(String issueType, String stateName) {
             state = stateName;
-            stateIndex = project.getStateIndexRecordingMissing(issueKey, state);
+            stateIndex = project.getStateIndexRecordingMissing(issueKey, issueType, state);
             return this;
         }
 
@@ -521,13 +531,13 @@ public abstract class Issue {
                     continue;
                 }
                 String stateName = linkedIssue.getStatusObject().getName();
-                Integer stateIndex = linkedProjectContext.getStateIndexRecordingMissing(linkedProjectContext.getCode(), linkedIssue.getKey(), stateName);
+                Integer stateIndex = linkedProjectContext.getStateIndexRecordingMissing(linkedIssue.getKey(), linkedIssue.getIssueType().getName(), stateName);
                 if (stateIndex != null) {
                     if (linkedIssues == null) {
                         linkedIssues = createLinkedIssueSet();
                     }
                     linkedIssues.add(new LinkedIssue(linkedProjectContext.getConfig(), linkedIssue.getKey(),
-                            stateName, stateIndex, linkedIssue.getSummary()));
+                            stateName, stateIndex, linkedIssue.getSummary(), linkedIssue.getIssueType().getName()));
                 }
             }
         }
@@ -550,7 +560,7 @@ public abstract class Issue {
                 //Map<String, CustomFieldValue> builtCustomFieldValues
                 return new BoardIssue(
                         project.getConfig(), issueKey, state, stateIndex, summary,
-                        issueTypeIndex, priorityIndex, assignee, components,
+                        issueTypeIndex, issueTypeName, priorityIndex, assignee, components,
                         labels, fixVersions,
                         linkedList,
                         mergeCustomFieldValues(),

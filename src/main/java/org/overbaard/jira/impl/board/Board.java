@@ -146,7 +146,7 @@ public class Board {
         this.allIssues.forEach((code, issue) -> {
             boolean relevant = true;
             if (!backlog) {
-                relevant = !getBoardProject(issue.getProjectCode()).isBacklogState(issue.getState());
+                relevant = !getBoardProject(issue.getProjectCode()).isBacklogState(issue.getIssueTypeName(), issue.getState());
             }
             if (relevant) {
                 allIssues.get(code).set(issue.getModelNodeForFullRefresh(this));
@@ -227,7 +227,7 @@ public class Board {
 
     public boolean isBacklogIssue(BoardProjectConfig projectConfig, String issueKey) {
         Issue issue = allIssues.get(issueKey);
-        int boardIndex = projectConfig.getProjectStates().mapOwnStateOntoBoardStateIndex(issue.getState());
+        int boardIndex = projectConfig.getOverriddenOrProjectStates(issue.getIssueTypeName()).mapOwnStateOntoBoardStateIndex(issue.getState());
         if (boardConfig.isBacklogState(boardIndex)) {
             return true;
         }
@@ -609,8 +609,11 @@ public class Board {
                 if (event.getDetails().getState() != null) {
 
                     //This was a move, work out if we are moving to a done state or to an old state
-                    boolean newDone = project.isDoneState(event.getDetails().getState());
-                    boolean oldDone = project.isDoneState(event.getDetails().getOldState());
+                    //Note that in theory if the issue type was changed the state calculation could be different
+                    //for the new state, HOWEVER Jira doesn't seem to allow you to change the type if the new type uses
+                    //a different workflow
+                    boolean newDone = project.isDoneState(event.getDetails().getIssueType(), event.getDetails().getState());
+                    boolean oldDone = project.isDoneState(event.getDetails().getIssueType(), event.getDetails().getOldState());
 
                     OverbaardLogger.LOGGER.debug("Board.Updater.handleCreateOrUpdateIssue - possible state change from {} to {}. oldDone: {}; newDone: {}",
                             event.getDetails().getOldState(), event.getDetails().getState(), oldDone, newDone);
@@ -626,7 +629,7 @@ public class Board {
                         return handleDeleteEvent(OverbaardIssueEvent.createDeleteEvent(event.getIssueKey(), event.getProjectCode()));
                     }
                     moveFromDone = oldDone && !newDone;
-                } else if (project.isDoneState(event.getDetails().getOldState())) {
+                } else if (project.isDoneState(event.getDetails().getIssueType(), event.getDetails().getOldState())) {
                     OverbaardLogger.LOGGER.debug("Board.Updater.handleCreateOrUpdateIssue- ignoring done issue {}, state: {}. Return original",
                             event.getIssueKey(), event.getDetails().getOldState());
                     //This was not a move, so if the 'old state' (which is the current one) is a done state
@@ -750,10 +753,10 @@ public class Board {
                     }
 
                     if (existingIssue != null) {
-                        changeBuilder.setFromBacklogState(project.isBacklogState(existingIssue.getState()));
+                        changeBuilder.setFromBacklogState(project.isBacklogState(existingIssue.getIssueTypeName(), existingIssue.getState()));
                     }
                     if (newIssue != null) {
-                        changeBuilder.setBacklogState(project.isBacklogState(newIssue.getState()));
+                        changeBuilder.setBacklogState(project.isBacklogState(newIssue.getIssueTypeName(), newIssue.getState()));
                     }
                     if (parallelTaskGroupValues.size() > 0) {
                         changeBuilder.setParallelTaskGroupValues(parallelTaskGroupValues);

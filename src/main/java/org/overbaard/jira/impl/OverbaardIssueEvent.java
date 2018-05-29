@@ -97,13 +97,14 @@ public class OverbaardIssueEvent {
         return new OverbaardIssueEvent(Type.CREATE, issueKey, projectCode, detail);
     }
 
-    public static OverbaardIssueEvent createUpdateEvent(String issueKey, String projectCode, String issueType, String priority,
+    public static OverbaardIssueEvent createUpdateEvent(String issueKey, String projectCode,
+                                                        String issueType, String priority,
                                                         String summary, ApplicationUser assignee, Collection<ProjectComponent> components,
                                                         Collection<Label> labels, Collection<Version> fixVersions,
-                                                        String currentState, String state, boolean reranked,
+                                                        String oldState, String state, boolean reranked,
                                                         Map<Long, String> customFieldValues) {
         Detail detail = new Detail(issueType, priority, summary, assignee, components, labels, fixVersions,
-                currentState, state, reranked, customFieldValues);
+                oldState, state, reranked, customFieldValues);
         return new OverbaardIssueEvent(Type.UPDATE, issueKey, projectCode, detail);
     }
 

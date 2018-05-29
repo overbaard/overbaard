@@ -7,8 +7,10 @@ import static org.overbaard.jira.impl.Constants.STATE_LINKS;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.jboss.dmr.ModelNode;
@@ -22,8 +24,22 @@ import org.overbaard.jira.impl.Constants;
 public class BoardProjectIssueTypeOverrides {
     private final List<StateLinksConfigOverride> stateLinksConfigOverrides;
 
+    private final Map<String, BoardProjectStateMapper> stateLinkOverrides;
+
     private BoardProjectIssueTypeOverrides(List<StateLinksConfigOverride> configOverrides) {
         this.stateLinksConfigOverrides = Collections.unmodifiableList(configOverrides);
+
+        Map<String, BoardProjectStateMapper> stateLinkOverrides = new HashMap<>();
+        for (StateLinksConfigOverride override : stateLinksConfigOverrides) {
+            for (String issueType : override.getIssueTypes()) {
+                stateLinkOverrides.put(issueType, override.stateMapper);
+            }
+        }
+        this.stateLinkOverrides = Collections.unmodifiableMap(stateLinkOverrides);
+    }
+
+    BoardProjectStateMapper getStateLinksOverride(String issueType) {
+        return stateLinkOverrides.get(issueType);
     }
 
     ModelNode serializeModelNodeForConfig() {
@@ -45,6 +61,10 @@ public class BoardProjectIssueTypeOverrides {
             }
         }
         return modelNode;
+    }
+
+    Map<String, BoardProjectStateMapper> getStateLinkOverrides() {
+        return stateLinkOverrides;
     }
 
     static BoardProjectIssueTypeOverrides load(ModelNode overridesNode, BoardStates boardStates, String projectCode, Set<String> existingIssueTypes) {

@@ -379,7 +379,8 @@ public class OverbaardIssueEventListener implements InitializingBean, Disposable
             }
         }
         final OverbaardIssueEvent event = OverbaardIssueEvent.createUpdateEvent(
-                issue.getKey(), issue.getProjectObject().getKey(), issueType, priority,
+                issue.getKey(), issue.getProjectObject().getKey(),
+                issueType, priority,
                 summary, assignee, components, labels, fixVersions,
                 //Always pass in the existing/old state of the issue
                 oldState != null ? oldState : issue.getStatusObject().getName(),

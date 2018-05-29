@@ -75,20 +75,16 @@ public class BoardProjectStateMapper extends ProjectStateList {
 
     }
 
-    public String mapBoardStateOntoOwnState(String boardState) {
+    private String mapBoardStateOntoOwnState(String boardState) {
         return boardToOwnStates.get(boardState);
     }
 
-    public String mapOwnStateOntoBoardState(String state) {
+    private String mapOwnStateOntoBoardState(String state) {
         return ownToBoardStates.get(state);
     }
 
     public Set<String> getOwnDoneStateNames() {
         return ownDoneStateNames;
-    }
-
-    public Map<String, String> getOwnToBoardStates() {
-        return ownToBoardStates;
     }
 
     public boolean isBacklogState(String ownState) {
