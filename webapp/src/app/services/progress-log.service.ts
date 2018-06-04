@@ -63,7 +63,11 @@ export class Progress {
     if (status === 401) {
       this._delegate.notLoggedIn();
     } else {
-      this._delegate.logMessage(this._routeId, response.message, true);
+      let message: string = response.message;
+      if (status === 400 && response.error && response.error.message) {
+        message = response.error.message;
+      }
+      this._delegate.logMessage(this._routeId, message, true);
     }
   }
 
