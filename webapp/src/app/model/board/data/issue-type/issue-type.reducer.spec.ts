@@ -12,6 +12,10 @@ export function getTestIssueTypesInput(): any {
     {
       name: 'bug',
       colour: 'red'
+    },
+    {
+      name: 'feature',
+      colour: 'yellow'
     }
   ]);
 }
@@ -28,14 +32,16 @@ describe('IssueType reducer tests', () => {
   }));
 
   it('Deserialize initial state', () => {
-    expect(state.types.size).toEqual(2);
+    expect(state.types.size).toEqual(3);
 
     const keys: string[] = state.types.keySeq().toArray();
     expect(keys[0]).toEqual('task');
     expect(keys[1]).toEqual('bug');
+    expect(keys[2]).toEqual('feature');
 
     checkIssueType(state.types.get('task'), 'task', 'green');
     checkIssueType(state.types.get('bug'), 'bug', 'red');
+    checkIssueType(state.types.get('feature'), 'feature', 'yellow');
   });
 
   it ('Deserialize same state', () => {

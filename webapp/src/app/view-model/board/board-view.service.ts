@@ -21,7 +21,7 @@ import {
 } from '../../model/board/user/board-filter/board-filter.constants';
 import {CustomField} from '../../model/board/data/custom-field/custom-field.model';
 import {NO_ASSIGNEE} from '../../model/board/data/assignee/assignee.model';
-import {BoardProject, ProjectUtil} from '../../model/board/data/project/project.model';
+import {BoardProject, OwnToBoardStateMappings, ProjectUtil} from '../../model/board/data/project/project.model';
 import {BoardIssue} from '../../model/board/data/issue/board-issue';
 import {BoardIssueViewUtil} from './board-issue-view.model';
 import {IssueChange} from '../../model/board/data/issue/issue.model';
@@ -513,8 +513,9 @@ class IssueTableBuilder {
   private _totalIssueCounts: List<number>;
   private _visibleIssueCounts: List<number>;
 
-  // Just a throwaway lookup so don't bother making this immutable
+  // Just throwaway lookups so don't bother making this immutable
   private _ownStateNames: Dictionary<string[]> = {};
+  private _ownStateNamesForOverriddenIssueTypes: Dictionary<Dictionary<string[]>> = {};
 
   constructor(
     private readonly _fontSizeTable: FontSizeTableService,
@@ -709,11 +710,12 @@ class IssueTableBuilder {
     if (!rankedKeysForProject) {
       return;
     }
-    const ownToBoardIndex: number[] = ProjectUtil.getOwnIndexToBoardIndex(this._currentBoardState.headers, project);
+
+    const ownToBoardIndex: OwnToBoardStateMappings = OwnToBoardStateMappings.create(this._currentBoardState.headers, project);
     rankedKeysForProject.forEach((key) => {
       const issue: BoardIssueView = issues.get(key);
       // find the index and add the issue
-      const boardIndex: number = ownToBoardIndex[issue.ownState];
+      const boardIndex: number = ownToBoardIndex.getBoardIndex(issue);
       totalIssues[boardIndex] += 1;
       if (issue.visible) {
         tableBuilder.push(boardIndex, issue);
@@ -779,9 +781,12 @@ class IssueTableBuilder {
 
   private getOwnStateName(issue: BoardIssue): string {
     let ownStateNames: string[] = this._ownStateNames[issue.projectCode];
+    let ownStateNamesForOverriddenTypes: Dictionary<string[]> = this._ownStateNamesForOverriddenIssueTypes[issue.projectCode];
     if (!ownStateNames) {
       const boardProject: BoardProject = this._currentBoardState.projects.boardProjects.get(issue.projectCode);
       const boardStates: List<string> = this._currentBoardState.headers.states;
+
+      // Populate the own state names for the project
       ownStateNames = [];
       boardStates.forEach((boardState) => {
         const ownState: string = boardProject.boardStateNameToOwnStateName.get(boardState);
@@ -790,6 +795,25 @@ class IssueTableBuilder {
         }
       });
       this._ownStateNames[issue.projectCode] = ownStateNames;
+
+      // Populate the issue type overrides for the project
+      ownStateNamesForOverriddenTypes = {};
+      boardProject.boardStateNameToOwnStateNameIssueTypeOverrides.forEach((issueTypeStates, type) => {
+        const issueTypeNames = [];
+        boardStates.forEach(boardState => {
+          const ownState: string = issueTypeStates.get(boardState);
+          if (ownState) {
+            issueTypeNames.push(ownState);
+          }
+        });
+        ownStateNamesForOverriddenTypes[type] = issueTypeNames;
+      });
+      this._ownStateNamesForOverriddenIssueTypes[issue.projectCode] = ownStateNamesForOverriddenTypes;
+    }
+
+    // Check the override
+    if (ownStateNamesForOverriddenTypes[issue.type.name]) {
+      return ownStateNamesForOverriddenTypes[issue.type.name][issue.ownState];
     }
     return ownStateNames[issue.ownState];
   }

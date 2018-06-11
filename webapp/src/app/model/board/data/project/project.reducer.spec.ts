@@ -4,6 +4,48 @@ import {BoardProject, initialProjectState, LinkedProject, ParallelTask, ProjectS
 import {cloneObject} from '../../../../common/object-util';
 
 export function getTestProjectsInput(): any {
+  return getTestProjectsInputWithOverrides(false);
+}
+
+function getTestProjectsInputWithOverrides(stateLinkOverrides: boolean) {
+  let overridesP1: any;
+  let overridesP2: any;
+
+  if (stateLinkOverrides) {
+    overridesP1 = {
+      'state-links': [
+        {
+          'issue-types': ['bug', 'task'],
+          override: {
+            'Board2': 'Test3',
+            'Board3': 'Test4',
+            'Board4': 'Test5'
+          }
+        }
+      ]
+    };
+    overridesP2 = {
+      'state-links': [
+        {
+          'issue-types': ['bug'],
+          override: {
+            'Board1': 'Test1',
+            'Board2': 'Test2',
+            'Board3': 'Test3'
+          }
+        },
+        {
+          'issue-types': ['task'],
+          override: {
+            'Board1': 'Test1',
+            'Board2': 'Test2',
+            'Board3': 'Test3'
+          }
+        }
+      ]
+    };
+  }
+
   return cloneObject(
     {
       owner: 'P1',
@@ -21,6 +63,7 @@ export function getTestProjectsInput(): any {
             'P1-3',
             'P1-2'
           ],
+          overrides: overridesP1
         },
         {
           code: 'P2',
@@ -65,7 +108,8 @@ export function getTestProjectsInput(): any {
                   'Vier']
               }
             ]
-          ]
+          ],
+          overrides: overridesP2
         }
       ],
       linked: {
@@ -93,12 +137,27 @@ export function getTestProjectsInput(): any {
   );
 }
 
+/*
+export getTestProjectsWithIssueTypeStateOverridesInput() {
+  get
+}
+*/
+
 describe('Projects reducer tests', () => {
 
   describe('Deserialization tests', () => {
-    it('Deserialize', () => {
+    it('Deserialize - No overrides', () => {
+      deserializeTest(false);
+    });
+
+    it('Deserialize - No overrides', () => {
+      deserializeTest(true);
+    });
+
+    function deserializeTest(overrides: boolean) {
+      const input: any = overrides ? getTestProjectsInputWithOverrides(true) : getTestProjectsInput();
       const projectState: ProjectState = projectMetaReducer(
-        initialProjectState, ProjectActions.createDeserializeProjects(getTestProjectsInput()));
+        initialProjectState, ProjectActions.createDeserializeProjects(input));
 
       // Board projects
       expect(projectState.boardProjects.size).toBe(2);
@@ -110,6 +169,21 @@ describe('Projects reducer tests', () => {
         Board1: 'Test1',
         Board3: 'Test3'
       });
+      if (!overrides) {
+        expect(p1.boardStateNameToOwnStateNameIssueTypeOverrides.size).toBe(0);
+      } else {
+        expect(p1.boardStateNameToOwnStateNameIssueTypeOverrides.size).toBe(2);
+        expect(p1.boardStateNameToOwnStateNameIssueTypeOverrides.get('bug').toObject()).toEqual({
+          'Board2': 'Test3',
+          'Board3': 'Test4',
+          'Board4': 'Test5'
+        });
+        expect(p1.boardStateNameToOwnStateNameIssueTypeOverrides.get('task').toObject()).toEqual({
+          'Board2': 'Test3',
+          'Board3': 'Test4',
+          'Board4': 'Test5'
+        });
+      }
 
       const p2: BoardProject = projectState.boardProjects.get('P2');
       expect(p2.key).toEqual('P2');
@@ -119,6 +193,21 @@ describe('Projects reducer tests', () => {
         Board1: 'Test1',
         Board2: 'Test2'
       });
+      if (!overrides) {
+        expect(p2.boardStateNameToOwnStateNameIssueTypeOverrides.size).toBe(0);
+      } else {
+        expect(p2.boardStateNameToOwnStateNameIssueTypeOverrides.size).toBe(2);
+        expect(p2.boardStateNameToOwnStateNameIssueTypeOverrides.get('bug').toObject()).toEqual({
+          'Board1': 'Test1',
+          'Board2': 'Test2',
+          'Board3': 'Test3'
+        });
+        expect(p2.boardStateNameToOwnStateNameIssueTypeOverrides.get('task').toObject()).toEqual({
+          'Board1': 'Test1',
+          'Board2': 'Test2',
+          'Board3': 'Test3'
+        });
+      }
 
       // Linked projects
       expect(projectState.linkedProjects.size).toBe(3);
@@ -143,7 +232,7 @@ describe('Projects reducer tests', () => {
       checkParallelTask(parallelTasks.getIn([0, 1]), 'Y Parallel Task', 'Y', ['Uno', 'Dos', 'Tres']);
       expect(parallelTasks.get(1).size).toBe(1);
       checkParallelTask(parallelTasks.getIn([1, 0]), 'Z Parallel Task', 'Z', ['Ein', 'Zwei', 'Drei', 'Vier']);
-    });
+    }
 
     function checkParallelTask(pt: ParallelTask, name: string, display: string, options: string[]) {
       expect(pt.name).toEqual(name);

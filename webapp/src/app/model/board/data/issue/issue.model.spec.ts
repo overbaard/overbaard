@@ -239,7 +239,7 @@ describe('Issue unit tests', () => {
     });
   });
 
-  describe('Changes', () => {
+  describe('Changes - no issue ype overrides', () => {
 
     let input: any;
 
@@ -356,7 +356,7 @@ describe('Issue unit tests', () => {
         const second = {
           key: 'P2-1', 'clear-components': true
         };
-        updated = updateIssue(updated, second);
+        updated = updateIssue(updated, createIssueMap(updated), second);
 
         new IssueChecker(updated,
           lookupParams.issueTypes.get('task'),
@@ -386,9 +386,11 @@ describe('Issue unit tests', () => {
         let updated = createAndUpdateIssue({
           key: 'P2-1', labels: ['L-10', 'L-20']
         });
-        updated = updateIssue(updated, {
-          key: 'P2-1', 'clear-labels': true
-        });
+        updated =
+          updateIssue(
+            updated,
+            createIssueMap(updated),
+            { key: 'P2-1', 'clear-labels': true});
 
         new IssueChecker(updated,
           lookupParams.issueTypes.get('task'),
@@ -418,9 +420,11 @@ describe('Issue unit tests', () => {
         let updated = createAndUpdateIssue({
           key: 'P2-1', 'fix-versions': ['F-10', 'F-20']
         });
-        updated = updateIssue(updated, {
-          key: 'P2-1', 'clear-fix-versions': true
-        });
+        updated =
+          updateIssue(
+            updated,
+            createIssueMap(updated),
+            {key: 'P2-1', 'clear-fix-versions': true});
 
         new IssueChecker(updated,
           lookupParams.issueTypes.get('task'),
@@ -446,9 +450,12 @@ describe('Issue unit tests', () => {
           .key('P2-1')
           .check();
         // Update one
-        updated = updateIssue(updated, {
-          key: 'P2-1', custom: {'Custom-1': 'c1-A'}
-        });
+        updated =
+          updateIssue(
+            updated,
+            createIssueMap(updated),
+            {key: 'P2-1', custom: {'Custom-1': 'c1-A'}});
+
         new IssueChecker(updated,
           lookupParams.issueTypes.get('task'),
           lookupParams.priorities.get('Blocker'),
@@ -466,9 +473,12 @@ describe('Issue unit tests', () => {
           key: 'P2-1', custom: {'Custom-1': 'c1-C', 'Custom-2': 'c2-B'}
         });
         // Clear a custom field
-        updated = updateIssue(updated, {
-          key: 'P2-1', custom: {'Custom-1': null}
-        });
+        updated =
+          updateIssue(
+            updated,
+            createIssueMap(updated),
+            {key: 'P2-1', custom: {'Custom-1': null}});
+
         new IssueChecker(updated,
           lookupParams.issueTypes.get('task'),
           lookupParams.priorities.get('Blocker'),
@@ -485,9 +495,13 @@ describe('Issue unit tests', () => {
           key: 'P2-1', custom: {'Custom-1': 'c1-C', 'Custom-2': 'c2-B'}
         });
         // Clear a custom field
-        updated = updateIssue(updated, {
-          key: 'P2-1', custom: {'Custom-1': null, 'Custom-2': null}
+        updated =
+          updateIssue(
+            updated,
+            createIssueMap(updated),
+            {key: 'P2-1', custom: {'Custom-1': null, 'Custom-2': null}
         });
+
         new IssueChecker(updated,
           lookupParams.issueTypes.get('task'),
           lookupParams.priorities.get('Blocker'),
@@ -500,9 +514,11 @@ describe('Issue unit tests', () => {
       it ('Parallel tasks (no existing ones)', () => {
         const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
         // Clear a custom field
-        const updated = updateIssue(issue, {
-          key: 'P2-1', 'parallel-tasks': {'0': {'1': 2, '0': 1}, '1': {'0': 0}}
-        });
+        const updated =
+          updateIssue(
+            issue,
+            createIssueMap(issue),
+            {key: 'P2-1', 'parallel-tasks': {'0': {'1': 2, '0': 1}, '1': {'0': 0}}});
 
         new IssueChecker(updated,
           lookupParams.issueTypes.get('task'),
@@ -518,9 +534,11 @@ describe('Issue unit tests', () => {
         input['parallel-tasks'] = [[0, 0], [1]];
         const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
 
-        let updated = updateIssue(issue, {
-          key: 'P2-1', 'parallel-tasks': {'0': {'1': 2}, '1': {'0': 3}}
-        });
+        let updated =
+          updateIssue(
+            issue,
+            createIssueMap(issue),
+            {key: 'P2-1', 'parallel-tasks': {'0': {'1': 2}, '1': {'0': 3}}});
 
         new IssueChecker(updated,
           lookupParams.issueTypes.get('task'),
@@ -532,9 +550,12 @@ describe('Issue unit tests', () => {
           .check();
 
         // Check setting it back to zero again works too
-        updated = updateIssue(updated, {
-          key: 'P2-1', 'parallel-tasks': {'0': {'1': 0}}
-        });
+        updated =
+          updateIssue(
+            updated,
+            createIssueMap(updated),
+            {key: 'P2-1', 'parallel-tasks': {'0': {'1': 0}}});
+
         new IssueChecker(updated,
           lookupParams.issueTypes.get('task'),
           lookupParams.priorities.get('Blocker'),
@@ -549,13 +570,17 @@ describe('Issue unit tests', () => {
 
     describe('New issue', () => {
       it ('New issue - minimum info', () => {
-        const newIssue = updateIssue(null, {
-          key: 'P2-1',
-          summary: 'Test summary',
-          state: 'Test2',
-          type: 'bug',
-          priority: 'Major'
-        });
+        const newIssue =
+          updateIssue(
+            null,
+            createIssueMap(null),
+            {
+              key: 'P2-1',
+              summary: 'Test summary',
+              state: 'Test2',
+              type: 'bug',
+            priority: 'Major'});
+
         new IssueChecker(newIssue,
           lookupParams.issueTypes.get('bug'),
           lookupParams.priorities.get('Major'),
@@ -567,19 +592,24 @@ describe('Issue unit tests', () => {
       });
 
       it ('New issue - full info', () => {
-        const newIssue = updateIssue(null, {
-          key: 'P2-1',
-          summary: 'Test summary',
-          state: 'Test1',
-          type: 'bug',
-          priority: 'Major',
-          assignee: 'kabir',
-          components: ['C-10', 'C-20'],
-          labels: ['L-10', 'L-20'],
-          'fix-versions': ['F-10', 'F-20'],
-          custom: {'Custom-1': 'c1-C', 'Custom-2': 'c2-B'},
-          'parallel-tasks': {'0': {'1': 2, '0': 1}, '1': {'0': 3}}
-        });
+        const newIssue =
+          updateIssue(
+            null,
+            createIssueMap(null),
+            {
+              key: 'P2-1',
+              summary: 'Test summary',
+              state: 'Test1',
+              type: 'bug',
+              priority: 'Major',
+              assignee: 'kabir',
+              components: ['C-10', 'C-20'],
+              labels: ['L-10', 'L-20'],
+              'fix-versions': ['F-10', 'F-20'],
+              custom: {'Custom-1': 'c1-C', 'Custom-2': 'c2-B'},
+              'parallel-tasks': {'0': {'1': 2, '0': 1}, '1': {'0': 3}}});
+
+
         new IssueChecker(newIssue,
           lookupParams.issueTypes.get('bug'),
           lookupParams.priorities.get('Major'),
@@ -598,12 +628,21 @@ describe('Issue unit tests', () => {
 
     function createAndUpdateIssue(changeInput: any): BoardIssue {
       const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
-      return updateIssue(issue, changeInput);
+      return updateIssue(issue, createIssueMap(issue), changeInput);
     }
 
-    function updateIssue(issue: BoardIssue, changeInput: any): BoardIssue {
-      const change: BoardIssue = IssueUtil.issueChangeFromJs(changeInput, lookupParams);
+    function updateIssue(issue: BoardIssue, currentIssues: Dictionary<BoardIssue>, changeInput: any): BoardIssue {
+      const issueMap: Map<string, BoardIssue> = Map<string, BoardIssue>(currentIssues);
+      const change: BoardIssue = IssueUtil.issueChangeFromJs(changeInput, issueMap, lookupParams);
       return IssueUtil.updateIssue(issue, change);
+    }
+
+    function createIssueMap(issue: BoardIssue): Dictionary<BoardIssue> {
+      const currentIssues: Dictionary<BoardIssue> = {};
+      if (issue) {
+        currentIssues[issue.key] = issue;
+      }
+      return currentIssues;
     }
   });
 });

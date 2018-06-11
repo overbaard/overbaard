@@ -102,6 +102,7 @@ export class DeserializeIssueLookupParams {
   private _boardStates: List<string>;
 
   private _ownStateNameToOwnIndexByProject: Map<string, Map<string, number>>;
+  private _ownStateNameToOwnIndexTypeOverridesByProject: Map<string, Map<string, Map<string, number>>>;
 
   setAssignees(value: OrderedMap<string, Assignee>): DeserializeIssueLookupParams {
     this._assignees = value;
@@ -224,29 +225,64 @@ export class DeserializeIssueLookupParams {
     return this._parallelTasks;
   }
 
-  getOwnStateNameToOwnIndex(issueKey: string): Map<string, number> {
+  getOwnStateNameToOwnIndex(issueKey: string, issueType: string): Map<string, number> {
+    const projectCode = IssueUtil.productCodeFromKey(issueKey);
+    const boardProject: BoardProject = this._boardProjects.get(projectCode);
+    const overridesForIssueType: Map<string, string> =
+      boardProject.boardStateNameToOwnStateNameIssueTypeOverrides.get(issueType);
+
+    if (overridesForIssueType) {
+      return this.getOwnStateNameToIssueTypeIndex(projectCode, issueType, overridesForIssueType);
+    } else {
+      return this.getOwnStateNameToProjectIndex(boardProject);
+    }
+  }
+
+  private getOwnStateNameToProjectIndex(boardProject: BoardProject): Map<string, number> {
     if (!this._ownStateNameToOwnIndexByProject) {
       this._ownStateNameToOwnIndexByProject = Map<string, Map<string, number>>();
     }
-    const projectCode = IssueUtil.productCodeFromKey(issueKey);
-    let ownStateToOwnIndex: Map<string, number> = this._ownStateNameToOwnIndexByProject.get(projectCode);
+    let ownStateToOwnIndex: Map<string, number> = this._ownStateNameToOwnIndexByProject.get(boardProject.key);
     if (ownStateToOwnIndex) {
       return ownStateToOwnIndex;
     }
-    const boardProject: BoardProject = this._boardProjects.get(projectCode);
+    ownStateToOwnIndex = this.createStateIndexMap(boardProject.boardStateNameToOwnStateName);
+    this._ownStateNameToOwnIndexByProject =
+      this._ownStateNameToOwnIndexByProject.set(boardProject.key, ownStateToOwnIndex);
+    return ownStateToOwnIndex;
+  }
+
+  private getOwnStateNameToIssueTypeIndex(
+    projectCode: string, issueType: string, overridesForIssueType: Map<string, string>): Map<string, number> {
+
+    if (!this._ownStateNameToOwnIndexTypeOverridesByProject) {
+      this._ownStateNameToOwnIndexTypeOverridesByProject = Map<string, Map<string, Map<string, number>>>();
+    }
+    let ownStateToOwnIndexByType: Map<string, Map<string, number>> = this._ownStateNameToOwnIndexTypeOverridesByProject.get(projectCode);
+    if (!ownStateToOwnIndexByType) {
+      ownStateToOwnIndexByType = Map<string, Map<string, number>>();
+      this._ownStateNameToOwnIndexTypeOverridesByProject.set(projectCode, ownStateToOwnIndexByType);
+    }
+    let ownStateToOwnIndex: Map<string, number> = ownStateToOwnIndexByType.get(issueType);
+    if (ownStateToOwnIndex) {
+      return ownStateToOwnIndex;
+    }
+    ownStateToOwnIndex = this.createStateIndexMap(overridesForIssueType);
+    this._ownStateNameToOwnIndexTypeOverridesByProject =
+      this._ownStateNameToOwnIndexTypeOverridesByProject.setIn([projectCode, issueType], ownStateToOwnIndex);
+    return ownStateToOwnIndex;
+  }
+
+  private createStateIndexMap(boardStateNameToOwnStateName: Map<string, string>): Map<string, number> {
     let currentOwnIndex = 0;
-    ownStateToOwnIndex = Map<string, number>().withMutations(mutable => {
+    return Map<string, number>().withMutations(mutable => {
       this._boardStates.forEach((v) => {
-        const ownName: string = boardProject.boardStateNameToOwnStateName.get(v);
+        const ownName: string = boardStateNameToOwnStateName.get(v);
         if (ownName) {
           mutable.set(ownName, currentOwnIndex++);
         }
       });
     });
-    this._ownStateNameToOwnIndexByProject = this._ownStateNameToOwnIndexByProject.withMutations(mutable => {
-      mutable.set(projectCode, ownStateToOwnIndex);
-    });
-    return ownStateToOwnIndex;
   }
 }
 
@@ -331,7 +367,7 @@ export class IssueUtil {
     return ISSUE_FACTORY(temp);
   }
 
-  static issueChangeFromJs(input: any, params: DeserializeIssueLookupParams): BoardIssue {
+  static issueChangeFromJs(input: any, currentIssues: Map<string, BoardIssue>, params: DeserializeIssueLookupParams): BoardIssue {
     let customFields: Map<string, CustomField>;
     const key: string = input['key'];
     const projectCode: string = IssueUtil.productCodeFromKey(input['key']);
@@ -373,10 +409,23 @@ export class IssueUtil {
       }
       selectedParallelTasks = List<List<number>>(selected);
     }
+
+    let ownState: number = null;
+    if (input['state']) {
+      let type: string = input['type'];
+
+
+      if (!type) {
+        // It is an update to an existing issue, as new issues will always have a type
+        type = currentIssues.get(key).type.name;
+      }
+      ownState = params.getOwnStateNameToOwnIndex(key, type).get(input['state']);
+    }
+
     return {
       key: key,
       projectCode: projectCode,
-      ownState: input['state'] ? params.getOwnStateNameToOwnIndex(input['key']).get(input['state']) : null,
+      ownState: ownState,
       summary: input['summary'],
       assignee: input['unassigned'] ? NO_ASSIGNEE : params.assignees.get(input['assignee']),
       priority: params.priorities.get(input['priority']),
