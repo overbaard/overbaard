@@ -42,8 +42,7 @@ export class MoveIssueDialogComponent implements OnInit {
       )
       .subscribe(
       (board: BoardState) => {
-        const projectState: BoardProject = board.projects.boardProjects.get(this.issue.projectCode);
-        const stateMappings: Map<string, string> = projectState.boardStateNameToOwnStateName;
+        const stateMappings: Map<string, string> = this.getStateMappings(board);
         board.headers.states.forEach(state => {
           const ownState: string = stateMappings.get(state);
           let currentState = false;
@@ -58,6 +57,17 @@ export class MoveIssueDialogComponent implements OnInit {
           }
         });
     });
+  }
+
+  private getStateMappings(board: BoardState): Map<string, string> {
+    const projectState: BoardProject = board.projects.boardProjects.get(this.issue.projectCode);
+    const stateMappings: Map<string, string> =
+      projectState.boardStateNameToOwnStateNameIssueTypeOverrides.get(this.issue.type.name);
+    if (stateMappings) {
+      return stateMappings;
+    }
+    return projectState.boardStateNameToOwnStateName;
+
   }
 
   onSelectToState(stateInfo: StateInfo) {
