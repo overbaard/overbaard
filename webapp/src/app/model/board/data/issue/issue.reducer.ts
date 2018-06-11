@@ -37,21 +37,23 @@ export class IssueActions {
     return new DeserializeIssuesAction(issues);
   }
 
-  static createChangeIssuesAction(input: any, params: DeserializeIssueLookupParams): Action {
+  static createChangeIssuesAction(input: any, currentIssues: Map<string, BoardIssue>, params: DeserializeIssueLookupParams): Action {
     const deletedKeys: string[] = <string[]>input['delete'];
 
     let issueChanges: List<BoardIssue>;
     if (input['new'] || input['update']) {
       issueChanges = List<BoardIssue>().withMutations(mutable => {
         if (input['new']) {
-          (<any[]>input['new']).forEach(v => mutable.push(IssueUtil.issueChangeFromJs(v, params)));
+          (<any[]>input['new']).forEach(v => mutable.push(IssueUtil.issueChangeFromJs(v, currentIssues, params)));
         }
         if (input['update']) {
-          (<any[]>input['update']).forEach(v => mutable.push(IssueUtil.issueChangeFromJs(v, params)));
+          (<any[]>input['update']).forEach(v => mutable.push(IssueUtil.issueChangeFromJs(v, currentIssues, params)));
         }
       });
     }
-    return new ChangeIssuesAction({issueChanges: issueChanges, deletedIssues: deletedKeys});
+    return new ChangeIssuesAction({
+      issueChanges: issueChanges,
+      deletedIssues: deletedKeys});
   }
 }
 
@@ -131,6 +133,7 @@ interface ChangeIssuesPayload {
   // This contains both new and changed issues
   issueChanges: List<BoardIssue>;
   deletedIssues: string[];
+
 }
 
 const getIssuesState = (state: AppState) => state.board.issues;

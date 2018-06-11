@@ -15,6 +15,7 @@
  */
 package org.overbaard.jira.impl.config;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -31,7 +32,7 @@ import org.overbaard.jira.impl.Constants;
 public class LinkedProjectConfig extends ProjectConfig {
 
     public LinkedProjectConfig(final String code, final Map<String, Integer> states) {
-        super(code, states);
+        super(code, new ProjectStateList(states));
     }
 
     static LinkedProjectConfig load(final String projectCode, final ModelNode project) {
@@ -52,8 +53,17 @@ public class LinkedProjectConfig extends ProjectConfig {
         final ModelNode projectNode = new ModelNode();
         final ModelNode statesNode = projectNode.get(Constants.STATES);
         statesNode.setEmptyList();
-        for (String state : states.keySet()) {
+        for (String state : projectStates.getStates().keySet()) {
             statesNode.add(state);
+        }
+        return projectNode;
+    }
+
+    ModelNode serializeModelNodeForBoard() {
+        ModelNode projectNode = new ModelNode();
+        ModelNode states = projectNode.get(Constants.STATES).setEmptyList();
+        for (String state : projectStates.getStates().keySet()) {
+            states.add(state);
         }
         return projectNode;
     }

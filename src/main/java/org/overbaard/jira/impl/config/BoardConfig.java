@@ -136,9 +136,14 @@ public class BoardConfig {
         if (projects.getType() != ModelType.LIST) {
             throw new IllegalStateException("'projects' must be an array");
         }
+
+        final Map<String, NameAndColour> issueTypes =
+                Collections.unmodifiableMap(loadIssueTypes(jiraInjectables.getIssueTypeManager(), boardNode.get(ISSUE_TYPES).asList()));
+
         final Map<String, BoardProjectConfig> mainProjects = new LinkedHashMap<>();
         for (ModelNode project : projects.asList()) {
-            BoardProjectConfig projectConfig = BoardProjectConfig.load(boardStates, project, customFields, parallelTaskConfig);
+            BoardProjectConfig projectConfig =
+                    BoardProjectConfig.load(boardStates, project, customFields, parallelTaskConfig, issueTypes.keySet());
             mainProjects.put(projectConfig.getCode(), projectConfig);
         }
 
@@ -157,7 +162,7 @@ public class BoardConfig {
                 Collections.unmodifiableMap(mainProjects),
                 Collections.unmodifiableMap(linkedProjects),
                 Collections.unmodifiableMap(loadPriorities(jiraInjectables.getPriorityManager(), boardNode.get(PRIORITIES).asList())),
-                Collections.unmodifiableMap(loadIssueTypes(jiraInjectables.getIssueTypeManager(), boardNode.get(ISSUE_TYPES).asList())),
+                issueTypes,
                 customFields,
                 parallelTaskConfig);
         return boardConfig;
@@ -306,12 +311,12 @@ public class BoardConfig {
         final ModelNode main = projects.get(MAIN);
         main.setEmptyList();
         for (BoardProjectConfig project : boardProjects.values()) {
-            main.add(project.serializeModelNodeForBoard(main, true));
+            main.add(project.serializeModelNodeForBoard());
         }
         final ModelNode linked = projects.get(LINKED);
         linked.setEmptyObject();
         for (LinkedProjectConfig project : linkedProjects.values()) {
-            linked.get(project.getCode()).set(project.serializeModelNodeForBoard(linked, false));
+            linked.get(project.getCode()).set(project.serializeModelNodeForBoard());
         }
     }
 

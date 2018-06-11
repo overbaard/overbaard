@@ -29,50 +29,21 @@ import org.overbaard.jira.impl.Constants;
  *
  * @author Kabir Khan
  */
-public abstract class ProjectConfig {
+public abstract class ProjectConfig<S extends ProjectStateList> {
     protected final String code;
-    protected final List<String> statesList;
-    protected final Map<String, Integer> states;
+    protected final S projectStates;
 
-    public ProjectConfig(final String code, final Map<String, Integer> states) {
+    public ProjectConfig(final String code, final S projectStates) {
         this.code = code;
-        this.states = states;
-
-        List<String> statesList = new ArrayList<>(states.size());
-        states.keySet().forEach(s -> statesList.add(s));
-        this.statesList = Collections.unmodifiableList(statesList);
+        this.projectStates = projectStates;
     }
 
     public String getCode() {
         return code;
     }
 
-    public Map<String, Integer> getStates() {
-        return states;
-    }
-
-    public Set<String> getStateNames() {
-        return states.keySet();
-    }
-
-    public Integer getStateIndex(String stateName) {
-        return states.get(stateName);
-    }
-
-    public String getStateName(int index) {
-        return statesList.get(index);
-    }
-
-    ModelNode serializeModelNodeForBoard(ModelNode parent, boolean addCode) {
-        ModelNode projectNode = new ModelNode();
-        if (addCode) {
-            projectNode.get(Constants.CODE).set(code);
-        }
-        ModelNode states = projectNode.get(Constants.STATES).setEmptyList();
-        for (String state : this.states.keySet()) {
-            states.add(state);
-        }
-        return projectNode;
+    public S getOverriddenOrProjectStates(String issueType) {
+        return projectStates;
     }
 
 }

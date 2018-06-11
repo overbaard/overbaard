@@ -182,6 +182,7 @@ public abstract class AbstractBoardTest {
     private class EventBuilderState {
         private final String issueKey;
         private final String projectCode;
+        private String oldIssueType;
         private String issueType;
         private String priority;
         private String summary;

@@ -55,7 +55,8 @@ describe('Swimlane observer tests', () => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .swimlanes([
                 {key: 'task', name: 'task', issues: ['ONE-2', 'ONE-4']},
-                {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3', 'ONE-5']}])
+                {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3', 'ONE-5']},
+                {key: 'feature', name: 'feature', issues: []}])
               .checkBoard(board);
           });
       });
@@ -234,7 +235,8 @@ describe('Swimlane observer tests', () => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .swimlanes([
                 {key: 'task', name: 'task', issues: ['ONE-2', 'ONE-4']},
-                {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3', 'ONE-5']}])
+                {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3', 'ONE-5']},
+                {key: 'feature', name: 'feature', issues: []}])
               .checkBoard(board);
           });
 
@@ -412,7 +414,8 @@ describe('Swimlane observer tests', () => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
               .swimlanes([
                 {key: 'task', name: 'task', issues: ['ONE-2', 'ONE-4', 'ONE-6']},
-                {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3', 'ONE-5']}])
+                {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3', 'ONE-5']},
+                {key: 'feature', name: 'feature', issues: []}])
               .checkBoard(board);
 
             new EqualityChecker()
@@ -955,7 +958,8 @@ describe('Swimlane observer tests', () => {
               new BoardChecker([['ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], ['ONE-1']])
                 .swimlanes([
                   {key: 'task', name: 'task', issues: ['ONE-2', 'ONE-4']},
-                  {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3', 'ONE-5']}])
+                  {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3', 'ONE-5']},
+                  {key: 'feature', name: 'feature', issues: []}])
                 .checkBoard(board);
 
               new EqualityChecker()
@@ -985,7 +989,8 @@ describe('Swimlane observer tests', () => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .swimlanes([
                   {key: 'task', name: 'task', issues: ['ONE-2', 'ONE-4']},
-                  {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3', 'ONE-5']}])
+                  {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3', 'ONE-5']},
+                  {key: 'feature', name: 'feature', issues: []}])
                 .checkBoard(board);
 
               expect(board).toBe(originalView);
@@ -1011,7 +1016,8 @@ describe('Swimlane observer tests', () => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4'], []])
                 .swimlanes([
                   {key: 'task', name: 'task', issues: ['ONE-2', 'ONE-4']},
-                  {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3']}])
+                  {key: 'bug', name: 'bug', issues: ['ONE-1', 'ONE-3']},
+                  {key: 'feature', name: 'feature', issues: []}])
                 .checkBoard(board);
 
               new EqualityChecker()
@@ -1045,7 +1051,8 @@ describe('Swimlane observer tests', () => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .swimlanes([
                   {key: 'task', name: 'task', issues: ['ONE-1', 'ONE-2', 'ONE-4']},
-                  {key: 'bug', name: 'bug', issues: ['ONE-3', 'ONE-5']}])
+                  {key: 'bug', name: 'bug', issues: ['ONE-3', 'ONE-5']},
+                  {key: 'feature', name: 'feature', issues: []}])
                 .checkBoard(board);
 
               new EqualityChecker()

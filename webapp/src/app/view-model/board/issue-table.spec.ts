@@ -10,6 +10,7 @@ import {BoardViewModel} from './board-view';
 import {BoardHeader} from './board-header';
 import {initialIssueDetailState} from '../../model/board/user/issue-detail/issue-detail.model';
 import {BoardIssueView} from './board-issue-view';
+import {BoardState} from '../../model/board/data/board';
 
 describe('Issue Table observer tests', () => {
 
@@ -1118,6 +1119,197 @@ describe('Switch View Mode (effect on Backlog) Tests', () => {
   }
 });
 
+describe('Issue Table issue type overrides tests', () => {
+
+  let issueFactory: IssueWithTypeIssueFactory;
+  let headerFactory: HeaderStateFactory;
+  let init: BoardStateInitializer;
+  let util: BoardViewObservableUtil;
+
+  beforeEach(() => {
+    issueFactory = new IssueWithTypeIssueFactory();
+    headerFactory = new NumberedHeaderStateFactory(5);
+    init =
+      new BoardStateInitializer()
+        .headerStateFactory(headerFactory)
+        .mapState('ONE', 'S-1', '1-1')
+        .mapState('ONE', 'S-2', '1-2')
+        .mapState('ONE', 'S-3', '1-3')
+        .mapState('ONE', 'S-5', '1-4')
+        .mapIssueTypeState('ONE', 'task', 'S-1', 'T-1')
+        .mapIssueTypeState('ONE', 'task', 'S-2', 'T-2')
+        .mapIssueTypeState('ONE', 'task', 'S-3', 'T-3')
+        .mapIssueTypeState('ONE', 'task', 'S-4', 'T-4')
+        .mapIssueTypeState('ONE', 'task', 'S-5', 'T-5')
+        .mapIssueTypeState('ONE', 'bug', 'S-1', 'B-1')
+        .mapIssueTypeState('ONE', 'bug', 'S-4', 'B-2')
+        .setRank('ONE', 101, 102, 103, 104, 201, 202, 203, 204, 205, 301, 302)
+        .issuesFactory(
+          issueFactory
+            .addIssue('ONE-101', 'feature', 0)
+            .addIssue('ONE-102', 'feature', 1)
+            .addIssue('ONE-103', 'feature', 2)
+            .addIssue('ONE-104', 'feature', 3)
+            .addIssue('ONE-201', 'task', 0)
+            .addIssue('ONE-202', 'task', 1)
+            .addIssue('ONE-203', 'task', 2)
+            .addIssue('ONE-204', 'task', 3)
+            .addIssue('ONE-205', 'task', 4)
+            .addIssue('ONE-301', 'bug', 0)
+            .addIssue('ONE-302', 'bug', 1)
+        );
+    util = new BoardViewObservableUtil(null);
+    util
+      .updateBoardState(init)
+      .observer()
+      .take(1)
+      .subscribe(board => {
+      });
+  });
+
+  it ('Load table', () => {
+    util
+      .observer()
+      .take(1)
+      .subscribe(board => {
+        const checker: BoardChecker = new BoardChecker([
+          ['ONE-101', 'ONE-201', 'ONE-301'],
+          ['ONE-102', 'ONE-202'],
+          ['ONE-103', 'ONE-203'],
+          ['ONE-204', 'ONE-302'],
+          ['ONE-104', 'ONE-205']]);
+        checker.checkBoard(board);
+        checkIssueOwnState(board, 'ONE-101', 0, '1-1');
+        checkIssueOwnState(board, 'ONE-102', 1, '1-2');
+        checkIssueOwnState(board, 'ONE-103', 2, '1-3');
+        checkIssueOwnState(board, 'ONE-104', 3, '1-4');
+        checkIssueOwnState(board, 'ONE-201', 0, 'T-1');
+        checkIssueOwnState(board, 'ONE-202', 1, 'T-2');
+        checkIssueOwnState(board, 'ONE-203', 2, 'T-3');
+        checkIssueOwnState(board, 'ONE-204', 3, 'T-4');
+        checkIssueOwnState(board, 'ONE-205', 4, 'T-5');
+        checkIssueOwnState(board, 'ONE-301', 0, 'B-1');
+        checkIssueOwnState(board, 'ONE-302', 1, 'B-2');
+      });
+  });
+
+  it ('Create issues', () => {
+    util
+      .getBoardStateUpdater()
+      .issueChanges({new: [
+          {key: 'ONE-105', state: '1-1', summary: 'Test', priority: 'Major', type: 'feature'},
+          {key: 'ONE-106', state: '1-2', summary: 'Test', priority: 'Major', type: 'feature'},
+          {key: 'ONE-107', state: '1-3', summary: 'Test', priority: 'Major', type: 'feature'},
+          {key: 'ONE-108', state: '1-4', summary: 'Test', priority: 'Major', type: 'feature'},
+          {key: 'ONE-206', state: 'T-1', summary: 'Test', priority: 'Major', type: 'task'},
+          {key: 'ONE-207', state: 'T-2', summary: 'Test', priority: 'Major', type: 'task'},
+          {key: 'ONE-208', state: 'T-3', summary: 'Test', priority: 'Major', type: 'task'},
+          {key: 'ONE-209', state: 'T-4', summary: 'Test', priority: 'Major', type: 'task'},
+          {key: 'ONE-210', state: 'T-5', summary: 'Test', priority: 'Major', type: 'task'},
+          {key: 'ONE-303', state: 'B-1', summary: 'Test', priority: 'Major', type: 'bug'},
+          {key: 'ONE-304', state: 'B-2', summary: 'Test', priority: 'Major', type: 'bug'}
+
+          // Add issues for other states
+        ]})
+      .rankChanges({ONE: [
+          {index: 11, key: 'ONE-105'},
+          {index: 12, key: 'ONE-106'},
+          {index: 13, key: 'ONE-107'},
+          {index: 14, key: 'ONE-108'},
+          {index: 15, key: 'ONE-206'},
+          {index: 16, key: 'ONE-207'},
+          {index: 17, key: 'ONE-208'},
+          {index: 18, key: 'ONE-209'},
+          {index: 19, key: 'ONE-210'},
+          {index: 20, key: 'ONE-303'},
+          {index: 21, key: 'ONE-304'},
+        ]})
+      .emit()
+      .observer()
+      .take(1)
+      .subscribe(
+        board => {
+          const checker: BoardChecker = new BoardChecker([
+            ['ONE-101', 'ONE-201', 'ONE-301', 'ONE-105', 'ONE-206', 'ONE-303'],
+            ['ONE-102', 'ONE-202', 'ONE-106', 'ONE-207'],
+            ['ONE-103', 'ONE-203', 'ONE-107', 'ONE-208'],
+            ['ONE-204', 'ONE-302', 'ONE-209', 'ONE-304'],
+            ['ONE-104', 'ONE-205', 'ONE-108', 'ONE-210']]);
+          checker.checkBoard(board);
+          checkIssueOwnState(board, 'ONE-101', 0, '1-1');
+          checkIssueOwnState(board, 'ONE-102', 1, '1-2');
+          checkIssueOwnState(board, 'ONE-103', 2, '1-3');
+          checkIssueOwnState(board, 'ONE-104', 3, '1-4');
+          checkIssueOwnState(board, 'ONE-105', 0, '1-1');
+          checkIssueOwnState(board, 'ONE-106', 1, '1-2');
+          checkIssueOwnState(board, 'ONE-107', 2, '1-3');
+          checkIssueOwnState(board, 'ONE-108', 3, '1-4');
+          checkIssueOwnState(board, 'ONE-201', 0, 'T-1');
+          checkIssueOwnState(board, 'ONE-202', 1, 'T-2');
+          checkIssueOwnState(board, 'ONE-203', 2, 'T-3');
+          checkIssueOwnState(board, 'ONE-204', 3, 'T-4');
+          checkIssueOwnState(board, 'ONE-205', 4, 'T-5');
+          checkIssueOwnState(board, 'ONE-206', 0, 'T-1');
+          checkIssueOwnState(board, 'ONE-207', 1, 'T-2');
+          checkIssueOwnState(board, 'ONE-208', 2, 'T-3');
+          checkIssueOwnState(board, 'ONE-209', 3, 'T-4');
+          checkIssueOwnState(board, 'ONE-210', 4, 'T-5');
+          checkIssueOwnState(board, 'ONE-301', 0, 'B-1');
+          checkIssueOwnState(board, 'ONE-302', 1, 'B-2');
+        });
+  });
+
+  it ('Move issues', () => {
+    util
+      .getBoardStateUpdater()
+      .issueChanges({update: [
+          {key: 'ONE-101', state: '1-4'},
+          {key: 'ONE-102', state: '1-1'},
+          {key: 'ONE-103', state: '1-2'},
+          {key: 'ONE-104', state: '1-3'},
+          {key: 'ONE-201', state: 'T-5'},
+          {key: 'ONE-202', state: 'T-1'},
+          {key: 'ONE-203', state: 'T-2'},
+          {key: 'ONE-204', state: 'T-3'},
+          {key: 'ONE-205', state: 'T-4'},
+          {key: 'ONE-301', state: 'B-2'},
+          {key: 'ONE-302', state: 'B-1'}
+      ]})
+      .emit()
+      .observer()
+      .take(1)
+      .subscribe(board => {
+        const checker: BoardChecker = new BoardChecker([
+          ['ONE-102', 'ONE-202', 'ONE-302'],
+          ['ONE-103', 'ONE-203'],
+          ['ONE-104', 'ONE-204'],
+          ['ONE-205', 'ONE-301'],
+          ['ONE-101', 'ONE-201']]);
+        checker.checkBoard(board);
+        checkIssueOwnState(board, 'ONE-101', 3, '1-4');
+        checkIssueOwnState(board, 'ONE-102', 0, '1-1');
+        checkIssueOwnState(board, 'ONE-103', 1, '1-2');
+        checkIssueOwnState(board, 'ONE-104', 2, '1-3');
+        checkIssueOwnState(board, 'ONE-201', 4, 'T-5');
+        checkIssueOwnState(board, 'ONE-202', 0, 'T-1');
+        checkIssueOwnState(board, 'ONE-203', 1, 'T-2');
+        checkIssueOwnState(board, 'ONE-204', 2, 'T-3');
+        checkIssueOwnState(board, 'ONE-205', 3, 'T-4');
+        checkIssueOwnState(board, 'ONE-301', 1, 'B-2');
+        checkIssueOwnState(board, 'ONE-302', 0, 'B-1');
+      });
+  });
+
+
+
+  function checkIssueOwnState(board: BoardViewModel, key: string, ownStateIndex: number, ownStateName: string) {
+    const issue: BoardIssueView = board.issueTable.issues.get(key);
+
+    expect(issue.ownState).toEqual(ownStateIndex);
+    expect(issue.ownStateName).toEqual(ownStateName);
+  }
+});
+
 function checkSameColumns(oldState: BoardViewModel, newState: BoardViewModel, ...cols: number[]) {
   const oldTable: List<List<BoardIssueView>> = oldState.issueTable.table;
   const newTable: List<List<BoardIssueView>> = newState.issueTable.table;
@@ -1163,6 +1355,54 @@ class SimpleIssueFactory implements IssuesFactory {
       input[this._issueKeys[i]] = {
         key: this._issueKeys[i],
         type: id % 2,
+        priority: id % 2,
+        summary: '-',
+        state: this._issueStates[i]
+      };
+    }
+    return input;
+  }
+}
+
+class IssueWithTypeIssueFactory implements IssuesFactory {
+  private _issueKeys: string[];
+  private _issueTypes: string[];
+  private _issueStates: number[];
+
+  addIssue(key: string, issueType: string, state: number): IssueWithTypeIssueFactory {
+    if (!this._issueKeys) {
+      this._issueKeys = [];
+      this._issueTypes = [];
+      this._issueStates = [];
+    }
+    this._issueKeys.push(key);
+    this._issueTypes.push(issueType);
+    this._issueStates.push(state);
+    return this;
+  }
+
+  clear() {
+    this._issueKeys = null;
+    this._issueTypes = null;
+    this._issueStates = null;
+  }
+
+  createIssueStateInput(params: DeserializeIssueLookupParams): any {
+    const input: any = {};
+
+    const typeIndicesByKey: any = {};
+    let index = 0;
+    params.issueTypes.forEach(type => {
+      typeIndicesByKey[type.name] = index;
+      index++;
+    });
+
+    for (let i = 0 ; i < this._issueKeys.length ; i++) {
+      const typeIndex: number = typeIndicesByKey[this._issueTypes[i]];
+      const id = Number(this._issueKeys[i].substr(this._issueKeys[i].indexOf('-') + 1));
+      input[this._issueKeys[i]] = {
+        key: this._issueKeys[i],
+        type: typeIndex,
         priority: id % 2,
         summary: '-',
         state: this._issueStates[i]

@@ -41,6 +41,7 @@ import {IssueSummaryLevel} from '../../model/board/user/issue-summary-level';
 import {HeaderActions, headerMetaReducer} from '../../model/board/data/header/header.reducer';
 import {cloneObject} from '../../common/object-util';
 import {take} from 'rxjs/operators';
+import {BoardIssue} from '../../model/board/data/issue/board-issue';
 
 export class BoardViewObservableUtil {
   private _service: BoardViewModelHandler = new BoardViewModelHandler(null);
@@ -115,7 +116,8 @@ export class BoardStateInitializer {
 
   // Used to create the initial board
   private _rankedIssueKeys: any = {};
-  private _stateMap: Map<string, StateMapping[]> = Map<string, StateMapping[]>();
+  private _stateMap: Dictionary<StateMapping[]> = {};
+  private _issueTypeStateMap: Dictionary<Dictionary<StateMapping[]>> = {};
 
   constructor() {
   }
@@ -137,12 +139,28 @@ export class BoardStateInitializer {
   }
 
   mapState(projectKey: string, boardState: string, ownState: string): BoardStateInitializer {
-    let projectMap: StateMapping[] = this._stateMap.get(projectKey);
+    let projectMap: StateMapping[] = this._stateMap[projectKey];
     if (!projectMap) {
       projectMap = [];
-      this._stateMap = this._stateMap.set(projectKey, projectMap);
+      this._stateMap[projectKey] = projectMap;
     }
     projectMap.push(new StateMapping(boardState, ownState));
+    return this;
+  }
+
+  mapIssueTypeState(projectKey: string, issueType: string, boardState: string, ownState: string) {
+    expect(this._stateMap[projectKey]).toBeTruthy('Adding a state override for an issue type for a project that has not been configured');
+    let projectMap: Dictionary<StateMapping[]> = this._issueTypeStateMap[projectKey];
+    if (!projectMap) {
+      projectMap = {};
+      this._issueTypeStateMap[projectKey] = projectMap;
+    }
+    let mapping: StateMapping[] = projectMap[issueType];
+    if (!mapping) {
+      mapping = [];
+      projectMap[issueType] = mapping;
+    }
+    mapping.push(new StateMapping(boardState, ownState));
     return this;
   }
 
@@ -169,24 +187,41 @@ export class BoardStateInitializer {
 
   private createProjectState(): ProjectState {
     const projects: Map<string, BoardProject> = Map<string, BoardProject>().withMutations(projectMap => {
-      if (this._stateMap.size === 0) {
+      if (Object.keys(this._stateMap).length === 0) {
         // Add an empty owner project for tests that are not really concerned with issues
-        this._stateMap = this._stateMap.set('xxx', new Array<StateMapping>());
+        this._stateMap['xxx'] = new Array<StateMapping>();
       }
-      this._stateMap.forEach((mappings, projectKey) => {
+
+      for (const projectKey of Object.keys(this._stateMap)) {
         const stateMap: Map<string, string> = Map<string, string>().withMutations(states => {
-          for (const mapping of mappings) {
+          for (const mapping of this._stateMap[projectKey]) {
             states.set(mapping.board, mapping.own);
           }
         });
+
+        const issueTypeStatesMap: Map<string, Map<string, string>> = Map<string, Map<string, string>>().withMutations(issueTypeStates => {
+          const projectIssueStateOverrides: Dictionary<StateMapping[]> = this._issueTypeStateMap[projectKey];
+          if (projectIssueStateOverrides) {
+            for (const issueTypeName of Object.keys(projectIssueStateOverrides)) {
+              const typeStatesMap: Map<string, string> = Map<string, string>().withMutations(typeStates => {
+                for (const mapping of projectIssueStateOverrides[issueTypeName]) {
+                  typeStates.set(mapping.board, mapping.own);
+                }
+              });
+              issueTypeStates.set(issueTypeName, typeStatesMap);
+            }
+          }
+        });
+
         const project: BoardProject = {
           key: projectKey,
           colour: 'red',
           canRank: false,
-          boardStateNameToOwnStateName: stateMap
+          boardStateNameToOwnStateName: stateMap,
+          boardStateNameToOwnStateNameIssueTypeOverrides: issueTypeStatesMap
         };
         projectMap.set(projectKey, project);
-      });
+      }
     });
 
     return {
@@ -254,10 +289,13 @@ export class BoardStateUpdater {
         // Don't bump the view id when we add the help texts
         mutable.viewId = mutable.viewId + 1;
 
+        const currentIssues: Map<string, BoardIssue> = this._mainUtil.boardState.issues.issues;
+
         mutable.issues = issueMetaReducer(
           this._mainUtil.boardState.issues,
           IssueActions.createChangeIssuesAction(
             this._issueChanges ? this._issueChanges : {},
+            currentIssues,
             getDeserializeIssueLookupParams(this._mainUtil.boardState.headers, this._mainUtil.boardState.projects)));
         if (this._rankChanges || this._rankDeleted) {
           mutable.ranks = rankMetaReducer(

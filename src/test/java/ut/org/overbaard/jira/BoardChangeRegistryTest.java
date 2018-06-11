@@ -1724,6 +1724,161 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
         checkDeletes(changesNode, "TDP-1");
     }
 
+    @Test
+    public void testMoveIssueWithIssueTypeStateLinkOverrides() throws Exception {
+        //Override the default configuration set up by the @Before method to one with backlog states set up
+        initializeMocks("config/board-issue-type-override-state-links.json");
+        issueRegistry.issueBuilder("TDP", "task", "highest", "One", "TDP-A")
+                .assignee("kabir").buildAndRegister();
+        issueRegistry.issueBuilder("TDP", "bug", "highest", "Two", "TDP-D")
+                .assignee("kabir").buildAndRegister();
+        issueRegistry.issueBuilder("TDP", "feature", "highest", "Three", "TDP-B")
+                .assignee("kabir").buildAndRegister();
+        checkViewId(0);
+
+        OverbaardIssueEvent update = updateEventBuilder("TDP-1").state("TDP-D").buildAndRegister();
+        boardManager.handleEvent(update, nextRankedIssueUtil);
+        
+        ModelNode changes = getChangesJson(0, 1, true);
+        checkAdds(changes);
+        checkUpdates(changes, new UpdateIssueData("TDP-1").state("TDP-D"));
+        checkDeletes(changes);
+
+        update = updateEventBuilder("TDP-2").state("TDP-A").buildAndRegister();
+        boardManager.handleEvent(update, nextRankedIssueUtil);
+
+        changes = getChangesJson(0, 2, true);
+        checkAdds(changes);
+        checkUpdates(changes,
+                new UpdateIssueData("TDP-1").state("TDP-D"),
+                new UpdateIssueData("TDP-2").state("TDP-A"));
+        checkDeletes(changes);
+        changes = getChangesJson(1, 2, true);
+        checkAdds(changes);
+        checkUpdates(changes,
+                new UpdateIssueData("TDP-2").state("TDP-A"));
+        checkDeletes(changes);
+
+        // Move an issue that does not have a type with overridden states
+        update = updateEventBuilder("TDP-3").state("TDP-C").buildAndRegister();
+        boardManager.handleEvent(update, nextRankedIssueUtil);
+
+        changes = getChangesJson(0, 3, true);
+        checkAdds(changes);
+        checkUpdates(changes,
+                new UpdateIssueData("TDP-1").state("TDP-D"),
+                new UpdateIssueData("TDP-2").state("TDP-A"),
+                new UpdateIssueData("TDP-3").state("TDP-C"));
+        checkDeletes(changes);
+        changes = getChangesJson(1, 3, true);
+        checkAdds(changes);
+        checkUpdates(changes,
+                new UpdateIssueData("TDP-2").state("TDP-A"),
+                new UpdateIssueData("TDP-3").state("TDP-C"));
+        checkDeletes(changes);
+        changes = getChangesJson(2, 3, true);
+        checkAdds(changes);
+        checkUpdates(changes,
+                new UpdateIssueData("TDP-3").state("TDP-C"));
+        checkDeletes(changes);
+    }
+
+    @Test
+    public void testCreateIssueWithIssueTypeStateLinkOverrides() throws Exception {
+        initializeMocks("config/board-issue-type-override-state-links.json");
+        checkViewId(0);
+
+        OverbaardIssueEvent create = createEventBuilder("TDP-1", IssueType.TASK, Priority.HIGH, "One")
+                .state("TDP-A")
+                .buildAndRegister();
+        boardManager.handleEvent(create, nextRankedIssueUtil);
+
+        ModelNode changes =
+                getChangesJson(0, 1, true,
+                        new NewRankChecker().rank(0, "TDP-1"));
+        checkAdds(changes,
+                new AddIssueData("TDP-1", IssueType.TASK, Priority.HIGH, "One", "TDP-A", null));
+        checkUpdates(changes);
+        checkDeletes(changes);
+
+        create = createEventBuilder("TDP-2", IssueType.BUG, Priority.HIGH, "Two")
+                .state("TDP-D")
+                .buildAndRegister();
+        boardManager.handleEvent(create, nextRankedIssueUtil);
+
+        changes = getChangesJson(0, 2, true,
+                        new NewRankChecker().rank(0, "TDP-1").rank(1, "TDP-2"));
+        checkAdds(changes,
+                new AddIssueData("TDP-1", IssueType.TASK, Priority.HIGH, "One", "TDP-A", null),
+                new AddIssueData("TDP-2", IssueType.BUG, Priority.HIGH, "Two", "TDP-D", null));
+        checkUpdates(changes);
+        checkDeletes(changes);
+        changes = getChangesJson(1, 2, true,
+                new NewRankChecker().rank(1, "TDP-2"));
+        checkAdds(changes,
+                new AddIssueData("TDP-2", IssueType.BUG, Priority.HIGH, "Two", "TDP-D", null));
+        checkUpdates(changes);
+        checkDeletes(changes);
+
+        create = createEventBuilder("TDP-3", IssueType.FEATURE, Priority.HIGH, "Three")
+                .state("TDP-C")
+                .buildAndRegister();
+        boardManager.handleEvent(create, nextRankedIssueUtil);
+
+        changes = getChangesJson(0, 3, true,
+                new NewRankChecker().rank(0, "TDP-1").rank(1, "TDP-2").rank(2, "TDP-3"));
+        checkAdds(changes,
+                new AddIssueData("TDP-1", IssueType.TASK, Priority.HIGH, "One", "TDP-A", null),
+                new AddIssueData("TDP-2", IssueType.BUG, Priority.HIGH, "Two", "TDP-D", null),
+                new AddIssueData("TDP-3", IssueType.FEATURE, Priority.HIGH, "Three", "TDP-C", null));
+        checkUpdates(changes);
+        checkDeletes(changes);
+        changes = getChangesJson(1, 3, true,
+                new NewRankChecker().rank(1, "TDP-2").rank(2, "TDP-3"));
+        checkAdds(changes,
+                new AddIssueData("TDP-2", IssueType.BUG, Priority.HIGH, "Two", "TDP-D", null),
+                new AddIssueData("TDP-3", IssueType.FEATURE, Priority.HIGH, "Three", "TDP-C", null));
+        changes = getChangesJson(2, 3, true,
+                new NewRankChecker().rank(2, "TDP-3"));
+        checkAdds(changes,
+                new AddIssueData("TDP-3", IssueType.FEATURE, Priority.HIGH, "Three", "TDP-C", null));
+    }
+
+    @Test
+    public void testMoveIssueWithIssueTypeStateLinkOverridesBlacklist() throws Exception {
+        //Override the default configuration set up by the @Before method to one with backlog states set up
+        initializeMocks("config/board-issue-type-override-state-links.json");
+        issueRegistry.issueBuilder("TDP", "task", "highest", "One", "TDP-A")
+                .assignee("kabir").buildAndRegister();
+        issueRegistry.issueBuilder("TDP", "bug", "highest", "Two", "TDP-D")
+                .assignee("kabir").buildAndRegister();
+        issueRegistry.issueBuilder("TDP", "feature", "highest", "Three", "TDP-B")
+                .assignee("kabir").buildAndRegister();
+        checkViewId(0);
+
+        OverbaardIssueEvent update = updateEventBuilder("TDP-1").state("TDP-D").buildAndRegister();
+        boardManager.handleEvent(update, nextRankedIssueUtil);
+
+        ModelNode changes = getChangesJson(0, 1, true);
+        checkAdds(changes);
+        checkUpdates(changes, new UpdateIssueData("TDP-1").state("TDP-D"));
+        checkDeletes(changes);
+
+        update = updateEventBuilder("TDP-2").state("TDP-C").buildAndRegister();
+        boardManager.handleEvent(update, nextRankedIssueUtil);
+
+        changes = getChangesJson(0, 2, true, new NewBlackListChecker().keys("TDP-2").states("TDP-C"));
+        checkAdds(changes);
+        checkUpdates(changes,
+                new UpdateIssueData("TDP-1").state("TDP-D"));
+        checkDeletes(changes);
+        changes = getChangesJson(1, 2, true, new NewBlackListChecker().keys("TDP-2").states("TDP-C"));
+        checkAdds(changes);
+        checkUpdates(changes);
+        checkDeletes(changes);
+
+    }
+
     private ModelNode checkNoIssueChanges(int fromView, int expectedView, NewChecker...checkers) throws SearchException {
         return checkNoIssueChanges(fromView, expectedView, false, checkers);
     }

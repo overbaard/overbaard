@@ -37,6 +37,8 @@ import static org.overbaard.jira.impl.Constants.LINKED;
 import static org.overbaard.jira.impl.Constants.MAIN;
 import static org.overbaard.jira.impl.Constants.NAME;
 import static org.overbaard.jira.impl.Constants.OPTIONS;
+import static org.overbaard.jira.impl.Constants.OVERRIDE;
+import static org.overbaard.jira.impl.Constants.OVERRIDES;
 import static org.overbaard.jira.impl.Constants.PARALLEL_TASKS;
 import static org.overbaard.jira.impl.Constants.PRIORITIES;
 import static org.overbaard.jira.impl.Constants.PRIORITY;
@@ -45,6 +47,7 @@ import static org.overbaard.jira.impl.Constants.RANK;
 import static org.overbaard.jira.impl.Constants.RANKED;
 import static org.overbaard.jira.impl.Constants.STATE;
 import static org.overbaard.jira.impl.Constants.STATES;
+import static org.overbaard.jira.impl.Constants.STATE_LINKS;
 import static org.overbaard.jira.impl.Constants.SUMMARY;
 import static org.overbaard.jira.impl.Constants.TYPE;
 import static org.overbaard.jira.impl.Constants.VALUE;
@@ -61,6 +64,7 @@ import java.util.Set;
 
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
+import org.junit.Ignore;
 import org.overbaard.jira.impl.BoardManagerBuilder;
 import org.overbaard.jira.impl.OverbaardIssueEvent;
 import org.overbaard.jira.impl.board.ProjectParallelTaskOptionsLoaderBuilder;
@@ -99,6 +103,69 @@ public class BoardManagerTest extends AbstractBoardTest {
         Assert.assertFalse(boardNode.hasDefined(BACKLOG));
         //The last 2 states are 'done' states (they must always be at the end)
         Assert.assertEquals(2, boardNode.get(DONE).asInt());
+    }
+
+    @Test
+    public void testProjectStateLinksNoOverrides() throws Exception {
+        ModelNode boardNode = getJson(0);
+        // Check the project state-links and that there are no overrides for the projects in this board
+        final ModelNode tdp = getProjectFromBoardNode(boardNode, "TDP");
+        final ModelNode tdpLinks = tdp.get(STATE_LINKS);
+        Assert.assertEquals(4, tdpLinks.keys().size());
+        Assert.assertEquals("TDP-A", tdpLinks.get("S-A").asString());
+        Assert.assertEquals("TDP-B", tdpLinks.get("S-B").asString());
+        Assert.assertEquals("TDP-C", tdpLinks.get("S-C").asString());
+        Assert.assertEquals("TDP-D", tdpLinks.get("S-D").asString());
+
+        final ModelNode tbg = getProjectFromBoardNode(boardNode, "TBG");
+        final ModelNode tbgLinks = tbg.get(STATE_LINKS);
+        Assert.assertEquals(2, tbgLinks.keys().size());
+        Assert.assertEquals("TBG-X", tbgLinks.get("S-B").asString());
+        Assert.assertEquals("TBG-Y", tbgLinks.get("S-C").asString());
+
+        // No overrides set up
+        Assert.assertFalse(tdp.hasDefined(OVERRIDES));
+        Assert.assertFalse(tbg.hasDefined(OVERRIDES));
+    }
+
+    @Test
+    public void testProjectStateLinksWithOverrides() throws Exception {
+        initializeMocks("config/board-issue-type-override-state-links.json");
+        ModelNode boardNode = getJson(0);
+        // Check the project state-links and that there are no overrides for the projects in this board
+        final ModelNode tdp = getProjectFromBoardNode(boardNode, "TDP");
+        final ModelNode tdpLinks = tdp.get(STATE_LINKS);
+        Assert.assertEquals(4, tdpLinks.keys().size());
+        Assert.assertEquals("TDP-A", tdpLinks.get("S-A").asString());
+        Assert.assertEquals("TDP-B", tdpLinks.get("S-B").asString());
+        Assert.assertEquals("TDP-C", tdpLinks.get("S-C").asString());
+        Assert.assertEquals("TDP-D", tdpLinks.get("S-D").asString());
+
+
+        final ModelNode tbg = getProjectFromBoardNode(boardNode, "TBG");
+        final ModelNode tbgLinks = tbg.get(STATE_LINKS);
+        Assert.assertEquals(2, tbgLinks.keys().size());
+        Assert.assertEquals("TBG-X", tbgLinks.get("S-B").asString());
+        Assert.assertEquals("TBG-Y", tbgLinks.get("S-C").asString());
+
+        // Check the issue type overrides for the TDP project
+        final ModelNode tdpOverridesNode = tdp.get(OVERRIDES, STATE_LINKS);
+        Assert.assertEquals(ModelType.LIST, tdpOverridesNode.getType());
+        final List<ModelNode> tdpOverrides = tdpOverridesNode.asList();
+        Assert.assertEquals(1, tdpOverrides.size());
+
+        final ModelNode taskBugOverrides = tdpOverrides.get(0);
+        final List<ModelNode> taskBugIssueTypes = taskBugOverrides.get(ISSUE_TYPES).asList();
+        Assert.assertEquals(2, taskBugIssueTypes.size());
+        Assert.assertEquals("task", taskBugIssueTypes.get(0).asString());
+        Assert.assertEquals("bug", taskBugIssueTypes.get(1).asString());
+        final ModelNode taskBugLinks = taskBugOverrides.get(OVERRIDE);
+        Assert.assertEquals(2, taskBugLinks.keys().size());
+        Assert.assertEquals("TDP-A", taskBugLinks.get("S-A").asString());
+        Assert.assertEquals("TDP-D", taskBugLinks.get("S-D").asString());
+
+        // No overrides set up
+        Assert.assertFalse(tbg.hasDefined(OVERRIDES));
     }
 
     @Test
@@ -2289,6 +2356,219 @@ public class BoardManagerTest extends AbstractBoardTest {
         checkIssue(allIssues, "TDP-1", IssueType.TASK, Priority.HIGHEST, "One", 0, new AssigneeChecker(1));
         checkIssue(allIssues, "TDP-2", IssueType.TASK, Priority.HIGH, "Two", 1, new AssigneeChecker(1));
         checkIssue(allIssues, "TDP-3", IssueType.TASK, Priority.LOW, "Three", 2, new AssigneeChecker(1));
+    }
+
+
+    @Test
+    public void testLoadBoardWithIssueTypeStateLinkOverrides() throws Exception {
+        initializeMocks("config/board-issue-type-override-state-links.json");
+        issueRegistry.issueBuilder("TDP", "feature", "highest", "One", "TDP-A")
+                .assignee("kabir").buildAndRegister();
+        issueRegistry.issueBuilder("TDP", "feature", "high", "Two", "TDP-B")
+                .assignee("kabir").buildAndRegister();
+        issueRegistry.issueBuilder("TDP", "feature", "low", "Three", "TDP-C")
+                .assignee("kabir").buildAndRegister();
+        issueRegistry.issueBuilder("TDP", "feature", "lowest", "Four", "TDP-D")
+                .assignee("kabir").buildAndRegister();
+        issueRegistry.issueBuilder("TDP", "bug", "highest", "Five", "TDP-A")
+                .assignee("kabir").buildAndRegister();
+        issueRegistry.issueBuilder("TDP", "bug", "high", "Six", "TDP-D")
+                .assignee("kabir").buildAndRegister();
+        issueRegistry.issueBuilder("TDP", "task", "low", "Seven", "TDP-A")
+                .assignee("kabir").buildAndRegister();
+        issueRegistry.issueBuilder("TDP", "task", "highest", "Eight", "TDP-D")
+                .assignee("kabir").buildAndRegister();
+
+        ModelNode boardNode = getJson(0, new BoardAssigneeChecker("kabir"));
+        checkNameAndColour(boardNode, "priorities", "highest", "high", "low", "lowest");
+        checkNameAndColour(boardNode, "issue-types", "task", "bug", "feature");
+
+        ModelNode allIssues = getIssuesCheckingSize(boardNode, 8);
+        checkIssue(allIssues, "TDP-1", IssueType.FEATURE, Priority.HIGHEST, "One", 0, new AssigneeChecker(0));
+        checkIssue(allIssues, "TDP-2", IssueType.FEATURE, Priority.HIGH, "Two", 1, new AssigneeChecker(0));
+        checkIssue(allIssues, "TDP-3", IssueType.FEATURE, Priority.LOW, "Three", 2, new AssigneeChecker(0));
+        checkIssue(allIssues, "TDP-4", IssueType.FEATURE, Priority.LOWEST, "Four", 3, new AssigneeChecker(0));
+        checkIssue(allIssues, "TDP-5", IssueType.BUG, Priority.HIGHEST, "Five", 0, new AssigneeChecker(0));
+        checkIssue(allIssues, "TDP-6", IssueType.BUG, Priority.HIGH, "Six", 1, new AssigneeChecker(0));
+        checkIssue(allIssues, "TDP-7", IssueType.TASK, Priority.LOW, "Seven", 0, new AssigneeChecker(0));
+        checkIssue(allIssues, "TDP-8", IssueType.TASK, Priority.HIGHEST, "Eight", 1, new AssigneeChecker(0));
+
+
+        checkProjectRankedIssues(boardNode, "TDP", 1, 2, 3, 4, 5, 6, 7, 8);
+    }
+
+
+    @Test
+    public void testLoadBoardWithIssueTypeStateLinkOverridesBlacklist() throws Exception {
+        initializeMocks("config/board-issue-type-override-state-links.json");
+        issueRegistry.issueBuilder("TDP", "feature", "highest", "One", "TDP-A")
+                .assignee("kabir").buildAndRegister();
+        issueRegistry.issueBuilder("TDP", "bug", "high", "Two", "TDP-C")
+                .assignee("kabir").buildAndRegister();
+
+
+        ModelNode boardNode = getJson(0, new BoardAssigneeChecker("kabir"), new BoardBlacklistChecker().keys("TDP-2").states("TDP-C"));
+        checkNameAndColour(boardNode, "priorities", "highest", "high", "low", "lowest");
+        checkNameAndColour(boardNode, "issue-types", "task", "bug", "feature");
+
+        ModelNode allIssues = getIssuesCheckingSize(boardNode, 1);
+        checkIssue(allIssues, "TDP-1", IssueType.FEATURE, Priority.HIGHEST, "One", 0, new AssigneeChecker(0));
+
+        checkProjectRankedIssues(boardNode, "TDP", 1);
+    }
+
+    @Test
+    public void testMoveIssueWithIssueTypeStateLinkOverrides() throws Exception {
+        initializeMocks("config/board-issue-type-override-state-links.json");
+        issueRegistry.issueBuilder("TDP", "feature", "highest", "One", "TDP-A")
+                .assignee("kabir").buildAndRegister();
+        issueRegistry.issueBuilder("TDP", "feature", "high", "Two", "TDP-B")
+                .assignee("kabir").buildAndRegister();
+        issueRegistry.issueBuilder("TDP", "feature", "low", "Three", "TDP-C")
+                .assignee("kabir").buildAndRegister();
+        issueRegistry.issueBuilder("TDP", "feature", "lowest", "Four", "TDP-D")
+                .assignee("kabir").buildAndRegister();
+        issueRegistry.issueBuilder("TDP", "bug", "highest", "Five", "TDP-A")
+                .assignee("kabir").buildAndRegister();
+        issueRegistry.issueBuilder("TDP", "bug", "high", "Six", "TDP-D")
+                .assignee("kabir").buildAndRegister();
+        issueRegistry.issueBuilder("TDP", "task", "low", "Seven", "TDP-A")
+                .assignee("kabir").buildAndRegister();
+        issueRegistry.issueBuilder("TDP", "task", "highest", "Eight", "TDP-D")
+                .assignee("kabir").buildAndRegister();
+
+        ModelNode boardNode = getJson(0, new BoardAssigneeChecker("kabir"));
+        checkNameAndColour(boardNode, "priorities", "highest", "high", "low", "lowest");
+        checkNameAndColour(boardNode, "issue-types", "task", "bug", "feature");
+        // This is the same layout as testLoadBoardWithIssueTypeStateLinkOverrides() so don't bother checking again
+
+        OverbaardIssueEvent update = updateEventBuilder("TDP-5")
+                .assignee("jason") // Pull in some new data to make sure it still works
+                .state("TDP-D")
+                .buildAndRegister();
+        boardManager.handleEvent(update, nextRankedIssueUtil);
+
+        boardNode = getJson(1, new BoardAssigneeChecker("jason", "kabir"));
+        ModelNode allIssues = getIssuesCheckingSize(boardNode, 8);
+        checkIssue(allIssues, "TDP-1", IssueType.FEATURE, Priority.HIGHEST, "One", 0, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-2", IssueType.FEATURE, Priority.HIGH, "Two", 1, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-3", IssueType.FEATURE, Priority.LOW, "Three", 2, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-4", IssueType.FEATURE, Priority.LOWEST, "Four", 3, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-5", IssueType.BUG, Priority.HIGHEST, "Five", 1, new AssigneeChecker(0));
+        checkIssue(allIssues, "TDP-6", IssueType.BUG, Priority.HIGH, "Six", 1, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-7", IssueType.TASK, Priority.LOW, "Seven", 0, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-8", IssueType.TASK, Priority.HIGHEST, "Eight", 1, new AssigneeChecker(1));
+
+        update = updateEventBuilder("TDP-8")
+                .state("TDP-A")
+                .buildAndRegister();
+        boardManager.handleEvent(update, nextRankedIssueUtil);
+
+        boardNode = getJson(2, new BoardAssigneeChecker("jason", "kabir"));
+        allIssues = getIssuesCheckingSize(boardNode, 8);
+        checkIssue(allIssues, "TDP-1", IssueType.FEATURE, Priority.HIGHEST, "One", 0, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-2", IssueType.FEATURE, Priority.HIGH, "Two", 1, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-3", IssueType.FEATURE, Priority.LOW, "Three", 2, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-4", IssueType.FEATURE, Priority.LOWEST, "Four", 3, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-5", IssueType.BUG, Priority.HIGHEST, "Five", 1, new AssigneeChecker(0));
+        checkIssue(allIssues, "TDP-6", IssueType.BUG, Priority.HIGH, "Six", 1, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-7", IssueType.TASK, Priority.LOW, "Seven", 0, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-8", IssueType.TASK, Priority.HIGHEST, "Eight", 0, new AssigneeChecker(1));
+
+        // Now move an issue with non overridden state mappings for the type to make sure that still works
+        update = updateEventBuilder("TDP-1")
+                .state("TDP-D")
+                .buildAndRegister();
+        boardManager.handleEvent(update, nextRankedIssueUtil);
+
+        boardNode = getJson(3, new BoardAssigneeChecker("jason", "kabir"));
+        allIssues = getIssuesCheckingSize(boardNode, 8);
+        checkIssue(allIssues, "TDP-1", IssueType.FEATURE, Priority.HIGHEST, "One", 3, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-2", IssueType.FEATURE, Priority.HIGH, "Two", 1, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-3", IssueType.FEATURE, Priority.LOW, "Three", 2, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-4", IssueType.FEATURE, Priority.LOWEST, "Four", 3, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-5", IssueType.BUG, Priority.HIGHEST, "Five", 1, new AssigneeChecker(0));
+        checkIssue(allIssues, "TDP-6", IssueType.BUG, Priority.HIGH, "Six", 1, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-7", IssueType.TASK, Priority.LOW, "Seven", 0, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-8", IssueType.TASK, Priority.HIGHEST, "Eight", 0, new AssigneeChecker(1));
+
+        checkProjectRankedIssues(boardNode, "TDP", 1, 2, 3, 4, 5, 6, 7, 8);
+    }
+
+    @Test
+    public void testCreateIssueWithIssueTypeStateLinkOverrides() throws Exception {
+        initializeMocks("config/board-issue-type-override-state-links.json");
+        issueRegistry.issueBuilder("TDP", "feature", "highest", "One", "TDP-A")
+                .assignee("kabir").buildAndRegister();
+        issueRegistry.issueBuilder("TDP", "feature", "high", "Two", "TDP-B")
+                .assignee("kabir").buildAndRegister();
+        issueRegistry.issueBuilder("TDP", "feature", "low", "Three", "TDP-C")
+                .assignee("kabir").buildAndRegister();
+        issueRegistry.issueBuilder("TDP", "feature", "lowest", "Four", "TDP-D")
+                .assignee("kabir").buildAndRegister();
+        issueRegistry.issueBuilder("TDP", "bug", "highest", "Five", "TDP-A")
+                .assignee("kabir").buildAndRegister();
+        issueRegistry.issueBuilder("TDP", "bug", "high", "Six", "TDP-D")
+                .assignee("kabir").buildAndRegister();
+        issueRegistry.issueBuilder("TDP", "task", "low", "Seven", "TDP-A")
+                .assignee("kabir").buildAndRegister();
+        issueRegistry.issueBuilder("TDP", "task", "highest", "Eight", "TDP-D")
+                .assignee("kabir").buildAndRegister();
+
+        ModelNode boardNode = getJson(0, new BoardAssigneeChecker("kabir"));
+        checkNameAndColour(boardNode, "priorities", "highest", "high", "low", "lowest");
+        checkNameAndColour(boardNode, "issue-types", "task", "bug", "feature");
+        // This is the same layout as testLoadBoardWithIssueTypeStateLinkOverrides() so don't bother checking again
+
+        // Create an issue with a type that has overridden state mappings
+        OverbaardIssueEvent create = createEventBuilder("TDP-9", IssueType.TASK, Priority.HIGH, "Nine")
+                .assignee("jason")
+                .state("TDP-D")
+                .buildAndRegister();
+        boardManager.handleEvent(create, nextRankedIssueUtil);
+
+        boardNode = getJson(1, new BoardAssigneeChecker("jason", "kabir"));
+        ModelNode allIssues = getIssuesCheckingSize(boardNode, 9);
+        checkIssue(allIssues, "TDP-1", IssueType.FEATURE, Priority.HIGHEST, "One", 0, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-2", IssueType.FEATURE, Priority.HIGH, "Two", 1, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-3", IssueType.FEATURE, Priority.LOW, "Three", 2, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-4", IssueType.FEATURE, Priority.LOWEST, "Four", 3, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-5", IssueType.BUG, Priority.HIGHEST, "Five", 0, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-6", IssueType.BUG, Priority.HIGH, "Six", 1, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-7", IssueType.TASK, Priority.LOW, "Seven", 0, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-8", IssueType.TASK, Priority.HIGHEST, "Eight", 1, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-9", IssueType.TASK, Priority.HIGH, "Nine", 1, new AssigneeChecker(0));
+
+        checkProjectRankedIssues(boardNode, "TDP", 1, 2, 3, 4, 5, 6, 7, 8, 9);
+
+        // Create an issue with a type that does not have overridden state mappings
+        create = createEventBuilder("TDP-10", IssueType.FEATURE, Priority.HIGH, "Ten")
+                .assignee("jason")
+                .state("TDP-C")
+                .buildAndRegister();
+        boardManager.handleEvent(create, nextRankedIssueUtil);
+
+        boardNode = getJson(2, new BoardAssigneeChecker("jason", "kabir"));
+        allIssues = getIssuesCheckingSize(boardNode, 10);
+        checkIssue(allIssues, "TDP-1", IssueType.FEATURE, Priority.HIGHEST, "One", 0, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-2", IssueType.FEATURE, Priority.HIGH, "Two", 1, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-3", IssueType.FEATURE, Priority.LOW, "Three", 2, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-4", IssueType.FEATURE, Priority.LOWEST, "Four", 3, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-5", IssueType.BUG, Priority.HIGHEST, "Five", 0, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-6", IssueType.BUG, Priority.HIGH, "Six", 1, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-7", IssueType.TASK, Priority.LOW, "Seven", 0, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-8", IssueType.TASK, Priority.HIGHEST, "Eight", 1, new AssigneeChecker(1));
+        checkIssue(allIssues, "TDP-9", IssueType.TASK, Priority.HIGH, "Nine", 1, new AssigneeChecker(0));
+        checkIssue(allIssues, "TDP-10", IssueType.FEATURE, Priority.HIGH, "Ten", 2, new AssigneeChecker(0));
+
+        checkProjectRankedIssues(boardNode, "TDP", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+    }
+    @Ignore
+    @Test
+    public void testChangeIssueTypeWithIssueTypeStateLinkOverrides() throws Exception {
+        // NOOP, as Jira (7.5.0) does not allow you to change the type of an issue to a type with a different workflow
+        // If this becomes possible in the future, we need to implement and add this in.
+        // Leave it here for now as documentation of this behaviour.
     }
 
     private ModelNode getJson(int expectedViewId, BoardDataChecker... checkers) throws SearchException {

@@ -210,7 +210,7 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
         .setParallelTasks(state.projects.parallelTasks);
 
       const issueState: IssueState = input['issues'] ?
-        metaReducers.issues(state.issues, IssueActions.createChangeIssuesAction(input['issues'], lookupParams))
+        metaReducers.issues(state.issues, IssueActions.createChangeIssuesAction(input['issues'], state.issues.issues, lookupParams))
         : state.issues;
 
       const blacklistState: BlacklistState = input['blacklist'] ?

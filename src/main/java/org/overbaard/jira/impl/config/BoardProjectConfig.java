@@ -17,8 +17,6 @@ package org.overbaard.jira.impl.config;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +24,6 @@ import java.util.Set;
 
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
-import org.jboss.dmr.Property;
 import org.overbaard.jira.OverbaardLogger;
 import org.overbaard.jira.OverbaardValidationException;
 import org.overbaard.jira.impl.Constants;
@@ -34,69 +31,34 @@ import org.overbaard.jira.impl.Constants;
 /** Abstract base class for project configurations of projects whose issues should appear as cards on the board.
  * @author Kabir Khan
  */
-public class BoardProjectConfig extends ProjectConfig {
-    private final BoardStates boardStates;
+public class BoardProjectConfig extends ProjectConfig<BoardProjectStateMapper> {
     private final String queryFilter;
     private final String colour;
-    private final Map<String, String> ownToBoardStates;
-    /** Maps the owner states onto our states */
-    private final Map<String, String> boardToOwnStates;
-
-    private final Set<String> ownDoneStateNames;
 
     private final List<String> customFieldNames;
     private final ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig;
 
+    private final BoardProjectIssueTypeOverrides issueTypeOverrides;
+
     private BoardProjectConfig(final BoardStates boardStates,
                                final String code, final String queryFilter,
-                               final String colour, final Map<String, Integer> states,
-                               final Map<String, String> ownToBoardStates,
-                               final Map<String, String> boardToOwnStates,
+                               final String colour,
+                               final BoardProjectStateMapper stateMapper,
                                final List<String> customFieldNames,
-                               final ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig) {
-        super(code, states);
-        this.boardStates = boardStates;
+                               final ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig, BoardProjectIssueTypeOverrides issueTypeOverrides) {
+        super(code, stateMapper);
         this.queryFilter = queryFilter;
         this.colour = colour;
-        this.boardToOwnStates = boardToOwnStates;
-        this.ownToBoardStates = ownToBoardStates;
         this.parallelTaskGroupsConfig = parallelTaskGroupsConfig;
-
-        Set<String> ownDoneStateNames = new HashSet<>();
-        for (String boardDoneState : boardStates.getDoneStates()) {
-            String ownDoneState = boardToOwnStates.get(boardDoneState);
-            if (ownDoneState != null) {
-                ownDoneStateNames.add(ownDoneState);
-            }
-        }
-        this.ownDoneStateNames = Collections.unmodifiableSet(ownDoneStateNames);
         this.customFieldNames = customFieldNames;
+        this.issueTypeOverrides = issueTypeOverrides;
     }
 
     static BoardProjectConfig load(final BoardStates boardStates, ModelNode project,
-                                   CustomFieldRegistry<CustomFieldConfig> customFieldConfigs, BoardParallelTaskConfig parallelTaskConfig) {
+                                   CustomFieldRegistry<CustomFieldConfig> customFieldConfigs,
+                                   BoardParallelTaskConfig parallelTaskConfig, Set<String> issueTypes) {
         String projectCode = Util.getRequiredChild(project, "Project", null, Constants.CODE).asString();
         String colour = Util.getRequiredChild(project, "Project", projectCode, Constants.COLOUR).asString();
-        ModelNode statesLinks = Util.getRequiredChild(project, "Project", projectCode, Constants.STATE_LINKS);
-
-        Map<String, String> ownToBoardStates = new LinkedHashMap<>();
-        Map<String, String> boardToOwnStates = new HashMap<>();
-        for (Property prop : statesLinks.asPropertyList()) {
-            final String ownState = prop.getName();
-            final String boardState = prop.getValue().asString();
-            ownToBoardStates.put(ownState, boardState);
-            boardToOwnStates.put(boardState, ownState);
-        }
-
-        int i = 0;
-        Map<String, Integer> states = new LinkedHashMap<>();
-        for (String boardState : boardStates.getStateNames()) {
-            final String ownState = boardToOwnStates.get(boardState);
-            if (ownState != null) {
-                states.put(ownState, i++);
-            }
-        }
-
 
         final List<String> customFieldNames;
         if (!project.hasDefined(Constants.CUSTOM)) {
@@ -148,12 +110,14 @@ public class BoardProjectConfig extends ProjectConfig {
             projectParallelTaskGroupsConfig = null;
         }
 
-        return new BoardProjectConfig(boardStates, projectCode, loadQueryFilter(project), colour,
-                Collections.unmodifiableMap(states),
-                Collections.unmodifiableMap(ownToBoardStates),
-                Collections.unmodifiableMap(boardToOwnStates),
+        BoardProjectIssueTypeOverrides issueTypeOverrides = BoardProjectIssueTypeOverrides.load(project.get(Constants.OVERRIDES), boardStates, projectCode, issueTypes);
+        ModelNode statesLinks = Util.getRequiredChild(project, "Project", projectCode, Constants.STATE_LINKS);
+        BoardProjectStateMapper stateMapper = BoardProjectStateMapper.load(statesLinks, boardStates);
+        return new BoardProjectConfig(
+                boardStates, projectCode, loadQueryFilter(project), colour,
+                stateMapper,
                 Collections.unmodifiableList(customFieldNames),
-                projectParallelTaskGroupsConfig);
+                projectParallelTaskGroupsConfig, issueTypeOverrides);
     }
 
 
@@ -176,28 +140,19 @@ public class BoardProjectConfig extends ProjectConfig {
         return colour;
     }
 
-    public Integer mapOwnStateOntoBoardStateIndex(String state) {
-        String boardState = mapOwnStateOntoBoardState(state);
-        return boardStates.getStateIndex(boardState);
+    ModelNode serializeModelNodeForBoard() {
+        ModelNode projectNode = new ModelNode();
+        projectNode.get(Constants.CODE).set(code);
 
-    }
-    public String mapBoardStateOntoOwnState(String boardState) {
-        return boardToOwnStates.get(boardState);
-    }
+        projectNode.get(Constants.STATE_LINKS).set(projectStates.serializeModelNodeForBoard());
 
-    public String mapOwnStateOntoBoardState(String state) {
-        return ownToBoardStates.get(state);
-    }
-
-    @Override
-    ModelNode serializeModelNodeForBoard(ModelNode parent, boolean addCode) {
-        ModelNode projectNode = super.serializeModelNodeForBoard(parent, addCode);
-        ModelNode stateLinksNode = projectNode.get(Constants.STATE_LINKS);
-        for (String state : boardStates.getStateNames()) {
-            String myState = mapBoardStateOntoOwnState(state);
-            stateLinksNode.get(state).set(myState == null ? new ModelNode() : new ModelNode(myState));
-        }
         projectNode.get(Constants.COLOUR).set(colour);
+
+        final ModelNode issueTypeOverrides = this.issueTypeOverrides.serializeModelNodeForBoard();
+        if (issueTypeOverrides.isDefined()) {
+            projectNode.get(Constants.OVERRIDES).set(issueTypeOverrides);
+        }
+
         return projectNode;
     }
 
@@ -226,33 +181,14 @@ public class BoardProjectConfig extends ProjectConfig {
             }
         }
 
-        final ModelNode stateLinksNode = projectNode.get(Constants.STATE_LINKS);
-        stateLinksNode.setEmptyObject();
-        for (Map.Entry<String, String> entry : ownToBoardStates.entrySet()) {
-            stateLinksNode.get(entry.getKey()).set(entry.getValue());
+        projectNode.get(Constants.STATE_LINKS).set(projectStates.serializeModelNodeForConfig());
+
+        final ModelNode issueTypeOverrides = this.issueTypeOverrides.serializeModelNodeForConfig();
+        if (issueTypeOverrides.isDefined()) {
+            projectNode.get(Constants.OVERRIDES).set(issueTypeOverrides);
         }
+
         return projectNode;
-    }
-
-    public boolean isBacklogState(String ownState) {
-        return isBacklogState(mapOwnStateOntoBoardStateIndex(ownState));
-    }
-
-    public boolean isDoneState(String ownState) {
-        Integer boardStateIndex = mapOwnStateOntoBoardStateIndex(ownState);
-        return boardStateIndex == null ? false : isDoneState(boardStateIndex);
-    }
-
-    private boolean isBacklogState(int boardStateIndex) {
-        return boardStates.isBacklogState(boardStateIndex);
-    }
-
-    public boolean isDoneState(int boardStateIndex) {
-        return boardStates.isDoneState(boardStateIndex);
-    }
-
-    public Set<String> getOwnDoneStateNames() {
-        return ownDoneStateNames;
     }
 
     public List<String> getCustomFieldNames() {
@@ -262,5 +198,32 @@ public class BoardProjectConfig extends ProjectConfig {
 
     public ProjectParallelTaskGroupsConfig getParallelTaskGroupsConfig() {
         return parallelTaskGroupsConfig;
+    }
+
+    @Override
+    public BoardProjectStateMapper getOverriddenOrProjectStates(String issueType) {
+        if (issueTypeOverrides != null) {
+            BoardProjectStateMapper states = issueTypeOverrides.getStateLinksOverride(issueType);
+            if (states != null) {
+                return states;
+            }
+        }
+        return projectStates;
+    }
+
+    /**
+     * This should not be called normally {@link #getOverriddenOrProjectStates(String)} should be preferred
+     * @return the project state mapper
+     */
+    public BoardProjectStateMapper getProjectStateLinks() {
+        return projectStates;
+    }
+
+    /**
+     * This should not be called normally {@link #getOverriddenOrProjectStates(String)} should be preferred
+     * @return the overridden state mappers by issue types
+     */
+    public Map<String, BoardProjectStateMapper> getIssueTypeStateLinksOverrides() {
+        return issueTypeOverrides.getStateLinkOverrides();
     }
 }

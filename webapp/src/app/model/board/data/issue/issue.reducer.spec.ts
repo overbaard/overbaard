@@ -176,7 +176,7 @@ describe('Issue reducer tests', () => {
             summary: 'Five',
             type: 'bug',
             priority: 'Major'
-            // Not that I am not setting the new state here to avoid wiring up more stuff for the test
+            // Note that I am not setting the new state here to avoid wiring up more stuff for the test
             // Real data from the server will have this, and we're testing this more extensively in the issue model tests
           }
         ],
@@ -184,7 +184,7 @@ describe('Issue reducer tests', () => {
       };
       const newState: IssueState = issueMetaReducer(
         issueState,
-        IssueActions.createChangeIssuesAction(changes, lookupParams));
+        IssueActions.createChangeIssuesAction(changes, issueState.issues, lookupParams));
 
       expect(newState.issues.size).toEqual(4);
       const issueArray: BoardIssue[] = newState.issues.toArray().sort((a, b) => a.key.localeCompare(b.key));
@@ -213,7 +213,7 @@ describe('Issue reducer tests', () => {
       const changes: any = {};
       const newState: IssueState = issueMetaReducer(
         issueState,
-        IssueActions.createChangeIssuesAction(changes, lookupParams));
+        IssueActions.createChangeIssuesAction(changes, issueState.issues, lookupParams));
       expect(newState.issues).toBe(issueState.issues);
       checkIssueChanges(newState, {});
     });
@@ -230,7 +230,7 @@ describe('Issue reducer tests', () => {
       };
       const newState: IssueState = issueMetaReducer(
         issueState,
-        IssueActions.createChangeIssuesAction(changes, lookupParams));
+        IssueActions.createChangeIssuesAction(changes, issueState.issues, lookupParams));
 
       expect(newState.issues.size).toEqual(4);
       const issueArray: BoardIssue[] = newState.issues.toArray().sort((a, b) => a.key.localeCompare(b.key));
@@ -262,7 +262,7 @@ describe('Issue reducer tests', () => {
       };
       const newState: IssueState = issueMetaReducer(
         issueState,
-        IssueActions.createChangeIssuesAction(changes, lookupParams));
+        IssueActions.createChangeIssuesAction(changes, issueState.issues, lookupParams));
 
       expect(newState.issues.size).toEqual(1);
       const issueArray: BoardIssue[] = newState.issues.toArray().sort((a, b) => a.key.localeCompare(b.key));
