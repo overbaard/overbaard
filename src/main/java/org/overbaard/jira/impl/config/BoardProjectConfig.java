@@ -40,6 +40,8 @@ public class BoardProjectConfig extends ProjectConfig<BoardProjectStateMapper> {
 
     private final BoardProjectIssueTypeOverrides issueTypeOverrides;
 
+    private final InternalAdvanced internalAdvanced;
+
     private BoardProjectConfig(final BoardStates boardStates,
                                final String code, final String queryFilter,
                                final String colour,
@@ -52,6 +54,7 @@ public class BoardProjectConfig extends ProjectConfig<BoardProjectStateMapper> {
         this.parallelTaskGroupsConfig = parallelTaskGroupsConfig;
         this.customFieldNames = customFieldNames;
         this.issueTypeOverrides = issueTypeOverrides;
+        this.internalAdvanced = new InternalAdvanced();
     }
 
     static BoardProjectConfig load(final BoardStates boardStates, ModelNode project,
@@ -211,19 +214,38 @@ public class BoardProjectConfig extends ProjectConfig<BoardProjectStateMapper> {
         return projectStates;
     }
 
+    public InternalAdvanced getInternalAdvanced() {
+        return internalAdvanced;
+    }
+
     /**
-     * This should not be called normally {@link #getOverriddenOrProjectStates(String)} should be preferred
+     * This should not be called normally {@link #getOverriddenOrProjectStates(String)} should be preferred.
+     * When it is really needed, it can be accessed via {@link #getInternalAdvanced()}
      * @return the project state mapper
      */
-    public BoardProjectStateMapper getProjectStateLinks() {
+    private BoardProjectStateMapper getProjectStateLinks() {
         return projectStates;
     }
 
     /**
      * This should not be called normally {@link #getOverriddenOrProjectStates(String)} should be preferred
+     * When it is really needed, it can be accessed via {@link #getInternalAdvanced()}
      * @return the overridden state mappers by issue types
      */
-    public Map<String, BoardProjectStateMapper> getIssueTypeStateLinksOverrides() {
+    private Map<String, BoardProjectStateMapper> getIssueTypeStateLinksOverrides() {
         return issueTypeOverrides.getStateLinkOverrides();
+    }
+
+    public class InternalAdvanced {
+        private InternalAdvanced() {
+        }
+
+        public BoardProjectStateMapper getProjectStateLinks() {
+            return BoardProjectConfig.this.getProjectStateLinks();
+        }
+
+        public Map<String, BoardProjectStateMapper> getIssueTypeStateLinksOverrides() {
+            return BoardProjectConfig.this.getIssueTypeStateLinksOverrides();
+        }
     }
 }

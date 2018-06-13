@@ -207,7 +207,8 @@ public class BoardProject {
 
         // Process the overrides
         Map<String, Set<String>> issueOverrideDoneStateNames = new HashMap<>();
-        for (Map.Entry<String, BoardProjectStateMapper> entry : projectConfig.getIssueTypeStateLinksOverrides().entrySet()) {
+        for (Map.Entry<String, BoardProjectStateMapper> entry :
+                projectConfig.getInternalAdvanced().getIssueTypeStateLinksOverrides().entrySet()) {
             issueOverrideDoneStateNames.put(entry.getKey(), entry.getValue().getOwnDoneStateNames());
         }
 
@@ -223,7 +224,8 @@ public class BoardProject {
         }
 
         // Do the filtering by state names and issue types for the project non-overridden issue types
-        boolean mainProjectHasOwnDoneStateNames = projectConfig.getProjectStateLinks().getOwnDoneStateNames().size() > 0;
+        boolean mainProjectHasOwnDoneStateNames =
+                projectConfig.getInternalAdvanced().getProjectStateLinks().getOwnDoneStateNames().size() > 0;
         boolean firstClause = true;
         if (mainProjectHasOwnDoneStateNames || hasIssueOverrides) {
             if (!hasIssueOverrides) {
@@ -231,7 +233,8 @@ public class BoardProject {
             }
             clauseBuilder.sub();
             if (mainProjectHasOwnDoneStateNames) {
-                clauseBuilder.not().addStringCondition("status", projectConfig.getProjectStateLinks().getOwnDoneStateNames());
+                clauseBuilder.not().addStringCondition("status",
+                        projectConfig.getInternalAdvanced().getProjectStateLinks().getOwnDoneStateNames());
                 firstClause = false;
             }
             if (hasIssueOverrides) {
@@ -252,7 +255,8 @@ public class BoardProject {
             clauseBuilder.addStringCondition("type", override.getKey());
             if (doneStateNames.size() > 0) {
                 clauseBuilder.and();
-                clauseBuilder.not().addStringCondition("status", projectConfig.getProjectStateLinks().getOwnDoneStateNames());
+                clauseBuilder.not().addStringCondition("status",
+                        projectConfig.getInternalAdvanced().getProjectStateLinks().getOwnDoneStateNames());
             }
             clauseBuilder.endsub();
         }
