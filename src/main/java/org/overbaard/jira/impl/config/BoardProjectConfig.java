@@ -204,7 +204,7 @@ public class BoardProjectConfig extends ProjectConfig<BoardProjectStateMapper> {
     }
 
     @Override
-    public BoardProjectStateMapper getOverriddenOrProjectStates(String issueType) {
+    public BoardProjectStateMapper getProjectStatesLinks(String issueType) {
         if (issueTypeOverrides != null) {
             BoardProjectStateMapper states = issueTypeOverrides.getStateLinksOverride(issueType);
             if (states != null) {
@@ -219,7 +219,7 @@ public class BoardProjectConfig extends ProjectConfig<BoardProjectStateMapper> {
     }
 
     /**
-     * This should not be called normally {@link #getOverriddenOrProjectStates(String)} should be preferred.
+     * This should not be called normally {@link #getProjectStatesLinks(String)} should be preferred.
      * When it is really needed, it can be accessed via {@link #getInternalAdvanced()}
      * @return the project state mapper
      */
@@ -228,7 +228,7 @@ public class BoardProjectConfig extends ProjectConfig<BoardProjectStateMapper> {
     }
 
     /**
-     * This should not be called normally {@link #getOverriddenOrProjectStates(String)} should be preferred
+     * This should not be called normally {@link #getProjectStatesLinks(String)} should be preferred
      * When it is really needed, it can be accessed via {@link #getInternalAdvanced()}
      * @return the overridden state mappers by issue types
      */

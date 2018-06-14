@@ -42,7 +42,7 @@ public abstract class ProjectConfig<S extends ProjectStateList> {
         return code;
     }
 
-    public S getOverriddenOrProjectStates(String issueType) {
+    public S getProjectStatesLinks(String issueType) {
         return projectStates;
     }
 

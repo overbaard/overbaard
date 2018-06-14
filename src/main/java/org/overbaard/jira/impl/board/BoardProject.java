@@ -154,11 +154,11 @@ public class BoardProject {
     }
 
     public boolean isBacklogState(String issueType, String state) {
-        return projectConfig.getOverriddenOrProjectStates(issueType).isBacklogState(state);
+        return projectConfig.getProjectStatesLinks(issueType).isBacklogState(state);
     }
 
     public boolean isDoneState(String issueType, String state) {
-        return projectConfig.getOverriddenOrProjectStates(issueType).isDoneState(state);
+        return projectConfig.getProjectStatesLinks(issueType).isDoneState(state);
     }
 
     public String getCode() {
@@ -292,7 +292,7 @@ public class BoardProject {
         }
 
         Integer getStateIndexRecordingMissing(String issueKey, String issueType, String stateName) {
-            final Integer index = projectConfig.getOverriddenOrProjectStates(issueType).getStateIndex(stateName);
+            final Integer index = projectConfig.getProjectStatesLinks(issueType).getStateIndex(stateName);
             if (index == null) {
                 board.addMissingState(issueKey, stateName);
             } else {
@@ -570,7 +570,7 @@ public class BoardProject {
         }
 
         Integer getStateIndexRecordingMissing(String issueKey, String issueType, String stateName) {
-            final Integer index = linkedProjectConfig.getOverriddenOrProjectStates(issueType).getStateIndex(stateName);
+            final Integer index = linkedProjectConfig.getProjectStatesLinks(issueType).getStateIndex(stateName);
             if (index == null) {
                 board.addMissingState(issueKey, stateName);
             }

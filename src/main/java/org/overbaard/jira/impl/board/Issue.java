@@ -102,7 +102,7 @@ public abstract class Issue {
     private ModelNode getBaseModelNode() {
         ModelNode issueNode = new ModelNode();
         issueNode.get(Constants.KEY).set(key);
-        issueNode.get(Constants.STATE).set(project.getOverriddenOrProjectStates(issueTypeName).getStateIndex(state));
+        issueNode.get(Constants.STATE).set(project.getProjectStatesLinks(issueTypeName).getStateIndex(state));
         issueNode.get(Constants.SUMMARY).set(summary);
         return issueNode;
     }
