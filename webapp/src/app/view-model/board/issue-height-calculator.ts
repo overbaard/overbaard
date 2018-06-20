@@ -152,7 +152,7 @@ export class IssueHeightCalculator {
       return 0;
     }
 
-    const lookup: FontSizeTable = this._fontSizeTable.getTable('14px');
+    const lookup: FontSizeTable = this._fontSizeTable.getTable('12px');
     let lines = 1;
     let currentWidth = 0;
     this._boardIssue.linkedIssues.forEach(linkedIssue => {
