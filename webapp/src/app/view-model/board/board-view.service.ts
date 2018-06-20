@@ -566,7 +566,7 @@ class IssueTableBuilder {
       case ChangeType.LOAD_BOARD: {
         const issues: Map<string, BoardIssueView> = Map<string, BoardIssueView>().asMutable();
         this._currentBoardState.issues.issues.forEach((issue, key) => {
-          const issueView: BoardIssueView = this.createIssueView(issue, true);
+          const issueView: BoardIssueView = this.createIssueView(issue);
           issues.set(key, issueView);
         });
         return issues.asImmutable();
@@ -584,7 +584,7 @@ class IssueTableBuilder {
             } else {
               issues = issues.asMutable();
               const issue: BoardIssue = this._currentBoardState.issues.issues.get(key);
-              const issueView: BoardIssueView = this.createIssueView(issue, true);
+              const issueView: BoardIssueView = this.createIssueView(issue);
               issues.set(key, issueView);
             }
           });
@@ -597,7 +597,7 @@ class IssueTableBuilder {
     }
   }
 
-  private createIssueView(issue: BoardIssue, visible: boolean): BoardIssueView {
+  private createIssueView(issue: BoardIssue): BoardIssueView {
     const colour: string = this._currentBoardState.projects.boardProjects.get(issue.projectCode).colour;
     const ownStateName: string = this.getOwnStateName(issue);
 
@@ -611,13 +611,14 @@ class IssueTableBuilder {
       summaryLines = List<string>(heightCalculator.summaryLines);
     }
     return BoardIssueViewUtil.createBoardIssue(
-      issue, this._currentBoardState.jiraUrl, colour, ownStateName, visible, summaryLines, height);
+      issue, this._currentBoardState.jiraUrl, colour, ownStateName, true, summaryLines, height);
   }
 
 
   private filterIssues(issues: Map<string, BoardIssueView>): Map<string, BoardIssueView> {
     switch (this._changeType) {
       case ChangeType.LOAD_BOARD:
+      case ChangeType.UPDATE_ISSUE_DETAIL:
       case ChangeType.APPLY_FILTERS: {
         const filters: AllFilters =
           new AllFilters(this._currentUserSettingState.filters, this._currentBoardState.projects, this._currentBoardState.currentUser);
