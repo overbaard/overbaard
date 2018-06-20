@@ -8,9 +8,10 @@ import {List, OrderedSet, Set} from 'immutable';
 import {Dictionary} from '../../common/dictionary';
 import {BoardViewModel} from './board-view';
 import {BoardHeader} from './board-header';
-import {initialIssueDetailState} from '../../model/board/user/issue-detail/issue-detail.model';
+import {initialIssueDetailState, IssueDetailState} from '../../model/board/user/issue-detail/issue-detail.model';
 import {BoardIssueView} from './board-issue-view';
 import {BoardState} from '../../model/board/data/board';
+import {IssueSummaryLevel} from '../../model/board/user/issue-summary-level';
 
 describe('Issue Table observer tests', () => {
 
@@ -840,6 +841,47 @@ describe('Issue table filter tests', () => {
     });
   });
 
+  describe('Update issue details when filters exist', () => {
+    it('No rank', () => {
+      doTest(false);
+    });
+    it('Rank', () => {
+      doTest(true);
+    });
+    function doTest(rank: boolean) {
+      const dict: Dictionary<string> = {priority: 'Major'};
+      if (rank) {
+        dict['view'] = 'rv';
+      }
+      const util: BoardViewObservableUtil = setupTable(dict);
+      util.observer().take(1).subscribe(board => {
+        const checker: BoardChecker =
+          new BoardChecker(standardTable)
+            .invisibleIssues('ONE-2', 'ONE-4', 'ONE-6', 'ONE-8');
+        if (rank) {
+          checker.rankOrder(...standardRank);
+        }
+        checker.checkBoard(board);
+      });
+
+      // Now update the issue details and check that it is all the same
+      util.getUserSettingUpdater().updateIssueSummaryLevel(IssueSummaryLevel.SHORT_SUMMARY_NO_AVATAR);
+      util.observer().take(1).subscribe(board => {
+        const checker: BoardChecker =
+          new BoardChecker(standardTable)
+            .invisibleIssues('ONE-2', 'ONE-4', 'ONE-6', 'ONE-8')
+            .issueDetailState({
+              issueSummaryLevel: IssueSummaryLevel.SHORT_SUMMARY_NO_AVATAR,
+              linkedIssues: true,
+              parallelTasks: true
+            });
+        if (rank) {
+          checker.rankOrder(...standardRank);
+        }
+        checker.checkBoard(board);
+      });
+    }
+  });
   function setupTable(params?: Dictionary<string>): BoardViewObservableUtil {
     const init =
       new BoardStateInitializer()
@@ -1443,6 +1485,7 @@ class BacklogStateFactory extends NumberedHeaderStateFactory {
 class BoardChecker {
   private _invisibleIssues: string[] = [];
   private _rankOrder: string[] = null;
+  private _issueDetailsState: IssueDetailState;
 
   constructor(private _expected: string[][]) {
   }
@@ -1451,6 +1494,12 @@ class BoardChecker {
     this._invisibleIssues = invisible;
     return this;
   }
+
+  issueDetailState(state: IssueDetailState): BoardChecker {
+    this._issueDetailsState = state;
+    return this;
+  }
+
 
   rankOrder(...rankOrder: string[]): BoardChecker {
     this._rankOrder = rankOrder;
@@ -1463,8 +1512,15 @@ class BoardChecker {
     const expectedVisible: string[][] = this._expected.map(
       col => col.filter(k => !invisibleIssueSet.contains(k)));
 
-    // We are not changing the issue details in this test
-    expect(board.issueDetail).toBe(initialIssueDetailState);
+
+    if (!this._issueDetailsState) {
+      // We are not changing the issue details in this test unless explicitly triggered
+      expect(board.issueDetail).toBe(initialIssueDetailState);
+    } else {
+      expect(board.issueDetail.issueSummaryLevel).toBe(this._issueDetailsState.issueSummaryLevel);
+      expect(board.issueDetail.parallelTasks).toBe(this._issueDetailsState.parallelTasks);
+      expect(board.issueDetail.linkedIssues).toBe(this._issueDetailsState.linkedIssues);
+    }
 
     const issueTable: IssueTable = board.issueTable;
     // Convert the issue table to a string[][]
