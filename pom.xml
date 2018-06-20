@@ -20,7 +20,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.overbaard</groupId>
     <artifactId>overbaard</artifactId>
-    <version>1.0.0.Alpha1</version>
+    <version>1.0.0.Alpha2-SNAPSHOT</version>
     <organization>
         <name>Red Hat Inc.</name>
         <url>https://github.com/overbaard/overbaard</url>
