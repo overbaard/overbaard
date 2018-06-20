@@ -1,3 +1,3 @@
-# Overbård User Guide
+# Overbård
 
-Coming soon. Stay tuned!
+Documentation coming soon. Stay tuned!
