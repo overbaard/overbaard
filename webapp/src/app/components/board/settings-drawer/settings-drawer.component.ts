@@ -4,7 +4,7 @@ import {Store} from '@ngrx/store';
 import {Dictionary} from '../../../common/dictionary';
 import {AbstractControl, FormControl, FormGroup} from '@angular/forms';
 import {Observable} from 'rxjs/Observable';
-import {boardProjectsSelector, linkedProjectsSelector, parallelTasksSelector} from '../../../model/board/data/project/project.reducer';
+import {boardProjectsSelector, linkedProjectsSelector} from '../../../model/board/data/project/project.reducer';
 import {BoardFilterState} from '../../../model/board/user/board-filter/board-filter.model';
 import {List, OrderedMap, Set} from 'immutable';
 import {issuesTypesSelector} from '../../../model/board/data/issue-type/issue-type.reducer';
@@ -30,7 +30,7 @@ import {
 import {BoardFilterActions} from '../../../model/board/user/board-filter/board-filter.reducer';
 import {customFieldsSelector} from '../../../model/board/data/custom-field/custom-field.reducer';
 import {CustomField} from '../../../model/board/data/custom-field/custom-field.model';
-import {ParallelTask} from '../../../model/board/data/project/project.model';
+import {BoardProject, ParallelTask, ProjectState} from '../../../model/board/data/project/project.model';
 import {UserSettingActions} from '../../../model/board/user/user-setting.reducer';
 import {Subject} from 'rxjs/Subject';
 import {UserSettingState} from '../../../model/board/user/user-setting';
@@ -39,6 +39,7 @@ import {MatCheckboxChange, MatSliderChange} from '@angular/material';
 import {toIssueSummaryLevel} from '../../../model/board/user/issue-summary-level';
 import {FilterFormEntry} from '../../../common/filter-form-entry';
 import {debounceTime, filter, map, take, takeUntil} from 'rxjs/operators';
+import {ParallelTaskFlattener} from '../../../model/board/data/project/parallel-task.flattener';
 
 @Component({
   selector: 'app-board-settings-drawer',
@@ -123,7 +124,7 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
       fixVersions => fixVersions.map(f => FilterFormEntry(f, f)).toArray(),
       () => this.userSettings.filters.fixVersion);
     this.createCustomFieldGroups(this.userSettings.filters, this._store.select(customFieldsSelector));
-    this.createParallelTaskGroup(this.userSettings.filters, this._store.select(parallelTasksSelector));
+    this.createParallelTaskGroup(this.userSettings.filters, this._store.select(boardProjectsSelector));
 
 
     this.filterForm.valueChanges
@@ -197,48 +198,37 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
       );
   }
 
-  private createParallelTaskGroup(filterState: BoardFilterState, observable: Observable<OrderedMap<string, List<List<ParallelTask>>>>) {
+  private createParallelTaskGroup(filterState: BoardFilterState, observable: Observable<OrderedMap<string, BoardProject>>) {
     observable
       .pipe(
         take(1)
       )
       .subscribe(
-        parallelTasks => {
-          if (parallelTasks.size === 0) {
-            // No parallel tasks configured
-            return;
-          }
+        boardProjects => {
           this.filterList.push(PARALLEL_TASK_ATTRIBUTES);
           const filterFormEntryDictionary: Dictionary<FilterFormEntry> = {};
           const filterFormEntries: FilterFormEntry[] = [];
-          const done: Dictionary<boolean> = {};
           const parallelTasksGroup: FormGroup = new FormGroup({});
 
-          parallelTasks.forEach((groupsForProject => {
-            groupsForProject.forEach(tasksForProject => {
-            // TODO if we have different options for different projects, we should merge those here if that becomes needed
-              tasksForProject.forEach((parallelTask: ParallelTask) => {
-                if (done[parallelTask.name]) {
-                  return;
-                }
-                done[parallelTask.name] = true;
+          const flattenedTasks: List<ParallelTask> = new ParallelTaskFlattener(boardProjects).flattenParallelTasks();
 
-                const options: FilterFormEntry[] = new Array<FilterFormEntry>(parallelTask.options.size);
-                const taskGroup: FormGroup = new FormGroup({});
+          flattenedTasks.forEach((parallelTask: ParallelTask) => {
 
-                parallelTask.options.forEach((option, i) => {
-                  options[i] = FilterFormEntry(option.name, option.name);
-                  const filteredOptions: Set<string> = filterState.parallelTask.get(parallelTask.display);
-                  taskGroup.addControl(option.name, new FormControl(!!filteredOptions && filteredOptions.contains(option.name)));
-                });
+            const options: FilterFormEntry[] = new Array<FilterFormEntry>(parallelTask.options.size);
+            const taskGroup: FormGroup = new FormGroup({});
 
-                const entry = FilterFormEntry(parallelTask.display, parallelTask.name, options);
-                filterFormEntryDictionary[entry.key] = entry;
-                filterFormEntries.push(entry);
-                parallelTasksGroup.addControl(parallelTask.display, taskGroup);
-              });
+            parallelTask.options.forEach((option, i) => {
+              options[i] = FilterFormEntry(option.name, option.name);
+              const filteredOptions: Set<string> = filterState.parallelTask.get(parallelTask.display);
+              taskGroup.addControl(option.name, new FormControl(!!filteredOptions && filteredOptions.contains(option.name)));
             });
-          }));
+
+            const entry = FilterFormEntry(parallelTask.display, parallelTask.name, options);
+            filterFormEntryDictionary[entry.key] = entry;
+            filterFormEntries.push(entry);
+            parallelTasksGroup.addControl(parallelTask.display, taskGroup);
+          });
+
 
           this.filterEntryDictionary[PARALLEL_TASK_ATTRIBUTES.key] = filterFormEntryDictionary;
           this.filterEntries[PARALLEL_TASK_ATTRIBUTES.key] = filterFormEntries;
@@ -246,6 +236,8 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
         }
       );
   }
+
+
 
   private createGroup(filterFormEntries: FilterFormEntry[], filterAttributes: FilterAttributes, setFilterGetter: () => Set<string>) {
     if (filterAttributes.hasNone) {

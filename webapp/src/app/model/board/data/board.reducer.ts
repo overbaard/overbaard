@@ -142,8 +142,7 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
         .setCustomFields(customFieldState.fields)
         .setBoardProjects(projectState.boardProjects)
         .setLinkedProjects(projectState.linkedProjects)
-        .setBoardStates(headerState.states)
-        .setParallelTasks(projectState.parallelTasks);
+        .setBoardStates(headerState.states);
 
       const issueState: IssueState =
         metaReducers.issues(state.issues, IssueActions.createDeserializeIssuesAction(input['issues'], lookupParams));
@@ -206,8 +205,7 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
         .setCustomFields(customFieldState.fields)
         .setBoardProjects(state.projects.boardProjects)
         .setLinkedProjects(state.projects.linkedProjects)
-        .setBoardStates(state.headers.states)
-        .setParallelTasks(state.projects.parallelTasks);
+        .setBoardStates(state.headers.states);
 
       const issueState: IssueState = input['issues'] ?
         metaReducers.issues(state.issues, IssueActions.createChangeIssuesAction(input['issues'], state.issues.issues, lookupParams))

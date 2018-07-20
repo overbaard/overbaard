@@ -1,54 +1,173 @@
 import {ProjectActions, projectMetaReducer} from './project.reducer';
 import {List} from 'immutable';
-import {BoardProject, initialProjectState, LinkedProject, ParallelTask, ProjectState} from './project.model';
+import {BoardProject, EMPTY_PARALLEL_TASK_OVERRIDE, initialProjectState, LinkedProject, ParallelTask, ProjectState} from './project.model';
 import {cloneObject} from '../../../../common/object-util';
 
 export function getTestProjectsInput(): any {
-  return getTestProjectsInputWithOverrides(false);
+  return new ProjectInputBuilder().linkedProjects().projectParallelTasks().build();
 }
 
-function getTestProjectsInputWithOverrides(stateLinkOverrides: boolean) {
-  let overridesP1: any;
-  let overridesP2: any;
+export class ProjectInputBuilder {
+  private _projectParallelTasks: boolean;
+  private _stateLinkOverrides: boolean;
+  private _parallelTaskOverrides: boolean;
+  private _emptyParallelTaskOverrides: boolean;
+  private _linkedProjects: boolean;
 
-  if (stateLinkOverrides) {
-    overridesP1 = {
-      'state-links': [
-        {
-          'issue-types': ['bug', 'task'],
-          override: {
-            'Board2': 'Test3',
-            'Board3': 'Test4',
-            'Board4': 'Test5'
-          }
-        }
-      ]
-    };
-    overridesP2 = {
-      'state-links': [
-        {
-          'issue-types': ['bug'],
-          override: {
-            'Board1': 'Test1',
-            'Board2': 'Test2',
-            'Board3': 'Test3'
-          }
-        },
-        {
-          'issue-types': ['task'],
-          override: {
-            'Board1': 'Test1',
-            'Board2': 'Test2',
-            'Board3': 'Test3'
-          }
-        }
-      ]
-    };
+  projectParallelTasks(): ProjectInputBuilder {
+    this._projectParallelTasks = true;
+    return this;
   }
 
-  return cloneObject(
-    {
-      owner: 'P1',
+  stateLinkOverrides(): ProjectInputBuilder {
+    this._stateLinkOverrides = true;
+    return this;
+  }
+
+  parallelTaskOverrides(): ProjectInputBuilder {
+    this._parallelTaskOverrides = true;
+    return this;
+  }
+
+  linkedProjects(): ProjectInputBuilder {
+    this._linkedProjects = true;
+    return this;
+  }
+
+  emptyParallelTaskOverrides() {
+    this._emptyParallelTaskOverrides = true;
+    return this;
+  }
+
+
+  build(): any {
+
+    let projectParallelTasks: any;
+    if (this._projectParallelTasks) {
+      projectParallelTasks = [
+        [
+          {
+            name : 'X Parallel Task',
+            display : 'X',
+            options : ['One', 'Two', 'Three', 'Four']
+          },
+          {
+            name : 'Y Parallel Task',
+            display : 'Y',
+            options : ['Uno', 'Dos', 'Tres']
+          }
+        ],
+        [
+          {
+            name : 'Z Parallel Task',
+            display : 'Z',
+            options : ['Ein', 'Zwei', 'Drei', 'Vier']
+          }
+        ]
+      ];
+    }
+
+    let overridesP1: any;
+    let overridesP2: any;
+    if (this._stateLinkOverrides || this._parallelTaskOverrides || this._emptyParallelTaskOverrides) {
+      if (this._parallelTaskOverrides && this._emptyParallelTaskOverrides) {
+        throw new Error('Can\'t set both to use parallel task overrides, and empty ones');
+      }
+      let stateLinkOverridesP1: any;
+      let stateLinkOverridesP2: any;
+      if (this._stateLinkOverrides) {
+        stateLinkOverridesP1 = [
+          {
+            'issue-types': ['bug', 'task'],
+            override: {
+              'Board2': 'Test3',
+              'Board3': 'Test4',
+              'Board4': 'Test5'
+            }
+          }
+        ];
+        stateLinkOverridesP2 = [
+          {
+            'issue-types': ['bug'],
+            override: {
+              'Board1': 'Test1',
+              'Board2': 'Test2',
+              'Board3': 'Test3'
+            }
+          },
+          {
+            'issue-types': ['task'],
+            override: {
+              'Board1': 'Test1',
+              'Board2': 'Test2',
+              'Board3': 'Test3'
+            }
+          }
+        ];
+      }
+
+      let parallelTaskOverridesP2: any;
+      if (this._parallelTaskOverrides) {
+        const overridePTs = [
+          [
+            {
+              name : 'Z Parallel Task',
+              display : 'Z',
+              options : ['Ein', 'Zwei', 'Drei', 'Vier']
+            }
+          ],
+          [
+            {
+              name : 'Y Parallel Task',
+              display : 'Y',
+              options : ['Uno', 'Dos', 'Tres']
+            },
+            {
+              name : 'X Parallel Task',
+              display : 'X',
+              options : ['One', 'Two', 'Three', 'Four']
+            }
+          ]
+        ];
+        parallelTaskOverridesP2 = [
+          {
+            type: 'task',
+            override: cloneObject(overridePTs)
+          },
+          {
+            type: 'bug',
+            override: cloneObject(overridePTs)
+          }
+        ];
+      } else if (this._emptyParallelTaskOverrides) {
+        parallelTaskOverridesP2 = [
+          {
+            type: 'task',
+            override: null
+          },
+          {
+            type: 'bug',
+            override: null
+          }
+        ];
+      }
+
+
+      if (stateLinkOverridesP1) {
+        overridesP1 = {};
+        overridesP1['state-links'] = stateLinkOverridesP1;
+      }
+
+      overridesP2 = {};
+      if (stateLinkOverridesP2) {
+        overridesP2['state-links'] = stateLinkOverridesP2;
+      }
+      if (parallelTaskOverridesP2) {
+        overridesP2['parallel-tasks'] = parallelTaskOverridesP2;
+      }
+    }
+
+    const projectInput = cloneObject({
       main: [
         {
           code: 'P1',
@@ -62,8 +181,7 @@ function getTestProjectsInputWithOverrides(stateLinkOverrides: boolean) {
             'P1-1',
             'P1-3',
             'P1-2'
-          ],
-          overrides: overridesP1
+          ]
         },
         {
           code: 'P2',
@@ -76,43 +194,22 @@ function getTestProjectsInputWithOverrides(stateLinkOverrides: boolean) {
             'P2-3',
             'P2-2',
             'P2-1'
-          ],
-          'parallel-tasks' : [
-            [
-              {
-                name : 'X Parallel Task',
-                display : 'X',
-                options : [
-                  'One',
-                  'Two',
-                  'Three',
-                  'Four']
-              },
-              {
-                name : 'Y Parallel Task',
-                display : 'Y',
-                options : [
-                  'Uno',
-                  'Dos',
-                  'Tres']
-              }
-            ],
-            [
-              {
-                name : 'Z Parallel Task',
-                display : 'Z',
-                options : [
-                  'Ein',
-                  'Zwei',
-                  'Drei',
-                  'Vier']
-              }
-            ]
-          ],
-          overrides: overridesP2
+          ]
         }
-      ],
-      linked: {
+      ]
+    });
+
+    if (overridesP1) {
+      projectInput['main'][0]['overrides'] = overridesP1;
+    }
+    if (overridesP2) {
+      projectInput['main'][1]['overrides'] = overridesP2;
+    }
+    if (projectParallelTasks) {
+      projectInput['main'][1]['parallel-tasks'] = projectParallelTasks;
+    }
+    if (this._linkedProjects) {
+      projectInput['linked'] = {
         L1: {
           states: [
             'L1-1',
@@ -132,16 +229,13 @@ function getTestProjectsInputWithOverrides(stateLinkOverrides: boolean) {
             'L3-1'
           ]
         }
-      }
+      };
     }
-  );
-}
 
-/*
-export getTestProjectsWithIssueTypeStateOverridesInput() {
-  get
+    return projectInput;
+  }
+
 }
-*/
 
 describe('Projects reducer tests', () => {
 
@@ -150,12 +244,123 @@ describe('Projects reducer tests', () => {
       deserializeTest(false);
     });
 
-    it('Deserialize - No overrides', () => {
+    it('Deserialize - Overrides', () => {
       deserializeTest(true);
     });
 
+    it ('Deserialize - PT overrides but no project ones', () => {
+      const projectState: ProjectState = projectMetaReducer(
+        initialProjectState, ProjectActions.createDeserializeProjects(
+          new ProjectInputBuilder()
+            .parallelTaskOverrides()
+            .build()
+        ));
+
+
+      // Board projects
+      expect(projectState.boardProjects.size).toBe(2);
+      const p1: BoardProject = projectState.boardProjects.get('P1');
+      expect(p1.key).toEqual('P1');
+      expect(p1.colour).toEqual('#FF0000');
+      expect(p1.canRank).toBe(true);
+      expect(p1.boardStateNameToOwnStateName.toObject()).toEqual({
+        Board1: 'Test1',
+        Board3: 'Test3'
+      });
+
+      // P1 does not have any parallel tasks or parallel task overrides
+      expect(p1.parallelTasks).toBeFalsy();
+      expect(p1.parallelTaskIssueTypeOverrides.size).toBe(0);
+
+      expect(p1.boardStateNameToOwnStateNameIssueTypeOverrides.size).toBe(0);
+      const p2: BoardProject = projectState.boardProjects.get('P2');
+      expect(p2.key).toEqual('P2');
+      expect(p2.colour).toEqual('#00FF00');
+      expect(p2.canRank).toBe(false);
+      expect(p2.boardStateNameToOwnStateName.toObject()).toEqual({
+        Board1: 'Test1',
+        Board2: 'Test2'
+      });
+
+      expect(p2.parallelTasks).toBeFalsy();
+      expect(p2.boardStateNameToOwnStateNameIssueTypeOverrides.size).toBe(0);
+      expect(p2.parallelTaskIssueTypeOverrides.size).toBe(2);
+      const p2Bug: List<List<ParallelTask>> = p2.parallelTaskIssueTypeOverrides.get('bug');
+      checkParallelTaskOverrides(p2Bug);
+      const p2Task: List<List<ParallelTask>> = p2.parallelTaskIssueTypeOverrides.get('task');
+      checkParallelTaskOverrides(p2Task);
+
+      // Linked projects
+      expect(projectState.linkedProjects.size).toBe(0);
+    });
+
+    it ('Deserialize - Empty PT overrides', () => {
+      const projectState: ProjectState = projectMetaReducer(
+        initialProjectState, ProjectActions.createDeserializeProjects(
+          new ProjectInputBuilder()
+            .projectParallelTasks()
+            .emptyParallelTaskOverrides()
+            .build()
+        ));
+
+
+      // Board projects
+      expect(projectState.boardProjects.size).toBe(2);
+      const p1: BoardProject = projectState.boardProjects.get('P1');
+      expect(p1.key).toEqual('P1');
+      expect(p1.colour).toEqual('#FF0000');
+      expect(p1.canRank).toBe(true);
+      expect(p1.boardStateNameToOwnStateName.toObject()).toEqual({
+        Board1: 'Test1',
+        Board3: 'Test3'
+      });
+
+      // P1 does not have any parallel tasks or parallel task overrides
+      expect(p1.parallelTasks).toBeFalsy();
+      expect(p1.parallelTaskIssueTypeOverrides.size).toBe(0);
+
+      expect(p1.boardStateNameToOwnStateNameIssueTypeOverrides.size).toBe(0);
+      const p2: BoardProject = projectState.boardProjects.get('P2');
+      expect(p2.key).toEqual('P2');
+      expect(p2.colour).toEqual('#00FF00');
+      expect(p2.canRank).toBe(false);
+      expect(p2.boardStateNameToOwnStateName.toObject()).toEqual({
+        Board1: 'Test1',
+        Board2: 'Test2'
+      });
+
+      expect(p2.boardStateNameToOwnStateNameIssueTypeOverrides.size).toBe(0);
+      expect(p2.parallelTaskIssueTypeOverrides.size).toBe(2);
+      const p2Bug: List<List<ParallelTask>> = p2.parallelTaskIssueTypeOverrides.get('bug');
+      expect(p2Bug).toBe(EMPTY_PARALLEL_TASK_OVERRIDE);
+      const p2Task: List<List<ParallelTask>> = p2.parallelTaskIssueTypeOverrides.get('task');
+      expect(p2Task).toBe(EMPTY_PARALLEL_TASK_OVERRIDE);
+
+      // Linked projects
+      expect(projectState.linkedProjects.size).toBe(0);
+
+      // Parallel tasks
+      expect(projectState.boardProjects.get('P1').parallelTasks).not.toEqual(jasmine.anything());
+      const parallelTasks: List<List<ParallelTask>> = projectState.boardProjects.get('P2').parallelTasks;
+      expect(parallelTasks.size).toBe(2);
+      expect(parallelTasks.get(0).size).toBe(2);
+      checkParallelTask(parallelTasks.getIn([0, 0]), 'X Parallel Task', 'X', ['One', 'Two', 'Three', 'Four']);
+      checkParallelTask(parallelTasks.getIn([0, 1]), 'Y Parallel Task', 'Y', ['Uno', 'Dos', 'Tres']);
+      expect(parallelTasks.get(1).size).toBe(1);
+      checkParallelTask(parallelTasks.getIn([1, 0]), 'Z Parallel Task', 'Z', ['Ein', 'Zwei', 'Drei', 'Vier']);
+    });
+
+
+
     function deserializeTest(overrides: boolean) {
-      const input: any = overrides ? getTestProjectsInputWithOverrides(true) : getTestProjectsInput();
+      const input: any = overrides ?
+        new ProjectInputBuilder()
+          .linkedProjects()
+          .projectParallelTasks()
+          .stateLinkOverrides()
+          .parallelTaskOverrides()
+          .build() :
+        getTestProjectsInput();
       const projectState: ProjectState = projectMetaReducer(
         initialProjectState, ProjectActions.createDeserializeProjects(input));
 
@@ -169,6 +374,11 @@ describe('Projects reducer tests', () => {
         Board1: 'Test1',
         Board3: 'Test3'
       });
+
+      // P1 does not have any parallel tasks or parallel task overrides
+      expect(p1.parallelTasks).toBeFalsy();
+      expect(p1.parallelTaskIssueTypeOverrides.size).toBe(0);
+
       if (!overrides) {
         expect(p1.boardStateNameToOwnStateNameIssueTypeOverrides.size).toBe(0);
       } else {
@@ -193,8 +403,10 @@ describe('Projects reducer tests', () => {
         Board1: 'Test1',
         Board2: 'Test2'
       });
+
       if (!overrides) {
         expect(p2.boardStateNameToOwnStateNameIssueTypeOverrides.size).toBe(0);
+        expect(p2.parallelTaskIssueTypeOverrides.size).toBe(0);
       } else {
         expect(p2.boardStateNameToOwnStateNameIssueTypeOverrides.size).toBe(2);
         expect(p2.boardStateNameToOwnStateNameIssueTypeOverrides.get('bug').toObject()).toEqual({
@@ -207,6 +419,12 @@ describe('Projects reducer tests', () => {
           'Board2': 'Test2',
           'Board3': 'Test3'
         });
+
+        expect(p2.parallelTaskIssueTypeOverrides.size).toBe(2);
+        const p2Bug: List<List<ParallelTask>> = p2.parallelTaskIssueTypeOverrides.get('bug');
+        checkParallelTaskOverrides(p2Bug);
+        const p2Task: List<List<ParallelTask>> = p2.parallelTaskIssueTypeOverrides.get('task');
+        checkParallelTaskOverrides(p2Task);
       }
 
       // Linked projects
@@ -224,14 +442,23 @@ describe('Projects reducer tests', () => {
       expect(l3.states.toArray()).toEqual(['L3-1']);
 
       // Parallel tasks
-      expect(projectState.parallelTasks.get('P1')).not.toEqual(jasmine.anything());
-      const parallelTasks: List<List<ParallelTask>> = projectState.parallelTasks.get('P2');
+      expect(projectState.boardProjects.get('P1').parallelTasks).not.toEqual(jasmine.anything());
+      const parallelTasks: List<List<ParallelTask>> = projectState.boardProjects.get('P2').parallelTasks;
       expect(parallelTasks.size).toBe(2);
       expect(parallelTasks.get(0).size).toBe(2);
       checkParallelTask(parallelTasks.getIn([0, 0]), 'X Parallel Task', 'X', ['One', 'Two', 'Three', 'Four']);
       checkParallelTask(parallelTasks.getIn([0, 1]), 'Y Parallel Task', 'Y', ['Uno', 'Dos', 'Tres']);
       expect(parallelTasks.get(1).size).toBe(1);
       checkParallelTask(parallelTasks.getIn([1, 0]), 'Z Parallel Task', 'Z', ['Ein', 'Zwei', 'Drei', 'Vier']);
+    }
+
+    function checkParallelTaskOverrides(pts: List<List<ParallelTask>>) {
+      expect(pts.size).toBe(2);
+      expect(pts.get(0).size).toBe(1);
+      checkParallelTask(pts.getIn([0, 0]), 'Z Parallel Task', 'Z', ['Ein', 'Zwei', 'Drei', 'Vier']);
+      expect(pts.get(1).size).toBe(2);
+      checkParallelTask(pts.getIn([1, 0]), 'Y Parallel Task', 'Y', ['Uno', 'Dos', 'Tres']);
+      checkParallelTask(pts.getIn([1, 1]), 'X Parallel Task', 'X', ['One', 'Two', 'Three', 'Four']);
     }
 
     function checkParallelTask(pt: ParallelTask, name: string, display: string, options: string[]) {

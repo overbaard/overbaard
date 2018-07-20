@@ -12,7 +12,7 @@ import {Dictionary} from '../../../../common/dictionary';
 import {cloneObject} from '../../../../common/object-util';
 import {initialProjectState, ProjectState} from '../project/project.model';
 import {ProjectActions, projectMetaReducer} from '../project/project.reducer';
-import {getTestProjectsInput} from '../project/project.reducer.spec';
+import {getTestProjectsInput, ProjectInputBuilder} from '../project/project.reducer.spec';
 import {getTestAssigneeState} from '../assignee/assignee.reducer.spec';
 import {getTestPriorityState} from '../priority/priority.reducer.spec';
 import {getTestIssueTypeState} from '../issue-type/issue-type.reducer.spec';
@@ -50,15 +50,13 @@ describe('Issue unit tests', () => {
       .setCustomFields(customFields)
       .setBoardProjects(projectState.boardProjects)
       .setLinkedProjects(projectState.linkedProjects)
-      .setBoardStates(List<string>(['Board1', 'Board2', 'Board3', 'Board4']))
-      .setParallelTasks(projectState.parallelTasks);
+      .setBoardStates(List<string>(['Board1', 'Board2', 'Board3', 'Board4']));
 
   });
 
   describe('Deserialize', () => {
 
     let input: any;
-
 
     beforeEach(() => {
       input = cloneObject({
@@ -239,7 +237,7 @@ describe('Issue unit tests', () => {
     });
   });
 
-  describe('Changes - no issue ype overrides', () => {
+  describe('Changes - no issue type overrides', () => {
 
     let input: any;
 
@@ -258,9 +256,7 @@ describe('Issue unit tests', () => {
     describe('Update', () => {
 
       it ('State', () => {
-        const updated = createAndUpdateIssue({
-          key: 'P2-1', state: 'Test2'
-        });
+        const updated = createAndUpdateIssue(input, {key: 'P2-1', state: 'Test2'});
         new IssueChecker(updated,
           lookupParams.issueTypes.get('task'),
           lookupParams.priorities.get('Blocker'),
@@ -270,8 +266,7 @@ describe('Issue unit tests', () => {
           .check();
       });
       it ('Summary', () => {
-        const updated = createAndUpdateIssue({
-          key: 'P2-1', summary: 'Updated summary'
+        const updated = createAndUpdateIssue(input, {key: 'P2-1', summary: 'Updated summary'
         });
         new IssueChecker(updated,
           lookupParams.issueTypes.get('task'),
@@ -283,8 +278,7 @@ describe('Issue unit tests', () => {
       });
 
       it ('Assignee', () => {
-        const updated = createAndUpdateIssue({
-          key: 'P2-1', assignee: 'kabir'
+        const updated = createAndUpdateIssue(input, {key: 'P2-1', assignee: 'kabir'
         });
         new IssueChecker(updated,
           lookupParams.issueTypes.get('task'),
@@ -296,8 +290,7 @@ describe('Issue unit tests', () => {
       });
 
       it ('Clear assignee', () => {
-        const updated = createAndUpdateIssue({
-          key: 'P2-1', unassigned: true
+        const updated = createAndUpdateIssue(input, {key: 'P2-1', unassigned: true
         });
         new IssueChecker(updated,
           lookupParams.issueTypes.get('task'),
@@ -309,8 +302,7 @@ describe('Issue unit tests', () => {
       });
 
       it ('Type', () => {
-        const updated = createAndUpdateIssue({
-          key: 'P2-1', type: 'bug'
+        const updated = createAndUpdateIssue(input, {key: 'P2-1', type: 'bug'
         });
         new IssueChecker(updated,
           lookupParams.issueTypes.get('bug'),
@@ -322,8 +314,7 @@ describe('Issue unit tests', () => {
       });
 
       it ('Priority', () => {
-        const updated = createAndUpdateIssue({
-          key: 'P2-1', priority: 'Major'
+        const updated = createAndUpdateIssue(input, {key: 'P2-1', priority: 'Major'
         });
         new IssueChecker(updated,
           lookupParams.issueTypes.get('task'),
@@ -335,8 +326,7 @@ describe('Issue unit tests', () => {
       });
 
       it ('Components', () => {
-        const updated = createAndUpdateIssue({
-          key: 'P2-1', components: ['C-10', 'C-20']
+        const updated = createAndUpdateIssue(input, {key: 'P2-1', components: ['C-10', 'C-20']
         });
         new IssueChecker(updated,
           lookupParams.issueTypes.get('task'),
@@ -350,8 +340,7 @@ describe('Issue unit tests', () => {
 
       it ('Clear components', () => {
         // Set some components first so we can clear them
-        let updated = createAndUpdateIssue({
-          key: 'P2-1', components: ['C-10', 'C-20']
+        let updated = createAndUpdateIssue(input, {key: 'P2-1', components: ['C-10', 'C-20']
         });
         const second = {
           key: 'P2-1', 'clear-components': true
@@ -368,8 +357,7 @@ describe('Issue unit tests', () => {
       });
 
       it ('Labels', () => {
-        const updated = createAndUpdateIssue({
-          key: 'P2-1', labels: ['L-10', 'L-20']
+        const updated = createAndUpdateIssue(input, {key: 'P2-1', labels: ['L-10', 'L-20']
         });
         new IssueChecker(updated,
           lookupParams.issueTypes.get('task'),
@@ -383,8 +371,7 @@ describe('Issue unit tests', () => {
 
       it ('Clear labels', () => {
         // Set some components first so we can clear them
-        let updated = createAndUpdateIssue({
-          key: 'P2-1', labels: ['L-10', 'L-20']
+        let updated = createAndUpdateIssue(input, {key: 'P2-1', labels: ['L-10', 'L-20']
         });
         updated =
           updateIssue(
@@ -402,8 +389,7 @@ describe('Issue unit tests', () => {
       });
 
       it ('Fix versions', () => {
-        const updated = createAndUpdateIssue({
-          key: 'P2-1', 'fix-versions': ['F-10', 'F-20']
+        const updated = createAndUpdateIssue(input, {key: 'P2-1', 'fix-versions': ['F-10', 'F-20']
         });
         new IssueChecker(updated,
           lookupParams.issueTypes.get('task'),
@@ -417,8 +403,7 @@ describe('Issue unit tests', () => {
 
       it ('Clear fix versions', () => {
         // Set some components first so we can clear them
-        let updated = createAndUpdateIssue({
-          key: 'P2-1', 'fix-versions': ['F-10', 'F-20']
+        let updated = createAndUpdateIssue(input, {key: 'P2-1', 'fix-versions': ['F-10', 'F-20']
         });
         updated =
           updateIssue(
@@ -437,8 +422,7 @@ describe('Issue unit tests', () => {
 
       it ('Custom fields', () => {
         // Update several
-        let updated = createAndUpdateIssue({
-          key: 'P2-1', custom: {'Custom-1': 'c1-C', 'Custom-2': 'c2-B'}
+        let updated = createAndUpdateIssue(input, {key: 'P2-1', custom: {'Custom-1': 'c1-C', 'Custom-2': 'c2-B'}
         });
         new IssueChecker(updated,
           lookupParams.issueTypes.get('task'),
@@ -469,8 +453,7 @@ describe('Issue unit tests', () => {
 
       it ('Clear custom field (one)', () => {
         // Create the custom fields first so we can clear them later
-        let updated = createAndUpdateIssue({
-          key: 'P2-1', custom: {'Custom-1': 'c1-C', 'Custom-2': 'c2-B'}
+        let updated = createAndUpdateIssue(input, {key: 'P2-1', custom: {'Custom-1': 'c1-C', 'Custom-2': 'c2-B'}
         });
         // Clear a custom field
         updated =
@@ -491,8 +474,7 @@ describe('Issue unit tests', () => {
 
       it ('Clear all custom fields', () => {
         // Create the custom fields first so we can clear them later
-        let updated = createAndUpdateIssue({
-          key: 'P2-1', custom: {'Custom-1': 'c1-C', 'Custom-2': 'c2-B'}
+        let updated = createAndUpdateIssue(input, {key: 'P2-1', custom: {'Custom-1': 'c1-C', 'Custom-2': 'c2-B'}
         });
         // Clear a custom field
         updated =
@@ -625,27 +607,559 @@ describe('Issue unit tests', () => {
           .check();
       });
     });
+  });
 
-    function createAndUpdateIssue(changeInput: any): BoardIssue {
-      const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
-      return updateIssue(issue, createIssueMap(issue), changeInput);
-    }
+  describe('Parallel task overrides', () => {
+    let input: any;
 
-    function updateIssue(issue: BoardIssue, currentIssues: Dictionary<BoardIssue>, changeInput: any): BoardIssue {
-      const issueMap: Map<string, BoardIssue> = Map<string, BoardIssue>(currentIssues);
-      const change: BoardIssue = IssueUtil.issueChangeFromJs(changeInput, issueMap, lookupParams);
-      return IssueUtil.updateIssue(issue, change);
-    }
+    beforeEach(() => {
+      input = cloneObject({
+        key: 'P2-1',
+        type: 0,
+        priority: 0,
+        summary: 'Issue summary',
+        assignee: 0,
+        state: 4
+      });
+    });
 
-    function createIssueMap(issue: BoardIssue): Dictionary<BoardIssue> {
-      const currentIssues: Dictionary<BoardIssue> = {};
-      if (issue) {
-        currentIssues[issue.key] = issue;
-      }
-      return currentIssues;
+    describe('Deserialize', () => {
+      describe('With project PTs', () => {
+
+        let projectState: ProjectState;
+
+        beforeEach(() => {
+          projectState = createProjectState(
+            new ProjectInputBuilder()
+              .projectParallelTasks()
+              .parallelTaskOverrides()
+              .build());
+          lookupParams.setBoardProjects(projectState.boardProjects);
+        });
+
+        it('Use project PT', () => {
+          input['type'] = 2; // feature uses project PTs
+          input['parallel-tasks'] = [[2, 1], [3]];
+          const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
+          new IssueChecker(issue,
+            lookupParams.issueTypes.get('feature'),
+            lookupParams.priorities.get('Blocker'),
+            lookupParams.assignees.get('bob'),
+            'Issue summary', 4)
+            .key('P2-1')
+            .selectedParallelTaskOptions([2, 1], [3])
+            .check();
+        });
+
+        it ('Use override PT', () => {
+          input['type'] = 0; // task uses overridden PTs
+          input['parallel-tasks'] = [[3], [1, 2]];
+          const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
+          new IssueChecker(issue,
+            lookupParams.issueTypes.get('task'),
+            lookupParams.priorities.get('Blocker'),
+            lookupParams.assignees.get('bob'),
+            'Issue summary', 4)
+            .key('P2-1')
+            .selectedParallelTaskOptions([3], [1, 2])
+            .check();
+        });
+
+      });
+
+      describe('With no project PTs', () => {
+        let projectState: ProjectState;
+
+        beforeEach(() => {
+          projectState = createProjectState(
+            new ProjectInputBuilder()
+              .parallelTaskOverrides()
+              .build());
+          lookupParams.setBoardProjects(projectState.boardProjects);
+        });
+
+        it('Use project PT - i.e. no PTs', () => {
+          input['type'] = 2; // feature uses project PTs
+          // The server will not actually send this data, but make sure we don't handle the empty PTs
+          input['parallel-tasks'] = [[2, 1], [3]];
+          const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
+          new IssueChecker(issue,
+            lookupParams.issueTypes.get('feature'),
+            lookupParams.priorities.get('Blocker'),
+            lookupParams.assignees.get('bob'),
+            'Issue summary', 4)
+            .key('P2-1')
+            .check();
+        });
+
+        it('Use override PT', () => {
+          input['type'] = 0; // task uses overridden PTs
+          input['parallel-tasks'] = [[3], [1, 2]];
+          const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
+          new IssueChecker(issue,
+            lookupParams.issueTypes.get('task'),
+            lookupParams.priorities.get('Blocker'),
+            lookupParams.assignees.get('bob'),
+            'Issue summary', 4)
+            .key('P2-1')
+            .selectedParallelTaskOptions([3], [1, 2])
+            .check();
+        });
+      });
+
+      describe('With empty override PTs', () => {
+        let projectState: ProjectState;
+
+        beforeEach(() => {
+          projectState = createProjectState(
+            new ProjectInputBuilder()
+              .projectParallelTasks()
+              .emptyParallelTaskOverrides()
+              .build());
+          lookupParams.setBoardProjects(projectState.boardProjects);
+        });
+
+        it('Use project PTs', () => {
+          input['type'] = 2; // feature uses project PTs
+          input['parallel-tasks'] = [[2, 1], [3]];
+          const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
+          new IssueChecker(issue,
+            lookupParams.issueTypes.get('feature'),
+            lookupParams.priorities.get('Blocker'),
+            lookupParams.assignees.get('bob'),
+            'Issue summary', 4)
+            .key('P2-1')
+            .selectedParallelTaskOptions([2, 1], [3])
+            .check();
+        });
+
+        it('Use override PT - i.e. no PTs', () => {
+          lookupParams.setBoardProjects(projectState.boardProjects);
+
+          input['type'] = 0; // task uses overridden PTs
+          // The server will not actually send this data, but make sure we don't handle the empty PTs
+          input['parallel-tasks'] = [[2, 1], [3]];
+          const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
+          new IssueChecker(issue,
+            lookupParams.issueTypes.get('task'),
+            lookupParams.priorities.get('Blocker'),
+            lookupParams.assignees.get('bob'),
+            'Issue summary', 4)
+            .key('P2-1')
+            .check();
+        });
+      });
+
+    });
+
+    describe('Changes', () => {
+      describe('Update', () => {
+        describe('With project PTs', () => {
+          let projectState: ProjectState;
+
+          beforeEach(() => {
+            projectState = createProjectState(
+              new ProjectInputBuilder()
+                .projectParallelTasks()
+                .parallelTaskOverrides()
+                .build());
+            lookupParams.setBoardProjects(projectState.boardProjects);
+          });
+
+          it ('Use project PTs', () => {
+            input['type'] = 2; // feature uses project PTs
+            input['parallel-tasks'] = [[2, 1], [3]];
+            const updated = createAndUpdateIssue(input, {key: 'P2-1', 'parallel-tasks': {'0': {'1': 0}, '1': {'0': 1}}});
+
+            new IssueChecker(updated,
+              lookupParams.issueTypes.get('feature'),
+              lookupParams.priorities.get('Blocker'),
+              lookupParams.assignees.get('bob'),
+              'Issue summary', 4)
+              .key('P2-1')
+              .selectedParallelTaskOptions([2, 0], [1])
+              .check();
+          });
+
+          it ('Use override PT', () => {
+            input['type'] = 0; // task uses overridden PTs
+            input['parallel-tasks'] = [[3], [1, 2]];
+            const updated = createAndUpdateIssue(input, {key: 'P2-1', 'parallel-tasks': {'0': {'0': 0}, '1': {'0': 0}}});
+
+            new IssueChecker(updated,
+              lookupParams.issueTypes.get('task'),
+              lookupParams.priorities.get('Blocker'),
+              lookupParams.assignees.get('bob'),
+              'Issue summary', 4)
+              .key('P2-1')
+              .selectedParallelTaskOptions([0], [0, 2])
+              .check();
+          });
+
+          it ('Change issue type', () =>  {
+            input['type'] = 2; // feature uses project PTs
+            input['parallel-tasks'] = [[2, 1], [3]];
+            const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
+            // Don't bother to check as it is the same as the deserialize test, and we will change back to this type
+
+            // When we update the issue type we override all the PTs
+            let updated = updateIssue(issue,
+              createIssueMap(issue), {key: 'P2-1', type: 'task', 'parallel-tasks': {'0': {0: 0}, 1: {0: 1, 1: 2}}});
+            new IssueChecker(updated,
+              lookupParams.issueTypes.get('task'),
+              lookupParams.priorities.get('Blocker'),
+              lookupParams.assignees.get('bob'),
+              'Issue summary', 4)
+              .key('P2-1')
+              .selectedParallelTaskOptions([0], [1, 2])
+              .check();
+
+            updated = updateIssue(updated,
+              createIssueMap(updated), {key: 'P2-1', type: 'feature', 'parallel-tasks': {0: {0: 2, 1: 1}, 1: {0: 0}}});
+            new IssueChecker(updated,
+              lookupParams.issueTypes.get('feature'),
+              lookupParams.priorities.get('Blocker'),
+              lookupParams.assignees.get('bob'),
+              'Issue summary', 4)
+              .key('P2-1')
+              .selectedParallelTaskOptions([2, 1], [0])
+              .check();
+          });
+        });
+
+        describe('With no project PTs', () => {
+          let projectState: ProjectState;
+
+          beforeEach(() => {
+            projectState = createProjectState(
+              new ProjectInputBuilder()
+                .parallelTaskOverrides()
+                .build());
+            lookupParams.setBoardProjects(projectState.boardProjects);
+          });
+
+          it('Use project PT - i.e. no PTs', () => {
+            input['type'] = 2; // feature uses project PTs
+            // The server will not actually send this data, but make sure we don't handle the empty PTs
+            input['parallel-tasks'] = [[2, 1], [3]];
+            // No point in testing updating the PTs here as the server will not send that data
+            const updated = createAndUpdateIssue(input, {key: 'P2-1', summary: 'Test'});
+
+            new IssueChecker(updated,
+              lookupParams.issueTypes.get('feature'),
+              lookupParams.priorities.get('Blocker'),
+              lookupParams.assignees.get('bob'),
+              'Test', 4)
+              .key('P2-1')
+              .check();
+          });
+
+          it('Use override PT', () => {
+            input['type'] = 0; // task uses overridden PTs
+            input['parallel-tasks'] = [[3], [1, 2]];
+            const updated = createAndUpdateIssue(input, {key: 'P2-1', 'parallel-tasks': {'0': {'0': 0}, '1': {'0': 0}}});
+
+            new IssueChecker(updated,
+              lookupParams.issueTypes.get('task'),
+              lookupParams.priorities.get('Blocker'),
+              lookupParams.assignees.get('bob'),
+              'Issue summary', 4)
+              .key('P2-1')
+              .selectedParallelTaskOptions([0], [0, 2])
+              .check();
+          });
+
+          it ('Change issue type', () =>  {
+            input['type'] = 2; // feature uses project PTs
+            // The server will not actually send this data, but make sure we don't handle the empty PTs
+            // input['parallel-tasks'] = [[2, 1], [3]];
+            const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
+            // Don't bother to check as it is the same as the deserialize test, and we will change back to this type
+
+            // When we update the issue type we override all the PTs
+            let updated = updateIssue(issue,
+              createIssueMap(issue), {key: 'P2-1', type: 'task', 'parallel-tasks': {'0': {0: 0}, 1: {0: 1, 1: 2}}});
+            new IssueChecker(updated,
+              lookupParams.issueTypes.get('task'),
+              lookupParams.priorities.get('Blocker'),
+              lookupParams.assignees.get('bob'),
+              'Issue summary', 4)
+              .key('P2-1')
+              .selectedParallelTaskOptions([0], [1, 2])
+              .check();
+
+            // This issue type has no PTs
+            updated = updateIssue(updated,
+              createIssueMap(updated), {key: 'P2-1', type: 'feature'});
+            new IssueChecker(updated,
+              lookupParams.issueTypes.get('feature'),
+              lookupParams.priorities.get('Blocker'),
+              lookupParams.assignees.get('bob'),
+              'Issue summary', 4)
+              .key('P2-1')
+              .check();
+          });
+        });
+
+        describe('With empty override PTs', () => {
+          let projectState: ProjectState;
+
+          beforeEach(() => {
+            projectState = createProjectState(
+              new ProjectInputBuilder()
+                .projectParallelTasks()
+                .emptyParallelTaskOverrides()
+                .build());
+            lookupParams.setBoardProjects(projectState.boardProjects);
+          });
+
+
+          it('Use project PTs', () => {
+            input['type'] = 2; // feature uses project PTs
+            input['parallel-tasks'] = [[2, 1], [3]];
+            const updated = createAndUpdateIssue(input, {key: 'P2-1', 'parallel-tasks': {'0': {'1': 0}, '1': {'0': 1}}});
+
+            new IssueChecker(updated,
+              lookupParams.issueTypes.get('feature'),
+              lookupParams.priorities.get('Blocker'),
+              lookupParams.assignees.get('bob'),
+              'Issue summary', 4)
+              .key('P2-1')
+              .selectedParallelTaskOptions([2, 0], [1])
+              .check();
+          });
+
+          it('Use override PT - i.e. no PTs', () => {
+            input['type'] = 0; // task uses overridden PTs
+            // The server will not actually send this data, but make sure we don't handle the empty PTs
+            input['parallel-tasks'] = [[3], [1, 2]];
+            // No point in testing updating the PTs here as the server will not send that data
+            const updated = createAndUpdateIssue(input, {key: 'P2-1', summary: 'Test'});
+
+            new IssueChecker(updated,
+              lookupParams.issueTypes.get('task'),
+              lookupParams.priorities.get('Blocker'),
+              lookupParams.assignees.get('bob'),
+              'Test', 4)
+              .key('P2-1')
+              .check();
+          });
+
+          it ('Change issue type', () =>  {
+            input['type'] = 2; // feature uses project PTs
+            input['parallel-tasks'] = [[2, 1], [3]];
+            const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
+            // Don't bother to check as it is the same as the deserialize test, and we will change back to this type
+
+            // When we update the issue type we override all the PTs. This issue type has none
+            let updated = updateIssue(issue,
+              createIssueMap(issue), {key: 'P2-1', type: 'task'});
+            new IssueChecker(updated,
+              lookupParams.issueTypes.get('task'),
+              lookupParams.priorities.get('Blocker'),
+              lookupParams.assignees.get('bob'),
+              'Issue summary', 4)
+              .key('P2-1')
+              .check();
+
+            updated = updateIssue(updated,
+              createIssueMap(updated), {key: 'P2-1', type: 'feature', 'parallel-tasks': {0: {0: 2, 1: 1}, 1: {0: 0}}});
+            new IssueChecker(updated,
+              lookupParams.issueTypes.get('feature'),
+              lookupParams.priorities.get('Blocker'),
+              lookupParams.assignees.get('bob'),
+              'Issue summary', 4)
+              .key('P2-1')
+              .selectedParallelTaskOptions([2, 1], [0])
+              .check();
+
+            // Although the server will not send parallel tasks for an issue type which has none, put them in
+            // here just to double check we don't use them
+            updated = updateIssue(issue,
+              createIssueMap(issue), {key: 'P2-1', type: 'task', 'parallel-tasks': {'0': {0: 0}, 1: {0: 1, 1: 2}}});
+            new IssueChecker(updated,
+              lookupParams.issueTypes.get('task'),
+              lookupParams.priorities.get('Blocker'),
+              lookupParams.assignees.get('bob'),
+              'Issue summary', 4)
+              .key('P2-1')
+              .check();
+          });
+        });
+
+      });
+
+      describe('New issue', () => {
+
+        beforeEach(() => {
+          input = {
+            key: 'P2-1',
+            summary: 'Test summary',
+            state: 'Test1',
+            priority: 'Major',
+            assignee: 'kabir'
+          };
+        });
+
+        describe('With project PTs', () => {
+          let projectState: ProjectState;
+
+          beforeEach(() => {
+            projectState = createProjectState(
+              new ProjectInputBuilder()
+                .projectParallelTasks()
+                .parallelTaskOverrides()
+                .build());
+            lookupParams.setBoardProjects(projectState.boardProjects);
+          });
+
+          it ('Use project PTs', () => {
+            input['type'] = 'feature'; // feature uses project PTs
+            input['parallel-tasks'] = {'0': {'1': 1, '0': 2}, '1': {'0': 3}};
+            const newIssue = updateIssue(null, createIssueMap(null), input);
+
+            new IssueChecker(newIssue,
+              lookupParams.issueTypes.get('feature'),
+              lookupParams.priorities.get('Major'),
+              lookupParams.assignees.get('kabir'),
+              'Test summary', 0)
+              .key('P2-1')
+              .selectedParallelTaskOptions([2, 1], [3])
+              .check();
+          });
+
+          it ('Use override PT', () => {
+            input['type'] = 'bug'; // bug uses overridden PTs
+            input['parallel-tasks'] = {'0': {'0': 2}, '1': {'0': 3, '1': 1}};
+            const newIssue = updateIssue(null, createIssueMap(null), input);
+
+            new IssueChecker(newIssue,
+              lookupParams.issueTypes.get('bug'),
+              lookupParams.priorities.get('Major'),
+              lookupParams.assignees.get('kabir'),
+              'Test summary', 0)
+              .key('P2-1')
+              .selectedParallelTaskOptions([2], [3, 1])
+              .check();
+          });
+        });
+
+        describe('With no project PTs', () => {
+          let projectState: ProjectState;
+
+          beforeEach(() => {
+            projectState = createProjectState(
+              new ProjectInputBuilder()
+                .parallelTaskOverrides()
+                .build());
+            lookupParams.setBoardProjects(projectState.boardProjects);
+          });
+
+          it('Use project PT - i.e. no PTs', () => {
+            input['type'] = 'feature'; // feature uses project PTs
+            // The server will not actually send this data, but make sure we don't handle the empty PTs
+            // input['parallel-tasks'] = {'0': {'1': 1, '0': 2}, '1': {'0': 3}};
+            const newIssue = updateIssue(null, createIssueMap(null), input);
+
+            new IssueChecker(newIssue,
+              lookupParams.issueTypes.get('feature'),
+              lookupParams.priorities.get('Major'),
+              lookupParams.assignees.get('kabir'),
+              'Test summary', 0)
+              .key('P2-1')
+              .check();
+          });
+
+          it('Use override PT', () => {
+            input['type'] = 'bug'; // bug uses overridden PTs
+            input['parallel-tasks'] = {'0': {'0': 1}, '1': {'0': 3, '1': 0}};
+            const newIssue = updateIssue(null, createIssueMap(null), input);
+
+            new IssueChecker(newIssue,
+              lookupParams.issueTypes.get('bug'),
+              lookupParams.priorities.get('Major'),
+              lookupParams.assignees.get('kabir'),
+              'Test summary', 0)
+              .key('P2-1')
+              .selectedParallelTaskOptions([1], [3, 0])
+              .check();
+          });
+        });
+
+        describe('With empty override PTs', () => {
+          let projectState: ProjectState;
+
+          beforeEach(() => {
+            projectState = createProjectState(
+              new ProjectInputBuilder()
+                .projectParallelTasks()
+                .emptyParallelTaskOverrides()
+                .build());
+            lookupParams.setBoardProjects(projectState.boardProjects);
+          });
+
+
+          it('Use project PTs', () => {
+            input['type'] = 'feature'; // feature uses project PTs
+            input['parallel-tasks'] = {'0': {'1': 1, '0': 0}, '1': {'0': 3}};
+            const newIssue = updateIssue(null, createIssueMap(null), input);
+
+            new IssueChecker(newIssue,
+              lookupParams.issueTypes.get('feature'),
+              lookupParams.priorities.get('Major'),
+              lookupParams.assignees.get('kabir'),
+              'Test summary', 0)
+              .key('P2-1')
+              .selectedParallelTaskOptions([0, 1], [3])
+              .check();
+          });
+
+          it('Use override PT - i.e. no PTs', () => {
+            input['type'] = 'bug'; // task uses overridden PTs
+            // The server will not actually send this data, but make sure we don't handle the empty PTs
+            input['parallel-tasks'] = {'0': {'0': 1}, '1': {'0': 3, '1': 0}};
+            const newIssue = updateIssue(null, createIssueMap(null), input);
+
+            new IssueChecker(newIssue,
+              lookupParams.issueTypes.get('bug'),
+              lookupParams.priorities.get('Major'),
+              lookupParams.assignees.get('kabir'),
+              'Test summary', 0)
+              .key('P2-1')
+              .check();
+          });
+        });
+
+      });
+
+    });
+
+    function createProjectState(projectInput: any): ProjectState {
+      return projectMetaReducer(initialProjectState, ProjectActions.createDeserializeProjects(projectInput));
     }
   });
+
+  function createAndUpdateIssue(input: any, changeInput: any): BoardIssue {
+    const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
+    return updateIssue(issue, createIssueMap(issue), changeInput);
+  }
+
+  function updateIssue(issue: BoardIssue, currentIssues: Dictionary<BoardIssue>, changeInput: any): BoardIssue {
+    const issueMap: Map<string, BoardIssue> = Map<string, BoardIssue>(currentIssues);
+    const change: BoardIssue = IssueUtil.issueChangeFromJs(changeInput, issueMap, lookupParams);
+    return IssueUtil.updateIssue(issue, change);
+  }
+
+  function createIssueMap(issue: BoardIssue): Dictionary<BoardIssue> {
+    const currentIssues: Dictionary<BoardIssue> = {};
+    if (issue) {
+      currentIssues[issue.key] = issue;
+    }
+    return currentIssues;
+  }
 });
+
+
 
 export class IssueChecker {
   private _issue: BoardIssue;
@@ -785,8 +1299,17 @@ export class IssueChecker {
       const options: List<List<number>> = this._issue.selectedParallelTasks;
       const arrOpts: number[][] = options.map(group => group.toArray()).toArray();
       expect(arrOpts).toEqual(this._parallelTasks);
+
+      expect(this._issue.selectedParallelTasks.size).toEqual(this._issue.parallelTasks.size);
+      this._issue.selectedParallelTasks.forEach((group, i) => {
+        expect(group.size).toEqual(this._issue.parallelTasks.get(i).size);
+      });
     } else {
       expect(this._issue.selectedParallelTasks).not.toEqual(jasmine.anything());
+
+      if (this._issue.parallelTasks && this._issue.parallelTasks.size !== 0) {
+        // fail('Should not have had tasks');
+      }
     }
   }
 
