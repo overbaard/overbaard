@@ -1,0 +1,78 @@
+{
+  "name": "Test Downstream Project",
+  "code": "TST",
+  "states": [
+    {"name": "S-A"},
+    {"name": "S-B"},
+    {"name": "S-C"},
+    {"name": "S-D"}
+  ],
+  "priorities": [
+    {"name": "highest", "colour": "colour-highest"},
+    {"name": "high", "colour": "colour-high"},
+    {"name": "low", "colour": "colour-low"},
+    {"name": "lowest", "colour": "colour-lowest"}
+  ],
+  "issue-types": [
+    {"name": "task", "colour": "colour-task"},
+    {"name": "bug", "colour": "colour-bug"},
+    {"name": "feature", "colour": "colour-feature"}
+  ],
+  "parallel-tasks": {
+      "fields": [
+        {
+          "name": "Upstream",
+          "type": "parallel-task-progress",
+          "field-id": 121212121212,
+          "display": "US"
+        },
+        {
+          "name": "Downstream",
+          "type": "parallel-task-progress",
+          "field-id": 121212121213,
+          "display": "DS"
+        },
+        {
+          "name": "Documentation",
+          "type": "parallel-task-progress",
+          "field-id": 121212121214,
+          "display": "DC"
+        }
+      ]
+  },
+  "projects": [
+    {
+      "code": "TDP",
+      "query-filter": null,
+      "colour": "#4667CA",
+      "state-links": {
+        "TDP-A" : "S-A",
+        "TDP-B" : "S-B",
+        "TDP-C" : "S-C",
+        "TDP-D" : "S-D"
+      },
+      "overrides": {
+        "parallel-tasks": [
+          {
+            "issue-types": ["task", "bug"],
+            "override": [
+              ["Documentation"],
+              ["Upstream", "Downstream"]
+            ]
+          }
+        ]
+      }
+
+    },
+    {
+      "code": "TBG",
+      "query-filter": null,
+      "colour": "#CA6746",
+      "state-links": {
+        "TBG-X": "S-B",
+        "TBG-Y": "S-C"
+      }
+    }
+  ],
+  "linked-projects": {}
+}

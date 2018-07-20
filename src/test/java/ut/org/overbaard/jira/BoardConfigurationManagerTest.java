@@ -55,18 +55,7 @@ public class BoardConfigurationManagerTest {
     //TODO Add more tests for things like saving, and not having the correct permissions
     @Test
     public void testLoadConfiguration() throws IOException {
-        BoardConfigurationManagerBuilder cfgManagerBuilder = new BoardConfigurationManagerBuilder()
-                .addConfigActiveObjectsFromFile("config/board-tdp.json")
-                .addSettingActiveObject(RANK_CUSTOM_FIELD_ID, "10000");
-        BoardConfigurationManager cfgManager = cfgManagerBuilder.build();
-
-        ModelNode original = BoardConfigurationManagerBuilder.loadConfig("config/board-tdp.json");
-        original.protect();
-
-        BoardConfig boardConfig = cfgManager.getBoardConfigForBoardDisplay(null, "TST");
-        Assert.assertNotNull(boardConfig);
-        ModelNode serialized = boardConfig.serializeModelNodeForConfig();
-        Assert.assertEquals(original, serialized);
+        checkConfig("config/board-tdp.json");
     }
 
     @Test(expected=OverbaardValidationException.class)
@@ -183,63 +172,54 @@ public class BoardConfigurationManagerTest {
 
     @Test
     public void testLoadConfigurationWithCustomFields() throws IOException {
-        BoardConfigurationManagerBuilder cfgManagerBuilder = new BoardConfigurationManagerBuilder()
-                .addConfigActiveObjectsFromFile("config/board-custom.json")
-                .setCustomFieldManager(CustomFieldManagerBuilder.loadFromResource("config/board-custom.json"))
-                .addSettingActiveObject(RANK_CUSTOM_FIELD_ID, "10000");
-        BoardConfigurationManager cfgManager = cfgManagerBuilder.build();
-
-        ModelNode original = BoardConfigurationManagerBuilder.loadConfig("config/board-custom.json");
-        original.protect();
-
-        BoardConfig boardConfig = cfgManager.getBoardConfigForBoardDisplay(null, "TST");
-        Assert.assertNotNull(boardConfig);
-        ModelNode serialized = boardConfig.serializeModelNodeForConfig();
-        Assert.assertEquals(original, serialized);
+        checkConfig("config/board-custom.json");
     }
 
     @Test
     public void testLoadConfigurationWithParallelTasks() throws IOException {
-        BoardConfigurationManagerBuilder cfgManagerBuilder = new BoardConfigurationManagerBuilder()
-                .addConfigActiveObjectsFromFile("config/board-parallel-tasks.json")
-                .setCustomFieldManager(CustomFieldManagerBuilder.loadFromResource("config/board-parallel-tasks.json"))
-                .addSettingActiveObject(RANK_CUSTOM_FIELD_ID, "10000");
-        BoardConfigurationManager cfgManager = cfgManagerBuilder.build();
-
-        ModelNode original = BoardConfigurationManagerBuilder.loadConfig("config/board-parallel-tasks.json");
-        original.protect();
-
-        BoardConfig boardConfig = cfgManager.getBoardConfigForBoardDisplay(null, "TST");
-        Assert.assertNotNull(boardConfig);
-        ModelNode serialized = boardConfig.serializeModelNodeForConfig();
-        Assert.assertEquals(original, serialized);
+        checkConfig("config/board-parallel-tasks.json");
     }
-
 
     @Test
     public void testLoadConfigurationWithWip() throws IOException {
-        BoardConfigurationManagerBuilder cfgManagerBuilder = new BoardConfigurationManagerBuilder()
-                .addConfigActiveObjectsFromFile("config/board-wip.json")
-                .addSettingActiveObject(RANK_CUSTOM_FIELD_ID, "10000");
-        BoardConfigurationManager cfgManager = cfgManagerBuilder.build();
-
-        ModelNode original = BoardConfigurationManagerBuilder.loadConfig("config/board-wip.json");
-        original.protect();
-
-        BoardConfig boardConfig = cfgManager.getBoardConfigForBoardDisplay(null, "TST");
-        Assert.assertNotNull(boardConfig);
-        ModelNode serialized = boardConfig.serializeModelNodeForConfig();
-        Assert.assertEquals(original, serialized);
+        checkConfig("config/board-wip.json");
     }
 
     @Test
-    public void testLoadConfigurationWithIssueTypeOverrides() throws IOException {
+    public void testLoadConfigurationWithStateLinksIssueTypeOverrides() throws IOException {
+        checkConfig("config/board-issue-type-override-state-links.json");
+    }
+
+    @Test
+    public void testLoadConfigurationWithParallelTasksIssueTypeOverrides() throws IOException {
+        checkConfig("config/board-issue-type-override-parallel-tasks.json");
+    }
+
+    @Test
+    public void testLoadConfigurationWithJustParallelTasksIssueTypeOverrides() throws IOException {
+        checkConfig("config/board-issue-type-overrides-only-parallel-tasks.json");
+    }
+
+    @Test
+    public void testLoadConfigurationWithEmptyParallelTasksIssueTypeOverrides() throws IOException {
+        checkConfig("config/board-issue-type-empty-overrides-parallel-tasks.json");
+    }
+
+    @Test
+    public void testLoadConfigurationWithVaryingParallelTasksIssueTypeOverrides() throws IOException {
+        checkConfig("config/board-issue-type-overrides-parallel-tasks-varying.json");
+    }
+
+
+
+    private void checkConfig(String config) throws IOException {
         BoardConfigurationManagerBuilder cfgManagerBuilder = new BoardConfigurationManagerBuilder()
-                .addConfigActiveObjectsFromFile("config/board-issue-type-override-state-links.json")
+                .addConfigActiveObjectsFromFile(config)
+                .setCustomFieldManager(CustomFieldManagerBuilder.loadFromResource(config))
                 .addSettingActiveObject(RANK_CUSTOM_FIELD_ID, "10000");
         BoardConfigurationManager cfgManager = cfgManagerBuilder.build();
 
-        ModelNode original = BoardConfigurationManagerBuilder.loadConfig("config/board-issue-type-override-state-links.json");
+        ModelNode original = BoardConfigurationManagerBuilder.loadConfig(config);
         original.protect();
 
         BoardConfig boardConfig = cfgManager.getBoardConfigForBoardDisplay(null, "TST");
@@ -247,7 +227,6 @@ public class BoardConfigurationManagerTest {
         ModelNode serialized = boardConfig.serializeModelNodeForConfig();
         Assert.assertEquals(original, serialized);
     }
-
 
     private void loadBadConfiguration(ModelNode original, StateModifier... modifiers) throws IOException {
         try {

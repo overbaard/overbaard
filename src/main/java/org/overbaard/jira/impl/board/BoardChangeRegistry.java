@@ -442,6 +442,7 @@ public class BoardChangeRegistry {
 
         private Map<String, CustomFieldValue> customFieldValues;
         private Map<ParallelTaskGroupPosition, Integer> parallelTaskGroupValues;
+        private Boolean clearedParallelTaskValues;
 
         private IssueChange(String projectCode, String issueKey, Boolean backlogState) {
             this.projectCode = projectCode;
@@ -590,6 +591,13 @@ public class BoardChangeRegistry {
                     this.parallelTaskGroupValues = new HashMap<>();
                 }
                 parallelTaskGroupValues.putAll(boardChange.getParallelTaskGroupValues());
+                clearedParallelTaskValues = false;
+            }
+            if (boardChange.isClearParallelTaskGroupValues()) {
+                if (parallelTaskGroupValues != null) {
+                    clearedParallelTaskValues = true;
+                }
+                parallelTaskGroupValues = null;
             }
         }
 
@@ -697,6 +705,7 @@ public class BoardChangeRegistry {
                     if (clearedFixVersions) {
                         output.get(Constants.CLEAR_FIX_VERSIONS).set(true);
                     }
+
                     break;
                 case DELETE:
                     //No more data needed

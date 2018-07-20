@@ -17,7 +17,7 @@ package org.overbaard.jira.impl.config;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,22 +38,22 @@ public class BoardProjectConfig extends ProjectConfig<BoardProjectStateMapper> {
     private final List<String> customFieldNames;
     private final ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig;
 
-    private final BoardProjectIssueTypeOverrides issueTypeOverrides;
+    private final BoardProjectIssueTypeOverrideConfig issueTypeOverrideConfig;
 
     private final InternalAdvanced internalAdvanced;
 
-    private BoardProjectConfig(final BoardStates boardStates,
+    private BoardProjectConfig(
                                final String code, final String queryFilter,
                                final String colour,
                                final BoardProjectStateMapper stateMapper,
                                final List<String> customFieldNames,
-                               final ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig, BoardProjectIssueTypeOverrides issueTypeOverrides) {
+                               final ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig, BoardProjectIssueTypeOverrideConfig issueTypeOverrideConfig) {
         super(code, stateMapper);
         this.queryFilter = queryFilter;
         this.colour = colour;
         this.parallelTaskGroupsConfig = parallelTaskGroupsConfig;
         this.customFieldNames = customFieldNames;
-        this.issueTypeOverrides = issueTypeOverrides;
+        this.issueTypeOverrideConfig = issueTypeOverrideConfig;
         this.internalAdvanced = new InternalAdvanced();
     }
 
@@ -84,40 +84,17 @@ public class BoardProjectConfig extends ProjectConfig<BoardProjectStateMapper> {
         final ProjectParallelTaskGroupsConfig projectParallelTaskGroupsConfig;
         if (project.hasDefined(Constants.PARALLEL_TASKS)) {
             ModelNode parallelTaskGroups = project.get(Constants.PARALLEL_TASKS);
-            if (parallelTaskGroups.getType() != ModelType.LIST) {
-                throw new OverbaardValidationException("The \"parallel-task-groups\" element of project \"" + projectCode + "\" must be an array");
-            }
-            List<Map<String, ParallelTaskCustomFieldConfig>> fieldConfigs = new ArrayList<>();
-
-            for (ModelNode parallelTaskGroup : parallelTaskGroups.asList()) {
-                if (parallelTaskGroups.getType() != ModelType.LIST) {
-                    throw new OverbaardValidationException("The \"parallel-task-groups\" element of project \"" + projectCode + "\" must be an array");
-                }
-                Map<String, ParallelTaskCustomFieldConfig> groupFieldConfigs = new LinkedHashMap<>();
-                boolean first = true;
-                for (ModelNode parallelTask : parallelTaskGroup.asList()) {
-                    ParallelTaskCustomFieldConfig fieldConfig = parallelTaskConfig.getConfigs().getForOverbaardName(parallelTask.asString());
-                    if (fieldConfig == null) {
-                        throw new OverbaardValidationException("The \"parallel-task-groups\" element of project \"" + projectCode + "\" " +
-                                "references a parallel task '" + parallelTask.asString() + "' which does not exist in the global parallel-tasks fields list");
-                    }
-                    groupFieldConfigs.put(fieldConfig.getName(), fieldConfig);
-                    if (first) {
-                        fieldConfigs.add(groupFieldConfigs);
-                        first = false;
-                    }
-                }
-            }
-            projectParallelTaskGroupsConfig = new ProjectParallelTaskGroupsConfig(fieldConfigs);
+            projectParallelTaskGroupsConfig = ProjectParallelTaskGroupsConfig.loadAndValidate(parallelTaskConfig, parallelTaskGroups, projectCode);
         } else {
             projectParallelTaskGroupsConfig = null;
         }
 
-        BoardProjectIssueTypeOverrides issueTypeOverrides = BoardProjectIssueTypeOverrides.load(project.get(Constants.OVERRIDES), boardStates, projectCode, issueTypes);
+        BoardProjectIssueTypeOverrideConfig issueTypeOverrides =
+                BoardProjectIssueTypeOverrideConfig.load(project.get(Constants.OVERRIDES), boardStates, parallelTaskConfig, projectCode, issueTypes);
         ModelNode statesLinks = Util.getRequiredChild(project, "Project", projectCode, Constants.STATE_LINKS);
         BoardProjectStateMapper stateMapper = BoardProjectStateMapper.load(statesLinks, boardStates);
         return new BoardProjectConfig(
-                boardStates, projectCode, loadQueryFilter(project), colour,
+                projectCode, loadQueryFilter(project), colour,
                 stateMapper,
                 Collections.unmodifiableList(customFieldNames),
                 projectParallelTaskGroupsConfig, issueTypeOverrides);
@@ -143,6 +120,10 @@ public class BoardProjectConfig extends ProjectConfig<BoardProjectStateMapper> {
         return colour;
     }
 
+    public BoardProjectIssueTypeOverrideConfig getIssueTypeOverrideConfig() {
+        return issueTypeOverrideConfig;
+    }
+
     ModelNode serializeModelNodeForBoard() {
         ModelNode projectNode = new ModelNode();
         projectNode.get(Constants.CODE).set(code);
@@ -150,11 +131,6 @@ public class BoardProjectConfig extends ProjectConfig<BoardProjectStateMapper> {
         projectNode.get(Constants.STATE_LINKS).set(projectStates.serializeModelNodeForBoard());
 
         projectNode.get(Constants.COLOUR).set(colour);
-
-        final ModelNode issueTypeOverrides = this.issueTypeOverrides.serializeModelNodeForBoard();
-        if (issueTypeOverrides.isDefined()) {
-            projectNode.get(Constants.OVERRIDES).set(issueTypeOverrides);
-        }
 
         return projectNode;
     }
@@ -173,20 +149,12 @@ public class BoardProjectConfig extends ProjectConfig<BoardProjectStateMapper> {
         }
 
         if (parallelTaskGroupsConfig != null) {
-            ModelNode parallelTaskGroupsNode = projectNode.get(Constants.PARALLEL_TASKS).setEmptyList();
-
-            for (ProjectParallelTaskConfig ptCfg : parallelTaskGroupsConfig.getGroups()) {
-                ModelNode group = new ModelNode().setEmptyList();
-                for (ParallelTaskCustomFieldConfig parallelTaskCustomFieldConfig : ptCfg.getConfigs().values()) {
-                    group.add(parallelTaskCustomFieldConfig.getName());
-                }
-                parallelTaskGroupsNode.add(group);
-            }
+            projectNode.get(Constants.PARALLEL_TASKS).set(parallelTaskGroupsConfig.serializeForConfig());
         }
 
         projectNode.get(Constants.STATE_LINKS).set(projectStates.serializeModelNodeForConfig());
 
-        final ModelNode issueTypeOverrides = this.issueTypeOverrides.serializeModelNodeForConfig();
+        final ModelNode issueTypeOverrides = this.issueTypeOverrideConfig.serializeModelNodeForConfig();
         if (issueTypeOverrides.isDefined()) {
             projectNode.get(Constants.OVERRIDES).set(issueTypeOverrides);
         }
@@ -199,14 +167,10 @@ public class BoardProjectConfig extends ProjectConfig<BoardProjectStateMapper> {
         return customFieldNames;
     }
 
-    public ProjectParallelTaskGroupsConfig getParallelTaskGroupsConfig() {
-        return parallelTaskGroupsConfig;
-    }
-
     @Override
     public BoardProjectStateMapper getProjectStatesLinks(String issueType) {
-        if (issueTypeOverrides != null) {
-            BoardProjectStateMapper states = issueTypeOverrides.getStateLinksOverride(issueType);
+        if (issueTypeOverrideConfig != null) {
+            BoardProjectStateMapper states = issueTypeOverrideConfig.getStateLinksOverride(issueType);
             if (states != null) {
                 return states;
             }
@@ -214,38 +178,59 @@ public class BoardProjectConfig extends ProjectConfig<BoardProjectStateMapper> {
         return projectStates;
     }
 
+    public ProjectParallelTaskGroupsConfig getParallelTaskGroupsConfig(String issueType) {
+        if (issueTypeOverrideConfig != null) {
+            ProjectParallelTaskGroupsConfig config = issueTypeOverrideConfig.getParallelTaskGroupsConfig(issueType);
+            if (config != null) {
+                return config == ProjectParallelTaskGroupsConfig.EMPTY_OVERRIDE ? null : config;
+            }
+        }
+        return parallelTaskGroupsConfig;
+    }
+
+    public Map<Long, ParallelTaskCustomFieldConfig> getAllParallelTaskCustomFieldConfigs() {
+        Map<Long, ParallelTaskCustomFieldConfig> cfgs = new HashMap<>();
+        if (parallelTaskGroupsConfig != null) {
+            for (ParallelTaskCustomFieldConfig cfg : parallelTaskGroupsConfig.getConfigs().values()) {
+                cfgs.put(cfg.getId(), cfg);
+            }
+        }
+        if (issueTypeOverrideConfig != null) {
+            for (ProjectParallelTaskGroupsConfig config : issueTypeOverrideConfig.getParallelTaskGroupsOverrides().values()) {
+                for (ParallelTaskCustomFieldConfig cfg : config.getConfigs().values()) {
+                    cfgs.put(cfg.getId(), cfg);
+                }
+            }
+        }
+        return cfgs;
+    }
+
     public InternalAdvanced getInternalAdvanced() {
         return internalAdvanced;
     }
 
     /**
-     * This should not be called normally {@link #getProjectStatesLinks(String)} should be preferred.
-     * When it is really needed, it can be accessed via {@link #getInternalAdvanced()}
-     * @return the project state mapper
+     * Generally the getters that take an issueType should be used, but for some 'setup' type stuff we need the
+     * full thing. Put those into this class in an attempt to avoid people accidentally calling these
      */
-    private BoardProjectStateMapper getProjectStateLinks() {
-        return projectStates;
-    }
-
-    /**
-     * This should not be called normally {@link #getProjectStatesLinks(String)} should be preferred
-     * When it is really needed, it can be accessed via {@link #getInternalAdvanced()}
-     * @return the overridden state mappers by issue types
-     */
-    private Map<String, BoardProjectStateMapper> getIssueTypeStateLinksOverrides() {
-        return issueTypeOverrides.getStateLinkOverrides();
-    }
-
     public class InternalAdvanced {
         private InternalAdvanced() {
         }
 
         public BoardProjectStateMapper getProjectStateLinks() {
-            return BoardProjectConfig.this.getProjectStateLinks();
+            return projectStates;
         }
 
         public Map<String, BoardProjectStateMapper> getIssueTypeStateLinksOverrides() {
-            return BoardProjectConfig.this.getIssueTypeStateLinksOverrides();
+            return issueTypeOverrideConfig.getStateLinkOverrides();
+        }
+
+        public ProjectParallelTaskGroupsConfig getParallelTaskGroupsConfig() {
+            return parallelTaskGroupsConfig;
+        }
+
+        public Map<String, ProjectParallelTaskGroupsConfig> getIssueTypeParallelTaskGroupsOverrides() {
+            return issueTypeOverrideConfig.getParallelTaskGroupsOverrides();
         }
     }
 }

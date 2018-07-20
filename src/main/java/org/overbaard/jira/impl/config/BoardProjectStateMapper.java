@@ -113,7 +113,7 @@ public class BoardProjectStateMapper extends ProjectStateList {
         return stateLinksNode;
     }
 
-    ModelNode serializeModelNodeForBoard() {
+    public ModelNode serializeModelNodeForBoard() {
         // Here we use boardState -> ownState
         ModelNode stateLinks = new ModelNode();
         for (String state : boardStates.getStateNames()) {

@@ -4,20 +4,28 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.jboss.dmr.ModelNode;
+import org.jboss.dmr.ModelType;
+import org.overbaard.jira.OverbaardValidationException;
 
 /**
  * @author <a href="mailto:kabir.khan@jboss.com">Kabir Khan</a>
  */
 public class ProjectParallelTaskGroupsConfig {
+
+    // Used when an issue type override wants to use no parallel tasks
+    public static ProjectParallelTaskGroupsConfig EMPTY_OVERRIDE = new ProjectParallelTaskGroupsConfig(Collections.emptyList());
+
     private final CustomFieldRegistry<ParallelTaskCustomFieldConfig> configs;
     private final List<ProjectParallelTaskConfig> configGroups;
     private final Map<String, ParallelTaskGroupPosition> groupIndices;
 
-    ProjectParallelTaskGroupsConfig(List<Map<String, ParallelTaskCustomFieldConfig>> configGroups) {
+    private ProjectParallelTaskGroupsConfig(List<Map<String, ParallelTaskCustomFieldConfig>> configGroups) {
         List<ProjectParallelTaskConfig> groups = new ArrayList<>();
         Map<String, ParallelTaskCustomFieldConfig> flattenedConfigs = new HashMap<>();
         Map<String, ParallelTaskGroupPosition> groupIndices = new HashMap<>();
@@ -38,6 +46,65 @@ public class ProjectParallelTaskGroupsConfig {
         this.configs = new CustomFieldRegistry<>(flattenedConfigs);
         this.configGroups = Collections.unmodifiableList(groups);
         this.groupIndices = Collections.unmodifiableMap(groupIndices);
+    }
+
+    static ProjectParallelTaskGroupsConfig loadAndValidate(BoardParallelTaskConfig parallelTaskConfig, ModelNode parallelTaskGroups, String projectCode) {
+        return loadAndValidate(parallelTaskConfig, parallelTaskGroups, projectCode, null);
+    }
+
+    static ProjectParallelTaskGroupsConfig loadAndValidate(BoardParallelTaskConfig parallelTaskConfig, ModelNode parallelTaskGroups, String projectCode, List<String> issueTypes) {
+
+        if (!parallelTaskGroups.isDefined() && issueTypes != null) {
+            // Used when a project has PTs defined, but we want to turn those off for an issue type
+            return ProjectParallelTaskGroupsConfig.EMPTY_OVERRIDE;
+        } else if (parallelTaskGroups.getType() != ModelType.LIST) {
+            throw new OverbaardValidationException(getErrorStringStart(projectCode, issueTypes) + " must be an array");
+        }
+
+        List<Map<String, ParallelTaskCustomFieldConfig>> fieldConfigs = new ArrayList<>();
+
+        for (ModelNode parallelTaskGroup : parallelTaskGroups.asList()) {
+            if (parallelTaskGroups.getType() != ModelType.LIST) {
+                throw new OverbaardValidationException(getErrorStringStart(projectCode, issueTypes) + " must be an array");
+            }
+            Map<String, ParallelTaskCustomFieldConfig> groupFieldConfigs = new LinkedHashMap<>();
+            boolean first = true;
+            for (ModelNode parallelTask : parallelTaskGroup.asList()) {
+                ParallelTaskCustomFieldConfig fieldConfig = parallelTaskConfig.getConfigs().getForOverbaardName(parallelTask.asString());
+                if (fieldConfig == null) {
+                    throw new OverbaardValidationException(getErrorStringStart(projectCode, issueTypes) +
+                            "references a parallel task '" + parallelTask.asString() + "' which does not exist in the global parallel-tasks fields list");
+                }
+                groupFieldConfigs.put(fieldConfig.getName(), fieldConfig);
+                if (first) {
+                    fieldConfigs.add(groupFieldConfigs);
+                    first = false;
+                }
+            }
+        }
+
+        return new ProjectParallelTaskGroupsConfig(fieldConfigs);
+    }
+
+    private static String getErrorStringStart(String projectCode, List<String> issueTypes) {
+        if (issueTypes == null) {
+            return "The \"parallel-task-groups\" element of project \"" + projectCode + "\"";
+        }
+        return "The \"overrides/parallel-task-groups\" element of project \"" + projectCode + "\" for issueTypes " + issueTypes;
+
+    }
+
+
+    ModelNode serializeForConfig() {
+        ModelNode parallelTaskGroupsNode = new ModelNode().setEmptyList();
+        for (ProjectParallelTaskConfig ptCfg : getGroups()) {
+            ModelNode group = new ModelNode().setEmptyList();
+            for (ParallelTaskCustomFieldConfig parallelTaskCustomFieldConfig : ptCfg.getConfigs().values()) {
+                group.add(parallelTaskCustomFieldConfig.getName());
+            }
+            parallelTaskGroupsNode.add(group);
+        }
+        return parallelTaskGroupsNode;
     }
 
     public List<ProjectParallelTaskConfig> getConfigGroups() {
@@ -73,4 +140,5 @@ public class ProjectParallelTaskGroupsConfig {
     public CustomFieldRegistry<ParallelTaskCustomFieldConfig> getConfigs() {
         return configs;
     }
+
 }
