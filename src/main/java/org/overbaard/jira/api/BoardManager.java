@@ -99,7 +99,7 @@ public interface BoardManager {
      * @param jiraCustomFieldName the custom field name. Note that this is the name of the field in Jira, not in the Overbård config
      * @return the custom field configs on boards involving the project, or an empty set if no boards are set up to use a custom field for {@code jiraCustomFieldName}
      */
-    Set<ParallelTaskCustomFieldConfig> getParallelTaskFieldsForUpdateEvent(String projectCode, String jiraCustomFieldName);
+    Set<ParallelTaskCustomFieldConfig> getParallelTaskFieldsForUpdateEvent(String projectCode, String issueType, String jiraCustomFieldName);
 
     /**
      * Gets all the possible parallel task custom field configurations for a created issue
@@ -107,7 +107,7 @@ public interface BoardManager {
      * @param projectCode the project code
      * @return the custom field configs on boards involving the issue.
      */
-    Set<ParallelTaskCustomFieldConfig> getParallelTaskFieldsForCreateEvent(String projectCode);
+    Set<ParallelTaskCustomFieldConfig> getParallelTaskFieldsForCreateEvent(String projectCode, String issueType);
 
     void updateParallelTaskForIssue(ApplicationUser user, String boardCode, String issueKey, int groupIndex, int taskIndex, int optionIndex) throws SearchException;
 }

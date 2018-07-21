@@ -262,6 +262,13 @@ public abstract class Issue {
         if (parallelTaskGroupValues.size() > 0) {
             changed = true;
             builder.setParallelTaskGroupValues(parallelTaskGroupValues);
+        } else {
+            if (issueType != null) {
+                // When changing the issue type, we always overwrite the PT fields. If the list of PT values
+                // is empty, it means we need to clear it
+                builder.clearParallelTaskGroupValues();
+            }
+
         }
         if (changed) {
             return builder.build();
@@ -398,6 +405,7 @@ public abstract class Issue {
         //Will only be set for an update
         private List<List<Integer>> originalParallelTaskGroupValues;
         private Integer[][] parallelTaskGroupValues;
+        private boolean clearParallelTaskGroupValues;
 
         private Builder(BoardProject.Accessor project, IssueLoadStrategy issueLoadStrategy) {
             this.project = project;
@@ -612,7 +620,11 @@ public abstract class Issue {
                 return Collections.unmodifiableList(values);
             } else {
                 if (parallelTaskGroupValues == null) {
-                    return originalParallelTaskGroupValues;
+                    if (clearParallelTaskGroupValues) {
+                        return null;
+                    } else {
+                        return originalParallelTaskGroupValues;
+                    }
                 }
                 List<List<Integer>> merged = new ArrayList<>();
                 for (int i = 0; i < parallelTaskGroupValues.length; i++) {
@@ -654,7 +666,10 @@ public abstract class Issue {
 
         public Builder setParallelTaskFieldValue(ParallelTaskGroupPosition position, int optionIndex) {
             initialiseParallelTaskGroupValues();
-            parallelTaskGroupValues[position.getGroupIndex()][position.getTaskIndex()] = optionIndex;
+            if (parallelTaskGroupValues != null) {
+                // This will be null if it is an override where the issue did not exist
+                parallelTaskGroupValues[position.getGroupIndex()][position.getTaskIndex()] = optionIndex;
+            }
             return this;
         }
 
@@ -665,7 +680,7 @@ public abstract class Issue {
 
         private void initialiseParallelTaskGroupValues() {
             if (parallelTaskGroupValues == null) {
-                ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig = project.getConfig().getParallelTaskGroupsConfig();
+                ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig = project.getConfig().getParallelTaskGroupsConfig(issueTypeName);
                 if (parallelTaskGroupsConfig != null) {
                     List<ProjectParallelTaskConfig> groups = parallelTaskGroupsConfig.getConfigGroups();
                     parallelTaskGroupValues = new Integer[groups.size()][];
@@ -676,6 +691,9 @@ public abstract class Issue {
             }
         }
 
+        public void clearParallelTaskGroupValues() {
+            clearParallelTaskGroupValues = true;
+        }
     }
 
     /**

@@ -25,11 +25,11 @@ import java.util.Map;
 import org.ofbiz.core.entity.jdbc.SQLProcessor;
 import org.osgi.framework.BundleReference;
 import org.overbaard.jira.OverbaardLogger;
+import org.overbaard.jira.api.ParallelTaskOptions;
 import org.overbaard.jira.impl.config.CustomFieldConfig;
 import org.overbaard.jira.impl.config.CustomFieldRegistry;
 import org.overbaard.jira.impl.config.ParallelTaskCustomFieldConfig;
 import org.overbaard.jira.impl.config.ParallelTaskGroupPosition;
-import org.overbaard.jira.impl.config.ProjectParallelTaskConfig;
 import org.overbaard.jira.impl.config.ProjectParallelTaskGroupsConfig;
 
 /**
@@ -52,7 +52,7 @@ class BulkIssueLoadStrategy implements IssueLoadStrategy {
     private static final String dataSourceName = "defaultDS";
     private final BoardProject.Builder project;
     private final Map<Long, BulkLoadContext<?>> customFieldContexts = new HashMap<>();
-    private final Map<Long, ParallelTaskCustomFieldConfig> parallelTaskFields = new HashMap();
+    private final Map<Long, ParallelTaskCustomFieldConfig> parallelTaskFields;
     private final List<Long> ids = new ArrayList<>();
     private final Map<Long, String> issues = new HashMap<>();
     private final Map<Long, Issue.Builder> builders = new HashMap<>();
@@ -72,18 +72,11 @@ class BulkIssueLoadStrategy implements IssueLoadStrategy {
             customFieldContexts.put(customFieldConfig.getId(), ctx);
         }
 
-        if (project.getConfig().getParallelTaskGroupsConfig() != null) {
-            //These have the options loaded already on project load, so there is no need for the context which does the caching
-            final ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig = project.getConfig().getParallelTaskGroupsConfig();
-            CustomFieldRegistry<ParallelTaskCustomFieldConfig> registry = parallelTaskGroupsConfig.getConfigs();
-
-            registry.values().forEach(parallelTaskCustomFieldConfig ->
-                    parallelTaskFields.put(parallelTaskCustomFieldConfig.getId(), parallelTaskCustomFieldConfig));
-        }
+        parallelTaskFields = project.getConfig().getAllParallelTaskCustomFieldConfigs();
     }
 
     static BulkIssueLoadStrategy create(BoardProject.Builder project) {
-        if (project.getConfig().getCustomFieldNames().size() == 0 || project.getConfig().getParallelTaskGroupsConfig() == null) {
+        if (project.getConfig().getCustomFieldNames().size() == 0 && project.getConfig().getInternalAdvanced().getParallelTaskGroupsConfig() == null) {
             //There are no custom fields or parallel tasks so we are not needed
             return null;
         }
@@ -137,6 +130,7 @@ class BulkIssueLoadStrategy implements IssueLoadStrategy {
 
     private void loadDataForBatch(SQLProcessor sqlProcessor, List<Long> idBatch) {
         final String sql = createSql(idBatch);
+        System.out.println(sql);
 
         try (final ResultSet rs = sqlProcessor.executeQuery(sql)){
             while (rs.next()) {
@@ -144,18 +138,19 @@ class BulkIssueLoadStrategy implements IssueLoadStrategy {
                 Long customFieldId = rs.getLong(2);
                 String stringValue = rs.getString(3);
                 Long numValue = rs.getLong(4);
+                String issueType = rs.getString(5);
                 if (rs.wasNull()) {
                     numValue = null;
                 }
 
-                processCustomFieldValue(issueId, customFieldId, stringValue, numValue);
+                processCustomFieldValue(issueId, customFieldId, stringValue, numValue, issueType);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void processCustomFieldValue(Long issueId, Long customFieldId, String stringValue, Long numValue) {
+    private void processCustomFieldValue(Long issueId, Long customFieldId, String stringValue, Long numValue, String issueType) {
         OverbaardLogger.LOGGER.trace("Processing bulk issue {}. customFieldId:{}, stringValue:{}, numValue:{}",
                 issueId, customFieldId, stringValue, numValue);
         Issue.Builder builder = builders.get(issueId);
@@ -175,9 +170,15 @@ class BulkIssueLoadStrategy implements IssueLoadStrategy {
             builder.addCustomFieldValue(value);
         } else if (parallelTaskFieldConfig != null) {
 
-            Map<String, SortedParallelTaskFieldOptions> parallelTaskValues = project.getParallelTaskValues();
-            SortedParallelTaskFieldOptions options = parallelTaskValues.get(parallelTaskFieldConfig.getName());
-            ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig = project.getConfig().getParallelTaskGroupsConfig();
+            ParallelTaskOptions parallelTaskOptions = project.getParallelTaskOptions();
+            SortedParallelTaskFieldOptions options =
+                    parallelTaskOptions.getOptions(issueType).get(parallelTaskFieldConfig.getName());
+            ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig = project.getConfig().getParallelTaskGroupsConfig(issueType);
+            if (parallelTaskGroupsConfig == null || options == null) {
+                // Issues may have values for custom fields configured as parallel tasks, but they
+                // are not necessarily configured for all issue types
+                return;
+            }
 
             Integer optionIndex = options.getIndex(stringValue);
             if (optionIndex == null) {
@@ -191,10 +192,11 @@ class BulkIssueLoadStrategy implements IssueLoadStrategy {
 
     private String createSql(List<Long> idBatch) {
         StringBuilder sb = new StringBuilder()
-                .append("select j.id, cv.customfield, cv.stringvalue, cv.numbervalue ")
-                .append("from project p, jiraissue j, customfieldvalue cv ")
+                .append("select j.id, cv.customfield, cv.stringvalue, cv.numbervalue, it.pname as type ")
+                .append("from project p, jiraissue j, customfieldvalue cv, issuetype it ")
                 .append("where ")
                 .append("p.id=j.project and j.id=cv.issue and ")
+                .append("j.issuetype=it.id and ")
                 .append("p.pkey='" + project.getCode() + "' and ")
                 .append("customfield in (");
 

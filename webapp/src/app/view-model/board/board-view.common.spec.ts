@@ -217,6 +217,8 @@ export class BoardStateInitializer {
           key: projectKey,
           colour: 'red',
           canRank: false,
+          parallelTasks: List<List<ParallelTask>>(),
+          parallelTaskIssueTypeOverrides: Map<string, List<List<ParallelTask>>>(),
           boardStateNameToOwnStateName: stateMap,
           boardStateNameToOwnStateNameIssueTypeOverrides: issueTypeStatesMap
         };
@@ -226,8 +228,7 @@ export class BoardStateInitializer {
 
     return {
       boardProjects: projects,
-      linkedProjects: Map<string, LinkedProject>(),
-      parallelTasks: Map<string, List<List<ParallelTask>>>()
+      linkedProjects: Map<string, LinkedProject>()
     };
   }
 

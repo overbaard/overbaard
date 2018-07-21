@@ -16,10 +16,7 @@
 
 package org.overbaard.jira.api;
 
-import java.util.Map;
-
 import org.overbaard.jira.impl.JiraInjectables;
-import org.overbaard.jira.impl.board.SortedParallelTaskFieldOptions;
 import org.overbaard.jira.impl.config.BoardConfig;
 import org.overbaard.jira.impl.config.BoardProjectConfig;
 
@@ -39,5 +36,5 @@ public interface ProjectParallelTaskOptionsLoader {
      * @param projectConfig
      * @return
      */
-    Map<String, SortedParallelTaskFieldOptions> loadValues(JiraInjectables jiraInjectables, BoardConfig boardConfig, BoardProjectConfig projectConfig);
+    ParallelTaskOptions loadValues(JiraInjectables jiraInjectables, BoardConfig boardConfig, BoardProjectConfig projectConfig);
 }

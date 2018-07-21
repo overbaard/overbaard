@@ -85,6 +85,9 @@ const CLEAR_STRING_LIST = OrderedSet<string>('Clear this!');
  * where we do this repeatedly and not all data is always needed.
  */
 export class DeserializeIssueLookupParams {
+
+  private static readonly EMPTY_PARALLEL_TASKS = List<List<ParallelTask>>();
+
   private _assignees: OrderedMap<string, Assignee> = OrderedMap<string, Assignee>();
   private _assigneesList: List<Assignee>;
   private _issueTypes: OrderedMap<string, IssueType> = OrderedMap<string, IssueType>();
@@ -96,7 +99,6 @@ export class DeserializeIssueLookupParams {
   private _fixVersions: List<string> = List<string>();
   private _customFields: OrderedMap<string, OrderedMap<string, CustomField>> = OrderedMap<string, OrderedMap<string, CustomField>>();
   private _customFieldsListMap: OrderedMap<string, List<CustomField>>;
-  private _parallelTasks: Map<string, List<List<ParallelTask>>> = Map<string, List<List<ParallelTask>>>();
   private _boardProjects: Map<string, BoardProject> = Map<string, BoardProject>();
   private _linkedProjects: Map<string, LinkedProject> = Map<string, LinkedProject>();
   private _boardStates: List<string>;
@@ -136,11 +138,6 @@ export class DeserializeIssueLookupParams {
 
   setCustomFields(value: OrderedMap<string, OrderedMap<string, CustomField>>): DeserializeIssueLookupParams {
     this._customFields = value;
-    return this;
-  }
-
-  setParallelTasks(value: Map<string, List<List<ParallelTask>>>): DeserializeIssueLookupParams {
-    this._parallelTasks = value;
     return this;
   }
 
@@ -221,8 +218,19 @@ export class DeserializeIssueLookupParams {
     return this._customFieldsListMap;
   }
 
-  get parallelTasks(): Map<string, List<List<ParallelTask>>> {
-    return this._parallelTasks;
+  getParallelTasks(projectCode: string, type: string): List<List<ParallelTask>> {
+    let boardProject: BoardProject = null;
+    if (this._boardProjects) {
+      boardProject = this._boardProjects.get(projectCode);
+    }
+    if (!boardProject) {
+      return DeserializeIssueLookupParams.EMPTY_PARALLEL_TASKS;
+    }
+    const overrideTasks = boardProject.parallelTaskIssueTypeOverrides.get(type);
+    if (overrideTasks) {
+      return overrideTasks === DeserializeIssueLookupParams.EMPTY_PARALLEL_TASKS ? null : overrideTasks;
+    }
+    return boardProject.parallelTasks;
   }
 
   getOwnStateNameToOwnIndex(issueKey: string, issueType: string): Map<string, number> {
@@ -312,7 +320,8 @@ export class IssueUtil {
 
     // priority and issue-type will never be null
     input['priority'] = params.prioritiesList.get(input['priority']);
-    input['type'] = params.issueTypesList.get(input['type']);
+    const issueType: IssueType = params.issueTypesList.get(input['type']);
+    input['type'] = issueType;
 
     if (input['components']) {
       input['components'] = IssueUtil.lookupStringsFromIndexArray(input['components'], params.components);
@@ -342,8 +351,11 @@ export class IssueUtil {
     if (input['parallel-tasks']) {
       const selectedParallelTasks: List<List<number>> =
         List<List<number>>((<number[][]>input['parallel-tasks']).map(group => List<number>(group)));
-      input['parallelTasks'] = params.parallelTasks.get(projectCode);
-      input['selectedParallelTasks'] = List<List<number>>(selectedParallelTasks);
+      const parallelTasks: List<List<ParallelTask>> = params.getParallelTasks(projectCode, issueType.name);
+      if (parallelTasks) {
+        input['parallelTasks'] = parallelTasks;
+        input['selectedParallelTasks'] = List<List<number>>(selectedParallelTasks);
+      }
       delete input['parallel-tasks'];
     }
 
@@ -371,6 +383,14 @@ export class IssueUtil {
     let customFields: Map<string, CustomField>;
     const key: string = input['key'];
     const projectCode: string = IssueUtil.productCodeFromKey(input['key']);
+
+    // Needed to determine the type for the issue type overrides
+    let overrideType = input['type'];
+    if (!overrideType) {
+      // It is an update to an existing issue, as new issues will always have a type
+      overrideType = currentIssues.get(key).type.name;
+    }
+
     if (input['custom']) {
       const customInput: any = input['custom'];
       customFields = Map<string, CustomField>().withMutations(mutable => {
@@ -389,37 +409,32 @@ export class IssueUtil {
     if (input['parallel-tasks']) {
 
       const parallelTasksInput: Object = input['parallel-tasks'];
-      const parallelTasks: List<List<ParallelTask>> = params.parallelTasks.get(projectCode);
-      const selected: List<number>[] = new Array<List<number>>(parallelTasks.size);
+      const parallelTasks: List<List<ParallelTask>> = params.getParallelTasks(projectCode, overrideType);
+      if (parallelTasks) {
+        const selected: List<number>[] = new Array<List<number>>(parallelTasks.size);
 
-      for (let groupIndex = 0 ; groupIndex < parallelTasks.size ; groupIndex++) {
+        for (let groupIndex = 0 ; groupIndex < parallelTasks.size ; groupIndex++) {
 
-        const groupKey = String(groupIndex);
-        const group = new Array<number>(parallelTasks.get(groupIndex).size);
-        const groupInput = parallelTasksInput[groupKey];
+          const groupKey = String(groupIndex);
+          const group = new Array<number>(parallelTasks.get(groupIndex).size);
+          const groupInput = parallelTasksInput[groupKey];
 
-        if (groupInput) {
-          for (const taskKey of Object.keys(groupInput)) {
-            const taskIndex = Number(taskKey);
-            group[taskIndex] = groupInput[taskKey];
+          if (groupInput) {
+            for (const taskKey of Object.keys(groupInput)) {
+              const taskIndex = Number(taskKey);
+              group[taskIndex] = groupInput[taskKey];
+            }
           }
-        }
 
-        selected[groupIndex] = List<number>(group);
+          selected[groupIndex] = List<number>(group);
+        }
+        selectedParallelTasks = List<List<number>>(selected);
       }
-      selectedParallelTasks = List<List<number>>(selected);
     }
 
     let ownState: number = null;
     if (input['state']) {
-      let type: string = input['type'];
-
-
-      if (!type) {
-        // It is an update to an existing issue, as new issues will always have a type
-        type = currentIssues.get(key).type.name;
-      }
-      ownState = params.getOwnStateNameToOwnIndex(key, type).get(input['state']);
+      ownState = params.getOwnStateNameToOwnIndex(key, overrideType).get(input['state']);
     }
 
     return {
@@ -434,7 +449,7 @@ export class IssueUtil {
       labels: IssueUtil.getClearableStringSet(input, 'clear-labels', 'labels'),
       fixVersions: IssueUtil.getClearableStringSet(input, 'clear-fix-versions', 'fix-versions'),
       customFields: customFields,
-      parallelTasks: params.parallelTasks.get(projectCode),
+      parallelTasks: params.getParallelTasks(projectCode, overrideType),
       selectedParallelTasks: selectedParallelTasks,
       linkedIssues: null // This isn't settable from the events at the moment, and only happens on full board refresh
     };
@@ -445,6 +460,12 @@ export class IssueUtil {
       issue = ISSUE_FACTORY(DEFAULT_ISSUE);
     }
     issue = (<BoardIssueRecord>issue).withMutations(mutable => {
+
+      if (change.type && change.type !== issue.type) {
+        // When the issue type changes, we overwrite the parallel tasks completely
+        mutable.selectedParallelTasks = null;
+      }
+
       for (const key of Object.keys(change)) {
         const value = change[key];
         if (value != null) {

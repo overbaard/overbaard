@@ -4,21 +4,24 @@ import {HeaderState} from '../header/header.state';
 import {ColourTable} from '../../../../common/colour-table';
 import {Dictionary} from '../../../../common/dictionary';
 import {BoardIssue} from '../issue/board-issue';
+import {cloneObject} from '../../../../common/object-util';
 
 export interface ProjectState {
   boardProjects: OrderedMap<string, BoardProject>;
   linkedProjects: Map<string, LinkedProject>;
-  // Parallel tasks ordered by project
-  parallelTasks: Map<string, List<List<ParallelTask>>>;
 }
 
 export interface BaseProject {
   key: string;
 }
 
+export const EMPTY_PARALLEL_TASK_OVERRIDE: List<List<ParallelTask>> = List<List<ParallelTask>>();
+
 export interface BoardProject extends BaseProject {
   colour: string;
   canRank: boolean;
+  parallelTasks: List<List<ParallelTask>>;
+  parallelTaskIssueTypeOverrides: Map<string, List<List<ParallelTask>>>;
   boardStateNameToOwnStateName: Map<string, string>;
   boardStateNameToOwnStateNameIssueTypeOverrides: Map<string, Map<string, string>>;
 }
@@ -45,14 +48,15 @@ export interface ParallelTaskPosition {
 
 const DEFAULT_STATE: ProjectState = {
   boardProjects: OrderedMap<string, BoardProject>(),
-  linkedProjects: Map<string, LinkedProject>(),
-  parallelTasks: Map<string, List<List<ParallelTask>>>()
+  linkedProjects: Map<string, LinkedProject>()
 };
 
 const DEFAULT_BOARD_PROJECT: BoardProject = {
   key: null,
   colour: null,
   canRank: false,
+  parallelTasks: null,
+  parallelTaskIssueTypeOverrides: Map<string, List<List<ParallelTask>>>(),
   boardStateNameToOwnStateName: Map<string, string>(),
   boardStateNameToOwnStateNameIssueTypeOverrides: Map<string, Map<string, string>>()
 };
@@ -169,14 +173,56 @@ export class ProjectUtil {
         }
       });
 
+    let parallelTasks: List<List<ParallelTask>> = null;
+    const parallelTasksInput: any[] = input['parallel-tasks'];
+    if (parallelTasksInput) {
+      parallelTasks = ProjectUtil.parseParallelTasksInput(parallelTasksInput);
+    }
+
+    const parallelTaskIssueTypeOverrides: Map<string, List<List<ParallelTask>>> =
+      Map<string, List<List<ParallelTask>>>().withMutations(overrides => {
+
+      const overridesInput: any = input['overrides'];
+      if (overridesInput) {
+        const ptOverrides: any = overridesInput['parallel-tasks'];
+        if (ptOverrides) {
+          for (const ptOverride of <any[]>ptOverrides) {
+            const type: string = ptOverride['type'];
+            const override: any = ptOverride['override'];
+
+            const parallelTasksForType: List<List<ParallelTask>> = override ?
+              ProjectUtil.parseParallelTasksInput(override) : EMPTY_PARALLEL_TASK_OVERRIDE;
+            overrides.set(type, parallelTasksForType);
+          }
+        }
+      }
+    });
+
     const projectInput: BoardProject = {
       key: input['code'],
       colour: input['colour'],
       canRank: input['rank'] ? input['rank'] : false,
+      parallelTasks: parallelTasks,
+      parallelTaskIssueTypeOverrides: parallelTaskIssueTypeOverrides,
       boardStateNameToOwnStateName: boardStateNameToOwnStateName,
       boardStateNameToOwnStateNameIssueTypeOverrides: boardStateNameToOwnStateNameIssueTypeOverrides
     };
     return BOARD_PROJECT_FACTORY(projectInput);
+  }
+
+  private static parseParallelTasksInput(parallelTasksInput: any): List<List<ParallelTask>> {
+    return List<List<ParallelTask>>().withMutations(mutableTasks => {
+      for (let groupIndex = 0; groupIndex < parallelTasksInput.length; groupIndex++) {
+        const existingGroup: any[] = parallelTasksInput[groupIndex];
+        const newGroup: ParallelTask[] = new Array<ParallelTask>(existingGroup.length);
+        for (let taskIndex = 0; taskIndex < existingGroup.length; taskIndex++) {
+          const task: ParallelTask = ProjectUtil.parallelTaskFromJs(existingGroup[taskIndex]);
+          newGroup[taskIndex] = task;
+        }
+        const groupList: List<ParallelTask> = List<ParallelTask>(newGroup);
+        mutableTasks.push(groupList);
+      }
+    });
   }
 
   static linkedProjectFromJs(key: string, input: any): LinkedProject {
@@ -204,6 +250,14 @@ export class ProjectUtil {
     });
   }
 
+  static createParallelTask(name: string, display: string, options: ParallelTaskOption[]): ParallelTask {
+    return PARALLEL_TASK_FACTORY({
+      name: name,
+      display: display,
+      options: List<ParallelTaskOption>(options)
+    });
+  }
+
   static withMutations(s: ProjectState, mutate: (mutable: ProjectState) => any): ProjectState {
     return (<ProjectStateRecord>s).withMutations(mutable => {
       mutate(mutable);
@@ -214,4 +268,5 @@ export class ProjectUtil {
   static createParallelTaskPosition(groupIndex: number, taskIndex: number): ParallelTaskPosition {
     return PARALLEL_TASK_POSITION_FACTORY({groupIndex: groupIndex, taskIndex: taskIndex});
   }
+
 }

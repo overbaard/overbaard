@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.jboss.dmr.ModelNode;
 import org.overbaard.jira.OverbaardLogger;
+import org.overbaard.jira.api.ParallelTaskOptions;
 import org.overbaard.jira.impl.Constants;
 import org.overbaard.jira.impl.config.CustomFieldConfig;
 import org.overbaard.jira.impl.config.ParallelTaskCustomFieldConfig;
@@ -72,14 +73,14 @@ public class CustomFieldValue {
     }
 
     static void loadParallelTaskValues(BoardProject.Accessor project, Issue issue, org.overbaard.jira.impl.board.Issue.Builder builder) {
-        if (project.getConfig().getParallelTaskGroupsConfig() == null) {
+        final String issueType = issue.getIssueType().getName();
+        final ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig = project.getConfig().getParallelTaskGroupsConfig(issueType);
+        if (parallelTaskGroupsConfig == null) {
             return;
         }
-        final ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig = project.getConfig().getParallelTaskGroupsConfig();
 
-
-        Map<String, SortedParallelTaskFieldOptions> parallelTaskValues = project.getParallelTaskValues();
-        for (Map.Entry<String, SortedParallelTaskFieldOptions> fieldEntry : parallelTaskValues.entrySet()) {
+        ParallelTaskOptions parallelTaskOptions = project.getParallelTaskOptions();
+        for (Map.Entry<String, SortedParallelTaskFieldOptions> fieldEntry : parallelTaskOptions.getOptions(issueType).entrySet()) {
             CustomFieldConfig customFieldConfig = parallelTaskGroupsConfig.getConfigs().getForOverbaardName(fieldEntry.getKey());
             String value = getParallelTaskCustomFieldValue(issue, customFieldConfig.getJiraCustomField(), fieldEntry.getKey());
             if (value == null) {
@@ -135,29 +136,45 @@ public class CustomFieldValue {
         return fields.size() > 0 ? fields : Collections.emptyMap();
     }
 
-    static Map<ParallelTaskGroupPosition, Integer> loadParallelTaskGroupValues(boolean create, final BoardProject.Accessor project, final Map<Long, String> customFieldValues) {
-        final Map<ParallelTaskGroupPosition, Integer> parallelTaskValues = new HashMap<>();
+    static Map<ParallelTaskGroupPosition, Integer> loadParallelTaskGroupValues(
+            final BoardProject.Accessor project, final Map<Long, String> updatedCustomFieldValues,
+            final org.overbaard.jira.impl.board.Issue existingIssue, String newIssueType) {
 
-        ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig = project.getConfig().getParallelTaskGroupsConfig();
+        // For an update we generally only want to populate the fields that were set in the update,
+        // while for a create we generally want to populate all the fields
+        final boolean overwriteAllFields;
+        final String issueType;
+        if (existingIssue != null) {
+            overwriteAllFields = false;
+            issueType = newIssueType != null ? newIssueType : existingIssue.getIssueTypeName();
+        } else {
+            // It is a create so any fields missing in updatedCustomFieldValues should be initialised to zero
+            overwriteAllFields = true;
+            issueType = newIssueType;
+        }
+
+        ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig = project.getConfig().getParallelTaskGroupsConfig(issueType);
 
         if (parallelTaskGroupsConfig == null) {
             return Collections.emptyMap();
         }
 
-        List<ProjectParallelTaskConfig> groups = parallelTaskGroupsConfig.getConfigGroups();
-        for (int groupIndex = 0 ; groupIndex < groups.size() ; groupIndex++) {
+        final Map<ParallelTaskGroupPosition, Integer> parallelTaskValues = new HashMap<>();
 
+        List<ProjectParallelTaskConfig> groups = parallelTaskGroupsConfig.getConfigGroups();
+
+        for (int groupIndex = 0 ; groupIndex < groups.size() ; groupIndex++) {
             ProjectParallelTaskConfig parallelTaskConfig = groups.get(groupIndex);
 
             for (ParallelTaskCustomFieldConfig customFieldConfig : parallelTaskConfig.getConfigs().values()) {
-                String value = customFieldValues.get(customFieldConfig.getId());
+                String value = updatedCustomFieldValues.get(customFieldConfig.getId());
 
                 if (value != null) {
                     int taskIndex = parallelTaskConfig.getIndex(customFieldConfig.getName());
-                    SortedParallelTaskFieldOptions options = project.getParallelTaskValues().get(customFieldConfig.getName());
+                    SortedParallelTaskFieldOptions options = project.getParallelTaskOptions().getOptions(issueType).get(customFieldConfig.getName());
                     int optionIndex = options.getIndex(value);
                     parallelTaskValues.put(new ParallelTaskGroupPosition(groupIndex, taskIndex), optionIndex);
-                } else if (create) {
+                } else if (overwriteAllFields) {
                     int taskIndex = parallelTaskConfig.getIndex(customFieldConfig.getName());
                     parallelTaskValues.put(new ParallelTaskGroupPosition(groupIndex, taskIndex), 0);
                 }
@@ -165,6 +182,7 @@ public class CustomFieldValue {
         }
         return parallelTaskValues;
     }
+
 
     public String getKey() {
         return key;

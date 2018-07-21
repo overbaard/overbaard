@@ -4,11 +4,17 @@ import {UserSettingActions} from '../../model/board/user/user-setting.reducer';
 import {Dictionary} from '../../common/dictionary';
 import {BoardIssueView} from './board-issue-view';
 import {Assignee, NO_ASSIGNEE} from '../../model/board/data/assignee/assignee.model';
-import {List, Map, OrderedSet} from 'immutable';
+import {List, Map, OrderedMap, OrderedSet} from 'immutable';
 import {CustomField} from '../../model/board/data/custom-field/custom-field.model';
 import {AllFilters} from './filter.util';
 import {CURRENT_USER_FILTER_KEY, NONE_FILTER_KEY} from '../../model/board/user/board-filter/board-filter.constants';
-import {ParallelTask, ProjectState} from '../../model/board/data/project/project.model';
+import {
+  BoardProject,
+  EMPTY_PARALLEL_TASK_OVERRIDE,
+  ParallelTask,
+  ParallelTaskOption,
+  ProjectState
+} from '../../model/board/data/project/project.model';
 import {LinkedIssue} from '../../model/board/data/issue/linked-issue';
 
 describe('Apply filter tests', () => {
@@ -256,63 +262,180 @@ describe('Apply filter tests', () => {
       });
     });
     describe('Parallel Tasks', () => {
-      let projectState: ProjectState;
-      const issue: BoardIssueView = emptyIssue();
-      beforeEach(() => {
-        const tasks: Map<string, List<List<ParallelTask>>> = Map<string, List<List<ParallelTask>>>().withMutations(map => {
+      it('None', () => {
+        // Since filters are chosen for the whole board, and parallel tasks are configured per project (with possible issue types)
+        // we only want to filter ones which have this PT set up
+        expect(filtersFromQs({'pt.CD': 'One'}).filterVisible(emptyIssue())).toBe(false);
+      });
+      describe('No overrides', () => {
+        let projectState: ProjectState;
+        const issue: BoardIssueView = emptyIssue();
+        beforeEach(() => {
           const projectTasks: List<List<ParallelTask>> = List<List<ParallelTask>>([
-            {
-              name: 'Community Docs',
-              display: 'CD',
-              options: [['One', 'Two', 'Three']]
-            },
-            {
-              name: 'Test Development',
-              display: 'TD',
-              options: [['Uno', 'Dos', 'Tres']]
-            }
+            List<ParallelTask>([
+              {name: 'Community Docs', display: 'CD', options: createPtOptions('One', 'Two', 'Three')},
+              {name: 'Test Development', display: 'TD', options: createPtOptions('Uno', 'Dos', 'Tres')}
+            ])
           ]);
-          map.set('ISSUE', projectTasks);
+          projectState = {
+            boardProjects: OrderedMap<string, BoardProject>({
+              ISSUE: {
+                key: 'ISSUE',
+                parallelTasks: projectTasks,
+              }
+            }),
+            linkedProjects: null
+          };
+          issue.parallelTasks = projectTasks;
+          issue.selectedParallelTasks = createSelecteParallelTasks([[0, 1]]);
         });
-        projectState = {
-          boardProjects: null,
-          linkedProjects: null,
-          parallelTasks: tasks
-        };
-        issue.selectedParallelTasks = List<List<number>>([0, 1]);
+        it ('Matches one', () => {
+          expect(filtersWithProjectStateFromQs(projectState, {'pt.CD': 'One'}).filterVisible(issue)).toBe(true);
+        });
+        it ('Matches other', () => {
+          expect(filtersWithProjectStateFromQs(projectState, {'pt.TD': 'Dos'}).filterVisible(issue)).toBe(true);
+        });
+        it ('Matches both', () => {
+          expect(filtersWithProjectStateFromQs(projectState, {'pt.CD': 'One', 'pt.TD': 'Dos'}).filterVisible(issue)).toBe(true);
+        });
+        it ('Matches one of several', () => {
+          expect(filtersWithProjectStateFromQs(projectState, {'pt.CD': 'One,Two,Three'}).filterVisible(issue)).toBe(true);
+        });
+        it ('Matches other of several', () => {
+          expect(filtersWithProjectStateFromQs(projectState, {'pt.TD': 'Uno,Dos,Tres'}).filterVisible(issue)).toBe(true);
+        });
+        it ('Matches both of several', () => {
+          expect(
+            filtersWithProjectStateFromQs(
+              projectState, {'pt.CD': 'One, Two, Three', 'pt.TD': 'Uno,Dos,Tres'}).filterVisible(issue)).toBe(true);
+        });
+        it ('Skip matching for unknown', () => {
+          // Since filters are chosen for the whole board, and parallel tasks are configured per project (with possible issue types)
+          // we only want to filter ones which have this PT set up
+          expect(filtersWithProjectStateFromQs(projectState, {'pt.UNKNOWN': 'One'}).filterVisible(issue)).toBe(false);
+        });
+        it ('Non Match - one', () => {
+          expect(filtersWithProjectStateFromQs(projectState, {'pt.CD': 'Two'}).filterVisible(issue)).toBe(false);
+        });
+        it ('Non Match - other', () => {
+          expect(filtersWithProjectStateFromQs(projectState, {'pt.TD': 'Tres'}).filterVisible(issue)).toBe(false);
+        });
       });
-      it ('Matches one', () => {
-        expect(filtersFromQs({'pt.CD': 'One'}).filterVisible(issue)).toBe(true);
+      describe('Overrides', () => {
+        let projectState: ProjectState;
+        const issue: BoardIssueView = emptyIssue();
+        beforeEach(() => {
+          const projectTasks: List<List<ParallelTask>> = List<List<ParallelTask>>([
+            List<ParallelTask>([
+              {name: 'Community Docs', display: 'CD', options: createPtOptions('One', 'Two', 'Three')},
+              {name: 'Test Development', display: 'TD', options: createPtOptions('Uno', 'Dos', 'Tres')}
+            ])
+          ]);
+          projectState = {
+            boardProjects: OrderedMap<string, BoardProject>({
+              ISSUE: {
+                key: 'ISSUE',
+                parallelTasks: projectTasks,
+                parallelTaskIssueTypeOverrides: Map<string, List<List<ParallelTask>>>({
+                  'task': List<List<ParallelTask>>([
+                    List<ParallelTask>([
+                      {name: 'Test Development', display: 'TD', options: createPtOptions('Ein', 'Zwei', 'Drei')},
+                      {name: 'Community Docs', display: 'CD', options: createPtOptions('En', 'To', 'Tre')}
+                    ])
+                  ])
+                })
+              }
+            }),
+            linkedProjects: null
+          };
+        });
+        describe('Main PTs', () => {
+          beforeEach(() => {
+            issue.parallelTasks = projectState.boardProjects.get('ISSUE').parallelTasks;
+            issue.selectedParallelTasks = createSelecteParallelTasks([[0, 1]]);
+          });
+          it ('Matches one', () => {
+            expect(filtersWithProjectStateFromQs(projectState, {'pt.CD': 'One'}).filterVisible(issue)).toBe(true);
+          });
+          it ('Matches other', () => {
+            expect(filtersWithProjectStateFromQs(projectState, {'pt.TD': 'Dos'}).filterVisible(issue)).toBe(true);
+          });
+          it ('Non-Match one', () => {
+            expect(filtersWithProjectStateFromQs(projectState, {'pt.CD': 'To'}).filterVisible(issue)).toBe(false);
+          });
+          it ('Non-Match other', () => {
+            expect(filtersWithProjectStateFromQs(projectState, {'pt.TD': 'Drei'}).filterVisible(issue)).toBe(false);
+          });
+        });
+        describe('Other PTs', () => {
+          beforeEach(() => {
+            issue.type = {name: 'task', colour: 'red'};
+            issue.parallelTasks = projectState.boardProjects.get('ISSUE').parallelTaskIssueTypeOverrides.get('task');
+            issue.selectedParallelTasks = createSelecteParallelTasks([[1, 0]]);
+          });
+          it ('Matches one', () => {
+            expect(filtersWithProjectStateFromQs(projectState, {'pt.CD': 'En'}).filterVisible(issue)).toBe(true);
+          });
+          it ('Matches other', () => {
+            expect(filtersWithProjectStateFromQs(projectState, {'pt.TD': 'Zwei'}).filterVisible(issue)).toBe(true);
+          });
+          it ('Non-Match one', () => {
+            expect(filtersWithProjectStateFromQs(projectState, {'pt.CD': 'One'}).filterVisible(issue)).toBe(false);
+          });
+          it ('Non-Match other', () => {
+            expect(filtersWithProjectStateFromQs(projectState, {'pt.TD': 'Dos'}).filterVisible(issue)).toBe(false);
+          });
+        });
       });
-      it ('Matches other', () => {
-        expect(filtersFromQs({'pt.TD': 'Uno'}).filterVisible(issue)).toBe(true);
+      describe('Empty Overrides', () => {
+        let projectState: ProjectState;
+        const issue: BoardIssueView = emptyIssue();
+        beforeEach(() => {
+          const projectTasks: List<List<ParallelTask>> = List<List<ParallelTask>>([
+            List<ParallelTask>([
+              {name: 'Community Docs', display: 'CD', options: createPtOptions('One', 'Two', 'Three')},
+              {name: 'Test Development', display: 'TD', options: createPtOptions('Uno', 'Dos', 'Tres')}
+            ])
+          ]);
+          projectState = {
+            boardProjects: OrderedMap<string, BoardProject>({
+              ISSUE: {
+                key: 'ISSUE',
+                parallelTasks: projectTasks,
+                parallelTaskIssueTypeOverrides: Map<string, List<List<ParallelTask>>>({
+                  'task': EMPTY_PARALLEL_TASK_OVERRIDE
+                })
+              }
+            }),
+            linkedProjects: null
+          };
+        });
+        describe('Main PTs', () => {
+          beforeEach(() => {
+            issue.parallelTasks = projectState.boardProjects.get('ISSUE').parallelTasks;
+            issue.selectedParallelTasks = createSelecteParallelTasks([[0, 1]]);
+          });
+          it ('Matches one', () => {
+            expect(filtersWithProjectStateFromQs(projectState, {'pt.CD': 'One'}).filterVisible(issue)).toBe(true);
+          });
+          it ('Matches other', () => {
+            expect(filtersWithProjectStateFromQs(projectState, {'pt.TD': 'Dos'}).filterVisible(issue)).toBe(true);
+          });
+        });
+        describe('Other PTs', () => {
+          beforeEach(() => {
+            issue.type = {name: 'task', colour: 'red'};
+            issue.parallelTasks = projectState.boardProjects.get('ISSUE').parallelTaskIssueTypeOverrides.get('task');
+            issue.selectedParallelTasks = createSelecteParallelTasks([[1, 0]]);
+          });
+          it ('Non-Match one overridden', () => {
+            expect(filtersWithProjectStateFromQs(projectState, {'pt.CD': 'En'}).filterVisible(issue)).toBe(false);
+          });
+          it ('Non-Match other', () => {
+            expect(filtersWithProjectStateFromQs(projectState, {'pt.TD': 'Zwei'}).filterVisible(issue)).toBe(false);
+          });
+        });
       });
-      it ('Matches both', () => {
-        expect(filtersFromQs({'pt.CD': 'One', 'pt.TD': 'Uno'}).filterVisible(issue)).toBe(true);
-      });
-      it ('Matches one of several', () => {
-        expect(filtersFromQs({'pt.CD': 'One, Two, Three'}).filterVisible(issue)).toBe(true);
-      });
-      it ('Matches other of several', () => {
-        expect(filtersFromQs({'pt.TD': 'Uno, Dos, Tres'}).filterVisible(issue)).toBe(true);
-      });
-      it ('Matches both of several', () => {
-        expect(filtersFromQs({'pt.CD': 'One, Two, Three', 'pt.TD': 'Uno,Dos,Tres'}).filterVisible(issue)).toBe(true);
-      });
-      it ('Skip matching for unknown', () => {
-        // Since filters are chosen for the whole board, and parallel tasks are configured per project
-        // we only want to filter ones which belong to the project
-        // TODO think about whether this is correct. Perhaps we should only pick ot ones which have that PT set ups
-        expect(filtersFromQs({'pt.UNKNOWN': 'One'}).filterVisible(issue)).toBe(true);
-      });
-
-      it ('Non Match - one', () => {
-        expect(filtersFromQs({'pt.CD': 'Two'}).filterVisible(issue)).toBe(true);
-      });
-      it ('Non Match - other', () => {
-        expect(filtersFromQs({'pt.TD': 'Tres'}).filterVisible(issue)).toBe(true);
-      });
-
     });
   });
 
@@ -322,7 +445,10 @@ describe('Apply filter tests', () => {
         linkedProjects: null,
         parallelTasks: Map<string, List<List<ParallelTask>>>()
       };
+    return filtersWithProjectStateFromQs(projectState, qs, currentUser);
+  }
 
+  function filtersWithProjectStateFromQs(projectState: ProjectState, qs: Dictionary<string>, currentUser?: string): AllFilters {
     const boardFilters: BoardFilterState =
       boardFilterMetaReducer(initialBoardFilterState, UserSettingActions.createInitialiseFromQueryString(qs));
     return new AllFilters(boardFilters, projectState, currentUser);
@@ -352,4 +478,25 @@ describe('Apply filter tests', () => {
       summaryLines: List<string>()
     };
   }
+
+  function createPtOptions(...options: string[]): List<ParallelTaskOption> {
+    const ptOptions: ParallelTaskOption[] = [];
+    for (const option of options) {
+      ptOptions.push({
+        name: option,
+        colour: 'red'
+      });
+    }
+    return List<ParallelTaskOption>(ptOptions);
+  }
+
+  function createSelecteParallelTasks(selected: number[][]) {
+    return List<List<number>>().withMutations(mutable => {
+      for (const group of selected) {
+        mutable.push(List<number>(group));
+      }
+    });
+  }
 });
+
+

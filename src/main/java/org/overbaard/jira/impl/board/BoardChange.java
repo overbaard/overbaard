@@ -64,6 +64,7 @@ public class BoardChange {
     private final Map<String, CustomFieldValue> customFieldValues;
     private final Map<String, CustomFieldValue> newCustomFieldValues;
     private final Map<ParallelTaskGroupPosition, Integer> parallelTaskGroupValues;
+    private final boolean clearParallelTaskGroupValues;
     private final Boolean fromBacklogState;
 
 
@@ -75,7 +76,7 @@ public class BoardChange {
                         Boolean fromBacklogState, Boolean backlogState,
                         Map<String, CustomFieldValue> customFieldValues,
                         Map<String, CustomFieldValue> newCustomFieldValues,
-                        Map<ParallelTaskGroupPosition, Integer> parallelTaskGroupValues) {
+                        Map<ParallelTaskGroupPosition, Integer> parallelTaskGroupValues, boolean clearParallelTaskGroupValues) {
         this.view = view;
         this.event = event;
         this.newAssignee = newAssignee;
@@ -92,6 +93,7 @@ public class BoardChange {
         this.customFieldValues = customFieldValues;
         this.newCustomFieldValues = newCustomFieldValues;
         this.parallelTaskGroupValues = parallelTaskGroupValues;
+        this.clearParallelTaskGroupValues = clearParallelTaskGroupValues;
     }
 
     long getTime() {
@@ -166,6 +168,10 @@ public class BoardChange {
         return parallelTaskGroupValues;
     }
 
+    public boolean isClearParallelTaskGroupValues() {
+        return clearParallelTaskGroupValues;
+    }
+
     public static class Builder {
         private final BoardChangeRegistry registry;
         private final int view;
@@ -193,6 +199,7 @@ public class BoardChange {
         private Boolean backlogState;
         private Map<String, CustomFieldValue> customFieldValues;
         private Map<ParallelTaskGroupPosition, Integer> parallelTaskGroupValues;
+        private boolean clearParallelTaskGroupValues;
 
         Builder(BoardChangeRegistry registry, int view, OverbaardIssueEvent event) {
             this.registry = registry;
@@ -270,12 +277,17 @@ public class BoardChange {
             return this;
         }
 
+        public void clearParallelTaskGroupValues() {
+            clearParallelTaskGroupValues = true;
+        }
+
+
         public void buildAndRegister() {
             BoardChange change = new BoardChange(
                     view, event, newAssignee, newComponents, newLabels, newFixVersions, addedBlacklistState,
                     addedBlacklistPriority, addedBlacklistIssueType, addedBlacklistIssue, deletedBlacklistIssue,
                     fromBacklogState, backlogState, customFieldValues, newCustomFieldValues,
-                    parallelTaskGroupValues);
+                    parallelTaskGroupValues, clearParallelTaskGroupValues);
             registry.registerChange(change);
         }
 

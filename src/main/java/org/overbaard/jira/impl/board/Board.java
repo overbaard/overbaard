@@ -650,14 +650,15 @@ public class Board {
             final BoardProject.Updater projectUpdater = project.updater(jiraInjectables, nextRankedIssueUtil, this, boardOwner);
             final Map<String, CustomFieldValue> customFieldValues
                     = CustomFieldValue.loadCustomFieldValues(projectUpdater, evtDetail.getCustomFieldValues());
-            final Map<ParallelTaskGroupPosition, Integer> parallelTaskGroupValues
-                    = CustomFieldValue.loadParallelTaskGroupValues(create, projectUpdater, evtDetail.getCustomFieldValues());
 
             final Issue existingIssue;
             final Issue newIssue;
+            final Map<ParallelTaskGroupPosition, Integer> parallelTaskGroupValues;
             if (create) {
                 OverbaardLogger.LOGGER.debug("Board.Updater.handleCreateOrUpdateIssue- create issue {}", event.getIssueKey());
                 existingIssue = null;
+                parallelTaskGroupValues =
+                        CustomFieldValue.loadParallelTaskGroupValues(projectUpdater, evtDetail.getCustomFieldValues(), null, evtDetail.getIssueType());
                 newIssue = projectUpdater.createIssue(event.getIssueKey(), evtDetail.getIssueType(),
                         evtDetail.getPriority(), evtDetail.getSummary(), issueAssignee,
                         issueComponents, issueLabels, issueFixVersions,
@@ -671,6 +672,9 @@ public class Board {
                         //We are doing a state change from one of the 'done' states for which we do not cache issues,
                         //into a cached state. Load it up and add it to the board
                         newIssue = projectUpdater.loadSingleIssue(event.getIssueKey());
+
+                        // A bit ugly, but further down we don't use value if we are moving from done
+                        parallelTaskGroupValues = Collections.emptyMap();
                         if (newIssue == null) {
                             throw new IllegalArgumentException("Can't load issue that was updated from a 'done' state: " + event.getIssueKey() + " in board " + board.boardConfig.getId());
                         }
@@ -679,6 +683,7 @@ public class Board {
                     }
                 } else {
                     OverbaardLogger.LOGGER.debug("Board.Updater.handleCreateOrUpdateIssue- Updating issue {}", event.getIssueKey());
+                    parallelTaskGroupValues = CustomFieldValue.loadParallelTaskGroupValues(projectUpdater, evtDetail.getCustomFieldValues(), existingIssue, evtDetail.getIssueType());
                     newIssue = projectUpdater.updateIssue(existingIssue, evtDetail.getIssueType(),
                             evtDetail.getPriority(), evtDetail.getSummary(), issueAssignee,
                             issueComponents, issueLabels, issueFixVersions,
@@ -760,6 +765,10 @@ public class Board {
                     }
                     if (parallelTaskGroupValues.size() > 0) {
                         changeBuilder.setParallelTaskGroupValues(parallelTaskGroupValues);
+                    } else {
+                        if (existingIssue != null && evtDetail.getIssueType() != null) {
+                            changeBuilder.clearParallelTaskGroupValues();
+                        }
                     }
                     OverbaardLogger.LOGGER.debug("Board.Updater.handleCreateOrUpdateIssue - Registering change");
                     changeBuilder.buildAndRegister();

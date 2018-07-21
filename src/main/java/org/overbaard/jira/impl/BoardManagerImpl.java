@@ -112,14 +112,16 @@ public class BoardManagerImpl implements BoardManager, InitializingBean, Disposa
         }
 
         final String projectCode = issueKey.substring(0, issueKey.indexOf("-"));
+        final String issueType = issue.getIssueType().getName();
 
         final ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig =
-                board.getConfig().getBoardProject(projectCode).getParallelTaskGroupsConfig();
+                board.getConfig().getBoardProject(projectCode).getParallelTaskGroupsConfig(issueType);
         final ParallelTaskCustomFieldConfig taskFieldConfig = parallelTaskGroupsConfig.forPosition(groupIndex, taskIndex);
         final CustomField customField = taskFieldConfig.getJiraCustomField();
 
         final BoardProject boardProject = board.getBoardProject(projectCode);
-        final SortedParallelTaskFieldOptions sortedParallelTaskFieldOptions = boardProject.getParallelTaskValues().get(taskFieldConfig.getName());
+        final SortedParallelTaskFieldOptions sortedParallelTaskFieldOptions =
+                boardProject.getParallelTaskOptions().getOptions(issueType).get(taskFieldConfig.getName());
         final CustomFieldValue value = sortedParallelTaskFieldOptions.forIndex(optionIndex);
 
         final IssueInputParameters inputParameters = issueService.newIssueInputParameters();
@@ -153,7 +155,7 @@ public class BoardManagerImpl implements BoardManager, InitializingBean, Disposa
                         //Since the field is not set, guess the default value (i.e. the first one in the list)
                         //Later if this is not satisfactory, we can use the Jira SDK to figure
                         final SortedParallelTaskFieldOptions currentParallelTaskFieldOptions =
-                                boardProject.getParallelTaskValues().get(parallelTaskField.getName());
+                                boardProject.getParallelTaskOptions().getInternalAdvanced().getOptionsForProject().get(parallelTaskField.getName());
                         CustomFieldValue defaultValue = currentParallelTaskFieldOptions.forIndex(0);
 
                         inputParameters.addCustomFieldValue(currentField.getId(), defaultValue.getKey());
@@ -301,15 +303,15 @@ public class BoardManagerImpl implements BoardManager, InitializingBean, Disposa
                 });
     }
 
-    public Set<ParallelTaskCustomFieldConfig> getParallelTaskFieldsForUpdateEvent(String projectCode, String jiraCustomFieldName) {
+    public Set<ParallelTaskCustomFieldConfig> getParallelTaskFieldsForUpdateEvent(String projectCode, String issueType, String jiraCustomFieldName) {
         return processBoardConfigs(
                 projectCode,
                 new BiFunction<BoardConfig, Set<ParallelTaskCustomFieldConfig>, Set<ParallelTaskCustomFieldConfig>>() {
                     @Override
                     public Set<ParallelTaskCustomFieldConfig> apply(BoardConfig boardConfig, Set<ParallelTaskCustomFieldConfig> result) {
                         BoardProjectConfig projectConfig = boardConfig.getBoardProject(projectCode);
-                        if (projectConfig != null && projectConfig.getParallelTaskGroupsConfig() != null) {
-                            ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig = projectConfig.getParallelTaskGroupsConfig();
+                        if (projectConfig != null && projectConfig.getParallelTaskGroupsConfig(issueType) != null) {
+                            ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig = projectConfig.getParallelTaskGroupsConfig(issueType);
                             return new HashSet<>(parallelTaskGroupsConfig.getFieldConfigs());
                         }
                         return result;
@@ -318,15 +320,15 @@ public class BoardManagerImpl implements BoardManager, InitializingBean, Disposa
     }
 
 
-    public Set<ParallelTaskCustomFieldConfig> getParallelTaskFieldsForCreateEvent(String projectCode) {
+    public Set<ParallelTaskCustomFieldConfig> getParallelTaskFieldsForCreateEvent(String projectCode, String issueType) {
         return processBoardConfigs(
                 projectCode,
                 new BiFunction<BoardConfig, Set<ParallelTaskCustomFieldConfig>, Set<ParallelTaskCustomFieldConfig>>() {
                     @Override
                     public Set<ParallelTaskCustomFieldConfig> apply(BoardConfig boardConfig, Set<ParallelTaskCustomFieldConfig> result) {
                         BoardProjectConfig projectConfig = boardConfig.getBoardProject(projectCode);
-                        if (projectConfig != null && projectConfig.getParallelTaskGroupsConfig() != null) {
-                            ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig = projectConfig.getParallelTaskGroupsConfig();
+                        if (projectConfig != null && projectConfig.getParallelTaskGroupsConfig(issueType) != null) {
+                            ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig = projectConfig.getParallelTaskGroupsConfig(issueType);
                             return new HashSet<>(parallelTaskGroupsConfig.getFieldConfigs());
                         }
                         return result;

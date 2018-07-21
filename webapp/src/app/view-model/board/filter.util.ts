@@ -17,7 +17,14 @@ import {BoardIssueView} from './board-issue-view';
 import {List, Map, Set} from 'immutable';
 import {NO_ASSIGNEE} from '../../model/board/data/assignee/assignee.model';
 import {CustomField} from '../../model/board/data/custom-field/custom-field.model';
-import {ParallelTask, ParallelTaskPosition, ProjectState, ProjectUtil} from '../../model/board/data/project/project.model';
+import {
+  ParallelTask,
+  ParallelTaskOption,
+  ParallelTaskPosition,
+  ProjectState,
+  ProjectUtil
+} from '../../model/board/data/project/project.model';
+import {P} from '@angular/core/src/render3';
 
 export class AllFilters {
   private _project: SimpleFilter;
@@ -30,6 +37,7 @@ export class AllFilters {
   private _customFieldFilters: Map<string, SimpleFilter>;
   private _parallelTaskFilters: Map<string, SimpleFilter>;
   private _parallelTaskFilterPositionsByProject: Map<string, Map<string, ParallelTaskPosition>>;
+  private _parallelTaskFilterPositionsByProjectIssueTypeOverride: Map<string, Map<string, Map<string, ParallelTaskPosition>>>;
 
   constructor(boardFilters: BoardFilterState, projectState: ProjectState, currentUser: string) {
     this._project = new SimpleFilter(PROJECT_ATTRIBUTES, boardFilters.project);
@@ -52,8 +60,31 @@ export class AllFilters {
       });
     });
     this._parallelTaskFilterPositionsByProject = Map<string, Map<string, ParallelTaskPosition>>().withMutations(mutable => {
-      projectState.parallelTasks.forEach((groups, project) => {
-          mutable.set(project, this.createParallelTaskIndices(groups));
+      if (projectState.boardProjects) {
+        projectState.boardProjects.forEach((project) => {
+          if (project.parallelTasks) {
+            mutable.set(project.key, this.createParallelTaskIndices(project.parallelTasks));
+          }
+        });
+      }
+    });
+    this._parallelTaskFilterPositionsByProjectIssueTypeOverride =
+      Map<string, Map<string, Map<string, ParallelTaskPosition>>>().withMutations(mutable => {
+      if (projectState.boardProjects) {
+        projectState.boardProjects.forEach(project => {
+          if (project.parallelTaskIssueTypeOverrides) {
+            mutable.set(project.key, this.createParallelTaskIssueTypeOverrideIndices(project.parallelTaskIssueTypeOverrides));
+          }
+        });
+      }
+    });
+  }
+
+  private createParallelTaskIssueTypeOverrideIndices(parallelTaskIssueTypeOverrides: Map<string, List<List<ParallelTask>>>):
+    Map<string, Map<string, ParallelTaskPosition>> {
+    return Map<string, Map<string, ParallelTaskPosition>>().withMutations(mutable => {
+      parallelTaskIssueTypeOverrides.forEach((parallelTasks, issueType) => {
+        mutable.set(issueType, this.createParallelTaskIndices(parallelTasks));
       });
     });
   }
@@ -119,21 +150,42 @@ export class AllFilters {
 
   private filterVisibleParallelTasks(issue: BoardIssueView): boolean {
     let visible = true;
-    const positionsForProject: Map<string, ParallelTaskPosition> = this._parallelTaskFilterPositionsByProject.get(issue.projectCode);
-    this._parallelTaskFilters.forEach((f, k) => {
-      if (positionsForProject) {
-        const pos: ParallelTaskPosition = positionsForProject.get(k);
-        if (!issue.parallelTasks ||
-          !f.doFilter(
-            issue.parallelTasks
-              .getIn([pos.groupIndex, pos.taskIndex])
-              .options.get(issue.selectedParallelTasks.getIn([pos.groupIndex, pos.taskIndex])).name)) {
+    const parallelTaskPositions: Map<string, ParallelTaskPosition> = this.getParallelTaskPositionsForIssue(issue);
+    if (parallelTaskPositions) {
+      this._parallelTaskFilters.forEach((f, k) => {
+        const pos: ParallelTaskPosition = parallelTaskPositions.get(k);
+        if (!pos) {
           visible = false;
           return false;
         }
-      }
-    });
+
+        if (issue.parallelTasks) {
+          const position: number[] = [pos.groupIndex, pos.taskIndex];
+          const task: ParallelTask = issue.parallelTasks.getIn(position);
+          const selectedOptionIndex: number = issue.selectedParallelTasks.getIn(position);
+          const selectedOption: ParallelTaskOption = task.options.get(selectedOptionIndex);
+          if (!f.doFilter(selectedOption.name)) {
+            visible = false;
+            return false;
+          }
+        } else {
+          visible = false;
+          return false;
+        }
+      });
+    } else if (this._parallelTaskFilters.size > 0) {
+      visible = false;
+    }
     return visible;
+  }
+
+  private getParallelTaskPositionsForIssue(issue: BoardIssueView): Map<string, ParallelTaskPosition> {
+    const issueTypeParallelTaskPositions: Map<string, ParallelTaskPosition> =
+      this._parallelTaskFilterPositionsByProjectIssueTypeOverride.getIn([issue.projectCode, issue.type.name]);
+    if (issueTypeParallelTaskPositions) {
+      return issueTypeParallelTaskPositions;
+    }
+    return this._parallelTaskFilterPositionsByProject.get(issue.projectCode);
   }
 }
 

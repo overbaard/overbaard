@@ -15,6 +15,8 @@
  */
 package org.overbaard.jira.impl.board;
 
+import static org.overbaard.jira.impl.Constants.OVERRIDES;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -26,6 +28,7 @@ import java.util.Set;
 import org.jboss.dmr.ModelNode;
 import org.overbaard.jira.OverbaardLogger;
 import org.overbaard.jira.api.NextRankedIssueUtil;
+import org.overbaard.jira.api.ParallelTaskOptions;
 import org.overbaard.jira.api.ProjectParallelTaskOptionsLoader;
 import org.overbaard.jira.impl.Constants;
 import org.overbaard.jira.impl.JiraInjectables;
@@ -67,12 +70,12 @@ public class BoardProject {
     private volatile Board board;
     private final BoardProjectConfig projectConfig;
     private final List<String> rankedIssueKeys;
-    private final Map<String, SortedParallelTaskFieldOptions> parallelTaskValues;
+    private final ParallelTaskOptions parallelTaskOptions;
 
-    private BoardProject(BoardProjectConfig projectConfig, List<String> rankedIssueKeys, Map<String, SortedParallelTaskFieldOptions> parallelTaskValues) {
+    private BoardProject(BoardProjectConfig projectConfig, List<String> rankedIssueKeys, ParallelTaskOptions parallelTaskOptions) {
         this.projectConfig = projectConfig;
         this.rankedIssueKeys = rankedIssueKeys;
-        this.parallelTaskValues = parallelTaskValues;
+        this.parallelTaskOptions = parallelTaskOptions;
     }
 
     void setBoard(Board board) {
@@ -118,24 +121,32 @@ public class BoardProject {
         }
         parent.get(Constants.RANKED).set(ranked);
 
-        if (parallelTaskValues.size() > 0) {
+        if (parallelTaskOptions.getInternalAdvanced().getOptionsForProject().size() > 0) {
             ModelNode parallelTasks = parent.get(Constants.PARALLEL_TASKS).setEmptyList();
-            for (ProjectParallelTaskConfig group : this.projectConfig.getParallelTaskGroupsConfig().getGroups()) {
+            for (ProjectParallelTaskConfig group : this.projectConfig.getInternalAdvanced().getParallelTaskGroupsConfig().getGroups()) {
                 ModelNode groupNode = new ModelNode().setEmptyList();
                 for (ParallelTaskCustomFieldConfig cfg : group.getConfigs().values()) {
-                    SortedParallelTaskFieldOptions options = parallelTaskValues.get(cfg.getName());
+                    SortedParallelTaskFieldOptions options = parallelTaskOptions.getInternalAdvanced().getOptionsForProject().get(cfg.getName());
                     options.serialize(groupNode);
                 }
                 parallelTasks.add(groupNode);
             }
         }
+        ModelNode overrides = BoardProjectIssueTypeOverrideSerializer.create(
+                projectConfig.getIssueTypeOverrideConfig(),
+                projectConfig,
+                parallelTaskOptions).serialize();
+        if (overrides.isDefined()) {
+            parent.get(OVERRIDES).set(overrides);
+        }
     }
+
+
 
     static Builder builder(JiraInjectables jiraInjectables, ProjectParallelTaskOptionsLoader projectParallelTaskOptionsLoader, Board.Builder builder, BoardProjectConfig projectConfig,
                            ApplicationUser boardOwner) {
-        Map<String, SortedParallelTaskFieldOptions> parallelTaskValues = projectParallelTaskOptionsLoader.loadValues(jiraInjectables, builder.getConfig(), projectConfig);
-        parallelTaskValues = Collections.unmodifiableMap(parallelTaskValues);
-        return new Builder(jiraInjectables, builder, projectConfig, boardOwner, parallelTaskValues);
+        ParallelTaskOptions parallelTaskOptions = projectParallelTaskOptionsLoader.loadValues(jiraInjectables, builder.getConfig(), projectConfig);
+        return new Builder(jiraInjectables, builder, projectConfig, boardOwner, parallelTaskOptions);
     }
 
     static LinkedProjectContext linkedProjectContext(Board.Accessor board, LinkedProjectConfig linkedProjectConfig) {
@@ -165,8 +176,8 @@ public class BoardProject {
         return projectConfig.getCode();
     }
 
-    public Map<String, SortedParallelTaskFieldOptions> getParallelTaskValues() {
-        return parallelTaskValues;
+    public ParallelTaskOptions getParallelTaskOptions() {
+        return parallelTaskOptions;
     }
 
     private boolean hasRankPermission(ApplicationUser user, ProjectManager projectManager, PermissionManager permissionManager) {
@@ -362,7 +373,7 @@ public class BoardProject {
             return jiraInjectables;
         }
 
-        abstract Map<String, SortedParallelTaskFieldOptions> getParallelTaskValues();
+        abstract ParallelTaskOptions getParallelTaskOptions();
 
     }
 
@@ -372,13 +383,13 @@ public class BoardProject {
     public static class Builder extends Accessor {
         private final List<String> rankedIssueKeys = new ArrayList<>();
         private final Map<String, List<String>> issueKeysByState = new HashMap<>();
-        private final Map<String, SortedParallelTaskFieldOptions> parallelTaskValues;
+        private final ParallelTaskOptions parallelTaskOptions;
 
 
         private Builder(JiraInjectables jiraInjectables, Board.Accessor board, BoardProjectConfig projectConfig,
-                        ApplicationUser boardOwner, Map<String, SortedParallelTaskFieldOptions> parallelTaskValues) {
+                        ApplicationUser boardOwner, ParallelTaskOptions parallelTaskOptions) {
             super(jiraInjectables, board, projectConfig, boardOwner);
-            this.parallelTaskValues = parallelTaskValues;
+            this.parallelTaskOptions = parallelTaskOptions;
         }
 
         Builder addIssue(String state, Issue issue) {
@@ -388,8 +399,8 @@ public class BoardProject {
             return this;
         }
 
-        public Map<String, SortedParallelTaskFieldOptions> getParallelTaskValues() {
-            return parallelTaskValues;
+        public ParallelTaskOptions getParallelTaskOptions() {
+            return parallelTaskOptions;
         }
 
         void load() throws SearchException {
@@ -420,7 +431,7 @@ public class BoardProject {
             return new BoardProject(
                     projectConfig,
                     Collections.unmodifiableList(rankedIssueKeys),
-                    Collections.unmodifiableMap(parallelTaskValues));
+                    parallelTaskOptions);
         }
 
         public void addBulkLoadedCustomFieldValue(CustomFieldConfig customFieldConfig, CustomFieldValue value) {
@@ -485,8 +496,8 @@ public class BoardProject {
             rankedIssueKeys.remove(issue.getKey());
         }
 
-        public Map<String, SortedParallelTaskFieldOptions> getParallelTaskValues() {
-            return project.getParallelTaskValues();
+        public ParallelTaskOptions getParallelTaskOptions() {
+            return project.getParallelTaskOptions();
         }
 
 
@@ -551,7 +562,7 @@ public class BoardProject {
                     this.rankedIssueKeys != null ?
                             Collections.unmodifiableList(this.rankedIssueKeys) : project.rankedIssueKeys;
 
-            return new BoardProject(projectConfig, rankedIssueKeys, project.parallelTaskValues);
+            return new BoardProject(projectConfig, rankedIssueKeys, project.parallelTaskOptions);
         }
     }
 

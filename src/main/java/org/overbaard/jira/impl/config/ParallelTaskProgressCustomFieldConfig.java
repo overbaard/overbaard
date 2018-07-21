@@ -33,4 +33,25 @@ class ParallelTaskProgressCustomFieldConfig extends CustomFieldConfigImpl implem
         return code;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!super.equals(o)) {
+            return false;
+        }
+        if (this == o) return true;
+        if (!(o instanceof ParallelTaskCustomFieldConfig)) return false;
+
+        ParallelTaskProgressCustomFieldConfig that = (ParallelTaskProgressCustomFieldConfig) o;
+
+        if (!code.equals(that.code)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + code.hashCode();
+        return result;
+    }
 }

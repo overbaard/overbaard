@@ -255,39 +255,31 @@ public class OverbaardIssueEventListener implements InitializingBean, Disposable
         }
 
         final Set<CustomFieldConfig> customFields = boardManager.getCustomFieldsForCreateEvent(issue.getProjectObject().getKey());
-        Map<Long, String> values = null;
+        Map<Long, String> customFieldValues = null;
         if (customFields.size() > 0) {
-            values = new HashMap<>();
+            customFieldValues = new HashMap<>();
             for (CustomFieldConfig cfg : customFields) {
-                if (!values.containsKey(cfg.getId())) {
+                if (!customFieldValues.containsKey(cfg.getId())) {
                     final Object value = issue.getCustomFieldValue(cfg.getJiraCustomField());
                     CustomFieldUtil customFieldUtil = CustomFieldUtil.getUtil(cfg);
                     String stringValue = value == null ? null : customFieldUtil.getCreateEventValue(value);
-                    values.put(cfg.getId(), stringValue);
+                    customFieldValues.put(cfg.getId(), stringValue);
                 }
             }
         }
 
-        final Set<ParallelTaskCustomFieldConfig> parallelFields = boardManager.getParallelTaskFieldsForCreateEvent(issue.getProjectObject().getKey());
-        if (parallelFields.size() > 0) {
-            if (values == null) {
-                values = new HashMap<>();
+        Map<Long, String> parallelTaskValues = setParallelTaskFieldsForNewIssueOrUpdatedIssueWithChangedIssueType(issue);
+        if (parallelTaskValues != null) {
+            if (customFieldValues == null) {
+                customFieldValues = new HashMap<>();
             }
-            for (ParallelTaskCustomFieldConfig cfg : parallelFields) {
-                if (!values.containsKey(cfg.getId())) {
-                    //A field cannot be both a custom field and a parallel task field
-                    String value = CustomFieldValue.getParallelTaskCustomFieldValue(issue, cfg.getJiraCustomField(), cfg.getId().toString());
-                    if (value != null) {
-                        values.put(cfg.getId(), value);
-                    }
-                }
-            }
+            customFieldValues.putAll(parallelTaskValues);
         }
 
         final OverbaardIssueEvent event = OverbaardIssueEvent.createCreateEvent(issue.getKey(), issue.getProjectObject().getKey(),
                 issue.getIssueTypeObject().getName(), issue.getPriorityObject().getName(), issue.getSummary(),
                 issue.getAssignee(), issue.getComponentObjects(), issue.getLabels(), issue.getFixVersions(),
-                issue.getStatusObject().getName(), values);
+                issue.getStatusObject().getName(), customFieldValues);
 
         passEventToBoardManagerOrDelay(event);
 
@@ -314,6 +306,7 @@ public class OverbaardIssueEventListener implements InitializingBean, Disposable
         //All the fields that changed, and only those, are in the change log.
         //For our created event, only set the fields that actually changed.
         String issueType = null;
+        String oldIssueType = null;
         String priority = null;
         String summary = null;
         ApplicationUser assignee = null;
@@ -330,6 +323,7 @@ public class OverbaardIssueEventListener implements InitializingBean, Disposable
             final String field = change.getString(CHANGE_LOG_FIELD);
             if (field.equals(CHANGE_LOG_ISSUETYPE)) {
                 issueType = issue.getIssueTypeObject().getName();
+                oldIssueType = change.getString(CHANGE_LOG_OLD_STRING);
             } else if (field.equals(CHANGE_LOG_PRIORITY)) {
                 priority = issue.getPriorityObject().getName();
             } else if (field.equals(CHANGE_LOG_SUMMARY)) {
@@ -365,7 +359,7 @@ public class OverbaardIssueEventListener implements InitializingBean, Disposable
                 }
 
                 Set<ParallelTaskCustomFieldConfig> parallelTaskConfigs
-                        = boardManager.getParallelTaskFieldsForUpdateEvent(issue.getProjectObject().getKey(), field);
+                        = boardManager.getParallelTaskFieldsForUpdateEvent(issue.getProjectObject().getKey(), issue.getIssueType().getName(), field);
                 if (parallelTaskConfigs.size() > 0) {
                     if (customFieldValues == null) {
                         customFieldValues = new HashMap<>();
@@ -378,6 +372,17 @@ public class OverbaardIssueEventListener implements InitializingBean, Disposable
                 }
             }
         }
+        if (issueType != null) {
+            // When changing the issue type, we always overwrite the PT fields
+            Map<Long, String> parallelTaskValues = setParallelTaskFieldsForNewIssueOrUpdatedIssueWithChangedIssueType(issue);
+            if (parallelTaskValues != null) {
+                if (customFieldValues == null) {
+                    customFieldValues = new HashMap<>();
+                }
+                customFieldValues.putAll(parallelTaskValues);
+            }
+        }
+
         final OverbaardIssueEvent event = OverbaardIssueEvent.createUpdateEvent(
                 issue.getKey(), issue.getProjectObject().getKey(),
                 issueType, priority,
@@ -385,6 +390,7 @@ public class OverbaardIssueEventListener implements InitializingBean, Disposable
                 //Always pass in the existing/old state of the issue
                 oldState != null ? oldState : issue.getStatusObject().getName(),
                 state, reranked, customFieldValues);
+
         passEventToBoardManagerOrDelay(event);
     }
 
@@ -447,6 +453,27 @@ public class OverbaardIssueEventListener implements InitializingBean, Disposable
             return Collections.emptyList();
         }
         return changeItems;
+    }
+
+    private Map<Long, String> setParallelTaskFieldsForNewIssueOrUpdatedIssueWithChangedIssueType(Issue issue) {
+
+        final Set<ParallelTaskCustomFieldConfig> parallelFields =
+                boardManager.getParallelTaskFieldsForCreateEvent(issue.getProjectObject().getKey(), issue.getIssueType().getName());
+        if (parallelFields.size() > 0) {
+            Map<Long, String> values = new HashMap<>();
+
+            for (ParallelTaskCustomFieldConfig cfg : parallelFields) {
+                if (!values.containsKey(cfg.getId())) {
+                    //A field cannot be both a custom field and a parallel task field
+                    String value = CustomFieldValue.getParallelTaskCustomFieldValue(issue, cfg.getJiraCustomField(), cfg.getId().toString());
+                    if (value != null) {
+                        values.put(cfg.getId(), value);
+                    }
+                }
+            }
+            return values;
+        }
+        return null;
     }
 
     private void passEventToBoardManagerOrDelay(OverbaardIssueEvent event) throws IndexException {

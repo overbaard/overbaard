@@ -18,30 +18,12 @@ export class ProjectActions {
   static createDeserializeProjects(input: any): DeserializeProjectsAction {
     const boardProjects: OrderedMap<string, BoardProject> = OrderedMap<string, BoardProject>().asMutable();
     const linkedProjects: Map<string, LinkedProject> = Map<string, LinkedProject>().asMutable();
-    const parallelTasks: Map<string, List<List<ParallelTask>>> = Map<string, List<List<ParallelTask>>>().asMutable();
 
     const mainInput: any = input['main'];
 
     for (const projectInput of mainInput) {
       const project: BoardProject = ProjectUtil.boardProjectFromJs(projectInput);
       boardProjects.set(project.key, project);
-      let parallelTasksInput: any[] = projectInput['parallel-tasks'];
-      if (parallelTasksInput) {
-        // Something makes this read-only so clone it
-        parallelTasksInput = cloneObject(parallelTasksInput);
-        const tasks: List<List<ParallelTask>> = List<List<ParallelTask>>().withMutations(mutableTasks => {
-          for (let groupIndex = 0 ; groupIndex < parallelTasksInput.length ; groupIndex++) {
-            const group: any[] = parallelTasksInput[groupIndex];
-            for (let taskIndex = 0 ; taskIndex < group.length ; taskIndex++) {
-              const task: ParallelTask = ProjectUtil.parallelTaskFromJs(group[taskIndex]);
-              group[taskIndex] = task;
-            }
-            const groupList: List<ParallelTask> = List<ParallelTask>(group);
-            mutableTasks.push(groupList);
-          }
-        });
-        parallelTasks.set(project.key, tasks);
-      }
     }
 
     const linkedInput = input['linked'];
@@ -54,8 +36,7 @@ export class ProjectActions {
 
     const payload: ProjectState = {
       boardProjects: boardProjects.asImmutable(),
-      linkedProjects: linkedProjects.asImmutable(),
-      parallelTasks: parallelTasks.asImmutable()
+      linkedProjects: linkedProjects.asImmutable()
     };
 
     return new DeserializeProjectsAction(payload);
@@ -74,9 +55,6 @@ export function projectMetaReducer(state: ProjectState = initialProjectState, ac
         if (!mutable.linkedProjects.equals(payload.linkedProjects)) {
           mutable.linkedProjects = payload.linkedProjects;
         }
-        if (!mutable.parallelTasks.equals(payload.parallelTasks)) {
-          mutable.parallelTasks = payload.parallelTasks;
-        }
       });
     }
   }
@@ -86,7 +64,7 @@ export function projectMetaReducer(state: ProjectState = initialProjectState, ac
 const getProjectState = (state: AppState): ProjectState => state.board.projects;
 const getBoardProjects = (state: ProjectState): OrderedMap<string, BoardProject> => state.boardProjects;
 const getLinkedProjects = (state: ProjectState): Map<string, LinkedProject> => state.linkedProjects;
-const getParallelTasks = (state: ProjectState): OrderedMap<string, List<List<ParallelTask>>> => state.parallelTasks;
+// const getParallelTasks = (state: ProjectState): OrderedMap<string, List<List<ParallelTask>>> => state.parallelTasks;
 export const boardProjectsSelector = createSelector(getProjectState, getBoardProjects);
-export const parallelTasksSelector = createSelector(getProjectState, getParallelTasks);
+// export const parallelTasksSelector = createSelector(getProjectState, getParallelTasks);
 export const linkedProjectsSelector = createSelector(getProjectState, getLinkedProjects);
