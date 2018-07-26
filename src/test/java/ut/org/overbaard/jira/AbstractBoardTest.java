@@ -62,12 +62,12 @@ public abstract class AbstractBoardTest {
     public MockitoContainer mockitoContainer = MockitoMocksInContainer.rule(this);
 
     protected BoardManager boardManager;
+    protected BoardConfigurationManager boardConfigurationManager;
     protected UserManager userManager;
     protected IssueRegistry issueRegistry;
     protected NextRankedIssueUtil nextRankedIssueUtil;
     protected SearchCallback searchCallback = new SearchCallback();
 
-    @Before
     public void initializeMocks() throws Exception {
         initializeMocks("config/board-tdp.json");
     }
@@ -77,12 +77,24 @@ public abstract class AbstractBoardTest {
     }
 
     protected void initializeMocks(String cfgResource, AdditionalBuilderInit init) throws Exception {
-        BoardConfigurationManager cfgManager = new BoardConfigurationManagerBuilder()
+        this.boardConfigurationManager = new BoardConfigurationManagerBuilder()
                 .addConfigActiveObjectsFromFile(cfgResource)
                 .addSettingActiveObject(RANK_CUSTOM_FIELD_ID, "10000")
                 .setCustomFieldManager(CustomFieldManagerBuilder.loadFromResource(cfgResource))
                 .build();
+        initializeMocks(this.boardConfigurationManager, init);
+    }
 
+    protected void initializeMocks(ModelNode config, AdditionalBuilderInit init) throws Exception {
+        this.boardConfigurationManager = new BoardConfigurationManagerBuilder()
+                .addConfigActiveObjectsFromModel(config)
+                .addSettingActiveObject(RANK_CUSTOM_FIELD_ID, "10000")
+                .setCustomFieldManager(CustomFieldManagerBuilder.loadFromModel(config))
+                .build();
+        initializeMocks(this.boardConfigurationManager, init);
+    }
+
+    private void initializeMocks(BoardConfigurationManager cfgManager, AdditionalBuilderInit init) throws Exception {
         MockComponentWorker worker = new MockComponentWorker();
         userManager = new UserManagerBuilder()
                 .addDefaultUsers()
@@ -111,6 +123,8 @@ public abstract class AbstractBoardTest {
         }
         boardManager = boardManagerBuilder.build();
     }
+
+
 
     protected CreateEventBuilder createEventBuilder(String issueKey, IssueType issueType, Priority priority, String summary) {
         return new CreateEventBuilder(issueKey, issueType == null ? null : issueType.name, priority == null ? null : priority.name, summary);

@@ -42,8 +42,6 @@ public abstract class ProjectConfig<S extends ProjectStateList> {
         return code;
     }
 
-    public S getProjectStatesLinks(String issueType) {
-        return projectStates;
-    }
+    public abstract S getProjectStatesLinks(String issueType);
 
 }

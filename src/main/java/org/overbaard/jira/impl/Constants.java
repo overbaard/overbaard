@@ -47,6 +47,7 @@ public class Constants {
     public static final String EMAIL = "email";
     public static final String FIELDS = "fields";
     public static final String FIELD_ID = "field-id";
+    public static final String FILTER = "filter";
     public static final String FIX_VERSIONS = "fix-versions";
     public static final String HEADER = "header";
     public static final String HEADERS = "headers";
@@ -60,6 +61,7 @@ public class Constants {
     public static final String LABELS = "labels";
     public static final String LINKED = "linked";
     public static final String LINKED_ISSUES = "linked-issues";
+    public static final String LINK_NAMES = "link-names";
     public static final String LINKED_PROJECTS = "linked-projects";
     public static final String MAIN = "main";
     public static final String NAME = "name";
@@ -85,6 +87,7 @@ public class Constants {
     public static final String STATES = "states";
     public static final String SUMMARY = "summary";
     public static final String TYPE = "type";
+    public static final String TYPE_STATES = "type-states";
     public static final String UPDATE = "update";
     public static final String UPDATES = "updates";
     public static final String UNASSIGNED = "unassigned";

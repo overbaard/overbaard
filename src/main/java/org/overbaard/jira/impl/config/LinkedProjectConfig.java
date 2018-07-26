@@ -15,13 +15,15 @@
  */
 package org.overbaard.jira.impl.config;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.jboss.dmr.ModelNode;
+import org.jboss.dmr.ModelType;
+import org.overbaard.jira.OverbaardValidationException;
 import org.overbaard.jira.impl.Constants;
 
 /**
@@ -31,14 +33,40 @@ import org.overbaard.jira.impl.Constants;
  */
 public class LinkedProjectConfig extends ProjectConfig {
 
-    public LinkedProjectConfig(final String code, final Map<String, Integer> states) {
-        super(code, new ProjectStateList(states));
+    private final Map<String, ProjectStateList> typeStateOverrides;
+
+    private LinkedProjectConfig(final String code, final ProjectStateList states, final Map<String, ProjectStateList> typeStateOverrides) {
+        super(code, states);
+        this.typeStateOverrides = typeStateOverrides;
     }
 
     static LinkedProjectConfig load(final String projectCode, final ModelNode project) {
-        List<ModelNode> statesList = Util.getRequiredChild(project, "Project", projectCode, Constants.STATES).asList();
-        Map<String, Integer> statesMap = getStringIntegerMap(statesList);
-        return new LinkedProjectConfig(projectCode, Collections.unmodifiableMap(statesMap));
+        ModelNode states = project.get(Constants.STATES);
+        if (states.getType() != ModelType.LIST) {
+            throw new OverbaardValidationException(Constants.STATES + " of linked-project['" + projectCode + "'] must be an array");
+        }
+        final ProjectStateList projectStateList = new ProjectStateList(Collections.unmodifiableMap(getStringIntegerMap(states.asList())));
+
+        final Map<String, ProjectStateList> typeStateOverrides;
+        if (project.has(Constants.TYPE_STATES)) {
+            ModelNode typeStates = project.get(Constants.TYPE_STATES);
+            if (typeStates.getType() != ModelType.OBJECT) {
+                throw new OverbaardValidationException(Constants.TYPE_STATES + " of linked-project['" + projectCode + "'] must be a map");
+            }
+            typeStateOverrides = new HashMap<>();
+            for (String type : typeStates.keys()) {
+                ModelNode overrideStates = typeStates.get(type);
+                if (overrideStates.getType() != ModelType.LIST && overrideStates.isDefined()) {
+                    throw new OverbaardValidationException(Constants.TYPE_STATES + "[" + type + "]" + " of linked-project['" + projectCode + "'] must be an array");
+                }
+                ProjectStateList typeStateList = overrideStates.isDefined() ?
+                        new ProjectStateList(Collections.unmodifiableMap(getStringIntegerMap(overrideStates.asList()))) : null;
+                typeStateOverrides.put(type, typeStateList);
+            }
+        } else {
+            typeStateOverrides = Collections.emptyMap();
+        }
+        return new LinkedProjectConfig(projectCode, projectStateList, typeStateOverrides);
     }
 
     private static Map<String, Integer> getStringIntegerMap(final List<ModelNode> statesList) {
@@ -49,22 +77,44 @@ public class LinkedProjectConfig extends ProjectConfig {
         return statesMap;
     }
 
+    @Override
+    public ProjectStateList getProjectStatesLinks(String issueType) {
+        if (typeStateOverrides != null) {
+            ProjectStateList override = typeStateOverrides.get(issueType);
+            if (override != null) {
+                return override;
+            }
+        }
+        return super.projectStates;
+    }
+
     ModelNode serializeModelNodeForConfig() {
         final ModelNode projectNode = new ModelNode();
-        final ModelNode statesNode = projectNode.get(Constants.STATES);
-        statesNode.setEmptyList();
-        for (String state : projectStates.getStates().keySet()) {
-            statesNode.add(state);
+        if (projectStates != null) {
+            final ModelNode statesNode = projectNode.get(Constants.STATES);
+            statesNode.setEmptyList();
+            for (String state : projectStates.getStates().keySet()) {
+                statesNode.add(state);
+            }
+        }
+        if (typeStateOverrides.size() > 0) {
+            final ModelNode typeStatesNode = projectNode.get(Constants.TYPE_STATES);
+            typeStatesNode.setEmptyObject();
+            for (Map.Entry<String, ProjectStateList> typeOverride : typeStateOverrides.entrySet()) {
+                ModelNode overrideNode = new ModelNode();
+                if (typeOverride.getValue() != null) {
+                    overrideNode.setEmptyList();
+                    for (String state : typeOverride.getValue().getStates().keySet()) {
+                        overrideNode.add(state);
+                    }
+                }
+                typeStatesNode.get(typeOverride.getKey()).set(overrideNode);
+            }
         }
         return projectNode;
     }
 
     ModelNode serializeModelNodeForBoard() {
-        ModelNode projectNode = new ModelNode();
-        ModelNode states = projectNode.get(Constants.STATES).setEmptyList();
-        for (String state : projectStates.getStates().keySet()) {
-            states.add(state);
-        }
-        return projectNode;
+        return serializeModelNodeForConfig();
     }
 }

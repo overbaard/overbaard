@@ -50,6 +50,7 @@ import static org.overbaard.jira.impl.Constants.STATES;
 import static org.overbaard.jira.impl.Constants.STATE_LINKS;
 import static org.overbaard.jira.impl.Constants.SUMMARY;
 import static org.overbaard.jira.impl.Constants.TYPE;
+import static org.overbaard.jira.impl.Constants.TYPE_STATES;
 import static org.overbaard.jira.impl.Constants.VALUE;
 import static org.overbaard.jira.impl.Constants.WIP;
 import static org.overbaard.jira.impl.board.CustomFieldValue.UNSET_VALUE;
@@ -65,6 +66,7 @@ import java.util.Set;
 
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.overbaard.jira.impl.BoardManagerBuilder;
 import org.overbaard.jira.impl.OverbaardIssueEvent;
@@ -85,6 +87,11 @@ import ut.org.overbaard.jira.mock.PermissionManagerBuilder;
  * @author Kabir Khan
  */
 public class BoardManagerTest extends AbstractBoardTest {
+
+    @Before
+    public void initializeMocks() throws Exception {
+        super.initializeMocks();
+    }
 
     @Test
     public void testStatesFields() throws Exception {
@@ -338,25 +345,53 @@ public class BoardManagerTest extends AbstractBoardTest {
     }
 
     @Test
-    public void testLinkedProjects() throws Exception {
+    public void testLinkedProjectsProjectFilters() throws Exception {
+        initializeMocks("config/board-linked-projects-project-filters.json");
+        checkLinkedProjects(false);
+    }
+
+    @Test
+    public void testLinkedProjectsOverrideFilters() throws Exception {
+        initializeMocks("config/board-linked-projects-issue-type-override-filters.json");
+        checkLinkedProjects(true);
+    }
+
+    private void checkLinkedProjects(boolean overrides) throws Exception {
         ModelNode boardNode = getJson(0);
         Assert.assertTrue(boardNode.hasDefined(PROJECTS, LINKED));
 
-        Assert.assertTrue(boardNode.hasDefined(PROJECTS, LINKED, "TUP", STATES));
-        List<String> states = new ArrayList<>();
-        for (ModelNode state : boardNode.get(PROJECTS, LINKED, "TUP", STATES).asList()) {
-            states.add(state.asString());
-        }
-        Assert.assertArrayEquals(new String[]{"TUP-A", "TUP-B", "TUP-C"}, states.toArray(new String[states.size()]));
+        ModelNode linkedProjects = boardNode.get(PROJECTS, LINKED);
+        Assert.assertEquals(3, linkedProjects.keys().size());
 
-        Assert.assertTrue(boardNode.hasDefined(PROJECTS, LINKED, "TUP2", STATES));
-        List<String> states2 = new ArrayList<>();
-        for (ModelNode state : boardNode.get(PROJECTS, LINKED, "TUP2", STATES).asList()) {
-            states2.add(state.asString());
+        ModelNode tup = linkedProjects.get("TUP");
+        Assert.assertTrue(tup.hasDefined(STATES));
+        checkStates(tup.get(STATES), "TUP-A", "TUP-B", "TUP-C");
+        Assert.assertFalse(tup.has(TYPE_STATES));
+
+        ModelNode tup2 = linkedProjects.get("TUP2");
+        checkStates(tup2.get(STATES), "TUP2-A", "TUP2-B", "TUP2-C");
+        Assert.assertFalse(tup2.has(TYPE_STATES));
+
+        ModelNode tup3 = linkedProjects.get("TUP3");
+        checkStates(tup3.get(STATES), "TUP3-A", "TUP3-B", "TUP3-C");
+        if (!overrides) {
+            Assert.assertFalse(tup3.has(TYPE_STATES));
+        } else {
+            ModelNode typeStates = tup3.get(TYPE_STATES);
+            Assert.assertEquals(2, typeStates.keys().size());
+            checkStates(typeStates.get("task"), "t-1", "t-2", "t-3");
+            checkStates(typeStates.get("bug"), "b-1", "b-2", "b-3");
         }
-        Assert.assertArrayEquals(new String[]{"TUP2-A", "TUP2-B", "TUP2-C"}, states2.toArray(new String[states.size()]));
     }
 
+    private void checkStates(ModelNode statesNode, String...expected) {
+        Assert.assertEquals(ModelType.LIST, statesNode.getType());
+        List<String> states = new ArrayList<>();
+        for (ModelNode state : statesNode.asList()) {
+            states.add(state.asString());
+        }
+        Assert.assertArrayEquals(expected, states.toArray(new String[states.size()]));
+    }
     @Test
     public void testLoadBoardOnlyOwnerProjectIssues() throws Exception {
         issueRegistry.issueBuilder("TDP", "task", "highest", "One", "TDP-A")

@@ -140,13 +140,6 @@ public class BoardConfig {
         final Map<String, NameAndColour> issueTypes =
                 Collections.unmodifiableMap(loadIssueTypes(jiraInjectables.getIssueTypeManager(), boardNode.get(ISSUE_TYPES).asList()));
 
-        final Map<String, BoardProjectConfig> mainProjects = new LinkedHashMap<>();
-        for (ModelNode project : projects.asList()) {
-            BoardProjectConfig projectConfig =
-                    BoardProjectConfig.load(boardStates, project, customFields, parallelTaskConfig, issueTypes.keySet());
-            mainProjects.put(projectConfig.getCode(), projectConfig);
-        }
-
         final ModelNode linked = boardNode.get(LINKED_PROJECTS);
         final Map<String, LinkedProjectConfig> linkedProjects = new LinkedHashMap<>();
         if (linked.isDefined()) {
@@ -154,6 +147,13 @@ public class BoardConfig {
                 ModelNode project = linked.get(projectName);
                 linkedProjects.put(projectName, LinkedProjectConfig.load(projectName, project));
             }
+        }
+
+        final Map<String, BoardProjectConfig> mainProjects = new LinkedHashMap<>();
+        for (ModelNode project : projects.asList()) {
+            BoardProjectConfig projectConfig =
+                    BoardProjectConfig.load(boardStates, project, customFields, parallelTaskConfig, issueTypes.keySet(), linkedProjects.keySet());
+            mainProjects.put(projectConfig.getCode(), projectConfig);
         }
 
         final BoardConfig boardConfig = new BoardConfig(id, code, boardName, owningUserKey,

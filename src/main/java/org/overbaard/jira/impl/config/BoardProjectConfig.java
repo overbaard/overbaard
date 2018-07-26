@@ -18,6 +18,7 @@ package org.overbaard.jira.impl.config;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,26 +41,34 @@ public class BoardProjectConfig extends ProjectConfig<BoardProjectStateMapper> {
 
     private final BoardProjectIssueTypeOverrideConfig issueTypeOverrideConfig;
 
+    private final List<LinkedIssueFilterConfig> linkedIssueFilterConfigs;
+    private final Map<String, LinkedIssueFilterConfig> linkedIssueFilterConfigsByLinkedProject;
+
     private final InternalAdvanced internalAdvanced;
 
     private BoardProjectConfig(
-                               final String code, final String queryFilter,
-                               final String colour,
-                               final BoardProjectStateMapper stateMapper,
-                               final List<String> customFieldNames,
-                               final ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig, BoardProjectIssueTypeOverrideConfig issueTypeOverrideConfig) {
+            final String code, final String queryFilter,
+            final String colour,
+            final BoardProjectStateMapper stateMapper,
+            final List<String> customFieldNames,
+            final ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig,
+            final List<LinkedIssueFilterConfig> linkedIssueFilterConfigs,
+            final BoardProjectIssueTypeOverrideConfig issueTypeOverrideConfig) {
         super(code, stateMapper);
         this.queryFilter = queryFilter;
         this.colour = colour;
         this.parallelTaskGroupsConfig = parallelTaskGroupsConfig;
         this.customFieldNames = customFieldNames;
+        this.linkedIssueFilterConfigs = linkedIssueFilterConfigs;
         this.issueTypeOverrideConfig = issueTypeOverrideConfig;
         this.internalAdvanced = new InternalAdvanced();
+        this.linkedIssueFilterConfigsByLinkedProject = LinkedIssueFilterConfig.convertToMap(linkedIssueFilterConfigs);
     }
 
     static BoardProjectConfig load(final BoardStates boardStates, ModelNode project,
                                    CustomFieldRegistry<CustomFieldConfig> customFieldConfigs,
-                                   BoardParallelTaskConfig parallelTaskConfig, Set<String> issueTypes) {
+                                   BoardParallelTaskConfig parallelTaskConfig, Set<String> issueTypes,
+                                   Set<String> linkedProjectNames) {
         String projectCode = Util.getRequiredChild(project, "Project", null, Constants.CODE).asString();
         String colour = Util.getRequiredChild(project, "Project", projectCode, Constants.COLOUR).asString();
 
@@ -89,15 +98,45 @@ public class BoardProjectConfig extends ProjectConfig<BoardProjectStateMapper> {
             projectParallelTaskGroupsConfig = null;
         }
 
+        final List<LinkedIssueFilterConfig> linkedIssueFilterConfigs = new ArrayList<>();
+        if (project.hasDefined(Constants.LINKED_ISSUES)) {
+            ModelNode linkedIssuesNode = project.get(Constants.LINKED_ISSUES);
+            if (linkedIssuesNode.getType() != ModelType.LIST) {
+                throw new OverbaardValidationException("The \"linked-issues\" element of project \"" + projectCode + "\" must be a list");
+            }
+
+            Set<String> seenProjects = new HashSet<>();
+            List<ModelNode> list = linkedIssuesNode.asList();
+
+            for (int i = 0 ; i < list.size() ; i++) {
+                ModelNode curr = list.get(i);
+                if (curr.getType() != ModelType.OBJECT) {
+                    throw new OverbaardValidationException("The \"linked-issues\" element entries of project \"" + projectCode + "\" must be maps");
+                }
+                LinkedIssueFilterConfig filterConfig = LinkedIssueFilterConfig.loadForBoardProject(linkedProjectNames, projectCode, curr);
+                for (String projectName : filterConfig.getProjects()) {
+                    if (!seenProjects.add(projectName)) {
+                        throw new OverbaardValidationException(
+                                "The \"linked-issues\" entries in project '" +
+                                        projectCode + "' uses project '" + projectName + "' more than once");
+                    }
+                }
+                linkedIssueFilterConfigs.add(filterConfig);
+            }
+        }
+
+
         BoardProjectIssueTypeOverrideConfig issueTypeOverrides =
-                BoardProjectIssueTypeOverrideConfig.load(project.get(Constants.OVERRIDES), boardStates, parallelTaskConfig, projectCode, issueTypes);
+                BoardProjectIssueTypeOverrideConfig.load(project.get(Constants.OVERRIDES), boardStates, parallelTaskConfig, projectCode, issueTypes, linkedProjectNames);
         ModelNode statesLinks = Util.getRequiredChild(project, "Project", projectCode, Constants.STATE_LINKS);
         BoardProjectStateMapper stateMapper = BoardProjectStateMapper.load(statesLinks, boardStates);
         return new BoardProjectConfig(
                 projectCode, loadQueryFilter(project), colour,
                 stateMapper,
                 Collections.unmodifiableList(customFieldNames),
-                projectParallelTaskGroupsConfig, issueTypeOverrides);
+                projectParallelTaskGroupsConfig,
+                Collections.unmodifiableList(linkedIssueFilterConfigs),
+                issueTypeOverrides);
     }
 
 
@@ -154,6 +193,15 @@ public class BoardProjectConfig extends ProjectConfig<BoardProjectStateMapper> {
 
         projectNode.get(Constants.STATE_LINKS).set(projectStates.serializeModelNodeForConfig());
 
+        if (linkedIssueFilterConfigs.size() > 0) {
+            final ModelNode linkedIssuesNode = projectNode.get(Constants.LINKED_ISSUES);
+            linkedIssuesNode.setEmptyList();
+            for (LinkedIssueFilterConfig entry : linkedIssueFilterConfigs) {
+                linkedIssuesNode.add(entry.serializeModelNodeForConfig());
+            }
+        }
+
+
         final ModelNode issueTypeOverrides = this.issueTypeOverrideConfig.serializeModelNodeForConfig();
         if (issueTypeOverrides.isDefined()) {
             projectNode.get(Constants.OVERRIDES).set(issueTypeOverrides);
@@ -186,6 +234,16 @@ public class BoardProjectConfig extends ProjectConfig<BoardProjectStateMapper> {
             }
         }
         return parallelTaskGroupsConfig;
+    }
+
+    public Map<String, LinkedIssueFilterConfig> getLinkedIssueFilterConfig(String issueType) {
+        if (issueTypeOverrideConfig != null) {
+            Map<String, LinkedIssueFilterConfig> config = issueTypeOverrideConfig.getLinkedIssueFilters(issueType);
+            if (config != null) {
+                return config;
+            }
+        }
+        return linkedIssueFilterConfigsByLinkedProject;
     }
 
     public Map<Long, ParallelTaskCustomFieldConfig> getAllParallelTaskCustomFieldConfigs() {

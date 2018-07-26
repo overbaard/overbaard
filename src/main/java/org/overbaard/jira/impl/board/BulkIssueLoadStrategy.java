@@ -130,7 +130,6 @@ class BulkIssueLoadStrategy implements IssueLoadStrategy {
 
     private void loadDataForBatch(SQLProcessor sqlProcessor, List<Long> idBatch) {
         final String sql = createSql(idBatch);
-        System.out.println(sql);
 
         try (final ResultSet rs = sqlProcessor.executeQuery(sql)){
             while (rs.next()) {

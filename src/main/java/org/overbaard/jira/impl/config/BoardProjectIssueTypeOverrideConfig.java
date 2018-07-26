@@ -1,28 +1,27 @@
 package org.overbaard.jira.impl.config;
 
+import static org.overbaard.jira.impl.Constants.FILTER;
 import static org.overbaard.jira.impl.Constants.ISSUE_TYPES;
+import static org.overbaard.jira.impl.Constants.LINKED_ISSUES;
 import static org.overbaard.jira.impl.Constants.OVERRIDE;
 import static org.overbaard.jira.impl.Constants.PARALLEL_TASKS;
 import static org.overbaard.jira.impl.Constants.STATE_LINKS;
-import static org.overbaard.jira.impl.Constants.TYPE;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 import org.overbaard.jira.OverbaardValidationException;
-import org.overbaard.jira.api.ParallelTaskOptions;
 import org.overbaard.jira.impl.Constants;
-import org.overbaard.jira.impl.board.SortedParallelTaskFieldOptions;
 
 /**
  * @author <a href="mailto:kabir.khan@jboss.com">Kabir Khan</a>
@@ -30,13 +29,19 @@ import org.overbaard.jira.impl.board.SortedParallelTaskFieldOptions;
 public class BoardProjectIssueTypeOverrideConfig {
     private final List<StateLinksConfigOverride> stateLinksConfigOverrides;
     private final List<ParallelTasksConfigOverride> parallelTasksConfigOverrides;
+    private final List<LinkedIssueFilterConfigOverride> linkedIssuesConfigOverrides;
 
     private final Map<String, BoardProjectStateMapper> stateLinkOverrides;
     private final Map<String, ProjectParallelTaskGroupsConfig> parallelTaskOverrides;
+    private final Map<String, Map<String, LinkedIssueFilterConfig>> linkedIssueFilters;
 
-    private BoardProjectIssueTypeOverrideConfig(List<StateLinksConfigOverride> configOverrides, List<ParallelTasksConfigOverride> parallelTasksConfigOverrides) {
+    private BoardProjectIssueTypeOverrideConfig(
+            List<StateLinksConfigOverride> configOverrides,
+            List<ParallelTasksConfigOverride> parallelTasksConfigOverrides,
+            List<LinkedIssueFilterConfigOverride> linkedIssuesConfigOverrides) {
         this.stateLinksConfigOverrides = Collections.unmodifiableList(configOverrides);
-        this.parallelTasksConfigOverrides = parallelTasksConfigOverrides;
+        this.parallelTasksConfigOverrides = Collections.unmodifiableList(parallelTasksConfigOverrides);
+        this.linkedIssuesConfigOverrides = Collections.unmodifiableList(linkedIssuesConfigOverrides);
 
         Map<String, BoardProjectStateMapper> stateLinkOverrides = new HashMap<>();
         for (StateLinksConfigOverride override : stateLinksConfigOverrides) {
@@ -53,6 +58,20 @@ public class BoardProjectIssueTypeOverrideConfig {
             }
         }
         this.parallelTaskOverrides = Collections.unmodifiableMap(parallelTaskOverrides);
+
+        Map<String, Map<String, LinkedIssueFilterConfig>> linkedIssueFilters = new HashMap<>();
+        for (LinkedIssueFilterConfigOverride override : linkedIssuesConfigOverrides) {
+            for (String issueType : override.getIssueTypes()) {
+                Map<String, LinkedIssueFilterConfig> byProject = new HashMap<>();
+                for (LinkedIssueFilterConfig config : override.filters) {
+                    for (String project : config.getProjects()) {
+                        byProject.put(project, config);
+                    }
+                }
+                linkedIssueFilters.put(issueType, Collections.unmodifiableMap(byProject));
+            }
+        }
+        this.linkedIssueFilters = Collections.unmodifiableMap(linkedIssueFilters);
     }
 
     BoardProjectStateMapper getStateLinksOverride(String issueType) {
@@ -73,6 +92,11 @@ public class BoardProjectIssueTypeOverrideConfig {
         if (parallelTasksConfigOverrides.size() > 0) {
             for (ParallelTasksConfigOverride override : parallelTasksConfigOverrides) {
                 modelNode.get(PARALLEL_TASKS).add(override.serializeModelNodeForConfig());
+            }
+        }
+        if (linkedIssuesConfigOverrides.size() > 0) {
+            for (LinkedIssueFilterConfigOverride override : linkedIssuesConfigOverrides) {
+                modelNode.get(LINKED_ISSUES).add(override.serializeModelNodeForConfig());
             }
         }
         return modelNode;
@@ -102,67 +126,91 @@ public class BoardProjectIssueTypeOverrideConfig {
         return parallelTaskOverrides;
     }
 
+    Map<String, LinkedIssueFilterConfig> getLinkedIssueFilters(String issueType) {
+        return linkedIssueFilters.get(issueType);
+    }
 
     static BoardProjectIssueTypeOverrideConfig load(
             ModelNode overridesNode, BoardStates boardStates,
-            BoardParallelTaskConfig parallelTaskConfig, String projectCode, Set<String> existingIssueTypes) {
+            BoardParallelTaskConfig parallelTaskConfig,
+            String projectCode,
+            Set<String> existingIssueTypes,
+            Set<String> linkedProjectNames) {
         List<StateLinksConfigOverride> stateLinksConfigOverrides = new ArrayList<>();
         List<ParallelTasksConfigOverride> parallelTasksConfigOverrides = new ArrayList<>();
+        List<LinkedIssueFilterConfigOverride> linkedIssueFilterConfigOverrides = new ArrayList<>();
         if (overridesNode.isDefined()) {
             loadStateLinksOverrides(stateLinksConfigOverrides, overridesNode, boardStates, projectCode, existingIssueTypes);
             loadParalleTaskGroupsOverrides(parallelTasksConfigOverrides, overridesNode, parallelTaskConfig, projectCode, existingIssueTypes);
+            loadLinkedIssueFilterOverrides(linkedIssueFilterConfigOverrides, overridesNode, projectCode, existingIssueTypes, linkedProjectNames);
         }
 
-        return new BoardProjectIssueTypeOverrideConfig(stateLinksConfigOverrides, parallelTasksConfigOverrides);
+        return new BoardProjectIssueTypeOverrideConfig(stateLinksConfigOverrides, parallelTasksConfigOverrides, linkedIssueFilterConfigOverrides);
     }
 
     private static void loadStateLinksOverrides(
             List<StateLinksConfigOverride> overrides, ModelNode overridesNode,
             BoardStates boardStates, String projectCode, Set<String> existingIssueTypes) {
-
-        ModelNode stateLinksNode = overridesNode.get(STATE_LINKS);
-        if (!stateLinksNode.isDefined()) {
-            return;
-        }
-        if (stateLinksNode.getType() != ModelType.LIST) {
-            throw new OverbaardValidationException("'overrides/state-links' for " + projectCode + " should be an array");
-        }
-
-        Set<String> issueTypes = new HashSet<>();
-        for (ModelNode override : stateLinksNode.asList()) {
-            StateLinksConfigOverride linksOverride = StateLinksConfigOverride.load(override, boardStates, projectCode, existingIssueTypes);
-            for (String issueType : linksOverride.getIssueTypes()) {
-                if (!issueTypes.add(issueType)) {
-                    throw new OverbaardValidationException("Issue type '" + issueType + "' appears more than once in 'overrides/state-links' for " + projectCode);
-                }
+        loadOverrides(overrides, overridesNode, STATE_LINKS, projectCode, new OverrideLoader<StateLinksConfigOverride>() {
+            @Override
+            public StateLinksConfigOverride load(ModelNode override) {
+                return StateLinksConfigOverride.load(override, boardStates, projectCode, existingIssueTypes);
             }
-            overrides.add(linksOverride);
-        }
+        });
     }
 
     private static void loadParalleTaskGroupsOverrides(
             List<ParallelTasksConfigOverride> overrides, ModelNode overridesNode,
             BoardParallelTaskConfig parallelTaskConfig, String projectCode, Set<String> existingIssueTypes) {
-        ModelNode parallelTasksNode = overridesNode.get(PARALLEL_TASKS);
-        if (!parallelTasksNode.isDefined()) {
+        loadOverrides(overrides, overridesNode, PARALLEL_TASKS, projectCode, new OverrideLoader<ParallelTasksConfigOverride>() {
+            @Override
+            public ParallelTasksConfigOverride load(ModelNode override) {
+                return ParallelTasksConfigOverride.load(override, parallelTaskConfig, projectCode, existingIssueTypes);
+            }
+        });
+    }
+
+    private static void loadLinkedIssueFilterOverrides(
+            List<LinkedIssueFilterConfigOverride> overrides, ModelNode overridesNode,
+            String projectCode, Set<String> existingIssueTypes, Set<String> linkedProjectNames) {
+        loadOverrides(overrides, overridesNode, LINKED_ISSUES, projectCode, new OverrideLoader<LinkedIssueFilterConfigOverride>() {
+            @Override
+            public LinkedIssueFilterConfigOverride load(ModelNode override) {
+                return LinkedIssueFilterConfigOverride.load(override, linkedProjectNames, projectCode, existingIssueTypes);
+            }
+        });
+
+    }
+
+    private static <T extends IssueTypeConfigOverride> void loadOverrides(
+            List<T> overrides, ModelNode overridesNode, String overrideType, String projectCode, OverrideLoader<T> loader) {
+        if (overridesNode.getType() != ModelType.OBJECT) {
+            throw new OverbaardValidationException("'overrides' for " + projectCode + " should be a map");
+        }
+        ModelNode overridesOfTypeNode = overridesNode.get(overrideType);
+        if (!overridesOfTypeNode.isDefined()) {
             return;
         }
-        if (parallelTasksNode.getType() != ModelType.LIST) {
-            throw new OverbaardValidationException("'overrides/parallel-tasks' for " + projectCode + " should be an array");
+        if (overridesOfTypeNode.getType() != ModelType.LIST) {
+            throw new OverbaardValidationException("'overrides/" + overrideType +"' for " + projectCode + " should be an array");
         }
 
         Set<String> issueTypes = new HashSet<>();
-        for (ModelNode override : parallelTasksNode.asList()) {
-            ParallelTasksConfigOverride linksOverride = ParallelTasksConfigOverride.load(override, parallelTaskConfig, projectCode, existingIssueTypes);
+        for (ModelNode override : overridesOfTypeNode.asList()) {
+            T linksOverride = loader.load(override);
             for (String issueType : linksOverride.getIssueTypes()) {
                 if (!issueTypes.add(issueType)) {
-                    throw new OverbaardValidationException("Issue type '" + issueType + "' appears more than once in 'overrides/parallel-tasks' for " + projectCode);
+                    throw new OverbaardValidationException("Issue type '" + issueType + "' appears more than once in 'overrides/" +
+                            overrideType + "' for " + projectCode);
                 }
             }
             overrides.add(linksOverride);
         }
     }
 
+    private interface OverrideLoader<T extends IssueTypeConfigOverride> {
+        T load(ModelNode override);
+    }
 
     private static abstract class IssueTypeConfigOverride {
         private final List<String> issueTypes;
@@ -281,4 +329,54 @@ public class BoardProjectIssueTypeOverrideConfig {
         }
 
     }
+
+    private static class LinkedIssueFilterConfigOverride extends IssueTypeConfigOverride {
+        private final List<LinkedIssueFilterConfig> filters;
+
+        public LinkedIssueFilterConfigOverride(List<String> issueTypes, List<LinkedIssueFilterConfig> filters) {
+            super(issueTypes);
+            this.filters = filters;
+        }
+
+        ModelNode serializeModelNodeForConfig() {
+            ModelNode override = super.serializeModelNodeForConfig();
+            ModelNode overrideNode = override.get(OVERRIDE);
+            overrideNode.setEmptyList();
+            for (LinkedIssueFilterConfig entry : filters) {
+                overrideNode.add(entry.serializeModelNodeForConfig());
+            }
+            return override;
+        }
+
+        static LinkedIssueFilterConfigOverride load(ModelNode overrideNode, Set<String> linkedProjectNames, String projectCode, Set<String> existingIssueTypes) {
+            ModelNode issueTypesNode = overrideNode.get(Constants.ISSUE_TYPES);
+            List<String> issueTypes = loadAndValidateIssueTypes(issueTypesNode, projectCode, LINKED_ISSUES, existingIssueTypes);
+            ModelNode override = overrideNode.get(OVERRIDE);
+            if (override.getType() != ModelType.LIST) {
+                throw new OverbaardValidationException("linked-issues override for issue-types=" + issueTypes + " in project '" + projectCode + "' must be an array");
+            }
+
+            Set<String> seenProjects = new HashSet<>();
+            List<LinkedIssueFilterConfig> filters = new ArrayList<>();
+
+            for (ModelNode curr : override.asList()) {
+                if (curr.getType() != ModelType.OBJECT) {
+                    throw new OverbaardValidationException("linked-issues override entry for issue-types=" + issueTypes + " in project '" + projectCode + "' must be a map");
+                }
+                LinkedIssueFilterConfig filterConfig =
+                        LinkedIssueFilterConfig.loadForBoardProjectIssueTypeOverride(linkedProjectNames, projectCode, issueTypes, curr);
+                for (String project : filterConfig.getProjects()) {
+                    if (!seenProjects.add(project)) {
+                        throw new OverbaardValidationException(
+                                "linked-issues override entry for issue-types=" + issueTypes + " in project '" +
+                                        projectCode + "' uses project '" + project + "' more than once");
+                    }
+                }
+                filters.add(filterConfig);
+            }
+            return new LinkedIssueFilterConfigOverride(issueTypes, Collections.unmodifiableList(filters));
+        }
+
+    }
+
 }

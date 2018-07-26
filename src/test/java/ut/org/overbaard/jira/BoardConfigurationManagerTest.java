@@ -210,7 +210,15 @@ public class BoardConfigurationManagerTest {
         checkConfig("config/board-issue-type-overrides-parallel-tasks-varying.json");
     }
 
+    @Test
+    public void testLoadConfigurationWithLinkedIssuesProjectFilters() throws IOException {
+        checkConfig("config/board-linked-projects-project-filters.json");
+    }
 
+    @Test
+    public void testLoadConfigurationWithLinkedIssuesIssueTypeOverrideFilters() throws IOException {
+        checkConfig("config/board-linked-projects-issue-type-override-filters.json");
+    }
 
     private void checkConfig(String config) throws IOException {
         BoardConfigurationManagerBuilder cfgManagerBuilder = new BoardConfigurationManagerBuilder()

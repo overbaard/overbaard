@@ -84,8 +84,13 @@ public class BoardConfigurationManagerBuilder {
     public BoardConfigurationManagerBuilder addConfigActiveObjectsFromFile(String... resources) throws IOException {
         for (String resource : resources) {
             ModelNode entry = loadConfig(resource);
-            addConfigActiveObject(entry.get(CODE).asString(), entry);
+            addConfigActiveObjectsFromModel(entry);
         }
+        return this;
+    }
+
+    public BoardConfigurationManagerBuilder addConfigActiveObjectsFromModel(ModelNode entry) throws IOException {
+        addConfigActiveObject(entry.get(CODE).asString(), entry);
         return this;
     }
 
