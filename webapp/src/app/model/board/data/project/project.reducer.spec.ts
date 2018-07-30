@@ -13,6 +13,7 @@ export class ProjectInputBuilder {
   private _parallelTaskOverrides: boolean;
   private _emptyParallelTaskOverrides: boolean;
   private _linkedProjects: boolean;
+  private _linkedProjectOverrides: boolean;
 
   projectParallelTasks(): ProjectInputBuilder {
     this._projectParallelTasks = true;
@@ -31,6 +32,14 @@ export class ProjectInputBuilder {
 
   linkedProjects(): ProjectInputBuilder {
     this._linkedProjects = true;
+    return this;
+  }
+
+  linkedProjectOverrides(): ProjectInputBuilder {
+    if (!this._linkedProjects) {
+      throw new Error('linkedProjects is not true');
+    }
+    this._linkedProjectOverrides = true;
     return this;
   }
 
@@ -226,10 +235,17 @@ export class ProjectInputBuilder {
         },
         L3: {
           states: [
-            'L3-1'
+            'L3-1',
+            'L3-2',
+            'L3-3'
           ]
         }
       };
+      if (this._linkedProjectOverrides) {
+        projectInput['linked']['L3']['type-states'] = {
+          task: ['L3-1t', 'L3-2t']
+        };
+      }
     }
 
     return projectInput;
@@ -356,6 +372,7 @@ describe('Projects reducer tests', () => {
       const input: any = overrides ?
         new ProjectInputBuilder()
           .linkedProjects()
+          .linkedProjectOverrides()
           .projectParallelTasks()
           .stateLinkOverrides()
           .parallelTaskOverrides()
@@ -432,14 +449,23 @@ describe('Projects reducer tests', () => {
       const l1: LinkedProject = projectState.linkedProjects.get('L1');
       expect(l1.key).toEqual('L1');
       expect(l1.states.toArray()).toEqual(['L1-1', 'L1-2', 'L1-3', 'L1-4']);
+      expect(l1.typeStates.size).toBe(0);
 
       const l2: LinkedProject = projectState.linkedProjects.get('L2');
       expect(l2.key).toEqual('L2');
       expect(l2.states.toArray()).toEqual(['L2-1', 'L2-2']);
+      expect(l2.typeStates.size).toBe(0);
 
       const l3: LinkedProject = projectState.linkedProjects.get('L3');
       expect(l3.key).toEqual('L3');
-      expect(l3.states.toArray()).toEqual(['L3-1']);
+      expect(l3.states.toArray()).toEqual(['L3-1', 'L3-2', 'L3-3']);
+      if (!overrides) {
+        expect(l3.typeStates.size).toBe(0);
+      } else {
+        expect(l3.typeStates.size).toBe(1);
+        const taskStates: List<string> = l3.typeStates.get('task');
+        expect(taskStates.toArray()).toEqual(['L3-1t', 'L3-2t']);
+      }
 
       // Parallel tasks
       expect(projectState.boardProjects.get('P1').parallelTasks).not.toEqual(jasmine.anything());
