@@ -1,10 +1,9 @@
 import {List, Map} from 'immutable';
-import {Observable} from 'rxjs/Observable';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {BoardViewModelHandler} from './board-view.service';
 import {initialUserSettingState} from '../../model/board/user/user-setting.model';
 import {BoardUtil, initialBoardState} from '../../model/board/data/board.model';
 import {BoardState} from '../../model/board/data/board';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {Dictionary} from '../../common/dictionary';
 import {UserSettingActions, userSettingReducer} from '../../model/board/user/user-setting.reducer';
 import {DeserializeIssueLookupParams, IssueState} from '../../model/board/data/issue/issue.model';

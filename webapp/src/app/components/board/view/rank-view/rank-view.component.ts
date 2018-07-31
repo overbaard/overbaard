@@ -15,8 +15,7 @@ import {
 import {FixedHeaderView} from '../fixed-header-view';
 import {BoardViewMode} from '../../../../model/board/user/board-view-mode';
 import {UpdateParallelTaskEvent} from '../../../../events/update-parallel-task.event';
-import {Subject} from 'rxjs/Subject';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import {Subject, BehaviorSubject} from 'rxjs';
 
 @Component({
   selector: 'app-rank-view',

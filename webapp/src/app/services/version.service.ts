@@ -2,9 +2,8 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {UrlService} from './url.service';
 import {Progress, ProgressLogService} from './progress-log.service';
-import {Observable} from 'rxjs/Observable';
+import {Observable, throwError as _throw} from 'rxjs';
 import {catchError, map, tap, timeout} from 'rxjs/operators';
-import {_throw} from 'rxjs/observable/throw';
 
 
 @Injectable()

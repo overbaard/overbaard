@@ -3,7 +3,7 @@ import {AppState} from '../../../app-store';
 import {Store} from '@ngrx/store';
 import {Dictionary} from '../../../common/dictionary';
 import {AbstractControl, FormControl, FormGroup} from '@angular/forms';
-import {Observable} from 'rxjs/Observable';
+import {Observable, Subject} from 'rxjs';
 import {boardProjectsSelector, linkedProjectsSelector} from '../../../model/board/data/project/project.reducer';
 import {BoardFilterState} from '../../../model/board/user/board-filter/board-filter.model';
 import {List, OrderedMap, Set} from 'immutable';
@@ -32,7 +32,6 @@ import {customFieldsSelector} from '../../../model/board/data/custom-field/custo
 import {CustomField} from '../../../model/board/data/custom-field/custom-field.model';
 import {BoardProject, ParallelTask, ProjectState} from '../../../model/board/data/project/project.model';
 import {UserSettingActions} from '../../../model/board/user/user-setting.reducer';
-import {Subject} from 'rxjs/Subject';
 import {UserSettingState} from '../../../model/board/user/user-setting';
 import {BoardViewMode} from '../../../model/board/user/board-view-mode';
 import {MatCheckboxChange, MatSliderChange} from '@angular/material';

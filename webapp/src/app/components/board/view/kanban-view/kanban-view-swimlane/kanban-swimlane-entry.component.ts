@@ -16,9 +16,7 @@ import {UpdateParallelTaskEvent} from '../../../../../events/update-parallel-tas
 import {IssueDetailState} from '../../../../../model/board/user/issue-detail/issue-detail.model';
 import {BoardHeaders} from '../../../../../view-model/board/board-headers';
 import {StartAndHeight} from '../../../../../common/scroll-height-splitter';
-import {Observable} from 'rxjs/Observable';
-import {Subject} from 'rxjs/Subject';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import {Observable, Subject, BehaviorSubject} from 'rxjs';
 import {ScrollPositionAndHeight} from '../../../../../common/scroll-position-height';
 import {takeUntil} from 'rxjs/operators';
 

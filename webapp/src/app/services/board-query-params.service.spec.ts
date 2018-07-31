@@ -1,11 +1,9 @@
 import {BoardQueryParamsHandler} from './board-query-params.service';
 import {UserSettingState} from '../model/board/user/user-setting';
-import {Subject} from 'rxjs/Subject';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import {Observable, Subject, BehaviorSubject} from 'rxjs';
 import {initialUserSettingState, UserSettingUtil} from '../model/board/user/user-setting.model';
 import {BoardState} from '../model/board/data/board';
 import {BoardUtil, initialBoardState} from '../model/board/data/board.model';
-import {Observable} from 'rxjs/Observable';
 import {Dictionary} from '../common/dictionary';
 import {UserSettingActions, userSettingReducer} from '../model/board/user/user-setting.reducer';
 import {BoardViewMode} from '../model/board/user/board-view-mode';

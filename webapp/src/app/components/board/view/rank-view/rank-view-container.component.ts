@@ -15,10 +15,9 @@ import {
 import {BoardViewMode} from '../../../../model/board/user/board-view-mode';
 import {UpdateParallelTaskEvent} from '../../../../events/update-parallel-task.event';
 import {IssueDetailState} from '../../../../model/board/user/issue-detail/issue-detail.model';
-import {Observable} from 'rxjs/Observable';
+import {Observable, Subject} from 'rxjs';
 import {RankViewEntry} from '../../../../view-model/board/rank-view-entry';
 import {List} from 'immutable';
-import {Subject} from 'rxjs/Subject';
 import {takeUntil} from 'rxjs/operators';
 import {ScrollHeightSplitter} from '../../../../common/scroll-height-splitter';
 

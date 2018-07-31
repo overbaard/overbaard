@@ -1,10 +1,9 @@
 import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {BoardsService} from '../../services/boards.service';
 import {AppHeaderService} from '../../services/app-header.service';
-import {Observable} from 'rxjs/Observable';
+import {Observable, Subject} from 'rxjs';
 import {OrderedMap} from 'immutable';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {Subject} from 'rxjs/Subject';
 import {map, take} from 'rxjs/operators';
 
 @Component({
