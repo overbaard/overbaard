@@ -369,13 +369,26 @@ public abstract class Issue {
     }
 
     private static class LinkedIssue extends Issue {
+        private final LinkedProjectConfig project;
+
         public LinkedIssue(LinkedProjectConfig project, String key, String state, Integer stateIndex, String issueTypeName, String summary) {
             super(project, key, state, stateIndex, issueTypeName, summary);
+            this.project = project;
         }
 
         @Override
         BoardChangeRegistry.IssueChange convertToCreateIssueChange(BoardChangeRegistry registry, BoardConfig boardConfig) {
             throw new IllegalStateException("Not for linked issues");
+        }
+
+        @Override
+        ModelNode getModelNodeForFullRefresh(Board board) {
+            ModelNode node = super.getModelNodeForFullRefresh(board);
+            if (this.project.getProjectStatesLinks(getIssueTypeName()) != null) {
+                // We are for an overridden state so only set this if it is one of those
+                node.get(Constants.TYPE).set(getIssueTypeName());
+            }
+            return node;
         }
     }
 
@@ -538,14 +551,23 @@ public abstract class Issue {
                     //This was not set up as one of the linked projects we are interested in
                     continue;
                 }
+
+                String linkName = outbound ? link.getIssueLinkType().getOutward() : link.getIssueLinkType().getInward();
+                LinkedIssueFilterUtil filter = new LinkedIssueFilterUtil(project.getConfig(), issueTypeName, linkName, linkedIssue, linkedProjectKey);
+                if (!filter.includeIssue()) {
+                    // We do not match the filter
+                    continue;
+                }
+
                 String stateName = linkedIssue.getStatusObject().getName();
                 Integer stateIndex = linkedProjectContext.getStateIndexRecordingMissing(linkedIssue.getKey(), linkedIssue.getIssueType().getName(), stateName);
+
                 if (stateIndex != null) {
                     if (linkedIssues == null) {
                         linkedIssues = createLinkedIssueSet();
                     }
                     linkedIssues.add(new LinkedIssue(linkedProjectContext.getConfig(), linkedIssue.getKey(),
-                            stateName, stateIndex, linkedIssue.getSummary(), linkedIssue.getIssueType().getName()));
+                            stateName, stateIndex, linkedIssue.getIssueType().getName(), linkedIssue.getSummary()));
                 }
             }
         }

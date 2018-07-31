@@ -35,6 +35,7 @@ import org.overbaard.jira.impl.JiraInjectables;
 import org.overbaard.jira.impl.config.BoardProjectConfig;
 import org.overbaard.jira.impl.config.BoardProjectStateMapper;
 import org.overbaard.jira.impl.config.CustomFieldConfig;
+import org.overbaard.jira.impl.config.LinkedIssueFilterConfig;
 import org.overbaard.jira.impl.config.LinkedProjectConfig;
 import org.overbaard.jira.impl.config.ParallelTaskCustomFieldConfig;
 import org.overbaard.jira.impl.config.ParallelTaskGroupPosition;

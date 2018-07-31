@@ -1,0 +1,82 @@
+{
+  "name": "Test Downstream Project",
+  "code": "TST",
+  "states": [
+    {"name": "S-A"},
+    {"name": "S-B"},
+    {"name": "S-C"},
+    {"name": "S-D"}
+  ],
+  "priorities": [
+    {"name": "highest", "colour": "colour-highest"},
+    {"name": "high", "colour": "colour-high"},
+    {"name": "low", "colour": "colour-low"},
+    {"name": "lowest", "colour": "colour-lowest"}
+  ],
+  "issue-types": [
+    {"name": "task", "colour": "colour-task"},
+    {"name": "bug", "colour": "colour-bug"},
+    {"name": "feature", "colour": "colour-feature"}
+  ],
+  "projects": [
+    {
+      "code": "TDP",
+      "query-filter": null,
+      "colour": "#4667CA",
+      "state-links": {
+        "TDP-A" : "S-A",
+        "TDP-B" : "S-B",
+        "TDP-C" : "S-C",
+        "TDP-D" : "S-D"
+      },
+      "linked-issues": [
+        {
+          "projects": ["TUP3"],
+          "filter": {
+            "issue-types": ["linked-issue-type-p"],
+            "priorities": ["linked-issue-priority-1-p", "linked-issue-priority-2-p"],
+            "labels": ["linked-issue-label-1-p", "linked-issue-label-2-p"],
+            "link-names": ["cloned to-p", "cloned from-p"]
+          }
+        },
+        {
+          "projects": ["TUP2"],
+          "filter": {}
+        },
+        {
+          "projects": ["TUP"],
+          "filter": {
+            "issue-types": ["linked-issue-type-p"],
+            "priorities": ["linked-issue-priority-1-p", "linked-issue-priority-2-p"],
+            "labels": ["linked-issue-label-1-p", "linked-issue-label-2-p"],
+            "link-names": ["cloned to-p", "cloned from-p"]
+          }
+        }
+      ]
+    }
+  ]
+  ,
+  "linked-projects": {
+    "TUP": {
+      "states": [
+        "TUP-A",
+        "TUP-B",
+        "TUP-C"
+      ]
+    },
+    "TUP2": {
+      "states": [
+        "TUP2-A",
+        "TUP2-B",
+        "TUP2-C"
+      ]
+    },
+    "TUP3": {
+      "states": [
+        "TUP3-A",
+        "TUP3-B",
+        "TUP3-C"
+      ]
+    }
+  }
+}

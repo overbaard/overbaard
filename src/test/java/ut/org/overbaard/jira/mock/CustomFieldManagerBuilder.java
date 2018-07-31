@@ -48,7 +48,10 @@ public class CustomFieldManagerBuilder {
     }
 
     public static CustomFieldManager loadFromResource(String resource) throws IOException {
-        ModelNode config = BoardConfigurationManagerBuilder.loadConfig(resource);
+        return loadFromModel(BoardConfigurationManagerBuilder.loadConfig(resource));
+    }
+
+    public static CustomFieldManager loadFromModel(ModelNode config) {
         CustomFieldManagerBuilder builder = new CustomFieldManagerBuilder();
         if (config.get(CUSTOM).isDefined()) {
             List<ModelNode> list = config.get(CUSTOM).asList();

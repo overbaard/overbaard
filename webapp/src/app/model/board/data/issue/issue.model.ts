@@ -52,7 +52,8 @@ const DEFAULT_LINKED_ISSUE: LinkedIssue = {
   summary: null,
   state: null,
   stateName: null,
-  colour: null
+  colour: null,
+  type: null
 };
 
 const DEFAULT_ISSUE_CHANGE_INFO: IssueChangeInfo = {
@@ -368,8 +369,15 @@ export class IssueUtil {
             const projCode: string = IssueUtil.productCodeFromKey(data['key']);
             const project: LinkedProject = params.linkedProjects.get(projCode);
             const stateIndex: number = data['state'];
-            data.colour = ColourTable.INSTANCE.getColourTable(project.states.size)[stateIndex];
-            data.stateName = project.states.get(stateIndex);
+
+            let linkedStates: List<string> = project.states;
+            const linkedIssueType: string = data['type'];
+            if (linkedIssueType) {
+              // This type will only be set in the data from the server if it is for a linked issue type override
+              linkedStates = project.typeStates.get(linkedIssueType);
+            }
+            data.colour = ColourTable.INSTANCE.getColourTable(linkedStates.size)[stateIndex];
+            data.stateName = linkedStates.get(stateIndex);
             mutable.set(i, LINKED_ISSUE_FACTORY(<any>data));
           });
         });

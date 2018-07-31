@@ -87,7 +87,8 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
     }
 
     @Before
-    public void setupIssues() throws SearchException {
+    public void setupIssues() throws Exception {
+        super.initializeMocks();
         setupIssues(null);
     }
 

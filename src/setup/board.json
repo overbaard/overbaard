@@ -42,7 +42,15 @@
         "Selected for Development": "Selected for Development",
         "In Progress": "In Progress",
         "Backlog": "Backlog"
-      }
+      },
+      "linked-issues": [
+        {
+          "projects": [
+            "UP"
+          ],
+          "filter": {}
+        }
+      ]
     },
     {
       "code": "SUP",
@@ -53,7 +61,15 @@
         "Selected for Development": "Selected for Development",
         "In Progress": "In Progress",
         "Backlog": "Backlog"
-      }
+      },
+      "linked-issues": [
+        {
+          "projects": [
+            "UP"
+          ],
+          "filter": {}
+        }
+      ]
     }
   ],
   "linked-projects": {

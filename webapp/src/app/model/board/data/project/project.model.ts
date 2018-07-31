@@ -5,6 +5,7 @@ import {ColourTable} from '../../../../common/colour-table';
 import {Dictionary} from '../../../../common/dictionary';
 import {BoardIssue} from '../issue/board-issue';
 import {cloneObject} from '../../../../common/object-util';
+import {t} from '@angular/core/src/render3';
 
 export interface ProjectState {
   boardProjects: OrderedMap<string, BoardProject>;
@@ -28,6 +29,7 @@ export interface BoardProject extends BaseProject {
 
 export interface LinkedProject extends BaseProject {
   states: List<string>;
+  typeStates: Map<string, List<string>>;
 }
 
 export interface ParallelTask {
@@ -63,7 +65,8 @@ const DEFAULT_BOARD_PROJECT: BoardProject = {
 
 const DEFAULT_LINKED_PROJECT: LinkedProject = {
   key: null,
-  states: List<string>()
+  states: List<string>(),
+  typeStates: Map<string, List<string>>()
 };
 
 const DEFAULT_PARALLEL_TASK: ParallelTask = {
@@ -226,9 +229,18 @@ export class ProjectUtil {
   }
 
   static linkedProjectFromJs(key: string, input: any): LinkedProject {
+    const typeStates: Map<string, List<string>> = Map<string, List<string>>().withMutations(mutable => {
+      if (input['type-states']) {
+        for (const type of Object.keys(input['type-states'])) {
+          const current: string[] = <string[]>input['type-states'][type];
+          mutable.set(type, List<string>(current));
+        }
+      }
+    });
     const projectInput: LinkedProject = {
       key: key,
-      states: List<string>(input['states'])
+      states: List<string>(input['states']),
+      typeStates: typeStates
     };
     return LINKED_PROJECT_FACTORY(projectInput);
   }

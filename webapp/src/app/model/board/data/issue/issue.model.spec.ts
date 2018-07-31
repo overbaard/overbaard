@@ -36,7 +36,12 @@ describe('Issue unit tests', () => {
     const projectState: ProjectState =
       projectMetaReducer(
         initialProjectState,
-        ProjectActions.createDeserializeProjects(getTestProjectsInput()));
+        ProjectActions.createDeserializeProjects(
+          new ProjectInputBuilder()
+            .linkedProjects()
+            .linkedProjectOverrides()
+            .projectParallelTasks()
+            .build()));
 
     lookupParams = new DeserializeIssueLookupParams();
 
@@ -130,28 +135,56 @@ describe('Issue unit tests', () => {
     });
 
 
-    it('Linked issues', () => {
-      input['linked-issues'] = [
-        {
-          key : 'L1-1',
-          summary : 'Linked 1',
-          state: 3
-        },
-        {
-          key : 'L2-2',
-          summary : 'Linked 2',
-          state: 0
-        }];
+    describe('Linked issues', () => {
+      it('No linked issue type overrides', () => {
+        input['linked-issues'] = [
+          {
+            key : 'L1-1',
+            summary : 'Linked 1',
+            state: 3
+          },
+          {
+            key : 'L2-2',
+            summary : 'Linked 2',
+            state: 0
+          }];
 
-      const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
-      new IssueChecker(issue,
-        lookupParams.issueTypes.get('task'),
-        lookupParams.priorities.get('Blocker'),
-        lookupParams.assignees.get('bob'), 'Issue summary', 4)
-        .key('P2-1')
-        .addLinkedIssue('L1-1', 'Linked 1', 3, 'L1-4')
-        .addLinkedIssue('L2-2', 'Linked 2', 0, 'L2-1')
-        .check();
+        const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
+        new IssueChecker(issue,
+          lookupParams.issueTypes.get('task'),
+          lookupParams.priorities.get('Blocker'),
+          lookupParams.assignees.get('bob'), 'Issue summary', 4)
+          .key('P2-1')
+          .addLinkedIssue('L1-1', 'Linked 1', 3, 'L1-4')
+          .addLinkedIssue('L2-2', 'Linked 2', 0, 'L2-1')
+          .check();
+      });
+      it ('Linked issue type overrides', () => {
+        input['linked-issues'] = [
+          {
+            key : 'L3-1',
+            summary : 'Linked 1',
+            // This type will only be set in the data from the server if it is for a linked issue type override
+            type: 'task',
+            state: 1
+          },
+          {
+            key : 'L2-2',
+            summary : 'Linked 2',
+            state: 0
+          }];
+
+        const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
+        new IssueChecker(issue,
+          lookupParams.issueTypes.get('task'),
+          lookupParams.priorities.get('Blocker'),
+          lookupParams.assignees.get('bob'), 'Issue summary', 4)
+          .key('P2-1')
+          .addLinkedIssue('L3-1', 'Linked 1', 1, 'L3-2t')
+          .addLinkedIssue('L2-2', 'Linked 2', 0, 'L2-1')
+          .check();
+
+      });
     });
 
     it('Components', () => {
