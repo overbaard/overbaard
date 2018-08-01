@@ -234,7 +234,7 @@ public class Board {
         return false;
     }
 
-    static abstract class Accessor {
+    abstract static class Accessor {
         protected final JiraInjectables jiraInjectables;
         protected final BoardConfig boardConfig;
         protected final ApplicationUser boardOwner;

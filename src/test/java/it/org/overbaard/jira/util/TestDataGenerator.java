@@ -18,7 +18,6 @@ import static org.overbaard.jira.impl.Constants.KEY;
 import static org.overbaard.jira.impl.Constants.LABELS;
 import static org.overbaard.jira.impl.Constants.MAIN;
 import static org.overbaard.jira.impl.Constants.NAME;
-import static org.overbaard.jira.impl.Constants.OWNER;
 import static org.overbaard.jira.impl.Constants.PRIORITIES;
 import static org.overbaard.jira.impl.Constants.PRIORITY;
 import static org.overbaard.jira.impl.Constants.PROJECTS;
@@ -32,18 +31,15 @@ import static org.overbaard.jira.impl.Constants.SUMMARY;
 import static org.overbaard.jira.impl.Constants.TYPE;
 import static org.overbaard.jira.impl.Constants.VIEW;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.jboss.dmr.ModelNode;
-import org.overbaard.jira.impl.Constants;
 
 /**
  * @author <a href="mailto:kabir.khan@jboss.com">Kabir Khan</a>

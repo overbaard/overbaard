@@ -50,7 +50,7 @@ public class RawSqlLoader {
         if (true) {
             throw new OverbaardValidationException("Db Explorer disabled");
         }
-        
+
         if (!sql.contains("limit")) {
             //Limit the numbers, we don't want to crash the production instance while nosing around
             sql += " limit 100";
@@ -132,7 +132,7 @@ public class RawSqlLoader {
     private <R> R internalExecute(String sql, Function<ResultSet, R> function) {
         final SQLProcessor sqlProcessor = new SQLProcessor(dataSourceName);
         try {
-            try (final ResultSet rs = sqlProcessor.executeQuery(sql)){
+            try (ResultSet rs = sqlProcessor.executeQuery(sql)){
                 return function.apply(rs);
             } catch (Exception e) {
                 throw new RuntimeException(e);

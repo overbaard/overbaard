@@ -1,7 +1,6 @@
 package org.overbaard.jira.impl.board;
 
 import org.overbaard.jira.impl.config.BoardProjectConfig;
-import org.overbaard.jira.impl.config.LinkedIssueFilterConfig;
 
 import com.atlassian.jira.issue.Issue;
 

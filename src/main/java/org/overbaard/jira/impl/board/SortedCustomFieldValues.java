@@ -63,7 +63,7 @@ public class SortedCustomFieldValues {
         }
     }
 
-    static abstract class Accessor {
+    abstract static class Accessor {
         protected final CustomFieldConfig config;
         protected final Map<String, CustomFieldValue> fields;
 

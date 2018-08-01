@@ -15,15 +15,6 @@
  */
 package org.overbaard.jira.impl.config;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.jboss.dmr.ModelNode;
-import org.overbaard.jira.impl.Constants;
-
 /**
  * Abstract base class for all kinds of project configurations.
  *

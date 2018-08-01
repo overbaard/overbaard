@@ -22,15 +22,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.jboss.dmr.ModelNode;
+import org.junit.Assert;
+import org.junit.Rule;
 import org.overbaard.jira.api.BoardConfigurationManager;
 import org.overbaard.jira.api.BoardManager;
 import org.overbaard.jira.api.NextRankedIssueUtil;
 import org.overbaard.jira.impl.BoardConfigurationManagerBuilder;
 import org.overbaard.jira.impl.BoardManagerBuilder;
 import org.overbaard.jira.impl.OverbaardIssueEvent;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
 
 import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.bc.project.component.ProjectComponent;
