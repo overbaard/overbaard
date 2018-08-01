@@ -88,6 +88,16 @@ public class LinkedProjectConfig extends ProjectConfig {
         return super.projectStates;
     }
 
+    public boolean hasTypeLinks(String issueType) {
+        if (typeStateOverrides != null) {
+            ProjectStateList override = typeStateOverrides.get(issueType);
+            if (override != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     ModelNode serializeModelNodeForConfig() {
         final ModelNode projectNode = new ModelNode();
         if (projectStates != null) {
