@@ -21,8 +21,7 @@ import org.jboss.dmr.ModelNode;
 import com.atlassian.jira.issue.search.SearchException;
 import com.atlassian.jira.user.ApplicationUser;
 
-public interface JiraFacade
-{
+public interface JiraFacade {
     /**
      * Gets the board configurations
      * @param user the logged in user

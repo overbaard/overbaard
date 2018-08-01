@@ -9,7 +9,6 @@ import java.util.Set;
 
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.Property;
-import org.overbaard.jira.impl.Constants;
 
 /**
  * @author <a href="mailto:kabir.khan@jboss.com">Kabir Khan</a>

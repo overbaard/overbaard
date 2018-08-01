@@ -28,7 +28,6 @@ import static org.overbaard.jira.impl.Constants.DISPLAY;
 import static org.overbaard.jira.impl.Constants.DONE;
 import static org.overbaard.jira.impl.Constants.EMAIL;
 import static org.overbaard.jira.impl.Constants.FIX_VERSIONS;
-import static org.overbaard.jira.impl.Constants.ICON;
 import static org.overbaard.jira.impl.Constants.ISSUES;
 import static org.overbaard.jira.impl.Constants.ISSUE_TYPES;
 import static org.overbaard.jira.impl.Constants.KEY;
@@ -66,14 +65,13 @@ import java.util.Set;
 
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Test;
 import org.overbaard.jira.impl.BoardManagerBuilder;
 import org.overbaard.jira.impl.OverbaardIssueEvent;
 import org.overbaard.jira.impl.board.ProjectParallelTaskOptionsLoaderBuilder;
-import org.junit.Assert;
-import org.junit.Test;
-import org.springframework.ui.Model;
 
 import com.atlassian.jira.issue.search.SearchException;
 
@@ -2227,7 +2225,7 @@ public class BoardManagerTest extends AbstractBoardTest {
         issueRegistry.issueBuilder("TDP", "task", "high", "Three", "TDP-C")
                 .assignee("kabir").buildAndRegister();      //3
         issueRegistry.issueBuilder("TBG", "task", "high", "One", "TBG-X")
-                .assignee("kabir").buildAndRegister();;     //1
+                .assignee("kabir").buildAndRegister();     //1
 
 
         getJson(0, new BoardAssigneeChecker("kabir"));
@@ -3588,7 +3586,7 @@ public class BoardManagerTest extends AbstractBoardTest {
         }
     }
 
-    private static abstract class MultiSelectNameOnlyChecker implements IssueChecker {
+    private abstract static class MultiSelectNameOnlyChecker implements IssueChecker {
         private final String name;
         private int[] expected;
 
@@ -3664,7 +3662,7 @@ public class BoardManagerTest extends AbstractBoardTest {
         }
     }
 
-    private static abstract class BoardMultiSelectNameOnlyValueChecker implements BoardDataChecker {
+    private abstract static class BoardMultiSelectNameOnlyValueChecker implements BoardDataChecker {
         private final String name;
         private final String[] valueNames;
 
@@ -3711,7 +3709,7 @@ public class BoardManagerTest extends AbstractBoardTest {
         }
     }
 
-    private static abstract class BoardCustomFieldChecker implements BoardDataChecker {
+    private abstract static class BoardCustomFieldChecker implements BoardDataChecker {
         private final String customFieldName;
         private final String[] keys;
 

@@ -1,6 +1,5 @@
 package org.overbaard.jira.impl.config;
 
-import static org.overbaard.jira.impl.Constants.FILTER;
 import static org.overbaard.jira.impl.Constants.ISSUE_TYPES;
 import static org.overbaard.jira.impl.Constants.LINKED_ISSUES;
 import static org.overbaard.jira.impl.Constants.OVERRIDE;
@@ -11,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -212,7 +210,7 @@ public class BoardProjectIssueTypeOverrideConfig {
         T load(ModelNode override);
     }
 
-    private static abstract class IssueTypeConfigOverride {
+    private abstract static class IssueTypeConfigOverride {
         private final List<String> issueTypes;
 
         public IssueTypeConfigOverride(List<String> issueTypes) {

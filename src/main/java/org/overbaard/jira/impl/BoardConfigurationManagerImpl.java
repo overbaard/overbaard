@@ -133,7 +133,7 @@ public class BoardConfigurationManagerImpl implements BoardConfigurationManager 
     @Override
     public BoardConfig getBoardConfigForBoardDisplay(ApplicationUser user, final String code) {
         BoardConfig boardConfig = getBoardConfig(code);
-        
+
         if (boardConfig != null && !canViewBoard(user, boardConfig)) {
             throw new OverbaardPermissionException("Insufficient permissions to view board " +
                     boardConfig.getName() + " (" + code + ")");

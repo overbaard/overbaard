@@ -17,8 +17,7 @@
 package it.org.overbaard.jira;
 
 //@RunWith(AtlassianPluginsTestRunner.class)
-public class JiraFacadeWiredTest
-{
+public class JiraFacadeWiredTest {
 /*    @ComponentImport
     private final ApplicationProperties applicationProperties;
     @ComponentImport
@@ -32,8 +31,7 @@ public class JiraFacadeWiredTest
     }*/
 
 //    @Test
-    public void testMyName()
-    {
+    public void testMyName() {
 //        assertEquals("names do not match!", "myComponent:" + applicationProperties.getDisplayName(), jiraFacade.getName());
     }
 }

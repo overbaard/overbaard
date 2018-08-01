@@ -27,7 +27,6 @@ import org.osgi.framework.BundleReference;
 import org.overbaard.jira.OverbaardLogger;
 import org.overbaard.jira.api.ParallelTaskOptions;
 import org.overbaard.jira.impl.config.CustomFieldConfig;
-import org.overbaard.jira.impl.config.CustomFieldRegistry;
 import org.overbaard.jira.impl.config.ParallelTaskCustomFieldConfig;
 import org.overbaard.jira.impl.config.ParallelTaskGroupPosition;
 import org.overbaard.jira.impl.config.ProjectParallelTaskGroupsConfig;
@@ -131,7 +130,7 @@ class BulkIssueLoadStrategy implements IssueLoadStrategy {
     private void loadDataForBatch(SQLProcessor sqlProcessor, List<Long> idBatch) {
         final String sql = createSql(idBatch);
 
-        try (final ResultSet rs = sqlProcessor.executeQuery(sql)){
+        try (ResultSet rs = sqlProcessor.executeQuery(sql)){
             while (rs.next()) {
                 Long issueId = rs.getLong(1);
                 Long customFieldId = rs.getLong(2);

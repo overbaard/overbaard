@@ -1043,7 +1043,7 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
         checkViewId(1); //No change, it was blacklisted already
 
         event = updateEventBuilder("TDP-8").issueType("NewBadType").buildAndRegister();
-        ;
+
         boardManager.handleEvent(event, nextRankedIssueUtil);
         checkViewId(1); //No change, it was blacklisted already
 
@@ -2601,7 +2601,7 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
         return fullRefreshNode;
     }
 
-    private static abstract class IssueData {
+    private abstract static class IssueData {
         String key;
         IssueType type;
         Priority priority;
@@ -2912,7 +2912,7 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
         }
     }
 
-    private static abstract class NewMultiSelectNameOnlyValueChecker implements NewChecker {
+    private abstract static class NewMultiSelectNameOnlyValueChecker implements NewChecker {
         private final String name;
         private final String[] expectedValues;
 
