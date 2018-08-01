@@ -457,6 +457,48 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>Test the UI</id>
+            <activation>
+                <property>
+                    <name>ob.ui.tests</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <!--
+                                    Run the linter
+                                -->
+                                <id>yarn run lint</id>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <configuration>
+                                    <arguments>run lint</arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <!--
+                                    Run the tests
+                                -->
+                                <id>yarn run test:travis-headless</id>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <configuration>
+                                    <arguments>run test:travis-headless</arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <!-- After upgrading IntelliJ IDEA to 2016.3.2, this is suddenly needed -->
