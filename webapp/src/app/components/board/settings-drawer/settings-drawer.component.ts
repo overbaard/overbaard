@@ -337,11 +337,13 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
   processFormValueChanges(value: any) {
     // bulkUpdateFilter is set by the onXXXFilter()
     const filterAttributes: FilterAttributes = this.bulkUpdateFilter ? this.bulkUpdateFilter : this.filtersToDisplay;
-    const obj: Object = value[filterAttributes.key];
-    this._store.dispatch(BoardFilterActions.createUpdateFilter(filterAttributes, obj));
-    this.filterForm.reset(value);
-    this.filterTooltips[filterAttributes.key] = null;
-    this.bulkUpdateFilter = null;
+    if (filterAttributes) {
+      const obj: Object = value[filterAttributes.key];
+      this._store.dispatch(BoardFilterActions.createUpdateFilter(filterAttributes, obj));
+      this.filterForm.reset(value);
+      this.filterTooltips[filterAttributes.key] = null;
+      this.bulkUpdateFilter = null;
+    }
   }
 
   processSwimlaneChange(value: any) {
