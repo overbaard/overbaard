@@ -384,7 +384,7 @@ public abstract class Issue {
         @Override
         ModelNode getModelNodeForFullRefresh(Board board) {
             ModelNode node = super.getModelNodeForFullRefresh(board);
-            if (this.project.getProjectStatesLinks(getIssueTypeName()) != null) {
+            if (this.project.hasTypeLinks(getIssueTypeName())) {
                 // We are for an overridden state so only set this if it is one of those
                 node.get(Constants.TYPE).set(getIssueTypeName());
             }

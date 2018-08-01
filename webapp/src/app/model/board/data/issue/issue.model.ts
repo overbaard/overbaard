@@ -376,8 +376,12 @@ export class IssueUtil {
               // This type will only be set in the data from the server if it is for a linked issue type override
               linkedStates = project.typeStates.get(linkedIssueType);
             }
-            data.colour = ColourTable.INSTANCE.getColourTable(linkedStates.size)[stateIndex];
-            data.stateName = linkedStates.get(stateIndex);
+            if (!linkedStates) {
+              console.warn(`Linked issue ${data['key']} has a 'type' which does not appear in the 'type-states' for the linked project`);
+            } else {
+              data.colour = ColourTable.INSTANCE.getColourTable(linkedStates.size)[stateIndex];
+              data.stateName = linkedStates.get(stateIndex);
+            }
             mutable.set(i, LINKED_ISSUE_FACTORY(<any>data));
           });
         });
