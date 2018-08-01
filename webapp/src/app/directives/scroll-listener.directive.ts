@@ -1,5 +1,5 @@
 import {AfterViewInit, Directive, ElementRef, Input, NgZone, OnDestroy, OnInit, Renderer2} from '@angular/core';
-import {Subject} from 'rxjs/Subject';
+import {Subject} from 'rxjs';
 
 
 @Directive({

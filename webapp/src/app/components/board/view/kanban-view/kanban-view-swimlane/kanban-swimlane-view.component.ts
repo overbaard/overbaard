@@ -15,11 +15,10 @@ import {SwimlaneData} from '../../../../../view-model/board/swimlane-data';
 import {SwimlaneInfo} from '../../../../../view-model/board/swimlane-info';
 import {UpdateParallelTaskEvent} from '../../../../../events/update-parallel-task.event';
 import {IssueDetailState} from '../../../../../model/board/user/issue-detail/issue-detail.model';
-import {Observable} from 'rxjs/Observable';
+import {Observable, Subject} from 'rxjs';
 import {List} from 'immutable';
 import {ScrollHeightSplitter, StartAndHeight} from '../../../../../common/scroll-height-splitter';
 import {BoardHeaders} from '../../../../../view-model/board/board-headers';
-import {Subject} from 'rxjs/Subject';
 import {takeUntil} from 'rxjs/operators';
 import {ScrollPositionAndHeight} from '../../../../../common/scroll-position-height';
 

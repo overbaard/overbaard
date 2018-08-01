@@ -1,19 +1,15 @@
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {UrlService} from './url.service';
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
-import { timer } from 'rxjs/observable/timer';
-import { _throw } from 'rxjs/observable/throw';
+import {Observable,  timer ,  throwError as _throw , Subscription, combineLatest} from 'rxjs';
 import {Progress, ProgressLogService} from './progress-log.service';
-import {Subscription} from 'rxjs/Subscription';
 import {Store} from '@ngrx/store';
 import {AppState} from '../app-store';
 import {BoardActions, boardViewIdSelector} from '../model/board/data/board.reducer';
 import {showBacklogSelector} from '../model/board/user/user-setting.reducer';
 import {BoardIssueView} from '../view-model/board/board-issue-view';
 import {HeaderActions} from '../model/board/data/header/header.reducer';
-import {catchError, take, tap, timeout} from 'rxjs/operators';
-import {combineLatest} from 'rxjs/observable/combineLatest';
+import {catchError, take, tap, timeout, map} from 'rxjs/operators';
 
 @Injectable()
 export class BoardService {
@@ -313,12 +309,16 @@ class ChangePoller {
     private _progressLog: ProgressLogService,
     private _showProgress: boolean) {
 
-    this._pollParameters$ = combineLatest(
-      this._store.select(boardViewIdSelector),
-      this._store.select(showBacklogSelector),
-      (viewId: number, showBacklog: boolean): PollParameters => {
-        return {boardCode: _boardCode, viewId: viewId, showBacklog: showBacklog};
-      });
+
+    this._pollParameters$ =
+      combineLatest(
+        this._store.select(boardViewIdSelector),
+        this._store.select(showBacklogSelector))
+        .pipe(
+          map((values: any[], index: number) => {
+            return {boardCode: _boardCode, viewId: values[0], showBacklog: values[1]};
+          })
+        );
   }
 
   // This will either return 'this' or a new instance depending on the state of the poller

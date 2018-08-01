@@ -1,10 +1,9 @@
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
+import {Observable, throwError as _throw} from 'rxjs';
 import {UrlService} from './url.service';
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {Progress, ProgressLogService} from './progress-log.service';
 import {catchError, map, tap, timeout} from 'rxjs/operators';
-import {_throw} from 'rxjs/observable/throw';
 
 @Injectable()
 export class BoardsService {

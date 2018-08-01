@@ -1,6 +1,7 @@
 import {Store} from '@ngrx/store';
 import {AppState} from '../app-store';
-import {combineLatest} from 'rxjs/observable/combineLatest';
+import {combineLatest, Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
 import {boardSelector} from '../model/board/data/board.reducer';
 import {userSettingSelector} from '../model/board/user/user-setting.reducer';
 import {BoardState} from '../model/board/data/board';
@@ -12,7 +13,6 @@ import {BoardFilterState} from '../model/board/user/board-filter/board-filter.mo
 import {BoardViewMode} from '../model/board/user/board-view-mode';
 import {Injectable} from '@angular/core';
 import {IssueSummaryLevel} from '../model/board/user/issue-summary-level';
-import {Observable} from 'rxjs/Observable';
 
 @Injectable()
 export class BoardQueryParamsService {
@@ -40,43 +40,49 @@ export class BoardQueryParamsHandler {
 
   getBoardViewModel(boardState$: Observable<BoardState>,
                     userSettingState$: Observable<UserSettingState>): Observable<string> {
-    return combineLatest(boardState$, userSettingState$, (boardState, userSettingState) => {
-      const oldState: UserSettingState = this._lastUserSettingState;
-      this._lastBoardState = boardState;
-      this._lastUserSettingState = userSettingState;
-      if (userSettingState !== oldState) {
-        if (oldState !== initialUserSettingState) {
-          const params: List<string> = List<string>().asMutable();
-          params.push(`board=${encodeURIComponent(userSettingState.boardCode)}`);
-          if (userSettingState.showBacklog) {
-            params.push('bl=true');
-          }
-          if (userSettingState.viewMode === BoardViewMode.RANK) {
-            params.push('view=rv');
-          }
-          if (userSettingState.issueDetail.issueSummaryLevel !== IssueSummaryLevel.FULL) {
-            params.push(`isl=${userSettingState.issueDetail.issueSummaryLevel}`);
-          }
-          if (!userSettingState.issueDetail.parallelTasks) {
-            params.push('vpt=false');
-          }
-          if (!userSettingState.issueDetail.linkedIssues) {
-            params.push('vli=false');
-          }
-          if (userSettingState.swimlane) {
-            params.push(`swimlane=${encodeURIComponent(userSettingState.swimlane)}`);
-            if (userSettingState.swimlaneShowEmpty) {
-              params.push('showEmptySl=true');
+    return combineLatest(boardState$, userSettingState$)
+      .pipe(
+        map((values: any[], index: number) => {
+          const boardState: BoardState = values[0];
+          const userSettingState: UserSettingState = values[1];
+
+          const oldState: UserSettingState = this._lastUserSettingState;
+          this._lastBoardState = boardState;
+          this._lastUserSettingState = userSettingState;
+          if (userSettingState !== oldState) {
+            if (oldState !== initialUserSettingState) {
+              const params: List<string> = List<string>().asMutable();
+              params.push(`board=${encodeURIComponent(userSettingState.boardCode)}`);
+              if (userSettingState.showBacklog) {
+                params.push('bl=true');
+              }
+              if (userSettingState.viewMode === BoardViewMode.RANK) {
+                params.push('view=rv');
+              }
+              if (userSettingState.issueDetail.issueSummaryLevel !== IssueSummaryLevel.FULL) {
+                params.push(`isl=${userSettingState.issueDetail.issueSummaryLevel}`);
+              }
+              if (!userSettingState.issueDetail.parallelTasks) {
+                params.push('vpt=false');
+              }
+              if (!userSettingState.issueDetail.linkedIssues) {
+                params.push('vli=false');
+              }
+              if (userSettingState.swimlane) {
+                params.push(`swimlane=${encodeURIComponent(userSettingState.swimlane)}`);
+                if (userSettingState.swimlaneShowEmpty) {
+                  params.push('showEmptySl=true');
+                }
+                this.appendSwimlaneVisibility(params, boardState, userSettingState);
+              }
+              this.appendFilters(params, userSettingState);
+              this.appendColumnVisibility(params, boardState, userSettingState);
+              this._lastQueryString = params.join('&');
             }
-            this.appendSwimlaneVisibility(params, boardState, userSettingState);
           }
-          this.appendFilters(params, userSettingState);
-          this.appendColumnVisibility(params, boardState, userSettingState);
-          this._lastQueryString = params.join('&');
-        }
-      }
-      return this._lastQueryString;
-    });
+          return this._lastQueryString;
+        })
+      );
   }
 
   private appendColumnVisibility(params: List<string>, boardState: BoardState, userSettingState: UserSettingState) {

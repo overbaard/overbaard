@@ -1,4 +1,4 @@
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import {BehaviorSubject} from 'rxjs';
 import {ScrollPositionAndHeight} from './scroll-position-height';
 
 export class ScrollPositionAndHeightSubject extends BehaviorSubject<ScrollPositionAndHeight> {

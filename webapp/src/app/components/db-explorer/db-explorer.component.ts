@@ -3,8 +3,7 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {AppHeaderService} from '../../services/app-header.service';
 import {UrlService} from '../../services/url.service';
-import {Subject} from 'rxjs/Subject';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import {Subject, BehaviorSubject} from 'rxjs';
 import {take, timeout} from 'rxjs/operators';
 
 /**

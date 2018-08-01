@@ -5,9 +5,7 @@ import {ChangeDetectorRef, Input, NgZone, OnChanges, SimpleChange, SimpleChanges
 import {BoardViewModel} from '../../../view-model/board/board-view';
 import {BOARD_HEADERS_HEIGHT, TOOLBAR_HEIGHT} from '../../../common/view-constants';
 import {IssueDetailState} from '../../../model/board/user/issue-detail/issue-detail.model';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import {Subject} from 'rxjs/Subject';
-import {Observable} from 'rxjs/Observable';
+import {BehaviorSubject, Subject, Observable} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 
 export class FixedHeaderView implements OnChanges {

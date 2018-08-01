@@ -1,7 +1,7 @@
 import {AfterViewInit, ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {AppState} from './app-store';
 import {Store} from '@ngrx/store';
-import {Observable} from 'rxjs/Observable';
+import {Observable, Subject} from 'rxjs';
 import {
   externallyDismissFirstMessageSelector,
   notLoggedInSelector,
@@ -13,7 +13,6 @@ import {MatSnackBar, MatSnackBarConfig, MatSnackBarRef, SimpleSnackBar} from '@a
 import {TOOLBAR_HEIGHT} from './common/view-constants';
 import {VersionService} from './services/version.service';
 import {UrlService} from './services/url.service';
-import {Subject} from 'rxjs/Subject';
 import {LogEntry} from './model/global/progress-log/log-entry';
 import {Router} from '@angular/router';
 import {filter, take, takeUntil} from 'rxjs/operators';
