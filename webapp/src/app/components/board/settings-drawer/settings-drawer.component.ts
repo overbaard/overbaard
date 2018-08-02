@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {AppState} from '../../../app-store';
 import {Store} from '@ngrx/store';
 import {Dictionary} from '../../../common/dictionary';
@@ -30,21 +30,23 @@ import {
 import {BoardFilterActions} from '../../../model/board/user/board-filter/board-filter.reducer';
 import {customFieldsSelector} from '../../../model/board/data/custom-field/custom-field.reducer';
 import {CustomField} from '../../../model/board/data/custom-field/custom-field.model';
-import {BoardProject, ParallelTask, ProjectState} from '../../../model/board/data/project/project.model';
+import {BoardProject, ParallelTask} from '../../../model/board/data/project/project.model';
 import {UserSettingActions} from '../../../model/board/user/user-setting.reducer';
 import {UserSettingState} from '../../../model/board/user/user-setting';
 import {BoardViewMode} from '../../../model/board/user/board-view-mode';
 import {MatCheckboxChange, MatSliderChange} from '@angular/material';
 import {toIssueSummaryLevel} from '../../../model/board/user/issue-summary-level';
 import {FilterFormEntry} from '../../../common/filter-form-entry';
-import {debounceTime, filter, map, take, takeUntil} from 'rxjs/operators';
+import {debounceTime, map, take, takeUntil} from 'rxjs/operators';
 import {ParallelTaskFlattener} from '../../../model/board/data/project/parallel-task.flattener';
+import {FilterEntryEvent} from './filter-entry.event';
+import {getNonParallelTaskSet} from './settings-drawer.util';
 
 @Component({
   selector: 'app-board-settings-drawer',
   templateUrl: './settings-drawer.component.html',
-  styleUrls: ['./settings-drawer.component.scss']/*,
-  changeDetection: ChangeDetectionStrategy.OnPush*/
+  styleUrls: ['./settings-drawer.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
 
@@ -70,8 +72,6 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
   filtersToDisplay: FilterAttributes = null;
   currentFilterEntries: FilterFormEntry[];
   filterSearch: string;
-
-  filterTooltips: Dictionary<string> = {};
 
   private _destroy$: Subject<null> = new Subject<null>();
 
@@ -262,25 +262,44 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
     this.filterForm.addControl(filterAttributes.key, group);
   }
 
-  onOpenFilterPane(filterAttributes: FilterAttributes) {
+  onFilterEntryEvent(event: FilterEntryEvent, filterAttributes: FilterAttributes) {
+    switch (event) {
+      case FilterEntryEvent.OPENED_ENTRY:
+        this.onOpenFilterPanel(filterAttributes);
+        break;
+      case FilterEntryEvent.CLOSED_ENTRY:
+        this.onCloseFilterPanel(filterAttributes);
+        break;
+      case FilterEntryEvent.CLEARED_FILTER:
+        this.onClearFilter(filterAttributes);
+        break;
+      case FilterEntryEvent.INVERTED_FILTER:
+        this.onInvertFilter(filterAttributes);
+        break;
+      case FilterEntryEvent.SELECTED_ALL_FILTER:
+        this.onSelectAllFilter(filterAttributes);
+        break;
+      default:
+        console.error(`Unknown FilterEntryEvent ${event}`);
+    }
+  }
+
+  private onOpenFilterPanel(filterAttributes: FilterAttributes) {
     this.filtersToDisplay = filterAttributes;
     this.currentFilterEntries = this.filterEntries[filterAttributes.key];
     this.filterSearch = null;
   }
 
-  onCloseFilterPanel(filterAttributes: FilterAttributes) {
+  private onCloseFilterPanel(filterAttributes: FilterAttributes) {
     if (this.filtersToDisplay === filterAttributes) {
       this.filtersToDisplay = null;
     }
   }
 
-
-  onClearFilter(event: MouseEvent, filterAttributes: FilterAttributes) {
-    event.preventDefault();
-    event.stopPropagation();
+  private onClearFilter(filterAttributes: FilterAttributes) {
     // This gets cleared by processFormValueChanges
     this.bulkUpdateFilter = filterAttributes;
-    const set: Set<string> = this.getNonParallelTaskSet(filterAttributes);
+    const set: Set<string> = getNonParallelTaskSet(this.userSettings.filters, filterAttributes);
     const group: FormGroup = <FormGroup>this.filterForm.controls[filterAttributes.key];
     if (set) {
       set.forEach(k => group.controls[k].setValue(false));
@@ -294,7 +313,7 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
     }
   }
 
-  onInvertFilter(filterAttributes: FilterAttributes) {
+  private onInvertFilter(filterAttributes: FilterAttributes) {
     this.bulkUpdateFilter = filterAttributes;
     const group: FormGroup = <FormGroup>this.filterForm.controls[filterAttributes.key];
     if (filterAttributes !== PARALLEL_TASK_ATTRIBUTES) {
@@ -315,7 +334,7 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
     }
   }
 
-  onSelectAllFilter(filterAttributes: FilterAttributes) {
+  private onSelectAllFilter(filterAttributes: FilterAttributes) {
     this.bulkUpdateFilter = filterAttributes;
     const group: FormGroup = <FormGroup>this.filterForm.controls[filterAttributes.key];
     if (filterAttributes !== PARALLEL_TASK_ATTRIBUTES) {
@@ -341,7 +360,6 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
       const obj: Object = value[filterAttributes.key];
       this._store.dispatch(BoardFilterActions.createUpdateFilter(filterAttributes, obj));
       this.filterForm.reset(value);
-      this.filterTooltips[filterAttributes.key] = null;
       this.bulkUpdateFilter = null;
     }
   }
@@ -365,82 +383,6 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
   onShowEmptySwimlanes(event: MouseEvent) {
     event.preventDefault();
     this._store.dispatch(UserSettingActions.createToggleShowEmptySwimlanes());
-  }
-
-  getSelectionTooltip(attributes: FilterAttributes): string {
-    let tooltip: string = this.filterTooltips[attributes.key];
-    if (!tooltip) {
-      tooltip = this.createSelectionTooltip(attributes);
-      if (tooltip.length > 0) {
-        tooltip = attributes.display + '\n\n' + tooltip;
-      }
-      this.filterTooltips[attributes.key] = tooltip;
-    }
-    return tooltip;
-  }
-
-  createSelectionTooltip(attributes: FilterAttributes): string {
-    const set: Set<string> = this.getNonParallelTaskSet(attributes);
-    if (set && set.size > 0) {
-      const lookup: Dictionary<FilterFormEntry> = this.filterEntryDictionary[attributes.key];
-      let first = true;
-      let tooltip = '';
-      set.forEach(key => {
-        if (first) {
-          first = false;
-        } else {
-          tooltip += '\n';
-        }
-        tooltip += lookup[key].display;
-      });
-      return tooltip;
-    }
-    if (attributes === PARALLEL_TASK_ATTRIBUTES) {
-      let first = true;
-      let tooltip = '';
-      const taskEntries: FilterFormEntry[] = this.filterEntries[attributes.key];
-      for (const taskEntry of taskEntries) {
-        const taskSet: Set<string> = this.userSettings.filters.parallelTask.get(taskEntry.key);
-        if (taskSet && taskSet.size > 0) {
-          if (first) {
-            first = false;
-          } else {
-            tooltip += '\n\n';
-          }
-          tooltip += taskEntry.display + ':';
-          taskSet.forEach(key => {
-            // For parallel tasks the key and the display value is the same so there is no need to look up
-            tooltip += '\n' + key;
-          });
-
-        }
-      }
-      return tooltip;
-    }
-    return '';
-  }
-
-  private getNonParallelTaskSet(entry: FilterAttributes): Set<string> {
-    switch (entry) {
-      case PROJECT_ATTRIBUTES:
-        return this.userSettings.filters.project;
-      case ISSUE_TYPE_ATTRIBUTES:
-        return this.userSettings.filters.issueType;
-      case PRIORITY_ATTRIBUTES:
-        return this.userSettings.filters.priority;
-      case ASSIGNEE_ATTRIBUTES:
-        return this.userSettings.filters.assignee;
-      case COMPONENT_ATTRIBUTES:
-        return this.userSettings.filters.component;
-      case LABEL_ATTRIBUTES:
-        return this.userSettings.filters.label;
-      case FIX_VERSION_ATTRIBUTES:
-        return this.userSettings.filters.fixVersion;
-    }
-    if (entry.customField) {
-      return this.userSettings.filters.customField.get(entry.key);
-    }
-    return null;
   }
 
   private getViewModeString(viewMode: BoardViewMode) {
