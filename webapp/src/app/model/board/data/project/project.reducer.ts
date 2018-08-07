@@ -64,7 +64,6 @@ export function projectMetaReducer(state: ProjectState = initialProjectState, ac
 const getProjectState = (state: AppState): ProjectState => state.board.projects;
 const getBoardProjects = (state: ProjectState): OrderedMap<string, BoardProject> => state.boardProjects;
 const getLinkedProjects = (state: ProjectState): Map<string, LinkedProject> => state.linkedProjects;
-// const getParallelTasks = (state: ProjectState): OrderedMap<string, List<List<ParallelTask>>> => state.parallelTasks;
 export const boardProjectsSelector = createSelector(getProjectState, getBoardProjects);
-// export const parallelTasksSelector = createSelector(getProjectState, getParallelTasks);
 export const linkedProjectsSelector = createSelector(getProjectState, getLinkedProjects);
+

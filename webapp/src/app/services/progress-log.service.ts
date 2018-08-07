@@ -77,6 +77,12 @@ export class Progress {
 
   }
 
+  logWarning(message: string) {
+    this.finishProgress();
+    this._delegate.logMessage(this._routeId, message, false);
+
+  }
+
   private finishProgress() {
     if (this._showProgress) {
       this._delegate.finishProgress(this._routeId);

@@ -10,6 +10,7 @@ import {AppState} from '../../../app-store';
 import {BoardViewMode} from './board-view-mode';
 import {IssueSummaryLevel, toIssueSummaryLevel} from './issue-summary-level';
 import {IssueDetailUtil} from './issue-detail/issue-detail.model';
+import {boardSearchFilterMetaReducer} from './board-filter/board-search-filter.reducer';
 
 const CLEAR_SETTINGS = 'CLEAR_SETTINGS';
 
@@ -257,6 +258,7 @@ export function userSettingReducer(state: UserSettingState = initialUserSettingS
   // Delegate other actions like updating the filters
   return UserSettingUtil.updateUserSettingState(state, mutable => {
     mutable.filters = boardFilterMetaReducer(state.filters, action);
+    mutable.searchFilters = boardSearchFilterMetaReducer(state.searchFilters, action);
   });
 }
 

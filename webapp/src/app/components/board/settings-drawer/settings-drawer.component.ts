@@ -41,6 +41,8 @@ import {debounceTime, map, take, takeUntil} from 'rxjs/operators';
 import {ParallelTaskFlattener} from '../../../model/board/data/project/parallel-task.flattener';
 import {FilterEntryEvent} from './filter-entry.event';
 import {getNonParallelTaskSet} from './settings-drawer.util';
+import {IssueState} from '../../../model/board/data/issue/issue.model';
+import {BoardSearchFilterActions} from '../../../model/board/user/board-filter/board-search-filter.reducer';
 
 @Component({
   selector: 'app-board-settings-drawer',
@@ -56,6 +58,9 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
   // Have this come in via an input to be able to decide the state of showing/hiding empty swimlanes
   @Input()
   userSettings: UserSettingState;
+
+  @Input()
+  issueState: IssueState;
 
   @Output()
   switchViewMode: EventEmitter<null> = new EventEmitter<null>();
@@ -227,7 +232,6 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
             filterFormEntries.push(entry);
             parallelTasksGroup.addControl(parallelTask.display, taskGroup);
           });
-
 
           this.filterEntryDictionary[PARALLEL_TASK_ATTRIBUTES.key] = filterFormEntryDictionary;
           this.filterEntries[PARALLEL_TASK_ATTRIBUTES.key] = filterFormEntries;
@@ -404,6 +408,11 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
 
   onChangeShowLinkedIssues(event: MatCheckboxChange) {
       this._store.dispatch(UserSettingActions.createUpdateShowLinkedIssues(event.checked));
+  }
+
+  onSelectedSearchIssueIds(event: Set<string>) {
+    console.log(`handling event ${event}`);
+    this._store.dispatch(BoardSearchFilterActions.createUpdateSearchIssueIds(event));
   }
 
   get hasParallelTasks(): boolean {

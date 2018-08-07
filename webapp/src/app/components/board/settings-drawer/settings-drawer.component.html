@@ -67,6 +67,11 @@
       <mat-card-title><div class="mat-h4 card-header">Filters</div></mat-card-title>
     </mat-card-header>
     <mat-accordion>
+      <app-search-filter
+        [issueState]="issueState"
+        [searchFilterState]="userSettings.searchFilters"
+        (selectedIssueIds)="onSelectedSearchIssueIds($event)"
+      ></app-search-filter>
       <app-setting-filter-entry
         *ngFor="let entry of filterList"
         [filterAttributes]="entry"

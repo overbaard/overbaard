@@ -19,6 +19,8 @@ import {ProgressLogActions, progressLogCurrentMessageSelector} from '../../model
 import {MatDialog} from '@angular/material';
 import {BlacklistDialogComponent} from './blacklist/blacklist-dialog.component';
 import {filter, take, takeUntil} from 'rxjs/operators';
+import {IssueState} from '../../model/board/data/issue/issue.model';
+import {issueStateSelector} from '../../model/board/data/issue/issue.reducer';
 
 
 @Component({
@@ -37,6 +39,7 @@ export class BoardComponent implements OnInit, OnDestroy {
   windowWidth: number;
 
   userSettings$: Observable<UserSettingState>;
+  issueState$: Observable<IssueState>;
 
   private _destroy$: Subject<boolean> = new Subject<boolean>();
 
@@ -91,6 +94,7 @@ export class BoardComponent implements OnInit, OnDestroy {
 
     this.board$ = this.boardViewService.getBoardViewModel();
     this.userSettings$ = this._store.select<UserSettingState>(userSettingSelector);
+    this.issueState$ = this._store.select(issueStateSelector);
 
     this._queryParamsService.getQueryParams()
       .pipe(
@@ -115,7 +119,6 @@ export class BoardComponent implements OnInit, OnDestroy {
           this.blacklist = blacklist;
         });
   }
-
 
   ngOnDestroy(): void {
     this._boardService.destroy();

@@ -1,6 +1,17 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  SimpleChange,
+  SimpleChanges
+} from '@angular/core';
 import {FilterAttributes, PARALLEL_TASK_ATTRIBUTES} from '../../../model/board/user/board-filter/board-filter.constants';
-import {Set} from 'immutable';
+import {List, Set} from 'immutable';
 import {Dictionary} from '../../../common/dictionary';
 import {FilterFormEntry} from '../../../common/filter-form-entry';
 import {BoardFilterState} from '../../../model/board/user/board-filter/board-filter.model';
@@ -9,6 +20,8 @@ import {FilterEntryEvent} from './filter-entry.event';
 import {Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 import {getNonParallelTaskSet} from './settings-drawer.util';
+import {IssueState} from '../../../model/board/data/issue/issue.model';
+import {BoardIssue} from '../../../model/board/data/issue/board-issue';
 
 
 @Component({
@@ -44,6 +57,8 @@ export class FilterEntryComponent implements OnInit, OnDestroy {
   private tooltip: string;
 
   filterSearch: string;
+
+  issueList: List<string> = List<string>();
 
   destroy$: Subject<void> = new Subject<void>();
 

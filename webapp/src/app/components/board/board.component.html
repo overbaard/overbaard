@@ -8,6 +8,7 @@
       <app-board-settings-drawer
         *ngIf="displaySettingsContent"
         [userSettings]="userSettings$ | async"
+        [issueState]="issueState$ | async"
         (switchViewMode)="onSwitchViewMode()"
       ></app-board-settings-drawer>
     </mat-drawer>

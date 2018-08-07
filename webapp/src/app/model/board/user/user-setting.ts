@@ -2,6 +2,7 @@ import {BoardFilterState} from './board-filter/board-filter.model';
 import {Map} from 'immutable';
 import {BoardViewMode} from './board-view-mode';
 import {IssueDetailState} from './issue-detail/issue-detail.model';
+import {BoardSearchFilterState} from './board-filter/board-search-filter.model';
 
 export interface UserSettingState {
   boardCode: string;
@@ -9,6 +10,7 @@ export interface UserSettingState {
   forceBacklog: boolean;
   showBacklog: boolean;
   filters: BoardFilterState;
+  searchFilters: BoardSearchFilterState;
   /** The visibility value to use for column, if its index does not show up in columnVisibilities */
   defaultColumnVisibility: boolean;
   /** The column visibilities if any, initially set up by the query parameters */
