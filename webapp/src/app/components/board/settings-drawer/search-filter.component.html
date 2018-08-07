@@ -57,11 +57,16 @@
         </mat-autocomplete>
       </mat-form-field>
       <mat-form-field>
-        <input
+        <textarea
+          #containingTextInput
           matInput
+          matTextareaAutosize
+          matAutosizeMinRows="1"
+          matAutosizeMaxRows="25"
           [placeholder]="'Issue Text Search'"
           [formControl]="searchContainingTextCtrl"
-        >
+        ></textarea>
+        <mat-hint *ngIf="containingTextInput.value?.trim().length <= 3" align="end">Minimum 3 characters</mat-hint>
       </mat-form-field>
     </div>
   </div>
