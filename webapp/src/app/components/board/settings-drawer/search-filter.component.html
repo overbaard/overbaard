@@ -48,13 +48,20 @@
           [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
           [formControl]="searchIssueIdCtrl"
           [matAutocomplete]="auto"
-          (matChipInputTokenEnd)="onAddIssueId($event)">
+          (matChipInputTokenEnd)="onAddSearchIssueId($event)">
         <!-- (matChipInputTokenEnd)="add($event)" -->
         <mat-autocomplete #auto="matAutocomplete" autoActiveFirstOption (optionSelected)="onSelectIssueId($event)">
           <mat-option *ngFor="let issue of filteredIssueList" [value]="issue.key">
             {{issue.key}} - {{issue.summary}}
           </mat-option>
         </mat-autocomplete>
+      </mat-form-field>
+      <mat-form-field>
+        <input
+          matInput
+          [placeholder]="'Issue Text Search'"
+          [formControl]="searchContainingTextCtrl"
+        >
       </mat-form-field>
     </div>
   </div>

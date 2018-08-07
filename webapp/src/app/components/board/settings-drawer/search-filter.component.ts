@@ -42,6 +42,9 @@ export class SearchFilterComponent implements OnInit, OnChanges, OnDestroy {
   @Output()
   selectedIssueIds: EventEmitter<Set<string>> = new EventEmitter<Set<string>>();
 
+  @Output()
+  containingText: EventEmitter<string> = new EventEmitter<string>();
+
   @ViewChild('searchIssueIdInput') searchIssueIdInput: ElementRef;
 
   // Set/read by the template
@@ -49,6 +52,7 @@ export class SearchFilterComponent implements OnInit, OnChanges, OnDestroy {
 
   searchForm: FormGroup;
   searchIssueIdCtrl: FormControl;
+  searchContainingTextCtrl: FormControl;
 
   tooltip: string;
 
@@ -70,16 +74,39 @@ export class SearchFilterComponent implements OnInit, OnChanges, OnDestroy {
     this.searchForm = new FormGroup({});
     this.searchIssueIdCtrl = new FormControl();
     this.searchForm.addControl('searchIssueId', this.searchIssueIdCtrl);
+    this.searchContainingTextCtrl = new FormControl(this.searchFilterState.containingText);
     this.searchForm.addControl('searchContainingText', new FormControl(this.searchFilterState.containingText));
 
-    this.searchForm.controls['searchIssueId'].valueChanges.pipe(
+    this.searchIssueIdCtrl.valueChanges.pipe(
       takeUntil(this._destroy$),
       startWith('')
     ).subscribe(value => {
       this.filteredIssueList = this.filterIssueList(value);
     });
-  }
+    this.searchContainingTextCtrl.valueChanges.pipe(
+      takeUntil(this._destroy$),
+    ).subscribe((value: string) => {
 
+      // TODO Do all this length stuff when populating the view model instead
+      /*let emit = false;
+      if (value && value.length > 2) {
+        if (this.searchContainingText !== value) {
+          emit = true;
+          this.searchContainingText = value;
+        }
+      } else if (this.searchContainingText && this.searchContainingText.length > 2) {
+        emit = true;
+        this.searchContainingText = null;
+      }
+      if (emit) {
+        this.emitContainingText();
+      }*/
+      this.searchContainingText = value ? value : '';
+      this.tooltip = null;
+      // TODO - debounce this a bit
+      this.emitContainingText();
+    });
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     const issueStateChange: SimpleChange = changes['issueState'];
@@ -97,6 +124,10 @@ export class SearchFilterComponent implements OnInit, OnChanges, OnDestroy {
         console.log('Not equal');
         const searchFilterState: BoardSearchFilterState = searchFilterStateChange.currentValue;
         this.selectedSearchIssueIds = searchFilterState.issueIds.toArray().sort();
+        if (!searchFilterStateChange.isFirstChange()) {
+          this.searchContainingText = searchFilterState.containingText;
+          this.searchContainingTextCtrl.setValue(searchFilterState.containingText);
+        }
       }
     }
   }
@@ -116,13 +147,13 @@ export class SearchFilterComponent implements OnInit, OnChanges, OnDestroy {
           for (const id of this.selectedSearchIssueIds) {
             tooltip += id + '\n';
           }
-          if (this.searchContainingText) {
-            if (tooltip.length > 0) {
-              tooltip += '\n';
-            }
-            tooltip += 'Text:\n';
-            tooltip += this.searchContainingText;
+        }
+        if (this.searchContainingText) {
+          if (tooltip.length > 0) {
+            tooltip += '\n';
           }
+          tooltip += 'Text:\n';
+          tooltip += this.searchContainingText;
         }
         this.tooltip = tooltip;
       } else {
@@ -136,7 +167,7 @@ export class SearchFilterComponent implements OnInit, OnChanges, OnDestroy {
     event.preventDefault();
     event.stopPropagation();
     this.selectedSearchIssueIds = [];
-    this.searchContainingText = null;
+    this.searchContainingTextCtrl.setValue(null);
     this.emitSelectedIssueIds();
   }
 
@@ -150,7 +181,7 @@ export class SearchFilterComponent implements OnInit, OnChanges, OnDestroy {
     this.emitSelectedIssueIds();
   }
 
-  onAddIssueId(event: MatChipInputEvent): void {
+  onAddSearchIssueId(event: MatChipInputEvent): void {
     const input = event.input;
     const value: string = event.value;
 
@@ -187,6 +218,11 @@ export class SearchFilterComponent implements OnInit, OnChanges, OnDestroy {
   private emitSelectedIssueIds() {
     this.tooltip = null;
     this.selectedIssueIds.emit(Set<string>(this.selectedSearchIssueIds));
+  }
+
+  private emitContainingText() {
+    this.tooltip = null;
+    this.containingText.emit(this.searchContainingText);
   }
 
   private filterIssueList(value: string): BoardIssue[] {

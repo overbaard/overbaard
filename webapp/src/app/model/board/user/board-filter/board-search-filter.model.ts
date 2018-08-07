@@ -8,7 +8,7 @@ export interface BoardSearchFilterState {
 
 const DEFAULT_STATE: BoardSearchFilterState = {
   issueIds: Set<string>(),
-  containingText: null
+  containingText: ''
 };
 
 interface BoardSearchFilterStateRecord extends TypedRecord<BoardSearchFilterStateRecord>, BoardSearchFilterState {

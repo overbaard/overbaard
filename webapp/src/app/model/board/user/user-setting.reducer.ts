@@ -83,7 +83,7 @@ class UpdateShowLinkedIssuesAction {
 }
 
 export class UserSettingActions {
-  static createClearSettings() {
+  static createClearSettings(): Action {
     return new ClearSettingsAction();
   }
 

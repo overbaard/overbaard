@@ -1,25 +1,31 @@
 import {Action} from '@ngrx/store';
 import {Set} from 'immutable';
-import {FilterAttributes,} from './board-filter.constants';
 import {INITIALISE_SETTINGS_FROM_QUERYSTRING, InitialiseFromQueryStringAction} from '../initialise-from-querystring.action';
-import {AppState} from '../../../../app-store';
-import {UserSettingState} from '../user-setting';
 import {BoardSearchFilterState, BoardSearchFilterUtil, initialBoardSearchFilterState} from './board-search-filter.model';
 
 const UPDATE_SELECTED_ISSUE_IDS = 'UPDATE_SELECTED_ISSUE_IDS';
+const UPDATE_CONTAINING_TEXT = 'UPDATE_CONTAINING_TEXT';
 
 
-class UpdateSelectedIssueIdsAction {
+class UpdateSelectedIssueIdsAction implements Action {
   readonly type = UPDATE_SELECTED_ISSUE_IDS;
   constructor(readonly payload: Set<string>) {
   }
 }
 
-
+class UpdateContainingTextAction implements Action {
+  readonly type = UPDATE_CONTAINING_TEXT;
+  constructor(readonly payload: string) {
+  }
+}
 
 export class BoardSearchFilterActions {
-  static createUpdateSearchIssueIds(searchIssueIds: Set<string>) {
+  static createUpdateSearchIssueIds(searchIssueIds: Set<string>): Action {
     return new UpdateSelectedIssueIdsAction(searchIssueIds);
+  }
+
+  static createContainingText(text: string): Action {
+    return new UpdateContainingTextAction(text);
   }
 }
 
@@ -58,24 +64,12 @@ export function boardSearchFilterMetaReducer(
         mutable.issueIds = usiAction.payload;
       });
     }
+    case UPDATE_CONTAINING_TEXT: {
+      const uctAction: UpdateContainingTextAction = <UpdateContainingTextAction>action;
+      return BoardSearchFilterUtil.updateBoardSearcgFilterState(state, mutable => {
+        mutable.containingText = uctAction.payload;
+      });
+    }
   }
   return state;
 }
-
-function createSelectedFieldsSet(object: Object): Set<string> {
-  return Set<string>().withMutations(mutable => {
-    for (const key of Object.keys(object)) {
-      if (object[key]) {
-        mutable.add(key);
-      }
-    }
-  });
-}
-
-interface UpdateFilterPayload {
-  filter: FilterAttributes;
-  data: Object;
-}
-
-const getUserSettingState = (state: AppState) => state.userSettings;
-const getFilters = (state: UserSettingState) => state.filters;
