@@ -102,7 +102,6 @@ export class SearchFilterComponent implements OnInit, OnChanges, OnDestroy {
         this.emitContainingText();
       }*/
       this.searchContainingText = value ? value : '';
-      this.tooltip = null;
       // TODO - debounce this a bit
       this.emitContainingText();
     });
@@ -119,13 +118,11 @@ export class SearchFilterComponent implements OnInit, OnChanges, OnDestroy {
     }
     const searchFilterStateChange: SimpleChange = changes['searchFilterState'];
     if (searchFilterStateChange) {
-      console.log('Updated serch filter');
       if (searchFilterStateChange.currentValue !== searchFilterStateChange.previousValue) {
-        console.log('Not equal');
         const searchFilterState: BoardSearchFilterState = searchFilterStateChange.currentValue;
         this.selectedSearchIssueIds = searchFilterState.issueIds.toArray().sort();
+        this.searchContainingText = searchFilterState.containingText;
         if (!searchFilterStateChange.isFirstChange()) {
-          this.searchContainingText = searchFilterState.containingText;
           this.searchContainingTextCtrl.setValue(searchFilterState.containingText);
         }
       }
@@ -155,7 +152,7 @@ export class SearchFilterComponent implements OnInit, OnChanges, OnDestroy {
           tooltip += 'Text:\n';
           tooltip += this.searchContainingText;
         }
-        this.tooltip = tooltip;
+        this.tooltip = 'Search:\n\n' + tooltip;
       } else {
         this.tooltip = '';
       }

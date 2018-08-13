@@ -411,11 +411,11 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
   }
 
   onSelectedSearchIssueIds(event: Set<string>) {
-    this._store.dispatch(BoardSearchFilterActions.createUpdateSearchIssueIds(event));
+    this._store.dispatch(BoardSearchFilterActions.createUpdateIssueIds(event));
   }
 
   onChangeContainingText(event: string) {
-    this._store.dispatch(BoardSearchFilterActions.createContainingText(event));
+    this._store.dispatch(BoardSearchFilterActions.createUpdateContainingText(event));
   }
 
   get hasParallelTasks(): boolean {

@@ -142,6 +142,7 @@ export function userSettingReducer(state: UserSettingState = initialUserSettingS
         }
         mutable.showBacklog = params['bl'] === 'true' || mutable.viewMode === BoardViewMode.RANK;
         mutable.filters = boardFilterMetaReducer(state.filters, action);
+        mutable.searchFilters = boardSearchFilterMetaReducer(state.searchFilters, action);
         mutable.defaultColumnVisibility = initAction.getVisibleColumnDefault();
         mutable.columnVisibilities = initAction.parseVisibleColumns();
           mutable.issueDetail = IssueDetailUtil.updateIssueDetailState(mutable.issueDetail, issueDetail => {

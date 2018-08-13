@@ -14,6 +14,7 @@ import {HeaderState} from '../model/board/data/header/header.state';
 import {IssueSummaryLevel} from '../model/board/user/issue-summary-level';
 import {IssueDetailUtil} from '../model/board/user/issue-detail/issue-detail.model';
 import {take} from 'rxjs/operators';
+import {BoardSearchFilterUtil, initialBoardSearchFilterState} from '../model/board/user/board-filter/board-search-filter.model';
 
 describe('Boards Query Parameters Service Tests', () => {
   const userSettingSubject: Subject<UserSettingState> = new BehaviorSubject<UserSettingState>(initialUserSettingState);
@@ -149,6 +150,10 @@ describe('Boards Query Parameters Service Tests', () => {
             'PT&1': Set<string>(['PT1&=A', 'PT1&=B']),
             'PT&2': Set<string>(['PT2&=A', 'PT2&=B']),
           });
+        });
+        mutable.searchFilters = BoardSearchFilterUtil.updateBoardSearcgFilterState(initialBoardSearchFilterState, mutable2 => {
+          mutable2.issueIds = Set<string>(['TEST-1', 'TEST-2']);
+          mutable2.containingText = 'Some text';
         });
       });
       userSettingSubject.next(newSetting);

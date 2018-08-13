@@ -20,11 +20,11 @@ class UpdateContainingTextAction implements Action {
 }
 
 export class BoardSearchFilterActions {
-  static createUpdateSearchIssueIds(searchIssueIds: Set<string>): Action {
+  static createUpdateIssueIds(searchIssueIds: Set<string>): Action {
     return new UpdateSelectedIssueIdsAction(searchIssueIds);
   }
 
-  static createContainingText(text: string): Action {
+  static createUpdateContainingText(text: string): Action {
     return new UpdateContainingTextAction(text);
   }
 }
@@ -36,38 +36,27 @@ export function boardSearchFilterMetaReducer(
   switch (action.type) {
     case INITIALISE_SETTINGS_FROM_QUERYSTRING: {
       const qsAction: InitialiseFromQueryStringAction = <InitialiseFromQueryStringAction>action;
-      /*
-      const filters: BoardFilterState = {
-        project: qsAction.parseBooleanFilter('project'),
-        priority: qsAction.parseBooleanFilter('priority'),
-        issueType: qsAction.parseBooleanFilter('issue-type'),
-        assignee: qsAction.parseBooleanFilter('assignee'),
-        component: qsAction.parseBooleanFilter('component'),
-        label: qsAction.parseBooleanFilter('label'),
-        fixVersion: qsAction.parseBooleanFilter('fix-version'),
-        customField: qsAction.parseCustomFieldFilters(),
-        parallelTask: qsAction.parseParallelTaskFilters(),
-        searchIssueId: Set<string>(),
-        searchContainingText: null
-      };
-      for (const key of Object.keys(filters)) {
-        if (filters[key].size > 0) {
-          return BoardFilterUtil.fromObject(filters);
-        }
+      const issueIds: Set<string> = qsAction.parseBooleanFilter('s.ids');
+      const containingText: string = qsAction.payload['s.text'] ? decodeURIComponent(qsAction.payload['s.text']) : '';
+      if (issueIds.size > 0 || containingText.length > 0) {
+        const filters: BoardSearchFilterState = {
+          issueIds: issueIds,
+          containingText: containingText
+        };
+        return BoardSearchFilterUtil.fromObject(filters);
       }
-      return state;*/
-      break; // TODO delete this
+      return state;
     }
     case UPDATE_SELECTED_ISSUE_IDS: {
       const usiAction: UpdateSelectedIssueIdsAction = <UpdateSelectedIssueIdsAction>action;
       return BoardSearchFilterUtil.updateBoardSearcgFilterState(state, mutable => {
-        mutable.issueIds = usiAction.payload;
+        mutable.issueIds = usiAction.payload ? usiAction.payload : initialBoardSearchFilterState.issueIds;
       });
     }
     case UPDATE_CONTAINING_TEXT: {
       const uctAction: UpdateContainingTextAction = <UpdateContainingTextAction>action;
       return BoardSearchFilterUtil.updateBoardSearcgFilterState(state, mutable => {
-        mutable.containingText = uctAction.payload;
+        mutable.containingText = uctAction.payload ? uctAction.payload : initialBoardSearchFilterState.containingText;
       });
     }
   }
