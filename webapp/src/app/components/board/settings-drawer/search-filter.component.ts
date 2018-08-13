@@ -189,8 +189,21 @@ export class SearchFilterComponent implements OnInit, OnChanges, OnDestroy {
       if (this.issueState.issues.get(value)) {
         this.addSelectedIssueId(value);
       } else {
-        this._progressLogService.startUserAction().logWarning(`Could not find issue '${value}'`);
+        // Do a brute force search as the user might have entered 'feat-1' while the issue is called 'FEAT-1'
+        let realKey: string = null;
+        const lowerCaseValue: string = value.toLowerCase();
+        this._issueList.forEach(issue => {
+          if (issue.key.toLowerCase() === lowerCaseValue) {
+            realKey = issue.key;
+            return false;
+          }
+        });
 
+        if (realKey) {
+          this.addSelectedIssueId(realKey);
+        } else {
+          this._progressLogService.startUserAction().logWarning(`Could not find issue '${value}'`);
+        }
       }
     }
 
