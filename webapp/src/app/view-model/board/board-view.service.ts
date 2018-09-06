@@ -626,6 +626,7 @@ class IssueTableBuilder {
       case ChangeType.LOAD_BOARD:
       case ChangeType.UPDATE_ISSUE_DETAIL:
       case ChangeType.APPLY_FILTERS: {
+
         const filters: AllFilters =
           new AllFilters(this._currentUserSettingState.filters, this._currentBoardState.projects, this._currentBoardState.currentUser);
         issues.forEach((issue, key) => {
