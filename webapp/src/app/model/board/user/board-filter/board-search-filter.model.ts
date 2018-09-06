@@ -4,11 +4,13 @@ import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 export interface BoardSearchFilterState {
   issueIds: Set<string>;
   containingText: string;
+  hideNonMatches: boolean;
 }
 
 const DEFAULT_STATE: BoardSearchFilterState = {
   issueIds: Set<string>(),
-  containingText: ''
+  containingText: '',
+  hideNonMatches: false
 };
 
 interface BoardSearchFilterStateRecord extends TypedRecord<BoardSearchFilterStateRecord>, BoardSearchFilterState {
@@ -18,7 +20,7 @@ const STATE_FACTORY = makeTypedFactory<BoardSearchFilterState, BoardSearchFilter
 export const initialBoardSearchFilterState: BoardSearchFilterState = STATE_FACTORY(DEFAULT_STATE);
 
 export class BoardSearchFilterUtil {
-  static updateBoardSearcgFilterState(
+  static updateBoardSearchFilterState(
     boardSearchFilterState: BoardSearchFilterState, mutate: (mutable: BoardSearchFilterState) => any): BoardSearchFilterState {
     return (<BoardSearchFilterStateRecord>boardSearchFilterState).withMutations(mutable => {
       return mutate(mutable);

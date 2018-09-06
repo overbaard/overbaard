@@ -23,6 +23,7 @@ const DEFAULT_STATE: BoardIssueView = {
   linkedIssues: List<LinkedIssue>(),
   ownState: -1,
   visible: true,
+  matchesSearch: true,
   projectColour: 'red',
   issueUrl: null,
   ownStateName: null,
@@ -39,7 +40,7 @@ export class BoardIssueViewUtil {
 
   static createBoardIssue(
     issue: BoardIssue, jiraUrl: string, projectColour: string, ownStateName: string,
-    visible: boolean, summaryLines: List<string>, totalHeight: number): BoardIssueViewRecord {
+    visible: boolean, matchesSearch: boolean, summaryLines: List<string>, totalHeight: number): BoardIssueViewRecord {
     const issueUrl = `${jiraUrl}browse/${issue.key}`;
     return ISSUE_FACTORY({
       key: issue.key,
@@ -57,6 +58,7 @@ export class BoardIssueViewUtil {
       linkedIssues: issue.linkedIssues,
       ownState: issue.ownState,
       visible: visible,
+      matchesSearch: matchesSearch,
       projectColour: projectColour,
       issueUrl: issueUrl,
       ownStateName: ownStateName,
@@ -72,6 +74,13 @@ export class BoardIssueViewUtil {
   static updateVisibility(issue: BoardIssueView, visible: boolean): BoardIssueView {
     return (<BoardIssueViewRecord>issue).withMutations(mutable => {
       mutable.visible = visible;
+    });
+  }
+
+  static updateVisibilityAndMatchesSearch(issue: BoardIssueView, visible: boolean, matchesSearch: boolean) {
+    return (<BoardIssueViewRecord>issue).withMutations(mutable => {
+      mutable.visible = visible;
+      mutable.matchesSearch = matchesSearch;
     });
   }
 }

@@ -19,7 +19,8 @@ describe('BoardSearchFilter reducer tests', () => {
     it ('With querystring', () => {
       const qs: Dictionary<string> = {
         's.ids': 'TEST-1,TEST-2',
-        's.text': 'Some%20text'
+        's.text': 'Some%20text',
+        's.hide': 'true'
       };
       const state: BoardSearchFilterState = boardSearchFilterMetaReducer(
         initialBoardSearchFilterState,
@@ -27,6 +28,7 @@ describe('BoardSearchFilter reducer tests', () => {
       const filterChecker: SearchFilterChecker = new SearchFilterChecker();
       filterChecker.containingText = 'Some text';
       filterChecker.issueIds = ['TEST-1', 'TEST-2'];
+      filterChecker.hideNonMatches = true;
       filterChecker.check(state);
     });
 
@@ -43,7 +45,8 @@ describe('BoardSearchFilter reducer tests', () => {
     beforeEach(() => {
       const qs: Dictionary<string> = {
         's.ids': 'TEST-1,TEST-2',
-        's.text': 'Some%20text'
+        's.text': 'Some%20text',
+        's.hide': 'false'
       };
       state = boardSearchFilterMetaReducer(
         initialBoardSearchFilterState,
@@ -83,17 +86,29 @@ describe('BoardSearchFilter reducer tests', () => {
       checker.check(state);
     });
 
-
+    it('Update hideNonMatches', () => {
+      state = boardSearchFilterMetaReducer(state, BoardSearchFilterActions.createUpdateHideNonMatches(true));
+      const checker: SearchFilterChecker = new SearchFilterChecker();
+      checker.issueIds = ['TEST-1', 'TEST-2'];
+      checker.containingText = 'Some text';
+      checker.hideNonMatches = true;
+      checker.check(state);
+      state = boardSearchFilterMetaReducer(state, BoardSearchFilterActions.createUpdateHideNonMatches(false));
+      checker.hideNonMatches = false;
+      checker.check(state);
+    });
   });
 });
 
 export class SearchFilterChecker {
   containingText = '';
   issueIds: string[] = [];
+  hideNonMatches = false;
 
   check(filterState: BoardSearchFilterState) {
     this.checkFilter(this.issueIds, filterState.issueIds);
     expect(this.containingText).toEqual(filterState.containingText);
+    expect(this.hideNonMatches).toEqual(filterState.hideNonMatches);
   }
 
   checkFilter(expected: string[], actual: Set<string>) {

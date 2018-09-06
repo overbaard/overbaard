@@ -92,6 +92,8 @@ export class BoardViewModelHandler {
               changeType = ChangeType.TOGGLE_SWIMLANE_COLLAPSED;
             } else if (userSettingState.issueDetail !== this._lastUserSettingState.issueDetail) {
               changeType = ChangeType.UPDATE_ISSUE_DETAIL;
+            } else if (userSettingState.searchFilters !== this._lastUserSettingState.searchFilters) {
+              changeType = ChangeType.UPDATE_SEARCH;
             }
           }
 
@@ -110,7 +112,6 @@ export class BoardViewModelHandler {
       );
   }
 }
-
 
 
 

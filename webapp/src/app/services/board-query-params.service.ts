@@ -171,6 +171,9 @@ export class BoardQueryParamsHandler {
     if (searchFilters.containingText) {
       params.push(`s.text=${encodeURIComponent(searchFilters.containingText)}`);
     }
+    if (searchFilters.hideNonMatches) {
+      params.push('s.hide=true');
+    }
   }
 
   private appendFilterEntry(params: List<string>, name: string, filters: Set<string>) {

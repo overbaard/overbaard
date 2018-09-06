@@ -25,21 +25,24 @@ import {
   ProjectUtil
 } from '../../model/board/data/project/project.model';
 import {P} from '@angular/core/src/render3';
+import {BoardSearchFilterState} from '../../model/board/user/board-filter/board-search-filter.model';
 
 export class AllFilters {
-  private _project: SimpleFilter;
-  private _issueType: SimpleFilter;
-  private _priority: SimpleFilter;
-  private _assignee: SimpleFilter;
-  private _component: MultiSelectFilter;
-  private _label: MultiSelectFilter;
-  private _fixVersion: MultiSelectFilter;
-  private _customFieldFilters: Map<string, SimpleFilter>;
-  private _parallelTaskFilters: Map<string, SimpleFilter>;
-  private _parallelTaskFilterPositionsByProject: Map<string, Map<string, ParallelTaskPosition>>;
-  private _parallelTaskFilterPositionsByProjectIssueTypeOverride: Map<string, Map<string, Map<string, ParallelTaskPosition>>>;
+  private readonly _project: SimpleFilter;
+  private readonly _issueType: SimpleFilter;
+  private readonly _priority: SimpleFilter;
+  private readonly _assignee: SimpleFilter;
+  private readonly _component: MultiSelectFilter;
+  private readonly _label: MultiSelectFilter;
+  private readonly _fixVersion: MultiSelectFilter;
+  private readonly _customFieldFilters: Map<string, SimpleFilter>;
+  private readonly _parallelTaskFilters: Map<string, SimpleFilter>;
+  private readonly _parallelTaskFilterPositionsByProject: Map<string, Map<string, ParallelTaskPosition>>;
+  private readonly _parallelTaskFilterPositionsByProjectIssueTypeOverride: Map<string, Map<string, Map<string, ParallelTaskPosition>>>;
+  private readonly _searchContainingText: string;
+  private readonly _searchIssueIds: Set<string>;
 
-  constructor(boardFilters: BoardFilterState, projectState: ProjectState, currentUser: string) {
+  constructor(boardFilters: BoardFilterState, searchFilters: BoardSearchFilterState, projectState: ProjectState, currentUser: string) {
     this._project = new SimpleFilter(PROJECT_ATTRIBUTES, boardFilters.project);
     this._priority = new SimpleFilter(PRIORITY_ATTRIBUTES, boardFilters.priority);
     this._issueType = new SimpleFilter(ISSUE_TYPE_ATTRIBUTES, boardFilters.issueType);
@@ -78,6 +81,8 @@ export class AllFilters {
         });
       }
     });
+    this._searchContainingText = searchFilters.containingText.toLocaleLowerCase();
+    this._searchIssueIds = searchFilters.issueIds;
   }
 
   private createParallelTaskIssueTypeOverrideIndices(parallelTaskIssueTypeOverrides: Map<string, List<List<ParallelTask>>>):
@@ -186,6 +191,21 @@ export class AllFilters {
       return issueTypeParallelTaskPositions;
     }
     return this._parallelTaskFilterPositionsByProject.get(issue.projectCode);
+  }
+
+  filterMatchesSearch(issue: BoardIssueView) {
+    if (this._searchIssueIds.size > 0) {
+      if (!this._searchIssueIds.contains(issue.key)) {
+        return false;
+      }
+    }
+    if (this._searchContainingText.length > 0) {
+      if (issue.summary.toLocaleLowerCase().indexOf(this._searchContainingText) < 0) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }
 

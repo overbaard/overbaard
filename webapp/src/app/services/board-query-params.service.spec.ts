@@ -151,9 +151,10 @@ describe('Boards Query Parameters Service Tests', () => {
             'PT&2': Set<string>(['PT2&=A', 'PT2&=B']),
           });
         });
-        mutable.searchFilters = BoardSearchFilterUtil.updateBoardSearcgFilterState(initialBoardSearchFilterState, mutable2 => {
+        mutable.searchFilters = BoardSearchFilterUtil.updateBoardSearchFilterState(initialBoardSearchFilterState, mutable2 => {
           mutable2.issueIds = Set<string>(['TEST-1', 'TEST-2']);
           mutable2.containingText = 'Some text';
+          mutable2.hideNonMatches = true;
         });
       });
       userSettingSubject.next(newSetting);

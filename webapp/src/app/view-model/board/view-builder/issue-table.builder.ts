@@ -127,7 +127,7 @@ export class IssueTableBuilder {
       summaryLines = List<string>(heightCalculator.summaryLines);
     }
     return BoardIssueViewUtil.createBoardIssue(
-      issue, this._currentBoardState.jiraUrl, colour, ownStateName, true, summaryLines, height);
+      issue, this._currentBoardState.jiraUrl, colour, ownStateName, true, true, summaryLines, height);
   }
 
 
@@ -135,16 +135,20 @@ export class IssueTableBuilder {
     switch (this._changeType) {
       case ChangeType.LOAD_BOARD:
       case ChangeType.UPDATE_ISSUE_DETAIL:
+      case ChangeType.UPDATE_SEARCH:
       case ChangeType.APPLY_FILTERS: {
 
         const filters: AllFilters =
-          new AllFilters(this._currentUserSettingState.filters, this._currentBoardState.projects, this._currentBoardState.currentUser);
+          new AllFilters(
+            this._currentUserSettingState.filters,
+            this._currentUserSettingState.searchFilters,
+            this._currentBoardState.projects,
+            this._currentBoardState.currentUser);
         issues.forEach((issue, key) => {
-          const visible = filters.filterVisible(issue);
-          if (visible !== issue.visible) {
+          const updated: BoardIssueView = this.filterIssue(issue, filters);
+          if (updated !== issue) {
             issues = issues.asMutable();
-            issue = BoardIssueViewUtil.updateVisibility(issue, visible);
-            issues.set(key, issue);
+            issues.set(key, updated);
           }
         });
         return issues.asImmutable();
@@ -152,18 +156,21 @@ export class IssueTableBuilder {
       case ChangeType.UPDATE_BOARD_AFTER_BACKLOG_TOGGLE:
       case ChangeType.UPDATE_BOARD: {
         const filters: AllFilters =
-          new AllFilters(this._currentUserSettingState.filters, this._currentBoardState.projects, this._currentBoardState.currentUser);
+          new AllFilters(
+            this._currentUserSettingState.filters,
+            this._currentUserSettingState.searchFilters,
+            this._currentBoardState.projects,
+            this._currentBoardState.currentUser);
         this._currentBoardState.issues.lastChanged.forEach((change, key) => {
           if (change.change === IssueChange.DELETE) {
             issues = issues.asMutable();
             issues.delete(key);
           } else {
-            let issue: BoardIssueView = issues.get(key);
-            const visible: boolean = filters.filterVisible(issue);
-            if (visible !== issue.visible) {
+            const issue: BoardIssueView = issues.get(key);
+            const updated: BoardIssueView = this.filterIssue(issue, filters);
+            if (updated !== issue) {
               issues = issues.asMutable();
-              issue = BoardIssueViewUtil.updateVisibility(issue, visible);
-              issues.set(key, issue);
+              issues.set(key, updated);
             }
           }
         });
@@ -174,6 +181,24 @@ export class IssueTableBuilder {
       }
     }
     return issues;
+  }
+
+  private filterIssue(issue: BoardIssueView, filters: AllFilters): BoardIssueView {
+    const filterVisible = this._changeType !== ChangeType.UPDATE_SEARCH;
+    const filterSearch = this._changeType !== ChangeType.APPLY_FILTERS;
+
+    let visible: boolean = issue.visible;
+    let matchesSearch: boolean = issue.matchesSearch;
+    if (filterVisible) {
+      visible = filters.filterVisible(issue);
+    }
+    if (filterSearch) {
+      matchesSearch = filters.filterMatchesSearch(issue);
+    }
+    if (visible !== issue.visible || matchesSearch !== issue.matchesSearch) {
+      return BoardIssueViewUtil.updateVisibilityAndMatchesSearch(issue, visible, matchesSearch);
+    }
+    return issue;
   }
 
   private createTableAndRankView(issues: Map<string, BoardIssueView>): Map<string, BoardIssueView> {

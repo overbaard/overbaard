@@ -7,7 +7,10 @@ import {List} from 'immutable';
 export interface BoardIssueView extends BoardIssue {
   // TODO other fields as needed
   projectColour: string;
+  // True if the issue matches the standard filters
   visible: boolean;
+  // True if the issue matches the search filters (issue ids, text search)
+  matchesSearch: boolean;
   issueUrl: string;
   ownStateName: string;
   calculatedTotalHeight: number;
