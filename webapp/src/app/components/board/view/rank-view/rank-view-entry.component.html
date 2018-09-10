@@ -8,8 +8,8 @@
     ></app-board-issue>
   </div>
   <div *ngFor="let unused of statesDummyArray ; let i = index" class="cell">
-    <div class="inner-cell">
-      <div *ngIf="rankEntry.boardIndex === i"  class="selected-cell"></div>
+    <div [class]="rankEntry.issue.matchesSearch ? 'inner-cell' : 'inner-cell-grey'">
+      <div *ngIf="rankEntry.boardIndex === i"  [class]="rankEntry.issue.matchesSearch ? 'selected-cell' : 'selected-cell-grey'"></div>
     </div>
   </div>
 </div>

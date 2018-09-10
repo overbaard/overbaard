@@ -28,9 +28,18 @@
   max-width: 36px;
   border: 2px solid $primary-colour;
 }
+.inner-cell-grey {
+  @extend .inner-cell;
+  border-color: $disabled-issue-colour;
+}
 
 .selected-cell {
   width: 100%;
   height: 100%;
   background-color: $primary-colour;
+}
+
+.selected-cell-grey {
+  @extend .selected-cell;
+  background-color: $disabled-issue-colour;
 }
