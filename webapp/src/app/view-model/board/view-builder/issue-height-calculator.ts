@@ -1,10 +1,9 @@
-import {BoardIssue} from '../../model/board/data/issue/board-issue';
-import {FontSizeTable, FontSizeTableService} from '../../services/font-size-table.service';
-import {IssueSummaryLevel} from '../../model/board/user/issue-summary-level';
-import {IssueDetailState} from '../../model/board/user/issue-detail/issue-detail.model';
-import {UserSettingState} from '../../model/board/user/user-setting';
-import {List} from 'immutable';
-import {BoardViewMode} from '../../model/board/user/board-view-mode';
+import {IssueDetailState} from '../../../model/board/user/issue-detail/issue-detail.model';
+import {BoardViewMode} from '../../../model/board/user/board-view-mode';
+import {BoardIssue} from '../../../model/board/data/issue/board-issue';
+import {FontSizeTable, FontSizeTableService} from '../../../services/font-size-table.service';
+import {UserSettingState} from '../../../model/board/user/user-setting';
+import {IssueSummaryLevel} from '../../../model/board/user/issue-summary-level';
 
 export class IssueHeightCalculator {
 
