@@ -13,7 +13,7 @@ import {BoardFilterState} from '../model/board/user/board-filter/board-filter.mo
 import {BoardViewMode} from '../model/board/user/board-view-mode';
 import {Injectable} from '@angular/core';
 import {IssueSummaryLevel} from '../model/board/user/issue-summary-level';
-import {BoardSearchFilterState} from '../model/board/user/board-filter/board-search-filter.model';
+import {BoardSearchFilterState, BoardSearchFilterUtil} from '../model/board/user/board-filter/board-search-filter.model';
 
 @Injectable()
 export class BoardQueryParamsService {
@@ -168,7 +168,7 @@ export class BoardQueryParamsHandler {
   private appendSearchFilters(params: List<string>, userSettingState: UserSettingState) {
     const searchFilters: BoardSearchFilterState = userSettingState.searchFilters;
     this.appendFilterEntry(params, 's.ids', searchFilters.issueIds);
-    if (searchFilters.containingText) {
+    if (BoardSearchFilterUtil.containingTextAboveMinimumLength(searchFilters.containingText)) {
       params.push(`s.text=${encodeURIComponent(searchFilters.containingText)}`);
     }
     if (searchFilters.hideNonMatches) {

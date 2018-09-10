@@ -15,7 +15,7 @@ import {
 import {FormControl, FormGroup} from '@angular/forms';
 import {Subject} from 'rxjs';
 import {startWith, takeUntil} from 'rxjs/operators';
-import {MatAutocompleteSelectedEvent, MatChipInputEvent} from '@angular/material';
+import {MatAutocompleteSelectedEvent, MatChipInputEvent, MatSlideToggleChange} from '@angular/material';
 import {SPACE} from '@angular/cdk/keycodes';
 import {IssueState} from '../../../model/board/data/issue/issue.model';
 import {Set} from 'immutable';
@@ -44,6 +44,9 @@ export class SearchFilterComponent implements OnInit, OnChanges, OnDestroy {
 
   @Output()
   containingText: EventEmitter<string> = new EventEmitter<string>();
+
+  @Output()
+  hideNonMatches: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   @ViewChild('searchIssueIdInput') searchIssueIdInput: ElementRef;
 
@@ -247,4 +250,7 @@ export class SearchFilterComponent implements OnInit, OnChanges, OnDestroy {
     });
   }
 
+  onChangeHideNonMatches(event: MatSlideToggleChange) {
+    this.hideNonMatches.emit(event.checked);
+  }
 }

@@ -25,7 +25,7 @@ import {
   ProjectUtil
 } from '../../model/board/data/project/project.model';
 import {P} from '@angular/core/src/render3';
-import {BoardSearchFilterState} from '../../model/board/user/board-filter/board-search-filter.model';
+import {BoardSearchFilterState, BoardSearchFilterUtil} from '../../model/board/user/board-filter/board-search-filter.model';
 
 export class AllFilters {
   private readonly _project: SimpleFilter;
@@ -199,7 +199,7 @@ export class AllFilters {
         return false;
       }
     }
-    if (this._searchContainingText.length > 0) {
+    if (BoardSearchFilterUtil.containingTextAboveMinimumLength(this._searchContainingText)) {
       if (issue.summary.toLocaleLowerCase().indexOf(this._searchContainingText) < 0) {
         return false;
       }

@@ -2,7 +2,8 @@ import {
   MatAutocompleteModule,
   MatButtonModule,
   MatCardModule,
-  MatCheckboxModule, MatChipsModule,
+  MatCheckboxModule,
+  MatChipsModule,
   MatDialogModule,
   MatExpansionModule,
   MatFormFieldModule,
@@ -14,6 +15,7 @@ import {
   MatSelectModule,
   MatSidenavModule,
   MatSliderModule,
+  MatSlideToggleModule,
   MatSnackBarModule,
   MatToolbarModule,
   MatTooltipModule
@@ -38,6 +40,7 @@ const materialModules: Array<Type<any>> = [
   MatSnackBarModule,
   MatSidenavModule,
   MatSelectModule,
+  MatSlideToggleModule,
   MatSliderModule,
   MatToolbarModule,
   MatTooltipModule];

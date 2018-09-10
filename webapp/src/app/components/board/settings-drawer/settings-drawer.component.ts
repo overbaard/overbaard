@@ -418,6 +418,10 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
     this._store.dispatch(BoardSearchFilterActions.createUpdateContainingText(event));
   }
 
+  onChangeHideNonMatches(event: boolean) {
+    this._store.dispatch(BoardSearchFilterActions.createUpdateHideNonMatches(event));
+  }
+
   get hasParallelTasks(): boolean {
     return !!this.filterEntries[PARALLEL_TASK_ATTRIBUTES.key];
   }

@@ -66,8 +66,13 @@
           [placeholder]="'Issue Text Search'"
           [formControl]="searchContainingTextCtrl"
         ></textarea>
-        <mat-hint *ngIf="containingTextInput.value?.trim().length <= 3" align="end">Minimum 3 characters</mat-hint>
+        <mat-hint *ngIf="containingTextInput.value?.trim().length < 3" align="end">Minimum 3 characters</mat-hint>
       </mat-form-field>
+      <mat-slide-toggle
+        [color]="'primary'"
+        [checked]="searchFilterState.hideNonMatches"
+        (change)="onChangeHideNonMatches($event)"
+      >Hide non-matching</mat-slide-toggle>
     </div>
   </div>
 </mat-expansion-panel>

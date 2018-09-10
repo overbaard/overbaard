@@ -136,6 +136,7 @@ export class IssueTableBuilder {
       case ChangeType.LOAD_BOARD:
       case ChangeType.UPDATE_ISSUE_DETAIL:
       case ChangeType.UPDATE_SEARCH:
+      case ChangeType.TOGGLE_HIDE_SEARCH_NON_MATCHES:
       case ChangeType.APPLY_FILTERS: {
 
         const filters: AllFilters =
@@ -192,8 +193,18 @@ export class IssueTableBuilder {
     if (filterVisible) {
       visible = filters.filterVisible(issue);
     }
-    if (filterSearch) {
-      matchesSearch = filters.filterMatchesSearch(issue);
+    const hideNonMatches: boolean = this._currentUserSettingState.searchFilters.hideNonMatches;
+    if (visible || hideNonMatches) {
+      if (filterSearch) {
+        const tempMatchesSearch = filters.filterMatchesSearch(issue);
+        if (!hideNonMatches) {
+          matchesSearch = tempMatchesSearch;
+        } else {
+          // If we have decided to hide all the issues, then we update that setting here
+          visible = tempMatchesSearch;
+          matchesSearch = true;
+        }
+      }
     }
     if (visible !== issue.visible || matchesSearch !== issue.matchesSearch) {
       return BoardIssueViewUtil.updateVisibilityAndMatchesSearch(issue, visible, matchesSearch);
@@ -283,6 +294,8 @@ export class IssueTableBuilder {
         swimlaneBuilder = SwimlaneInfoBuilder.create(this._currentBoardState, this._currentUserSettingState, null);
         break;
       case ChangeType.APPLY_FILTERS:
+      case ChangeType.UPDATE_SEARCH:
+      case ChangeType.TOGGLE_HIDE_SEARCH_NON_MATCHES:
       case ChangeType.UPDATE_BOARD_AFTER_BACKLOG_TOGGLE:
       case ChangeType.UPDATE_BOARD: {
         const oldSwimlane = this._oldIssueTableState.swimlaneInfo;

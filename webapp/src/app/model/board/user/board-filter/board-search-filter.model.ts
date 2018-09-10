@@ -31,6 +31,10 @@ export class BoardSearchFilterUtil {
   static fromObject(object: BoardSearchFilterState) {
     return STATE_FACTORY(object);
   }
+
+  static containingTextAboveMinimumLength(containingText: string): boolean {
+    return containingText && containingText.length >= 3;
+  }
 }
 
 

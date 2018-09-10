@@ -895,6 +895,12 @@ describe('Issue table filter tests', () => {
   }
 });
 
+describe ('Issue table search filter', () => {
+  describe('Not hidden', () => {
+
+  });
+});
+
 describe('Switch View Mode (effect on Backlog) Tests', () => {
   // The key thing here is that when bringing in the backlog the BoardComponent makes another call to fetch the backlog
   // data from the server
@@ -1354,36 +1360,41 @@ function checkSameColumns(oldState: BoardViewModel, newState: BoardViewModel, ..
 
 
 class SimpleIssueFactory implements IssuesFactory {
-  _issueKeys: string[];
-  _issueStates: number[];
+  _issues: Dictionary<any>;
 
-  addIssue(key: string, state: number): SimpleIssueFactory {
-    if (!this._issueKeys) {
-      this._issueKeys = [];
-      this._issueStates = [];
+  addIssue(key: string, state: number, data?: any): SimpleIssueFactory {
+    if (!this._issues) {
+      this._issues = {};
     }
-    this._issueKeys.push(key);
-    this._issueStates.push(state);
+    this._issues[key] = !data ? {} : data;
+    this._issues[key]['state'] = state;
     return this;
   }
 
   clear() {
-    this._issueKeys = null;
-    this._issueStates = null;
+    this._issues = null;
   }
 
   createIssueStateInput(params: DeserializeIssueLookupParams): any {
-    const input: any = {};
-    for (let i = 0; i < this._issueKeys.length; i++) {
-      const id = Number(this._issueKeys[i].substr(this._issueKeys[i].indexOf('-') + 1));
-      input[this._issueKeys[i]] = {
-        key: this._issueKeys[i],
+   const input: any = {};
+    for (const key of Object.keys(this._issues)) {
+      const id = Number(key.substr(key.indexOf('-') + 1));
+      const assignee: number = id % 3 === 2 ? null : id % 3;
+      const isssue = {
+        key: key,
         type: id % 2,
         priority: id % 2,
         summary: '-',
-        state: this._issueStates[i]
       };
+
+      const data: any = this._issues[key];
+      for (const override of Object.keys(data)) {
+        isssue[override] = data[override];
+      }
+
+      input[key] = isssue;
     }
+
     return input;
   }
 }
