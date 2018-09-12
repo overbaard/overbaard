@@ -31,11 +31,7 @@ describe('Swimlane observer tests', () => {
             .addIssue('TWO-1', 0)
             .addIssue('TWO-2', 1)
             .addIssue('TWO-3', 1))
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+          .easySubscribe(
           board => {
             new BoardChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']])
               .swimlanes([
@@ -46,11 +42,7 @@ describe('Swimlane observer tests', () => {
       });
       it('Issue Type', () => {
         createUtilWithStandardIssues({swimlane: 'issue-type'})
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+          .easySubscribe(
           board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .swimlanes([
@@ -62,11 +54,7 @@ describe('Swimlane observer tests', () => {
       });
       it('Priority', () => {
         createUtilWithStandardIssues({swimlane: 'priority'})
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+          .easySubscribe(
           board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .swimlanes([
@@ -77,11 +65,7 @@ describe('Swimlane observer tests', () => {
       });
       it('Assignee', () => {
         createUtilWithStandardIssues({swimlane: 'assignee'})
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+          .easySubscribe(
           board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .swimlanes([
@@ -93,11 +77,7 @@ describe('Swimlane observer tests', () => {
       });
       it('Components', () => {
         createUtilWithStandardIssues({swimlane: 'component'})
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+          .easySubscribe(
           board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .swimlanes([
@@ -110,11 +90,7 @@ describe('Swimlane observer tests', () => {
       });
       it('Fix Versions', () => {
         createUtilWithStandardIssues({swimlane: 'fix-version'})
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+          .easySubscribe(
           board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .swimlanes([
@@ -127,11 +103,7 @@ describe('Swimlane observer tests', () => {
       });
       it('Labels', () => {
         createUtilWithStandardIssues({swimlane: 'label'})
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+          .easySubscribe(
           board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .swimlanes([
@@ -144,11 +116,7 @@ describe('Swimlane observer tests', () => {
       });
       it('Custom Field', () => {
         createUtilWithStandardIssues({swimlane: 'Custom-2'})
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+          .easySubscribe(
           board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .swimlanes([
@@ -174,22 +142,14 @@ describe('Swimlane observer tests', () => {
             .addIssue('TWO-1', 0)
             .addIssue('TWO-2', 1)
             .addIssue('TWO-3', 1));
-        util.observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+        util.easySubscribe(
           board => {
             new BoardChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']])
               .checkBoard(board);
           });
         util.getUserSettingUpdater()
           .updateSwimlane('project')
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+          .easySubscribe(
           board => {
             new BoardChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']])
               .swimlanes([
@@ -200,11 +160,7 @@ describe('Swimlane observer tests', () => {
         // Check resetting the swimlanes, it does not need testing elsewhere
         util.getUserSettingUpdater()
           .updateSwimlane(null)
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+          .easySubscribe(
           board => {
             new BoardChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']])
               .checkBoard(board);
@@ -214,11 +170,7 @@ describe('Swimlane observer tests', () => {
       it('Other', () => {
         // Test switching between all these in one go, just to see there isn't anything hanging around
         const util: BoardViewObservableUtil = createUtilWithStandardIssues({});
-        util.observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+        util.easySubscribe(
           board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .checkBoard(board);
@@ -226,11 +178,7 @@ describe('Swimlane observer tests', () => {
 
         util.getUserSettingUpdater()
           .updateSwimlane('issue-type')
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+          .easySubscribe(
           board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .swimlanes([
@@ -242,11 +190,7 @@ describe('Swimlane observer tests', () => {
 
         util.getUserSettingUpdater()
           .updateSwimlane('priority')
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+          .easySubscribe(
           board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .swimlanes([
@@ -257,11 +201,7 @@ describe('Swimlane observer tests', () => {
 
         util.getUserSettingUpdater()
           .updateSwimlane('assignee')
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+          .easySubscribe(
           board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .swimlanes([
@@ -273,11 +213,7 @@ describe('Swimlane observer tests', () => {
 
         util.getUserSettingUpdater()
           .updateSwimlane('component')
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+          .easySubscribe(
           board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .swimlanes([
@@ -290,11 +226,7 @@ describe('Swimlane observer tests', () => {
 
         util.getUserSettingUpdater()
           .updateSwimlane('fix-version')
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+          .easySubscribe(
           board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .swimlanes([
@@ -307,11 +239,7 @@ describe('Swimlane observer tests', () => {
 
         util.getUserSettingUpdater()
           .updateSwimlane('label')
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+          .easySubscribe(
           board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .swimlanes([
@@ -324,11 +252,7 @@ describe('Swimlane observer tests', () => {
 
         util.getUserSettingUpdater()
           .updateSwimlane('Custom-2')
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+          .easySubscribe(
           board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .swimlanes([
@@ -358,11 +282,7 @@ describe('Swimlane observer tests', () => {
             .addIssue('TWO-1', 0)
             .addIssue('TWO-2', 1)
             .addIssue('TWO-3', 1));
-        util.observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(board => originalView = board);
+        util.easySubscribe(board => originalView = board);
 
         util
           .getBoardStateUpdater()
@@ -373,11 +293,7 @@ describe('Swimlane observer tests', () => {
           })
           .rankChanges({ONE: [{index: 4, key: 'ONE-5'}], TWO: [{index: 3, key: 'TWO-4'}]})
           .emit()
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+          .easySubscribe(
           board => {
             new BoardChecker([['ONE-2', 'ONE-1', 'ONE-5'], ['ONE-3', 'TWO-1', 'TWO-4'], ['ONE-4', 'TWO-3', 'TWO-2']])
               .swimlanes([
@@ -395,21 +311,13 @@ describe('Swimlane observer tests', () => {
 
       it('Issue Type', () => {
         util = createUtilWithStandardIssues({swimlane: 'issue-type'});
-        util.observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(board => originalView = board);
+        util.easySubscribe(board => originalView = board);
         util
           .getBoardStateUpdater()
           .issueChanges({new: [{key: 'ONE-6', state: '1-1', summary: 'Test', priority: 'Major', type: 'task'}]})
           .rankChanges({ONE: [{index: 5, key: 'ONE-6'}]})
           .emit()
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+          .easySubscribe(
           board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
               .swimlanes([
@@ -427,21 +335,13 @@ describe('Swimlane observer tests', () => {
 
       it('Priority', () => {
         util = createUtilWithStandardIssues({swimlane: 'priority'});
-        util.observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(board => originalView = board);
+        util.easySubscribe(board => originalView = board);
         util
           .getBoardStateUpdater()
           .issueChanges({new: [{key: 'ONE-6', state: '1-1', summary: 'Test', priority: 'Major', type: 'task'}]})
           .rankChanges({ONE: [{index: 5, key: 'ONE-6'}]})
           .emit()
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+          .easySubscribe(
           board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
               .swimlanes([
@@ -460,11 +360,7 @@ describe('Swimlane observer tests', () => {
 
         beforeEach(() => {
           util = createUtilWithStandardIssues({swimlane: 'assignee'});
-          util.observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(board => originalView = board);
+          util.easySubscribe(board => originalView = board);
 
         });
         it('None', () => {
@@ -473,11 +369,7 @@ describe('Swimlane observer tests', () => {
             .issueChanges({new: [{key: 'ONE-6', state: '1-1', summary: 'Test', priority: 'Major', type: 'task'}]})
             .rankChanges({ONE: [{index: 5, key: 'ONE-6'}]})
             .emit()
-            .observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+            .easySubscribe(
             board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
                 .swimlanes([
@@ -507,11 +399,7 @@ describe('Swimlane observer tests', () => {
             })
             .rankChanges({ONE: [{index: 5, key: 'ONE-6'}]})
             .emit()
-            .observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+            .easySubscribe(
             board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
                 .swimlanes([
@@ -531,11 +419,7 @@ describe('Swimlane observer tests', () => {
       describe('Components', () => {
         beforeEach(() => {
           util = createUtilWithStandardIssues({swimlane: 'component'});
-          util.observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(board => originalView = board);
+          util.easySubscribe(board => originalView = board);
 
         });
         it('None', () => {
@@ -544,11 +428,7 @@ describe('Swimlane observer tests', () => {
             .issueChanges({new: [{key: 'ONE-6', state: '1-1', summary: 'Test', priority: 'Major', type: 'task'}]})
             .rankChanges({ONE: [{index: 5, key: 'ONE-6'}]})
             .emit()
-            .observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+            .easySubscribe(
             board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
                 .swimlanes([
@@ -579,11 +459,7 @@ describe('Swimlane observer tests', () => {
             })
             .rankChanges({ONE: [{index: 5, key: 'ONE-6'}]})
             .emit()
-            .observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+            .easySubscribe(
             board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
                 .swimlanes([
@@ -616,11 +492,7 @@ describe('Swimlane observer tests', () => {
             })
             .rankChanges({ONE: [{index: 5, key: 'ONE-6'}]})
             .emit()
-            .observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+            .easySubscribe(
             board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
                 .swimlanes([
@@ -642,11 +514,7 @@ describe('Swimlane observer tests', () => {
       describe('Fix Versions', () => {
         beforeEach(() => {
           util = createUtilWithStandardIssues({swimlane: 'fix-version'});
-          util.observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(board => originalView = board);
+          util.easySubscribe(board => originalView = board);
 
         });
         it('None', () => {
@@ -655,11 +523,7 @@ describe('Swimlane observer tests', () => {
             .issueChanges({new: [{key: 'ONE-6', state: '1-1', summary: 'Test', priority: 'Major', type: 'task'}]})
             .rankChanges({ONE: [{index: 5, key: 'ONE-6'}]})
             .emit()
-            .observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+            .easySubscribe(
             board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
                 .swimlanes([
@@ -690,11 +554,7 @@ describe('Swimlane observer tests', () => {
             })
             .rankChanges({ONE: [{index: 5, key: 'ONE-6'}]})
             .emit()
-            .observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+            .easySubscribe(
             board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
                 .swimlanes([
@@ -726,11 +586,7 @@ describe('Swimlane observer tests', () => {
             })
             .rankChanges({ONE: [{index: 5, key: 'ONE-6'}]})
             .emit()
-            .observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+            .easySubscribe(
             board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
                 .swimlanes([
@@ -752,11 +608,7 @@ describe('Swimlane observer tests', () => {
       describe('Labels', () => {
         beforeEach(() => {
           util = createUtilWithStandardIssues({swimlane: 'label'});
-          util.observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(board => originalView = board);
+          util.easySubscribe(board => originalView = board);
 
         });
         it('None', () => {
@@ -765,11 +617,7 @@ describe('Swimlane observer tests', () => {
             .issueChanges({new: [{key: 'ONE-6', state: '1-1', summary: 'Test', priority: 'Major', type: 'task'}]})
             .rankChanges({ONE: [{index: 5, key: 'ONE-6'}]})
             .emit()
-            .observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+            .easySubscribe(
             board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
                 .swimlanes([
@@ -800,11 +648,7 @@ describe('Swimlane observer tests', () => {
             })
             .rankChanges({ONE: [{index: 5, key: 'ONE-6'}]})
             .emit()
-            .observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+            .easySubscribe(
             board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
                 .swimlanes([
@@ -836,11 +680,7 @@ describe('Swimlane observer tests', () => {
             })
             .rankChanges({ONE: [{index: 5, key: 'ONE-6'}]})
             .emit()
-            .observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+            .easySubscribe(
             board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
                 .swimlanes([
@@ -861,11 +701,7 @@ describe('Swimlane observer tests', () => {
       describe('CustomField', () => {
         beforeEach(() => {
           util = createUtilWithStandardIssues({swimlane: 'Custom-2'});
-          util.observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(board => originalView = board);
+          util.easySubscribe(board => originalView = board);
 
         });
         it('None', () => {
@@ -877,11 +713,7 @@ describe('Swimlane observer tests', () => {
             })
             .rankChanges({ONE: [{index: 5, key: 'ONE-6'}]})
             .emit()
-            .observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+            .easySubscribe(
             board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
                 .swimlanes([
@@ -912,11 +744,7 @@ describe('Swimlane observer tests', () => {
             })
             .rankChanges({ONE: [{index: 5, key: 'ONE-6'}]})
             .emit()
-            .observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+            .easySubscribe(
             board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
                 .swimlanes([
@@ -940,20 +768,12 @@ describe('Swimlane observer tests', () => {
       describe('Remain in same swimlane', () => {
         it('Change state', () => {
           util = createUtilWithStandardIssues({swimlane: 'issue-type'});
-          util.observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(board => originalView = board);
+          util.easySubscribe(board => originalView = board);
           util
             .getBoardStateUpdater()
             .issueChanges({update: [{key: 'ONE-1', state: '1-3'}]})
             .emit()
-            .observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+            .easySubscribe(
             board => {
               new BoardChecker([['ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], ['ONE-1']])
                 .swimlanes([
@@ -971,20 +791,12 @@ describe('Swimlane observer tests', () => {
         it('Change rank - not affecting states or swimlanes', () => {
 
           util = createUtilWithStandardIssues({swimlane: 'issue-type'});
-          util.observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(board => originalView = board);
+          util.easySubscribe(board => originalView = board);
           util
             .getBoardStateUpdater()
             .rankChanges({ONE: [{index: 4, key: 'ONE-3'}]})
             .emit()
-            .observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+            .easySubscribe(
             board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .swimlanes([
@@ -998,20 +810,12 @@ describe('Swimlane observer tests', () => {
         });
         it('Delete issue', () => {
           util = createUtilWithStandardIssues({swimlane: 'issue-type'});
-          util.observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(board => originalView = board);
+          util.easySubscribe(board => originalView = board);
           util
             .getBoardStateUpdater()
             .issueChanges({delete: ['ONE-5']})
             .emit()
-            .observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+            .easySubscribe(
             board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4'], []])
                 .swimlanes([
@@ -1033,20 +837,12 @@ describe('Swimlane observer tests', () => {
 
         it('Issue Type', () => {
           util = createUtilWithStandardIssues({swimlane: 'issue-type'});
-          util.observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(board => originalView = board);
+          util.easySubscribe(board => originalView = board);
           util
             .getBoardStateUpdater()
             .issueChanges({update: [{key: 'ONE-1', type: 'task'}]})
             .emit()
-            .observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+            .easySubscribe(
             board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .swimlanes([
@@ -1064,20 +860,12 @@ describe('Swimlane observer tests', () => {
 
         it('Priority', () => {
           util = createUtilWithStandardIssues({swimlane: 'priority'});
-          util.observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(board => originalView = board);
+          util.easySubscribe(board => originalView = board);
           util
             .getBoardStateUpdater()
             .issueChanges({update: [{key: 'ONE-2', priority: 'Blocker'}]})
             .emit()
-            .observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+            .easySubscribe(
             board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .swimlanes([
@@ -1094,11 +882,7 @@ describe('Swimlane observer tests', () => {
         describe('Assignee', () => {
           beforeEach(() => {
             util = createUtilWithStandardIssues({swimlane: 'assignee'});
-            util.observer()
-              .pipe(
-                take(1)
-              )
-              .subscribe(board => originalView = board);
+            util.easySubscribe(board => originalView = board);
 
           });
           it('None', () => {
@@ -1115,11 +899,7 @@ describe('Swimlane observer tests', () => {
                 }]
               })
               .emit()
-              .observer()
-              .pipe(
-                take(1)
-              )
-              .subscribe(
+              .easySubscribe(
               board => {
                 new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                   .swimlanes([
@@ -1140,11 +920,7 @@ describe('Swimlane observer tests', () => {
               .getBoardStateUpdater()
               .issueChanges({update: [{key: 'ONE-2', assignee: 'bob'}]})
               .emit()
-              .observer()
-              .pipe(
-                take(1)
-              )
-              .subscribe(
+              .easySubscribe(
               board => {
                 new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                   .swimlanes([
@@ -1164,11 +940,7 @@ describe('Swimlane observer tests', () => {
         describe('Components', () => {
           beforeEach(() => {
             util = createUtilWithStandardIssues({swimlane: 'component'});
-            util.observer()
-              .pipe(
-                take(1)
-              )
-              .subscribe(board => originalView = board);
+            util.easySubscribe(board => originalView = board);
 
           });
           it('None', () => {
@@ -1176,11 +948,7 @@ describe('Swimlane observer tests', () => {
               .getBoardStateUpdater()
               .issueChanges({update: [{key: 'ONE-4', 'clear-components': true}]})
               .emit()
-              .observer()
-              .pipe(
-                take(1)
-              )
-              .subscribe(
+              .easySubscribe(
               board => {
                 new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                   .swimlanes([
@@ -1203,11 +971,7 @@ describe('Swimlane observer tests', () => {
               .getBoardStateUpdater()
               .issueChanges({update: [{key: 'ONE-3', components: ['C-10']}]})
               .emit()
-              .observer()
-              .pipe(
-                take(1)
-              )
-              .subscribe(
+              .easySubscribe(
               board => {
                 new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                   .swimlanes([
@@ -1232,11 +996,7 @@ describe('Swimlane observer tests', () => {
                   [{key: 'ONE-3', components: ['C-10', 'C-20']}]
               })
               .emit()
-              .observer()
-              .pipe(
-                take(1)
-              )
-              .subscribe(
+              .easySubscribe(
               board => {
                 new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                   .swimlanes([
@@ -1258,11 +1018,7 @@ describe('Swimlane observer tests', () => {
         describe('Fix Versions', () => {
           beforeEach(() => {
             util = createUtilWithStandardIssues({swimlane: 'fix-version'});
-            util.observer()
-              .pipe(
-                take(1)
-              )
-              .subscribe(board => originalView = board);
+            util.easySubscribe(board => originalView = board);
 
           });
           it('None', () => {
@@ -1270,11 +1026,7 @@ describe('Swimlane observer tests', () => {
               .getBoardStateUpdater()
               .issueChanges({update: [{key: 'ONE-2', 'clear-fix-versions': true}]})
               .emit()
-              .observer()
-              .pipe(
-                take(1)
-              )
-              .subscribe(
+              .easySubscribe(
               board => {
                 new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                   .swimlanes([
@@ -1306,11 +1058,7 @@ describe('Swimlane observer tests', () => {
                   }]
               })
               .emit()
-              .observer()
-              .pipe(
-                take(1)
-              )
-              .subscribe(
+              .easySubscribe(
               board => {
                 new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                   .swimlanes([
@@ -1335,11 +1083,7 @@ describe('Swimlane observer tests', () => {
                   [{key: 'ONE-2', 'fix-versions': ['F-10', 'F-20']}]
               })
               .emit()
-              .observer()
-              .pipe(
-                take(1)
-              )
-              .subscribe(
+              .easySubscribe(
               board => {
                 new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                   .swimlanes([
@@ -1361,11 +1105,7 @@ describe('Swimlane observer tests', () => {
         describe('Labels', () => {
           beforeEach(() => {
             util = createUtilWithStandardIssues({swimlane: 'label'});
-            util.observer()
-              .pipe(
-                take(1)
-              )
-              .subscribe(board => originalView = board);
+            util.easySubscribe(board => originalView = board);
 
           });
           it('None', () => {
@@ -1373,11 +1113,7 @@ describe('Swimlane observer tests', () => {
               .getBoardStateUpdater()
               .issueChanges({update: [{key: 'ONE-4', 'clear-labels': true}]})
               .emit()
-              .observer()
-              .pipe(
-                take(1)
-              )
-              .subscribe(
+              .easySubscribe(
               board => {
                 new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                   .swimlanes([
@@ -1399,11 +1135,7 @@ describe('Swimlane observer tests', () => {
               .getBoardStateUpdater()
               .issueChanges({update: [{key: 'ONE-4', labels: ['L-10']}]})
               .emit()
-              .observer()
-              .pipe(
-                take(1)
-              )
-              .subscribe(
+              .easySubscribe(
               board => {
                 new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                   .swimlanes([
@@ -1429,11 +1161,7 @@ describe('Swimlane observer tests', () => {
                   [{key: 'ONE-5', labels: ['L-10', 'L-20']}]
               })
               .emit()
-              .observer()
-              .pipe(
-                take(1)
-              )
-              .subscribe(
+              .easySubscribe(
               board => {
                 new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                   .swimlanes([
@@ -1455,11 +1183,7 @@ describe('Swimlane observer tests', () => {
         describe('CustomField', () => {
           beforeEach(() => {
             util = createUtilWithStandardIssues({swimlane: 'Custom-2'});
-            util.observer()
-              .pipe(
-                take(1)
-              )
-              .subscribe(board => originalView = board);
+            util.easySubscribe(board => originalView = board);
 
           });
           it('None', () => {
@@ -1467,11 +1191,7 @@ describe('Swimlane observer tests', () => {
               .getBoardStateUpdater()
               .issueChanges({update: [{key: 'ONE-2', custom: {'Custom-2': null}}]})
               .emit()
-              .observer()
-              .pipe(
-                take(1)
-              )
-              .subscribe(
+              .easySubscribe(
               board => {
                 new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                   .swimlanes([
@@ -1496,11 +1216,7 @@ describe('Swimlane observer tests', () => {
                   [{key: 'ONE-3', custom: {'Custom-2': 'c2-B'}}]
               })
               .emit()
-              .observer()
-              .pipe(
-                take(1)
-              )
-              .subscribe(
+              .easySubscribe(
               board => {
                 new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                   .swimlanes([
@@ -1541,11 +1257,7 @@ describe('Swimlane observer tests', () => {
               .addIssue('TWO-1', 0)
               .addIssue('TWO-2', 1)
               .addIssue('TWO-3', 1));
-          util.observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+          util.easySubscribe(
             board => {
               new BoardChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']])
                 .invisibleIssues(['TWO-1', 'TWO-2', 'TWO-3'])
@@ -1555,11 +1267,7 @@ describe('Swimlane observer tests', () => {
               originalView = board;
             });
           util.getUserSettingUpdater().updateFilters('project')
-            .observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+            .easySubscribe(
             board => {
               new BoardChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']])
                 .swimlanes([
@@ -1573,11 +1281,7 @@ describe('Swimlane observer tests', () => {
               originalView = board;
             });
           util.getUserSettingUpdater().updateFilters('project', 'TWO')
-            .observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+            .easySubscribe(
             board => {
               new BoardChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']])
                 .invisibleIssues(['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4'])
@@ -1590,11 +1294,7 @@ describe('Swimlane observer tests', () => {
               originalView = board;
             });
           util.getUserSettingUpdater().updateFilters('project', 'ONE', 'TWO')
-            .observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+            .easySubscribe(
             board => {
               new BoardChecker([['ONE-2', 'ONE-1'], ['ONE-3', 'TWO-1'], ['ONE-4', 'TWO-3', 'TWO-2']])
                 .swimlanes([
@@ -1609,11 +1309,7 @@ describe('Swimlane observer tests', () => {
         });
         it('Issue Type', () => {
           util = createUtilWithStandardIssues({swimlane: 'issue-type', 'issue-type': 'bug'});
-          util.observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+          util.easySubscribe(
             board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .invisibleIssues(['ONE-2', 'ONE-4'])
@@ -1623,11 +1319,7 @@ describe('Swimlane observer tests', () => {
               originalView = board;
             });
           util.getUserSettingUpdater().updateFilters('issue-type', 'task')
-            .observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(board => {
+            .easySubscribe(board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .invisibleIssues(['ONE-1', 'ONE-3', 'ONE-5'])
               .swimlanes([
@@ -1640,11 +1332,7 @@ describe('Swimlane observer tests', () => {
         });
         it('Priority', () => {
           util = createUtilWithStandardIssues({swimlane: 'priority', 'priority': 'Blocker'});
-          util.observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+          util.easySubscribe(
             board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .invisibleIssues(['ONE-2', 'ONE-4'])
@@ -1654,11 +1342,7 @@ describe('Swimlane observer tests', () => {
               originalView = board;
             });
           util.getUserSettingUpdater().updateFilters('priority', 'Major')
-            .observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(board => {
+            .easySubscribe(board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .invisibleIssues(['ONE-1', 'ONE-3', 'ONE-5'])
               .swimlanes([
@@ -1671,11 +1355,7 @@ describe('Swimlane observer tests', () => {
         });
         it('Assignee', () => {
           util = createUtilWithStandardIssues({swimlane: 'assignee', 'assignee': 'kabir'});
-          util.observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+          util.easySubscribe(
             board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .invisibleIssues(['ONE-3', 'ONE-2', 'ONE-5'])
@@ -1685,11 +1365,7 @@ describe('Swimlane observer tests', () => {
               originalView = board;
             });
           util.getUserSettingUpdater().updateFilters('assignee', 'kabir', NONE_FILTER_KEY)
-            .observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(board => {
+            .easySubscribe(board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .invisibleIssues(['ONE-3'])
               .swimlanes([
@@ -1704,11 +1380,7 @@ describe('Swimlane observer tests', () => {
         });
         it('Components', () => {
           util = createUtilWithStandardIssues({swimlane: 'component', 'component': NONE_FILTER_KEY});
-          util.observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+          util.easySubscribe(
             board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .invisibleIssues(['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4'])
@@ -1718,11 +1390,7 @@ describe('Swimlane observer tests', () => {
               originalView = board;
             });
           util.getUserSettingUpdater().updateFilters('component', 'C-10', 'C-20')
-            .observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(board => {
+            .easySubscribe(board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .invisibleIssues(['ONE-3', 'ONE-5'])
               .swimlanes([
@@ -1737,11 +1405,7 @@ describe('Swimlane observer tests', () => {
         });
         it('Fix Versions', () => {
           util = createUtilWithStandardIssues({swimlane: 'fix-version', 'fix-version': NONE_FILTER_KEY});
-          util.observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+          util.easySubscribe(
             board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .invisibleIssues(['ONE-1', 'ONE-2', 'ONE-3', 'ONE-5'])
@@ -1751,11 +1415,7 @@ describe('Swimlane observer tests', () => {
               originalView = board;
             });
           util.getUserSettingUpdater().updateFilters('fix-version', 'F-10')
-            .observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(board => {
+            .easySubscribe(board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .invisibleIssues(['ONE-3', 'ONE-4', 'ONE-5'])
               .swimlanes([
@@ -1768,11 +1428,7 @@ describe('Swimlane observer tests', () => {
         });
         it('Labels', () => {
           util = createUtilWithStandardIssues({swimlane: 'label', 'label': NONE_FILTER_KEY});
-          util.observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+          util.easySubscribe(
             board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .invisibleIssues(['ONE-2', 'ONE-3', 'ONE-4', 'ONE-5'])
@@ -1782,11 +1438,7 @@ describe('Swimlane observer tests', () => {
               originalView = board;
             });
           util.getUserSettingUpdater().updateFilters('label')
-            .observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(board => {
+            .easySubscribe(board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .swimlanes([
                 {key: 'L-10', name: 'L-10', issues: ['ONE-2', 'ONE-3']},
@@ -1804,11 +1456,7 @@ describe('Swimlane observer tests', () => {
         });
         it('Custom Field', () => {
           util = createUtilWithStandardIssues({swimlane: 'Custom-2', 'cf.Custom-2': 'c2-A'});
-          util.observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+          util.easySubscribe(
             board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .invisibleIssues(['ONE-4', 'ONE-5'])
@@ -1818,11 +1466,7 @@ describe('Swimlane observer tests', () => {
               originalView = board;
             });
           util.getUserSettingUpdater().updateFilters('Custom-2', 'c2-B')
-            .observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(board => {
+            .easySubscribe(board => {
             new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
               .invisibleIssues(['ONE-1', 'ONE-2', 'ONE-3', 'ONE-5'])
               .swimlanes([
@@ -1842,11 +1486,7 @@ describe('Swimlane observer tests', () => {
         it('Update non-swimlane filter', () => {
           util =
             createUtilWithStandardIssues({swimlane: 'assignee', 'assignee': 'kabir', 'issue-type': 'task'});
-          util.observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+          util.easySubscribe(
             board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .invisibleIssues(['ONE-1', 'ONE-2', 'ONE-3', 'ONE-5'])
@@ -1857,11 +1497,7 @@ describe('Swimlane observer tests', () => {
             });
           util.getUserSettingUpdater().updateFilters('issue-type');
           util.getUserSettingUpdater().updateFilters('priority', 'Blocker')
-            .observer()
-            .pipe(
-              take(1)
-            )
-            .subscribe(
+            .easySubscribe(
             board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .invisibleIssues(['ONE-2', 'ONE-3', 'ONE-4', 'ONE-5'])
@@ -1883,22 +1519,14 @@ describe('Swimlane observer tests', () => {
         // What we create here does not really matter, the main check is that the swimlane info 'showEmpty' field gets set
         const util: BoardViewObservableUtil =
           createUtilWithStandardIssues({swimlane: 'assignee', 'assignee': 'kabir', 'issue-type': 'task'});
-        util.observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+        util.easySubscribe(
           board => {
             // We do tests elsewhere for the content of the board/swimlanes - let's just check the SwimlaneInfo showEmpty field
             expect(board.issueTable.swimlaneInfo).toBeTruthy();
             expect(board.issueTable.swimlaneInfo.showEmpty).toBe(false);
           });
         util.getUserSettingUpdater().toggleShowEmptySwimlanes()
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+          .easySubscribe(
           board => {
             expect(board.issueTable.swimlaneInfo).toBeTruthy();
             expect(board.issueTable.swimlaneInfo.showEmpty).toBe(true);
@@ -1906,31 +1534,19 @@ describe('Swimlane observer tests', () => {
 
         // Do some extra checks here which are not needed in the other similar tests
         util.getUserSettingUpdater().updateSwimlane('project')
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+          .easySubscribe(
           board => {
             expect(board.issueTable.swimlaneInfo).toBeTruthy();
             expect(board.issueTable.swimlaneInfo.showEmpty).toBe(false);
           });
         util.getUserSettingUpdater().toggleShowEmptySwimlanes()
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+          .easySubscribe(
           board => {
             expect(board.issueTable.swimlaneInfo).toBeTruthy();
             expect(board.issueTable.swimlaneInfo.showEmpty).toBe(true);
           });
         util.getUserSettingUpdater().updateSwimlane(null)
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+          .easySubscribe(
           board => {
             expect(board.issueTable.swimlaneInfo).toBeFalsy();
           });
@@ -1940,22 +1556,14 @@ describe('Swimlane observer tests', () => {
         // What we create here does not really matter, the main check is that the swimlane info 'showEmpty' field gets set
         const util: BoardViewObservableUtil =
           createUtilWithStandardIssues({showEmptySl: 'true', swimlane: 'assignee', 'assignee': 'kabir', 'issue-type': 'task'});
-        util.observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+        util.easySubscribe(
           board => {
             // We do tests elsewhere for the content of the board/swimlanes - let's just check the SwimlaneInfo showEmpty field
             expect(board.issueTable.swimlaneInfo).toBeTruthy();
             expect(board.issueTable.swimlaneInfo.showEmpty).toBe(true);
           });
         util.getUserSettingUpdater().toggleShowEmptySwimlanes()
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+          .easySubscribe(
           board => {
             expect(board.issueTable.swimlaneInfo).toBeTruthy();
             expect(board.issueTable.swimlaneInfo.showEmpty).toBe(false);
@@ -1977,40 +1585,24 @@ describe('Swimlane observer tests', () => {
 
       it('Default settings', () => {
         util = createUtilWithStandardIssues({swimlane: 'priority'});
-        util.observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+        util.easySubscribe(
           board => {
             checker.checkBoard(board);
           });
         util.getUserSettingUpdater().toggleCollapsedSwimlane('Blocker')
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(board => {
+          .easySubscribe(board => {
             checker
               .collapsedSwimlanes('Blocker')
               .checkBoard(board);
           });
         util.getUserSettingUpdater().toggleCollapsedSwimlane('Major')
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(board => {
+          .easySubscribe(board => {
             checker
               .collapsedSwimlanes('Blocker', 'Major')
               .checkBoard(board);
           });
         util.getUserSettingUpdater().toggleCollapsedSwimlane('Major')
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(board => {
+          .easySubscribe(board => {
             checker
               .collapsedSwimlanes('Blocker')
               .checkBoard(board);
@@ -2018,42 +1610,26 @@ describe('Swimlane observer tests', () => {
       });
       it('Initially Collapsed/hidden', () => {
         util = createUtilWithStandardIssues({swimlane: 'priority', 'hidden-sl': 'Blocker'});
-        util.observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+        util.easySubscribe(
           board => {
             checker
               .collapsedSwimlanes('Blocker')
               .checkBoard(board);
           });
         util.getUserSettingUpdater().toggleCollapsedSwimlane('Blocker')
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(board => {
+          .easySubscribe(board => {
             checker
               .collapsedSwimlanes()
               .checkBoard(board);
           });
         util.getUserSettingUpdater().toggleCollapsedSwimlane('Major')
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(board => {
+          .easySubscribe(board => {
             checker
               .collapsedSwimlanes('Major')
               .checkBoard(board);
           });
         util.getUserSettingUpdater().toggleCollapsedSwimlane('Major')
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(board => {
+          .easySubscribe(board => {
             checker
               .collapsedSwimlanes()
               .checkBoard(board);
@@ -2061,32 +1637,20 @@ describe('Swimlane observer tests', () => {
       });
       it('Initially visible', () => {
         util = createUtilWithStandardIssues({swimlane: 'priority', 'visible-sl': 'Blocker'});
-        util.observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(
+        util.easySubscribe(
           board => {
             checker
               .collapsedSwimlanes('Major')
               .checkBoard(board);
           });
         util.getUserSettingUpdater().toggleCollapsedSwimlane('Blocker')
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(board => {
+          .easySubscribe(board => {
             checker
               .collapsedSwimlanes('Major', 'Blocker')
               .checkBoard(board);
         });
         util.getUserSettingUpdater().toggleCollapsedSwimlane('Major')
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(board => {
+          .easySubscribe(board => {
             checker
               .collapsedSwimlanes('Blocker')
               .checkBoard(board);
@@ -2100,21 +1664,13 @@ describe('Swimlane observer tests', () => {
             {key: 'Blocker', name: 'Blocker', issues: ['ONE-1', 'ONE-3', 'ONE-5']}]);
 
         util.getUserSettingUpdater().toggleCollapsedSwimlane('Blocker')
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(board => {
+          .easySubscribe(board => {
             checker
               .collapsedSwimlanes('Blocker')
               .checkBoard(board);
         });
         util.getUserSettingUpdater().toggleCollapsedSwimlane('Blocker')
-          .observer()
-          .pipe(
-            take(1)
-          )
-          .subscribe(board => {
+          .easySubscribe(board => {
             checker
               .collapsedSwimlanes()
               .checkBoard(board);
