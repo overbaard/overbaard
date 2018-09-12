@@ -39,7 +39,7 @@ import {Action} from '@ngrx/store';
 import {IssueSummaryLevel} from '../../model/board/user/issue-summary-level';
 import {HeaderActions, headerMetaReducer} from '../../model/board/data/header/header.reducer';
 import {cloneObject} from '../../common/object-util';
-import {take} from 'rxjs/operators';
+import {map, take} from 'rxjs/operators';
 import {BoardIssue} from '../../model/board/data/issue/board-issue';
 
 export class BoardViewObservableUtil {
@@ -106,6 +106,28 @@ export class BoardViewObservableUtil {
 
   observer(): Observable<BoardViewModel> {
     return this._boardView$;
+  }
+
+  easySubscribeHeaders(fn: (BoardHeaders) => void): void {
+    this._boardView$
+      .pipe(
+        take(1),
+        map(board => board.headers)
+      )
+      .subscribe(headers => {
+        fn(headers);
+      });
+
+  }
+
+  easySubscribe(fn: (BoardViewModel) => void): void {
+    this._boardView$
+      .pipe(
+        take(1)
+      )
+      .subscribe(board => {
+        fn(board);
+      });
   }
 }
 

@@ -31,12 +31,7 @@ describe('Board headers tests', () => {
         it('Simple', () => {
           util
             .updateBoardState(initializer.headerStateFactory(createHeaderStateFactory(states, 0, 0)))
-            .observer()
-            .pipe(
-              take(1),
-              map(board => board.headers)
-            )
-            .subscribe(headers => {
+            .easySubscribeHeaders(headers => {
               check(headers.headersList,
                 new HeaderChecker('S1').stateIndices(0),
                 new HeaderChecker('S2').stateIndices(1),
@@ -48,12 +43,7 @@ describe('Board headers tests', () => {
         it('Backlog and done', () => {
           util
             .updateBoardState(initializer.headerStateFactory(createHeaderStateFactory(states, 2, 1)))
-            .observer()
-            .pipe(
-              take(1),
-              map(board => board.headers)
-            )
-            .subscribe(headers => {
+            .easySubscribeHeaders(headers => {
               check(headers.headersList,
                 new HeaderChecker('Backlog').stateIndices(0, 1).backlog().invisible()
                   .states(
@@ -74,12 +64,7 @@ describe('Board headers tests', () => {
             .headerStateFactory(createHeaderStateFactory(states, 1, 0));
           util
             .updateBoardState(initializer)
-            .observer()
-            .pipe(
-              take(1),
-              map(board => board.headers)
-            )
-            .subscribe(headers => {
+            .easySubscribeHeaders(headers => {
               check(headers.headersList,
                 new HeaderChecker('Backlog').stateIndices(0).backlog().invisible()
                   .states(
@@ -101,12 +86,7 @@ describe('Board headers tests', () => {
             .headerStateFactory(createHeaderStateFactory(states, 1, 0));
           util
             .updateBoardState(initializer)
-            .observer()
-            .pipe(
-              take(1),
-              map(board => board.headers)
-            )
-            .subscribe(headers => {
+            .easySubscribeHeaders(headers => {
               check(headers.headersList,
                 new HeaderChecker('Backlog').stateIndices(0).backlog().invisible()
                   .states(
@@ -146,12 +126,7 @@ describe('Board headers tests', () => {
             .headerStateFactory(new TestHeaderStateFactory(states, ['H1'], 0, 0));
           util
             .updateBoardState(initializer)
-            .observer()
-            .pipe(
-              take(1),
-              map(board => board.headers)
-            )
-            .subscribe(headers => {
+            .easySubscribeHeaders(headers => {
               check(headers.headersList,
                 new HeaderChecker('H1').stateIndices(0)
                   .states(
@@ -171,12 +146,7 @@ describe('Board headers tests', () => {
             .headerStateFactory(new TestHeaderStateFactory(states, ['H1'], 0, 0));
           util
             .updateBoardState(initializer)
-            .observer()
-            .pipe(
-              take(1),
-              map(board => board.headers)
-            )
-            .subscribe(headers => {
+            .easySubscribeHeaders(headers => {
               check(headers.headersList,
                 new HeaderChecker('H1').stateIndices(0, 1)
                   .states(
@@ -195,12 +165,7 @@ describe('Board headers tests', () => {
             .headerStateFactory(new TestHeaderStateFactory(states, ['H1'], 0, 0));
           util
             .updateBoardState(initializer)
-            .observer()
-            .pipe(
-              take(1),
-              map(board => board.headers)
-            )
-            .subscribe(headers => {
+            .easySubscribeHeaders(headers => {
               check(headers.headersList,
                 new HeaderChecker('S1').stateIndices(0),
                 new HeaderChecker('S2').stateIndices(1),
@@ -220,12 +185,7 @@ describe('Board headers tests', () => {
             .headerStateFactory(new TestHeaderStateFactory(states, ['H1'], 0, 0));
           util
             .updateBoardState(initializer)
-            .observer()
-            .pipe(
-              take(1),
-              map(board => board.headers)
-            )
-            .subscribe(headers => {
+            .easySubscribeHeaders(headers => {
               check(headers.headersList,
                 new HeaderChecker('S1').stateIndices(0),
                 new HeaderChecker('S2').stateIndices(1),
@@ -244,12 +204,7 @@ describe('Board headers tests', () => {
             .headerStateFactory(new TestHeaderStateFactory(states, ['H1'], 0, 0));
           util
             .updateBoardState(initializer)
-            .observer()
-            .pipe(
-              take(1),
-              map(board => board.headers)
-            )
-            .subscribe(headers => {
+            .easySubscribeHeaders(headers => {
               check(headers.headersList,
                 new HeaderChecker('S1').stateIndices(0),
                 new HeaderChecker('S2').stateIndices(1),
@@ -270,12 +225,7 @@ describe('Board headers tests', () => {
             .headerStateFactory(new TestHeaderStateFactory(states, ['H1'], 0, 0));
           util
             .updateBoardState(initializer)
-            .observer()
-            .pipe(
-              take(1),
-              map(board => board.headers)
-            )
-            .subscribe(headers => {
+            .easySubscribeHeaders(headers => {
               check(headers.headersList,
                 new HeaderChecker('S1').stateIndices(0),
                 new HeaderChecker('S2').stateIndices(1),
@@ -304,12 +254,7 @@ describe('Board headers tests', () => {
             .headerStateFactory(new TestHeaderStateFactory(states, ['H1', 'H2'], 0, 0));
           util
             .updateBoardState(initializer)
-            .observer()
-            .pipe(
-              take(1),
-              map(board => board.headers)
-            )
-            .subscribe(headers => {
+            .easySubscribeHeaders(headers => {
               check(headers.headersList,
                 new HeaderChecker('H1').stateIndices(0, 1).wip(8)
                   .states(
@@ -340,12 +285,7 @@ describe('Board headers tests', () => {
             .headerStateFactory(new TestHeaderStateFactory(states, ['H1', 'H2'], 0, 0));
           util
             .updateBoardState(initializer)
-            .observer()
-            .pipe(
-              take(1),
-              map(board => board.headers)
-            )
-            .subscribe(headers => {
+            .easySubscribeHeaders(headers => {
               check(headers.headersList,
                 new HeaderChecker('H1').stateIndices(0, 1, 2).wip(21)
                   .states(
@@ -380,12 +320,7 @@ describe('Board headers tests', () => {
             .headerStateFactory(new TestHeaderStateFactory(states, ['H1', 'H2'], 2, 0));
           util
             .updateBoardState(initializer)
-            .observer()
-            .pipe(
-              take(1),
-              map(board => board.headers)
-            )
-            .subscribe(headers => {
+            .easySubscribeHeaders(headers => {
               check(headers.headersList,
                 new HeaderChecker('Backlog').stateIndices(0, 1).backlog().invisible()
                   .states(
@@ -410,22 +345,12 @@ describe('Board headers tests', () => {
           let original: BoardHeaders;
           util
             .updateBoardState(initializer)
-            .observer()
-            .pipe(
-              take(1),
-              map(board => board.headers)
-            )
-            .subscribe(headers => {
+            .easySubscribeHeaders(headers => {
               original = headers;
             });
           util
             .updateBoardState(initializer)
-            .observer()
-            .pipe(
-              take(1),
-              map(board => board.headers)
-            )
-            .subscribe(headers => {
+            .easySubscribeHeaders(headers => {
               expect(headers).toBe(headers);
             });
         });
@@ -446,12 +371,7 @@ describe('Board headers tests', () => {
         .headerStateFactory(new TestHeaderStateFactory(states, ['Short Header', 'A much longer header'], 1, 0));
       util
         .updateBoardState(initializer)
-        .observer()
-        .pipe(
-          take(1),
-          map(board => board.headers)
-        )
-        .subscribe(headers => {
+        .easySubscribeHeaders(headers => {
           check(headers.headersList,
             new HeaderChecker('Backlog').abbreviated('B').stateIndices(0).backlog().invisible()
               .states(
@@ -481,33 +401,23 @@ describe('Board headers tests', () => {
               {name: 'S4'}], []),
             {priority: 'Major'});
         // Layout is ['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9'], []] odd=Blocker, even=Major
-        util.observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
-            check(headers.headersList,
-              new HeaderChecker('S1').stateIndices(0).counts(1, 2),
-              new HeaderChecker('S2').stateIndices(1).counts(2, 3),
-              new HeaderChecker('S3').stateIndices(2).counts(2, 4),
-              new HeaderChecker('S4').stateIndices(3).counts(0, 0));
-            original = headers;
+        util.easySubscribeHeaders(headers => {
+          check(headers.headersList,
+            new HeaderChecker('S1').stateIndices(0).counts(1, 2),
+            new HeaderChecker('S2').stateIndices(1).counts(2, 3),
+            new HeaderChecker('S3').stateIndices(2).counts(2, 4),
+            new HeaderChecker('S4').stateIndices(3).counts(0, 0));
+          original = headers;
         });
       });
       it('Update visible issues', () => {
         util.getUserSettingUpdater().updateFilters('priority', 'Blocker');
-        util.observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
-            checkAndCompare(headers.headersList, original,
-              new HeaderChecker('S1').stateIndices(0).counts(1, 2).same(),
-              new HeaderChecker('S2').stateIndices(1).counts(1, 3),
-              new HeaderChecker('S3').stateIndices(2).counts(2, 4).same(),
-              new HeaderChecker('S4').stateIndices(3).counts(0, 0).same());
+        util.easySubscribeHeaders(headers => {
+          checkAndCompare(headers.headersList, original,
+            new HeaderChecker('S1').stateIndices(0).counts(1, 2).same(),
+            new HeaderChecker('S2').stateIndices(1).counts(1, 3),
+            new HeaderChecker('S3').stateIndices(2).counts(2, 4).same(),
+            new HeaderChecker('S4').stateIndices(3).counts(0, 0).same());
         });
       });
 
@@ -520,17 +430,12 @@ describe('Board headers tests', () => {
           })
           .rankChanges({ONE: [{index: 9, key: 'ONE-10'}, {index: 10, key: 'ONE-11'}]})
           .emit();
-        util.observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
-            checkAndCompare(headers.headersList, original,
-              new HeaderChecker('S1').stateIndices(0).counts(1, 2).same(),
-              new HeaderChecker('S2').stateIndices(1).counts(2, 3).same(),
-              new HeaderChecker('S3').stateIndices(2).counts(2, 4).same(),
-              new HeaderChecker('S4').stateIndices(3).counts(1, 2));
+        util.easySubscribeHeaders(headers => {
+          checkAndCompare(headers.headersList, original,
+            new HeaderChecker('S1').stateIndices(0).counts(1, 2).same(),
+            new HeaderChecker('S2').stateIndices(1).counts(2, 3).same(),
+            new HeaderChecker('S3').stateIndices(2).counts(2, 4).same(),
+            new HeaderChecker('S4').stateIndices(3).counts(1, 2));
         });
       });
     });
@@ -548,42 +453,32 @@ describe('Board headers tests', () => {
             {priority: 'Major'});
         // Layout is ['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9'], []] odd=Blocker, even=Major
 
-        util.observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
-            check(headers.headersList,
-              new HeaderChecker('H1').stateIndices(0, 1).counts(3, 5)
-                .states(
-                  new HeaderChecker('S1').stateIndices(0).counts(1, 2),
-                  new HeaderChecker('S2').stateIndices(1).counts(2, 3)),
-              new HeaderChecker('H2').stateIndices(2, 3).counts(2, 4)
-                .states(
-                  new HeaderChecker('S3').stateIndices(2).counts(2, 4),
-                  new HeaderChecker('S4').stateIndices(3).counts(0, 0)));
-            original = headers;
+        util.easySubscribeHeaders(headers => {
+          check(headers.headersList,
+            new HeaderChecker('H1').stateIndices(0, 1).counts(3, 5)
+              .states(
+                new HeaderChecker('S1').stateIndices(0).counts(1, 2),
+                new HeaderChecker('S2').stateIndices(1).counts(2, 3)),
+            new HeaderChecker('H2').stateIndices(2, 3).counts(2, 4)
+              .states(
+                new HeaderChecker('S3').stateIndices(2).counts(2, 4),
+                new HeaderChecker('S4').stateIndices(3).counts(0, 0)));
+          original = headers;
         });
       });
 
       it('Update visible issues', () => {
         util.getUserSettingUpdater().updateFilters('priority', 'Blocker');
-        util.observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
-            checkAndCompare(headers.headersList, original,
-              new HeaderChecker('H1').stateIndices(0, 1).counts(2, 5)
-                .states(
-                  new HeaderChecker('S1').stateIndices(0).counts(1, 2).same(),
-                  new HeaderChecker('S2').stateIndices(1).counts(1, 3)),
-              new HeaderChecker('H2').stateIndices(2, 3).counts(2, 4).same()
-                .states(
-                  new HeaderChecker('S3').stateIndices(2).counts(2, 4).same(),
-                  new HeaderChecker('S4').stateIndices(3).counts(0, 0).same()));
+        util.easySubscribeHeaders(headers => {
+          checkAndCompare(headers.headersList, original,
+            new HeaderChecker('H1').stateIndices(0, 1).counts(2, 5)
+              .states(
+                new HeaderChecker('S1').stateIndices(0).counts(1, 2).same(),
+                new HeaderChecker('S2').stateIndices(1).counts(1, 3)),
+            new HeaderChecker('H2').stateIndices(2, 3).counts(2, 4).same()
+              .states(
+                new HeaderChecker('S3').stateIndices(2).counts(2, 4).same(),
+                new HeaderChecker('S4').stateIndices(3).counts(0, 0).same()));
 
         });
       });
@@ -597,21 +492,16 @@ describe('Board headers tests', () => {
           })
           .rankChanges({ONE: [{index: 9, key: 'ONE-10'}, {index: 10, key: 'ONE-11'}]})
           .emit();
-        util.observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
-            checkAndCompare(headers.headersList, original,
-              new HeaderChecker('H1').stateIndices(0, 1).counts(3, 5).same()
-                .states(
-                  new HeaderChecker('S1').stateIndices(0).counts(1, 2).same(),
-                  new HeaderChecker('S2').stateIndices(1).counts(2, 3).same()),
-              new HeaderChecker('H2').stateIndices(2, 3).counts(3, 6)
-                .states(
-                  new HeaderChecker('S3').stateIndices(2).counts(2, 4).same(),
-                  new HeaderChecker('S4').stateIndices(3).counts(1, 2)));
+        util.easySubscribeHeaders(headers => {
+          checkAndCompare(headers.headersList, original,
+            new HeaderChecker('H1').stateIndices(0, 1).counts(3, 5).same()
+              .states(
+                new HeaderChecker('S1').stateIndices(0).counts(1, 2).same(),
+                new HeaderChecker('S2').stateIndices(1).counts(2, 3).same()),
+            new HeaderChecker('H2').stateIndices(2, 3).counts(3, 6)
+              .states(
+                new HeaderChecker('S3').stateIndices(2).counts(2, 4).same(),
+                new HeaderChecker('S4').stateIndices(3).counts(1, 2)));
         });
       });
     });
@@ -649,12 +539,7 @@ describe('Board headers tests', () => {
         util = new BoardViewObservableUtil()
           .updateBoardState(createInitialiser());
         util
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             check(headers.headersList,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog().invisible()
                 .states(
@@ -677,22 +562,12 @@ describe('Board headers tests', () => {
       it('Toggle backlog', () => {
         // The toggle itself is a noop
         util.getUserSettingUpdater().toggleBacklog()
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             expect(headers).toBe(original);
           });
         // The caller (BoardComponent) does a full refresh to load the board again
         util.updateBoardState(createInitialiser())
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             expect(headers).not.toBe(original);
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog()
@@ -715,12 +590,7 @@ describe('Board headers tests', () => {
         // Toggle backlog states - DON'T TOGGLE all of them and assume that the backlog will be toggled
         // - that is handled by the header group component
         util.getUserSettingUpdater().updateVisibility(false, 0)
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog()
                 .states(
@@ -740,12 +610,7 @@ describe('Board headers tests', () => {
           });
 
         util.getUserSettingUpdater().updateVisibility(true, 0)
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog()
                 .states(
@@ -767,12 +632,7 @@ describe('Board headers tests', () => {
 
       it('Toggle single state visibility', () => {
         util.getUserSettingUpdater().updateVisibility(false, 4)
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog().invisible().same()
                 .states(
@@ -792,12 +652,7 @@ describe('Board headers tests', () => {
           });
 
         util.getUserSettingUpdater().updateVisibility(true, 4)
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog().invisible().same()
                 .states(
@@ -820,12 +675,7 @@ describe('Board headers tests', () => {
       it('Toggle state in category visibilities', () => {
         // One category state invisible, category should still be visible
         util.getUserSettingUpdater().updateVisibility(false, 3)
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog().invisible().same()
                 .states(
@@ -846,12 +696,7 @@ describe('Board headers tests', () => {
 
         // All category states invisible, category should  be invisible too
         util.getUserSettingUpdater().updateVisibility(false, 2)
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog().invisible().same()
                 .states(
@@ -872,12 +717,7 @@ describe('Board headers tests', () => {
 
         // One category state invisible, category should still be visible
         util.getUserSettingUpdater().updateVisibility(true, 3)
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog().invisible().same()
                 .states(
@@ -900,12 +740,7 @@ describe('Board headers tests', () => {
         // Some extra checks here just to make sure, we don't need to repeat these everywhere else
         // All category states visible, category should  be visible too
         util.getUserSettingUpdater().updateVisibility(true, 2)
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog().invisible().same()
                 .states(
@@ -926,12 +761,7 @@ describe('Board headers tests', () => {
 
         // All category states invisible, category should  be invisible too
         util.getUserSettingUpdater().updateVisibility(false, 2, 3)
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog().invisible().same()
                 .states(
@@ -952,12 +782,7 @@ describe('Board headers tests', () => {
 
         // All category states visible, category should  be invisible too
         util.getUserSettingUpdater().updateVisibility(true, 2, 3)
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog().invisible().same()
                 .states(
@@ -983,12 +808,7 @@ describe('Board headers tests', () => {
         util = new BoardViewObservableUtil({bl: 'true', visible: '0,2,4'})
           .updateBoardState(createInitialiser());
         util
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             check(headers.headersList,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog()
                 .states(
@@ -1012,12 +832,7 @@ describe('Board headers tests', () => {
         // DON'T TOGGLE all of them and assume that the backlog will be toggled
         // - that is handled by the header group component
         util.getUserSettingUpdater().updateVisibility(true, 1)
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog()
                 .states(
@@ -1039,22 +854,12 @@ describe('Board headers tests', () => {
         // Toggle the backlog to invisible
         // The toggle itself is a noop
         util.getUserSettingUpdater().toggleBacklog()
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             expect(headers).toBe(original);
           });
         // The caller (BoardComponent) does a full refresh to load the board again which rebuilds it
         util.updateBoardState(createInitialiser())
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             expect(headers).not.toBe(original);
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog().invisible()
@@ -1079,22 +884,12 @@ describe('Board headers tests', () => {
         // Toggle the backlog to invisible
         // The toggle itself is a noop
         util.getUserSettingUpdater().toggleBacklog()
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             expect(headers).toBe(original);
           });
         // The caller (BoardComponent) does a full refresh to load the board again which rebuilds it
         util.updateBoardState(createInitialiser())
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             expect(headers).not.toBe(original);
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog()
@@ -1118,12 +913,7 @@ describe('Board headers tests', () => {
 
       it('Toggle states not in category', () => {
         util.getUserSettingUpdater().updateVisibility(false, 4)
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog().same()
                 .states(
@@ -1144,12 +934,7 @@ describe('Board headers tests', () => {
           });
 
         util.getUserSettingUpdater().updateVisibility(true, 7)
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog().same()
                 .states(
@@ -1170,12 +955,7 @@ describe('Board headers tests', () => {
 
       it('Toggle states in category', () => {
         util.getUserSettingUpdater().updateVisibility(false, 2)
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog().same()
                 .states(
@@ -1196,12 +976,7 @@ describe('Board headers tests', () => {
           });
 
         util.getUserSettingUpdater().updateVisibility(true, 3)
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog().same()
                 .states(
@@ -1222,12 +997,7 @@ describe('Board headers tests', () => {
           });
 
         util.getUserSettingUpdater().updateVisibility(true, 5, 6)
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog().same()
                 .states(
@@ -1254,12 +1024,7 @@ describe('Board headers tests', () => {
         util = new BoardViewObservableUtil({bl: 'true', hidden: '0,2,3,4'})
           .updateBoardState(createInitialiser());
         util
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             check(headers.headersList,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog()
                 .states(
@@ -1285,12 +1050,7 @@ describe('Board headers tests', () => {
         // - that is handled by the header group component
 
         util.getUserSettingUpdater().updateVisibility(true, 0)
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog()
                 .states(
@@ -1311,22 +1071,12 @@ describe('Board headers tests', () => {
 
         // Toggle the backlog to invisible
         util.getUserSettingUpdater().toggleBacklog()
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             expect(headers).toBe(original);
           });
         // The caller (BoardComponent) does a full refresh to load the board again which rebuilds it
         util.updateBoardState(createInitialiser())
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             expect(headers).not.toBe(original);
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog().invisible()
@@ -1349,22 +1099,12 @@ describe('Board headers tests', () => {
 
         // Toggle the backlog to visible
         util.getUserSettingUpdater().toggleBacklog()
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             expect(headers).toBe(original);
           });
         // The caller (BoardComponent) does a full refresh to load the board again which rebuilds it
         util.updateBoardState(createInitialiser())
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             expect(headers).not.toBe(original);
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog()
@@ -1388,12 +1128,7 @@ describe('Board headers tests', () => {
 
       it('Toggle states not in category', () => {
         util.getUserSettingUpdater().updateVisibility(true, 4)
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog().same()
                 .states(
@@ -1414,12 +1149,7 @@ describe('Board headers tests', () => {
           });
 
         util.getUserSettingUpdater().updateVisibility(false, 7)
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog().same()
                 .states(
@@ -1443,12 +1173,7 @@ describe('Board headers tests', () => {
 
       it('Toggle states in category', () => {
         util.getUserSettingUpdater().updateVisibility(true, 2)
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog().same()
                 .states(
@@ -1469,12 +1194,7 @@ describe('Board headers tests', () => {
           });
 
         util.getUserSettingUpdater().updateVisibility(true, 3)
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog().same()
                 .states(
@@ -1495,12 +1215,7 @@ describe('Board headers tests', () => {
           });
 
         util.getUserSettingUpdater().updateVisibility(false, 5, 6)
-          .observer()
-          .pipe(
-            take(1),
-            map(board => board.headers)
-          )
-          .subscribe(headers => {
+          .easySubscribeHeaders(headers => {
             checkAndCompare(headers.headersList, original,
               new HeaderChecker('Backlog').stateIndices(0, 1).backlog().same()
                 .states(
@@ -1545,12 +1260,7 @@ describe('Board headers tests', () => {
     beforeEach(() => {
       util = createInitialiser();
       util
-        .observer()
-        .pipe(
-          take(1),
-          map(board => board.headers)
-        )
-        .subscribe(headers => {
+        .easySubscribeHeaders(headers => {
           check(headers.headersList,
             new HeaderChecker('Backlog').stateIndices(0, 1).counts(2, 2).backlog().invisible()
               .states(
@@ -1570,31 +1280,21 @@ describe('Board headers tests', () => {
         });
     });
 
-    it ('Empty help texts', () => {
+    it('Empty help texts', () => {
       util.getBoardStateUpdater().setHelpTexts({}).emit()
-        .observer()
-        .pipe(
-          take(1),
-          map(board => board.headers)
-        )
-        .subscribe(headers => {
+        .easySubscribeHeaders(headers => {
           expect(headers).toBe(original);
         });
     });
 
-    it ('Initialise help texts', () => {
+    it('Initialise help texts', () => {
       const help: any = {
         B2: 'B-One',
         S2: 'Two',
         S6: 'Six'
       };
       util.getBoardStateUpdater().setHelpTexts(help).emit()
-        .observer()
-        .pipe(
-          take(1),
-          map(board => board.headers)
-        )
-        .subscribe(headers => {
+        .easySubscribeHeaders(headers => {
           checkAndCompare(headers.headersList, original,
             new HeaderChecker('Backlog').stateIndices(0, 1).counts(2, 2).backlog().invisible()
               .states(
@@ -1655,7 +1355,7 @@ describe('Board headers tests', () => {
 
 function checkAndCompare(headers: List<BoardHeader>, original: BoardHeaders, ...checkers: HeaderChecker[]) {
   check(headers, ...checkers);
-  for (let i = 0 ; i < checkers.length ; i++) {
+  for (let i = 0; i < checkers.length; i++) {
     const header: BoardHeader = headers.get(i);
     const originalHeader: BoardHeader = original.headersList.get(i);
     const checker: HeaderChecker = checkers[i];
@@ -1665,7 +1365,7 @@ function checkAndCompare(headers: List<BoardHeader>, original: BoardHeaders, ...
       expect(header).not.toBe(originalHeader);
     }
     if (header.category) {
-      for (let j = 0 ; j < header.states.size ; j++) {
+      for (let j = 0; j < header.states.size; j++) {
         const stateHeader: BoardHeader = header.states.get(j);
         const originalStateHeader: BoardHeader = originalHeader.states.get(j);
         const stateChecker: HeaderChecker = checker.getStates()[j];
@@ -1682,7 +1382,7 @@ function checkAndCompare(headers: List<BoardHeader>, original: BoardHeaders, ...
 
 function check(headers: List<BoardHeader>, ...checkers: HeaderChecker[]) {
   expect(headers.size).toBe(checkers.length);
-  for (let i = 0 ; i < checkers.length ; i++) {
+  for (let i = 0; i < checkers.length; i++) {
     checkers[i].check(headers.get(i));
   }
 }
