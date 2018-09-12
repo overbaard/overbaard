@@ -402,22 +402,22 @@ describe('Board headers tests', () => {
             {priority: 'Major'});
         // Layout is ['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9'], []] odd=Blocker, even=Major
         util.easySubscribeHeaders(headers => {
-            check(headers.headersList,
-              new HeaderChecker('S1').stateIndices(0).counts(1, 2),
-              new HeaderChecker('S2').stateIndices(1).counts(2, 3),
-              new HeaderChecker('S3').stateIndices(2).counts(2, 4),
-              new HeaderChecker('S4').stateIndices(3).counts(0, 0));
-            original = headers;
+          check(headers.headersList,
+            new HeaderChecker('S1').stateIndices(0).counts(1, 2),
+            new HeaderChecker('S2').stateIndices(1).counts(2, 3),
+            new HeaderChecker('S3').stateIndices(2).counts(2, 4),
+            new HeaderChecker('S4').stateIndices(3).counts(0, 0));
+          original = headers;
         });
       });
       it('Update visible issues', () => {
         util.getUserSettingUpdater().updateFilters('priority', 'Blocker');
         util.easySubscribeHeaders(headers => {
-            checkAndCompare(headers.headersList, original,
-              new HeaderChecker('S1').stateIndices(0).counts(1, 2).same(),
-              new HeaderChecker('S2').stateIndices(1).counts(1, 3),
-              new HeaderChecker('S3').stateIndices(2).counts(2, 4).same(),
-              new HeaderChecker('S4').stateIndices(3).counts(0, 0).same());
+          checkAndCompare(headers.headersList, original,
+            new HeaderChecker('S1').stateIndices(0).counts(1, 2).same(),
+            new HeaderChecker('S2').stateIndices(1).counts(1, 3),
+            new HeaderChecker('S3').stateIndices(2).counts(2, 4).same(),
+            new HeaderChecker('S4').stateIndices(3).counts(0, 0).same());
         });
       });
 
@@ -431,11 +431,11 @@ describe('Board headers tests', () => {
           .rankChanges({ONE: [{index: 9, key: 'ONE-10'}, {index: 10, key: 'ONE-11'}]})
           .emit();
         util.easySubscribeHeaders(headers => {
-            checkAndCompare(headers.headersList, original,
-              new HeaderChecker('S1').stateIndices(0).counts(1, 2).same(),
-              new HeaderChecker('S2').stateIndices(1).counts(2, 3).same(),
-              new HeaderChecker('S3').stateIndices(2).counts(2, 4).same(),
-              new HeaderChecker('S4').stateIndices(3).counts(1, 2));
+          checkAndCompare(headers.headersList, original,
+            new HeaderChecker('S1').stateIndices(0).counts(1, 2).same(),
+            new HeaderChecker('S2').stateIndices(1).counts(2, 3).same(),
+            new HeaderChecker('S3').stateIndices(2).counts(2, 4).same(),
+            new HeaderChecker('S4').stateIndices(3).counts(1, 2));
         });
       });
     });
@@ -454,31 +454,31 @@ describe('Board headers tests', () => {
         // Layout is ['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4', 'ONE-5'], ['ONE-6', 'ONE-7', 'ONE-8', 'ONE-9'], []] odd=Blocker, even=Major
 
         util.easySubscribeHeaders(headers => {
-            check(headers.headersList,
-              new HeaderChecker('H1').stateIndices(0, 1).counts(3, 5)
-                .states(
-                  new HeaderChecker('S1').stateIndices(0).counts(1, 2),
-                  new HeaderChecker('S2').stateIndices(1).counts(2, 3)),
-              new HeaderChecker('H2').stateIndices(2, 3).counts(2, 4)
-                .states(
-                  new HeaderChecker('S3').stateIndices(2).counts(2, 4),
-                  new HeaderChecker('S4').stateIndices(3).counts(0, 0)));
-            original = headers;
+          check(headers.headersList,
+            new HeaderChecker('H1').stateIndices(0, 1).counts(3, 5)
+              .states(
+                new HeaderChecker('S1').stateIndices(0).counts(1, 2),
+                new HeaderChecker('S2').stateIndices(1).counts(2, 3)),
+            new HeaderChecker('H2').stateIndices(2, 3).counts(2, 4)
+              .states(
+                new HeaderChecker('S3').stateIndices(2).counts(2, 4),
+                new HeaderChecker('S4').stateIndices(3).counts(0, 0)));
+          original = headers;
         });
       });
 
       it('Update visible issues', () => {
         util.getUserSettingUpdater().updateFilters('priority', 'Blocker');
         util.easySubscribeHeaders(headers => {
-            checkAndCompare(headers.headersList, original,
-              new HeaderChecker('H1').stateIndices(0, 1).counts(2, 5)
-                .states(
-                  new HeaderChecker('S1').stateIndices(0).counts(1, 2).same(),
-                  new HeaderChecker('S2').stateIndices(1).counts(1, 3)),
-              new HeaderChecker('H2').stateIndices(2, 3).counts(2, 4).same()
-                .states(
-                  new HeaderChecker('S3').stateIndices(2).counts(2, 4).same(),
-                  new HeaderChecker('S4').stateIndices(3).counts(0, 0).same()));
+          checkAndCompare(headers.headersList, original,
+            new HeaderChecker('H1').stateIndices(0, 1).counts(2, 5)
+              .states(
+                new HeaderChecker('S1').stateIndices(0).counts(1, 2).same(),
+                new HeaderChecker('S2').stateIndices(1).counts(1, 3)),
+            new HeaderChecker('H2').stateIndices(2, 3).counts(2, 4).same()
+              .states(
+                new HeaderChecker('S3').stateIndices(2).counts(2, 4).same(),
+                new HeaderChecker('S4').stateIndices(3).counts(0, 0).same()));
 
         });
       });
@@ -493,15 +493,15 @@ describe('Board headers tests', () => {
           .rankChanges({ONE: [{index: 9, key: 'ONE-10'}, {index: 10, key: 'ONE-11'}]})
           .emit();
         util.easySubscribeHeaders(headers => {
-            checkAndCompare(headers.headersList, original,
-              new HeaderChecker('H1').stateIndices(0, 1).counts(3, 5).same()
-                .states(
-                  new HeaderChecker('S1').stateIndices(0).counts(1, 2).same(),
-                  new HeaderChecker('S2').stateIndices(1).counts(2, 3).same()),
-              new HeaderChecker('H2').stateIndices(2, 3).counts(3, 6)
-                .states(
-                  new HeaderChecker('S3').stateIndices(2).counts(2, 4).same(),
-                  new HeaderChecker('S4').stateIndices(3).counts(1, 2)));
+          checkAndCompare(headers.headersList, original,
+            new HeaderChecker('H1').stateIndices(0, 1).counts(3, 5).same()
+              .states(
+                new HeaderChecker('S1').stateIndices(0).counts(1, 2).same(),
+                new HeaderChecker('S2').stateIndices(1).counts(2, 3).same()),
+            new HeaderChecker('H2').stateIndices(2, 3).counts(3, 6)
+              .states(
+                new HeaderChecker('S3').stateIndices(2).counts(2, 4).same(),
+                new HeaderChecker('S4').stateIndices(3).counts(1, 2)));
         });
       });
     });
@@ -1280,14 +1280,14 @@ describe('Board headers tests', () => {
         });
     });
 
-    it ('Empty help texts', () => {
+    it('Empty help texts', () => {
       util.getBoardStateUpdater().setHelpTexts({}).emit()
         .easySubscribeHeaders(headers => {
           expect(headers).toBe(original);
         });
     });
 
-    it ('Initialise help texts', () => {
+    it('Initialise help texts', () => {
       const help: any = {
         B2: 'B-One',
         S2: 'Two',
@@ -1355,7 +1355,7 @@ describe('Board headers tests', () => {
 
 function checkAndCompare(headers: List<BoardHeader>, original: BoardHeaders, ...checkers: HeaderChecker[]) {
   check(headers, ...checkers);
-  for (let i = 0 ; i < checkers.length ; i++) {
+  for (let i = 0; i < checkers.length; i++) {
     const header: BoardHeader = headers.get(i);
     const originalHeader: BoardHeader = original.headersList.get(i);
     const checker: HeaderChecker = checkers[i];
@@ -1365,7 +1365,7 @@ function checkAndCompare(headers: List<BoardHeader>, original: BoardHeaders, ...
       expect(header).not.toBe(originalHeader);
     }
     if (header.category) {
-      for (let j = 0 ; j < header.states.size ; j++) {
+      for (let j = 0; j < header.states.size; j++) {
         const stateHeader: BoardHeader = header.states.get(j);
         const originalStateHeader: BoardHeader = originalHeader.states.get(j);
         const stateChecker: HeaderChecker = checker.getStates()[j];
@@ -1382,7 +1382,7 @@ function checkAndCompare(headers: List<BoardHeader>, original: BoardHeaders, ...
 
 function check(headers: List<BoardHeader>, ...checkers: HeaderChecker[]) {
   expect(headers.size).toBe(checkers.length);
-  for (let i = 0 ; i < checkers.length ; i++) {
+  for (let i = 0; i < checkers.length; i++) {
     checkers[i].check(headers.get(i));
   }
 }

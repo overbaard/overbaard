@@ -40,6 +40,7 @@ describe('Issue Table observer tests', () => {
         it('No rank', () => {
           doTest(true);
         });
+
         function doTest(rank: boolean) {
           init
             .setRank('ONE', 5, 1, 2, 3, 4, 6)
@@ -70,6 +71,7 @@ describe('Issue Table observer tests', () => {
         it('Rank', () => {
           doTest(true);
         });
+
         function doTest(rank: boolean) {
           init
             .setRank('ONE', 5, 1, 2, 3, 4)
@@ -99,6 +101,7 @@ describe('Issue Table observer tests', () => {
         it('Rank', () => {
           doTest(true);
         });
+
         function doTest(rank: boolean) {
           init
             .setRank('ONE', 5, 1, 2, 3, 4)
@@ -128,6 +131,7 @@ describe('Issue Table observer tests', () => {
         it('Rank', () => {
           doTest(true);
         });
+
         function doTest(rank: boolean) {
           init =
             new BoardStateInitializer()
@@ -163,6 +167,7 @@ describe('Issue Table observer tests', () => {
         it('Rank', () => {
           doTest(true);
         });
+
         function doTest(rank: boolean) {
           init
             .setRank('ONE', 1, 2, 3, 4, 5, 6)
@@ -210,6 +215,7 @@ describe('Issue Table observer tests', () => {
         it('Rank', () => {
           doTest(true);
         });
+
         function doTest(rank: boolean) {
           init =
             new BoardStateInitializer()
@@ -291,6 +297,7 @@ describe('Issue Table observer tests', () => {
         it('Rank', () => {
           doTest(true);
         });
+
         function doTest(rank: boolean) {
           setup(rank);
           util
@@ -329,6 +336,7 @@ describe('Issue Table observer tests', () => {
         it('Rank', () => {
           doTest(true);
         });
+
         function doTest(rank: boolean) {
           setup(rank);
           util
@@ -380,6 +388,7 @@ describe('Issue Table observer tests', () => {
         it('Rank', () => {
           doTest(true);
         });
+
         function doTest(rank: boolean) {
           setup(rank);
           util
@@ -422,6 +431,7 @@ describe('Issue Table observer tests', () => {
           it('Rank', () => {
             doTest(true);
           });
+
           function doTest(rank: boolean) {
             setup(rank);
             util
@@ -448,6 +458,7 @@ describe('Issue Table observer tests', () => {
           it('Rank', () => {
             doTest(true);
           });
+
           function doTest(rank: boolean) {
             // Don't use the standard setup here as we have another project
             init =
@@ -513,6 +524,7 @@ describe('Issue Table observer tests', () => {
         it('Rank', () => {
           doTest(true);
         });
+
         function doTest(rank: boolean) {
           setup(rank);
           util
@@ -542,6 +554,7 @@ describe('Issue Table observer tests', () => {
         it('Rank', () => {
           doTest(true);
         });
+
         function doTest(rank: boolean) {
           setup(rank);
           util
@@ -582,6 +595,7 @@ describe('Issue table filter tests', () => {
     it('Rank', () => {
       doTest(true);
     });
+
     function doTest(rank: boolean) {
       const util: BoardViewObservableUtil = setupTable(rank ? {view: 'rv'} : null);
       util.easySubscribe(board => {
@@ -624,6 +638,7 @@ describe('Issue table filter tests', () => {
     it('Rank', () => {
       doTest(true);
     });
+
     function doTest(rank: boolean) {
       const util: BoardViewObservableUtil = setupTable(rank ? {view: 'rv'} : null);
       util.easySubscribe(board => {
@@ -639,7 +654,7 @@ describe('Issue table filter tests', () => {
       util.easySubscribe(board => {
         const checker: BoardChecker =
           new BoardChecker(standardTable)
-          .invisibleIssues('ONE-1', 'ONE-3', 'ONE-5', 'ONE-7', 'ONE-9');
+            .invisibleIssues('ONE-1', 'ONE-3', 'ONE-5', 'ONE-7', 'ONE-9');
         if (rank) {
           checker.rankOrder(...standardRank);
         }
@@ -652,7 +667,7 @@ describe('Issue table filter tests', () => {
       util.easySubscribe(board => {
         const checker: BoardChecker =
           new BoardChecker(standardTable)
-          .invisibleIssues('ONE-2', 'ONE-4', 'ONE-6', 'ONE-8');
+            .invisibleIssues('ONE-2', 'ONE-4', 'ONE-6', 'ONE-8');
         if (rank) {
           checker.rankOrder(...standardRank);
         }
@@ -670,6 +685,7 @@ describe('Issue table filter tests', () => {
     it('Rank', () => {
       doTest(true);
     });
+
     function doTest(rank: boolean) {
       const dict: Dictionary<string> = {priority: 'Major'};
       if (rank) {
@@ -679,7 +695,7 @@ describe('Issue table filter tests', () => {
       util.easySubscribe(board => {
         const checker: BoardChecker =
           new BoardChecker(standardTable)
-          .invisibleIssues('ONE-2', 'ONE-4', 'ONE-6', 'ONE-8');
+            .invisibleIssues('ONE-2', 'ONE-4', 'ONE-6', 'ONE-8');
         if (rank) {
           checker.rankOrder(...standardRank);
         }
@@ -697,6 +713,7 @@ describe('Issue table filter tests', () => {
         it('Rank', () => {
           doTest(true);
         });
+
         function doTest(rank: boolean) {
           const dict: Dictionary<string> = {priority: 'Major'};
           if (rank) {
@@ -716,7 +733,7 @@ describe('Issue table filter tests', () => {
                 checker.rankOrder(...standardRank);
               }
               checker.checkBoard(board);
-          });
+            });
         }
       });
       describe('Not matching filter', () => {
@@ -726,6 +743,7 @@ describe('Issue table filter tests', () => {
         it('Rank', () => {
           doTest(true);
         });
+
         function doTest(rank: boolean) {
           const dict: Dictionary<string> = {priority: 'Major'};
           if (rank) {
@@ -756,6 +774,7 @@ describe('Issue table filter tests', () => {
           it('Rank', () => {
             doTest(true);
           });
+
           function doTest(rank: boolean) {
             const dict: Dictionary<string> = {priority: 'Major'};
             if (rank) {
@@ -766,13 +785,13 @@ describe('Issue table filter tests', () => {
               .issueChanges({update: [{key: 'ONE-2', priority: 'Major'}]})
               .emit()
               .easySubscribe(board => {
-              const checker: BoardChecker = new BoardChecker(standardTable)
-                .invisibleIssues('ONE-4', 'ONE-6', 'ONE-8');
-              if (rank) {
-                checker.rankOrder(...standardRank);
-              }
-              checker.checkBoard(board);
-            });
+                const checker: BoardChecker = new BoardChecker(standardTable)
+                  .invisibleIssues('ONE-4', 'ONE-6', 'ONE-8');
+                if (rank) {
+                  checker.rankOrder(...standardRank);
+                }
+                checker.checkBoard(board);
+              });
           }
         });
         describe('Not matching filter', () => {
@@ -782,6 +801,7 @@ describe('Issue table filter tests', () => {
           it('Rank', () => {
             doTest(true);
           });
+
           function doTest(rank: boolean) {
             const dict: Dictionary<string> = {priority: 'Major'};
             if (rank) {
@@ -792,13 +812,13 @@ describe('Issue table filter tests', () => {
               .issueChanges({update: [{key: 'ONE-1', priority: 'Blocker'}]})
               .emit()
               .easySubscribe(board => {
-              const checker: BoardChecker = new BoardChecker(standardTable)
-                .invisibleIssues('ONE-1', 'ONE-2', 'ONE-4', 'ONE-6', 'ONE-8');
-              if (rank) {
-                checker.rankOrder(...standardRank);
-              }
-              checker.checkBoard(board);
-            });
+                const checker: BoardChecker = new BoardChecker(standardTable)
+                  .invisibleIssues('ONE-1', 'ONE-2', 'ONE-4', 'ONE-6', 'ONE-8');
+                if (rank) {
+                  checker.rankOrder(...standardRank);
+                }
+                checker.checkBoard(board);
+              });
           }
         });
       });
@@ -812,6 +832,7 @@ describe('Issue table filter tests', () => {
     it('Rank', () => {
       doTest(true);
     });
+
     function doTest(rank: boolean) {
       const dict: Dictionary<string> = {priority: 'Major'};
       if (rank) {
@@ -846,6 +867,7 @@ describe('Issue table filter tests', () => {
       });
     }
   });
+
   function setupTable(params?: Dictionary<string>): BoardViewObservableUtil {
     const init =
       new BoardStateInitializer()
@@ -881,7 +903,7 @@ describe('Switch View Mode (effect on Backlog) Tests', () => {
   describe('Initial kanban view', () => {
     describe('Backlog initially hidden', () => {
 
-      it ('Switch view', () => {
+      it('Switch view', () => {
         util = setupTable(false);
         util.easySubscribe(board => {
           new BoardChecker([[], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
@@ -892,39 +914,39 @@ describe('Switch View Mode (effect on Backlog) Tests', () => {
         // Go to Rank View
         util.getUserSettingUpdater().switchViewMode()
           .easySubscribe(board => {
-          // We need the new deserialized data to actually trigger the new view model when showing/hiding the backlog
-          expect(board).toBe(last);
-        });
+            // We need the new deserialized data to actually trigger the new view model when showing/hiding the backlog
+            expect(board).toBe(last);
+          });
         // The caller (BoardComponent) does a full refresh (since we need the backlog)
         util.updateBoardState(createInitializer(true))
           .easySubscribe(board => {
-          expect(board).not.toBe(last);
-          new BoardChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
-            .rankOrder('ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6')
-            .checkBoard(board);
-          expect(board).not.toBe(last);
-          checkSameColumns(last, board, 1, 2);
-          last = board;
-        });
+            expect(board).not.toBe(last);
+            new BoardChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
+              .rankOrder('ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6')
+              .checkBoard(board);
+            expect(board).not.toBe(last);
+            checkSameColumns(last, board, 1, 2);
+            last = board;
+          });
 
         // Go to Kanban view again
         util.getUserSettingUpdater().switchViewMode()
           .easySubscribe(board => {
-          // We need the new deserialized data to actually trigger the new view model when showing/hiding the backlog
-          expect(board).toBe(last);
-        });
+            // We need the new deserialized data to actually trigger the new view model when showing/hiding the backlog
+            expect(board).toBe(last);
+          });
         // The caller (BoardComponent) does a full refresh (since we need to unload the backlog)
         util.updateBoardState(createInitializer(false))
           .easySubscribe(board => {
-          expect(board).not.toBe(last);
-          new BoardChecker([[], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
-            .checkBoard(board);
-          checkSameColumns(last, board, 1, 2);
-          last = board;
-        });
+            expect(board).not.toBe(last);
+            new BoardChecker([[], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
+              .checkBoard(board);
+            checkSameColumns(last, board, 1, 2);
+            last = board;
+          });
       });
 
-      it ('Toggle backlog', () => {
+      it('Toggle backlog', () => {
         util = setupTable(false);
         util.easySubscribe(board => {
           new BoardChecker([[], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
@@ -935,40 +957,40 @@ describe('Switch View Mode (effect on Backlog) Tests', () => {
         // Set the backlog to true
         util.getUserSettingUpdater().toggleBacklog()
           .easySubscribe(board => {
-          // We need the new deserialized data to actually trigger the new view model
-          expect(board).toBe(last);
-        });
+            // We need the new deserialized data to actually trigger the new view model
+            expect(board).toBe(last);
+          });
         // The caller (BoardComponent) does a full refresh (since we need to load the backlog)
         util.updateBoardState(createInitializer(true))
           .easySubscribe(board => {
-          expect(board).not.toBe(last);
-          new BoardChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
-            .checkBoard(board);
-          expect(board).not.toBe(last);
-          checkSameColumns(last, board, 1, 2);
-          last = board;
-        });
+            expect(board).not.toBe(last);
+            new BoardChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
+              .checkBoard(board);
+            expect(board).not.toBe(last);
+            checkSameColumns(last, board, 1, 2);
+            last = board;
+          });
 
         // Set the backlog to false again
         util.getUserSettingUpdater().toggleBacklog()
           .easySubscribe(board => {
-          // We need the new deserialized data to actually trigger the new view model
-          expect(board.issueTable).toBe(last.issueTable);
-        });
+            // We need the new deserialized data to actually trigger the new view model
+            expect(board.issueTable).toBe(last.issueTable);
+          });
         // The caller (BoardComponent) does a full refresh (since we need to unload the backlog)
         util.updateBoardState(createInitializer(false))
           .easySubscribe(board => {
-          expect(board).not.toBe(last);
-          new BoardChecker([[], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
-            .checkBoard(board);
-          checkSameColumns(last, board, 1, 2);
-          last = board;
-        });
+            expect(board).not.toBe(last);
+            new BoardChecker([[], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
+              .checkBoard(board);
+            checkSameColumns(last, board, 1, 2);
+            last = board;
+          });
       });
     });
 
     describe('Backlog initially visible', () => {
-      it ('Switch view', () => {
+      it('Switch view', () => {
         // Start off with rank view which forces the backlog
         util = setupTable(true, {bl: 'true'});
         util.easySubscribe(board => {
@@ -981,29 +1003,29 @@ describe('Switch View Mode (effect on Backlog) Tests', () => {
         // changing the backlog visibility
         util.getUserSettingUpdater().switchViewMode()
           .easySubscribe(board => {
-          expect(board).not.toBe(last);
-          new BoardChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
-            .rankOrder('ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6')
-            .checkBoard(board);
-          expect(board).not.toBe(last);
-          expect(board.issueTable.table).toBe(last.issueTable.table);
-          last = board;
-        });
+            expect(board).not.toBe(last);
+            new BoardChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
+              .rankOrder('ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6')
+              .checkBoard(board);
+            expect(board).not.toBe(last);
+            expect(board.issueTable.table).toBe(last.issueTable.table);
+            last = board;
+          });
 
         // Switching back to kanban should just use the same issue table since we are not
         // changing the backlog visibility
         util.getUserSettingUpdater().switchViewMode()
           .easySubscribe(board => {
-          expect(board).not.toBe(last);
-          new BoardChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
-            .checkBoard(board);
-          expect(board).not.toBe(last);
-          expect(board.issueTable.table).toBe(last.issueTable.table);
-          last = board;
-        });
+            expect(board).not.toBe(last);
+            new BoardChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
+              .checkBoard(board);
+            expect(board).not.toBe(last);
+            expect(board.issueTable.table).toBe(last.issueTable.table);
+            last = board;
+          });
       });
 
-      it ('Toggle backlog', () => {
+      it('Toggle backlog', () => {
         util = setupTable(true, {bl: 'true'});
         util.easySubscribe(board => {
           new BoardChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
@@ -1014,35 +1036,35 @@ describe('Switch View Mode (effect on Backlog) Tests', () => {
         // Set the backlog to false
         util.getUserSettingUpdater().toggleBacklog()
           .easySubscribe(board => {
-          // We need the new deserialized data to actually trigger the new view model
-          expect(board.issueTable).toBe(last.issueTable);
-        });
+            // We need the new deserialized data to actually trigger the new view model
+            expect(board.issueTable).toBe(last.issueTable);
+          });
         // The caller (BoardComponent) does a full refresh (since we need to unload the backlog)
         util.updateBoardState(createInitializer(false))
           .easySubscribe(board => {
-          expect(board).not.toBe(last);
-          new BoardChecker([[], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
-            .checkBoard(board);
-          checkSameColumns(last, board, 1, 2);
-          last = board;
-        });
+            expect(board).not.toBe(last);
+            new BoardChecker([[], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
+              .checkBoard(board);
+            checkSameColumns(last, board, 1, 2);
+            last = board;
+          });
 
         // Set the backlog to true
         util.getUserSettingUpdater().toggleBacklog()
           .easySubscribe(board => {
-          // We need the new deserialized data to actually trigger the new view model
-          expect(board).toBe(last);
-        });
+            // We need the new deserialized data to actually trigger the new view model
+            expect(board).toBe(last);
+          });
         // The caller (BoardComponent) does a full refresh (since we need to load the backlog)
         util.updateBoardState(createInitializer(true))
           .easySubscribe(board => {
-          expect(board).not.toBe(last);
-          new BoardChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
-            .checkBoard(board);
-          expect(board).not.toBe(last);
-          checkSameColumns(last, board, 1, 2);
-          last = board;
-        });
+            expect(board).not.toBe(last);
+            new BoardChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
+              .checkBoard(board);
+            expect(board).not.toBe(last);
+            checkSameColumns(last, board, 1, 2);
+            last = board;
+          });
       });
     });
   });
@@ -1060,35 +1082,35 @@ describe('Switch View Mode (effect on Backlog) Tests', () => {
     // Go to Kanban and discard rankview
     util.getUserSettingUpdater().switchViewMode()
       .easySubscribe(board => {
-      // We need the new deserialized data to actually trigger the new view model when showing/hiding the backlog
-      expect(board).toBe(last);
-    });
+        // We need the new deserialized data to actually trigger the new view model when showing/hiding the backlog
+        expect(board).toBe(last);
+      });
     // The caller (BoardComponent) does a full refresh (since we need to unload the backlog)
     util.updateBoardState(createInitializer(false))
       .easySubscribe(board => {
-      expect(board).not.toBe(last);
-      new BoardChecker([[], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
-        .checkBoard(board);
-      checkSameColumns(last, board, 1, 2);
-      last = board;
-    });
+        expect(board).not.toBe(last);
+        new BoardChecker([[], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
+          .checkBoard(board);
+        checkSameColumns(last, board, 1, 2);
+        last = board;
+      });
 
     util.getUserSettingUpdater().switchViewMode()
       .easySubscribe(board => {
-      // We need the new deserialized data to actually trigger the new view model
+        // We need the new deserialized data to actually trigger the new view model
         expect(board).toBe(last);
-    });
+      });
     // Push the loaded board state with the backlog data, which is what the component would do when we
     // don't have the backlog data
     util.updateBoardState(createInitializer(true))
       .easySubscribe(board => {
-      expect(board).not.toBe(last);
-      new BoardChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
-        .rankOrder('ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6')
-        .checkBoard(board);
-      checkSameColumns(last, board, 1, 2);
-      last = board;
-    });
+        expect(board).not.toBe(last);
+        new BoardChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
+          .rankOrder('ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6')
+          .checkBoard(board);
+        checkSameColumns(last, board, 1, 2);
+        last = board;
+      });
 
   });
 
@@ -1171,7 +1193,7 @@ describe('Issue Table issue type overrides tests', () => {
       });
   });
 
-  it ('Load table', () => {
+  it('Load table', () => {
     util
       .easySubscribe(board => {
         const checker: BoardChecker = new BoardChecker([
@@ -1195,10 +1217,11 @@ describe('Issue Table issue type overrides tests', () => {
       });
   });
 
-  it ('Create issues', () => {
+  it('Create issues', () => {
     util
       .getBoardStateUpdater()
-      .issueChanges({new: [
+      .issueChanges({
+        new: [
           {key: 'ONE-105', state: '1-1', summary: 'Test', priority: 'Major', type: 'feature'},
           {key: 'ONE-106', state: '1-2', summary: 'Test', priority: 'Major', type: 'feature'},
           {key: 'ONE-107', state: '1-3', summary: 'Test', priority: 'Major', type: 'feature'},
@@ -1212,8 +1235,10 @@ describe('Issue Table issue type overrides tests', () => {
           {key: 'ONE-304', state: 'B-2', summary: 'Test', priority: 'Major', type: 'bug'}
 
           // Add issues for other states
-        ]})
-      .rankChanges({ONE: [
+        ]
+      })
+      .rankChanges({
+        ONE: [
           {index: 11, key: 'ONE-105'},
           {index: 12, key: 'ONE-106'},
           {index: 13, key: 'ONE-107'},
@@ -1225,7 +1250,8 @@ describe('Issue Table issue type overrides tests', () => {
           {index: 19, key: 'ONE-210'},
           {index: 20, key: 'ONE-303'},
           {index: 21, key: 'ONE-304'},
-        ]})
+        ]
+      })
       .emit()
       .easySubscribe(
         board => {
@@ -1259,10 +1285,11 @@ describe('Issue Table issue type overrides tests', () => {
         });
   });
 
-  it ('Move issues', () => {
+  it('Move issues', () => {
     util
       .getBoardStateUpdater()
-      .issueChanges({update: [
+      .issueChanges({
+        update: [
           {key: 'ONE-101', state: '1-4'},
           {key: 'ONE-102', state: '1-1'},
           {key: 'ONE-103', state: '1-2'},
@@ -1274,7 +1301,8 @@ describe('Issue Table issue type overrides tests', () => {
           {key: 'ONE-205', state: 'T-4'},
           {key: 'ONE-301', state: 'B-2'},
           {key: 'ONE-302', state: 'B-1'}
-      ]})
+        ]
+      })
       .emit()
       .easySubscribe(board => {
         const checker: BoardChecker = new BoardChecker([
@@ -1299,7 +1327,6 @@ describe('Issue Table issue type overrides tests', () => {
   });
 
 
-
   function checkIssueOwnState(board: BoardViewModel, key: string, ownStateIndex: number, ownStateName: string) {
     const issue: BoardIssueView = board.issueTable.issues.get(key);
 
@@ -1314,7 +1341,7 @@ function checkSameColumns(oldState: BoardViewModel, newState: BoardViewModel, ..
 
   const expectedEqual: OrderedSet<number> = OrderedSet<number>(cols);
   expect(oldTable.size).toBe(newTable.size);
-  for (let i = 0 ; i < oldTable.size ; i++) {
+  for (let i = 0; i < oldTable.size; i++) {
     const oldCol: List<BoardIssueView> = oldTable.get(i);
     const newCol: List<BoardIssueView> = newTable.get(i);
     if (expectedEqual.contains(i)) {
@@ -1324,7 +1351,6 @@ function checkSameColumns(oldState: BoardViewModel, newState: BoardViewModel, ..
     }
   }
 }
-
 
 
 class SimpleIssueFactory implements IssuesFactory {
@@ -1348,7 +1374,7 @@ class SimpleIssueFactory implements IssuesFactory {
 
   createIssueStateInput(params: DeserializeIssueLookupParams): any {
     const input: any = {};
-    for (let i = 0 ; i < this._issueKeys.length ; i++) {
+    for (let i = 0; i < this._issueKeys.length; i++) {
       const id = Number(this._issueKeys[i].substr(this._issueKeys[i].indexOf('-') + 1));
       input[this._issueKeys[i]] = {
         key: this._issueKeys[i],
@@ -1395,7 +1421,7 @@ class IssueWithTypeIssueFactory implements IssuesFactory {
       index++;
     });
 
-    for (let i = 0 ; i < this._issueKeys.length ; i++) {
+    for (let i = 0; i < this._issueKeys.length; i++) {
       const typeIndex: number = typeIndicesByKey[this._issueTypes[i]];
       const id = Number(this._issueKeys[i].substr(this._issueKeys[i].indexOf('-') + 1));
       input[this._issueKeys[i]] = {
@@ -1416,7 +1442,7 @@ class NumberedHeaderStateFactory implements HeaderStateFactory {
 
   createHeaderState(currentState: HeaderState): HeaderState {
     const input: any = [];
-    for (let i = 1 ; i <= this._numStates ; i++) {
+    for (let i = 1; i <= this._numStates; i++) {
       input.push({name: 'S-' + i});
     }
     return headerMetaReducer(currentState,
@@ -1498,7 +1524,7 @@ class BoardChecker {
     // Check issue counts
     const totalIssueCounts: number[] = new Array<number>(this._expected.length);
     const visibleIssueCounts: number[] = new Array<number>(this._expected.length);
-    for (let i = 0 ; i < this._expected.length ; i++) {
+    for (let i = 0; i < this._expected.length; i++) {
       visibleIssueCounts[i] = this._expected[i].reduce((s, v, ind, arr) => {
         return invisibleIssueSet.contains(arr[ind]) ? s : s + 1;
       }, 0);
