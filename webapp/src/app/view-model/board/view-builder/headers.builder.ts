@@ -6,6 +6,7 @@ import {UserSettingState} from '../../../model/board/user/user-setting';
 import {List, Map} from 'immutable';
 import {BoardHeader} from '../board-header';
 import {BoardViewModelUtil} from '../board-view.model';
+import {UserSettingUtil} from '../../../model/board/user/user-setting.model';
 
 export class HeadersBuilder {
   private _headers: BoardHeaders;
@@ -280,7 +281,7 @@ export class HeadersBuilder {
   }
 
   private calculateVisibility(userSettingState: UserSettingState, index: number): boolean {
-    return userSettingState.columnVisibilities.get(index, userSettingState.defaultColumnVisibility);
+    return UserSettingUtil.calculateVisibility(userSettingState, index);
   }
 
   build(): BoardHeaders {

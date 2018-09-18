@@ -36,4 +36,9 @@ export class UserSettingUtil {
       return mutate(mutable);
     });
   }
+
+  static calculateVisibility(userSettingState: UserSettingState, index: number): boolean {
+    return userSettingState.columnVisibilities.get(index, userSettingState.defaultColumnVisibility);
+  }
+
 }

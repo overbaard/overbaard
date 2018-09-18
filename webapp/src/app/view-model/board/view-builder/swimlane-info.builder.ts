@@ -15,6 +15,7 @@ import {CustomField} from '../../../model/board/data/custom-field/custom-field.m
 import {SwimlaneData} from '../swimlane-data';
 import {BoardViewModelUtil} from '../board-view.model';
 import {TableBuilder} from './table.builder';
+import {UserSettingUtil} from '../../../model/board/user/user-setting.model';
 
 export class SwimlaneInfoBuilder {
   static create(boardState: BoardState,
@@ -22,7 +23,9 @@ export class SwimlaneInfoBuilder {
     const states: number = boardState.headers.states.size;
     let builderMap: OrderedMap<string, SwimlaneDataBuilder> = OrderedMap<string, SwimlaneDataBuilder>().asMutable();
     let builderNone: SwimlaneDataBuilder =
-      new SwimlaneDataBuilder(NONE_FILTER_KEY, 'None', states, collapsed(userSettingState, NONE_FILTER_KEY),  existingInfo);
+      new SwimlaneDataBuilder(
+        NONE_FILTER_KEY, 'None', states, collapsed(userSettingState, NONE_FILTER_KEY),  userSettingState, existingInfo);
+
     let issueMatcher:
       (issue: BoardIssueView, dataBuilders: Map<string, SwimlaneDataBuilder>) => SwimlaneDataBuilder[];
     switch (userSettingState.swimlane) {
@@ -30,7 +33,7 @@ export class SwimlaneInfoBuilder {
         boardState.projects.boardProjects.forEach(
           p => {
             builderMap.set(p.key,
-              new SwimlaneDataBuilder(p.key, p.key, states, collapsed(userSettingState, p.key), existingInfo));
+              new SwimlaneDataBuilder(p.key, p.key, states, collapsed(userSettingState, p.key), userSettingState, existingInfo));
           });
         issueMatcher = ((issue, dataBuilders) => [dataBuilders.get(issue.projectCode)]);
         builderNone = null;
@@ -39,7 +42,7 @@ export class SwimlaneInfoBuilder {
         boardState.issueTypes.types.forEach(
           t => {
             builderMap.set(
-              t.name, new SwimlaneDataBuilder(t.name, t.name, states, collapsed(userSettingState, t.name), existingInfo));
+              t.name, new SwimlaneDataBuilder(t.name, t.name, states, collapsed(userSettingState, t.name), userSettingState, existingInfo));
           });
         issueMatcher = ((issue, dataBuilders) => [dataBuilders.get(issue.type.name)]);
         builderNone = null;
@@ -48,7 +51,7 @@ export class SwimlaneInfoBuilder {
         boardState.priorities.priorities.forEach(
           p => {
             builderMap.set(p.name,
-              new SwimlaneDataBuilder(p.name, p.name, states, collapsed(userSettingState, p.name), existingInfo));
+              new SwimlaneDataBuilder(p.name, p.name, states, collapsed(userSettingState, p.name), userSettingState, existingInfo));
           });
         issueMatcher = ((issue, dataBuilders) => [dataBuilders.get(issue.priority.name)]);
         builderNone = null;
@@ -57,7 +60,7 @@ export class SwimlaneInfoBuilder {
         boardState.assignees.assignees.forEach(
           a => {
             builderMap.set(a.key,
-              new SwimlaneDataBuilder(a.key, a.name, states, collapsed(userSettingState, a.key), existingInfo));
+              new SwimlaneDataBuilder(a.key, a.name, states, collapsed(userSettingState, a.key), userSettingState, existingInfo));
           });
         issueMatcher = ((issue, dataBuilders) =>
           [dataBuilders.get(issue.assignee === NO_ASSIGNEE ? NONE_FILTER_KEY : issue.assignee.key)]);
@@ -65,7 +68,7 @@ export class SwimlaneInfoBuilder {
       case COMPONENT_ATTRIBUTES.key:
         boardState.components.components.forEach(
           c => {
-            builderMap.set(c, new SwimlaneDataBuilder(c, c, states, collapsed(userSettingState, c), existingInfo));
+            builderMap.set(c, new SwimlaneDataBuilder(c, c, states, collapsed(userSettingState, c), userSettingState, existingInfo));
           });
         issueMatcher = ((issue, dataBuilders) => this.multiStringMatcher(issue.components, dataBuilders));
         break;
@@ -73,7 +76,7 @@ export class SwimlaneInfoBuilder {
         boardState.labels.labels.forEach(
           l => {
             builderMap.set(l,
-              new SwimlaneDataBuilder(l, l, states, collapsed(userSettingState, l), existingInfo));
+              new SwimlaneDataBuilder(l, l, states, collapsed(userSettingState, l), userSettingState, existingInfo));
           });
         issueMatcher = ((issue, dataBuilders) => this.multiStringMatcher(issue.labels, dataBuilders));
         break;
@@ -81,7 +84,7 @@ export class SwimlaneInfoBuilder {
         boardState.fixVersions.versions.forEach(
           f => {
             builderMap.set(f,
-              new SwimlaneDataBuilder(f, f, states, collapsed(userSettingState, f), existingInfo));
+              new SwimlaneDataBuilder(f, f, states, collapsed(userSettingState, f), userSettingState, existingInfo));
           });
         issueMatcher = ((issue, dataBuilders) => this.multiStringMatcher(issue.fixVersions, dataBuilders));
         break;
@@ -91,7 +94,7 @@ export class SwimlaneInfoBuilder {
           customFields.forEach(
             f => {
               builderMap.set(f.key,
-                new SwimlaneDataBuilder(f.key, f.value, states, collapsed(userSettingState, f.key), existingInfo));
+                new SwimlaneDataBuilder(f.key, f.value, states, collapsed(userSettingState, f.key), userSettingState, existingInfo));
             });
           issueMatcher = ((issue, dataBuilders) => {
             const issueField: CustomField = issue.customFields.get(userSettingState.swimlane);
@@ -240,7 +243,7 @@ class SwimlaneDataBuilder {
 
 
   constructor(private readonly _key: string, private readonly _display: string,
-              states: number, private _collapsed: boolean, exisitingInfo: SwimlaneInfo) {
+              states: number, private _collapsed: boolean, private _userSettingState, exisitingInfo: SwimlaneInfo) {
     this._existing = exisitingInfo ? exisitingInfo.swimlanes.get(_key) : null;
     this._tableBuilder = new TableBuilder<BoardIssueView>(states, this._existing ? this._existing.table : null);
     this._calculatedColumnHeights = new Array<number>(states);
@@ -297,9 +300,11 @@ class SwimlaneDataBuilder {
     }
 
     let maxColumnHeight = 0;
-    this._calculatedColumnHeights.forEach(v => {
+    this._calculatedColumnHeights.forEach((v, index) => {
       if (v > maxColumnHeight) {
-        maxColumnHeight = v;
+        if (UserSettingUtil.calculateVisibility(this._userSettingState, index)) {
+          maxColumnHeight = v;
+        }
       }
     });
 
