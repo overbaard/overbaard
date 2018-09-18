@@ -16,6 +16,9 @@ import {
   ProjectState
 } from '../../model/board/data/project/project.model';
 import {LinkedIssue} from '../../model/board/data/issue/linked-issue';
+import {BoardSearchFilterState, initialBoardSearchFilterState} from '../../model/board/user/board-filter/board-search-filter.model';
+import {boardSearchFilterMetaReducer} from '../../model/board/user/board-filter/board-search-filter.reducer';
+import {Action} from '@ngrx/store';
 
 describe('Apply filter tests', () => {
 
@@ -439,6 +442,60 @@ describe('Apply filter tests', () => {
     });
   });
 
+  describe('Search filters', () => {
+    it ('No filters', () => {
+      const issue: BoardIssueView = emptyIssue();
+      expect(filtersFromQs({}).filterMatchesSearch(issue)).toBe(true);
+    });
+
+    describe('Issue keys', () => {
+      it ('Matches', () => {
+        const issue: BoardIssueView = emptyIssue();
+        expect(filtersFromQs({'s.ids': 'ISSUE-1'}).filterMatchesSearch(issue)).toBe(true);
+      });
+      it ('Matches one out of several', () => {
+        const issue: BoardIssueView = emptyIssue();
+        expect(filtersFromQs({'s.ids': 'ISSUE-10,ISSUE-1'}).filterMatchesSearch(issue)).toBe(true);
+      });
+      it ('Non match', () => {
+        const issue: BoardIssueView = emptyIssue();
+        expect(filtersFromQs({'s.ids': 'ISSUE-10'}).filterMatchesSearch(issue)).toBe(false);
+      });
+    });
+
+    describe('Containing text', () => {
+      it ('Matches', () => {
+        const issue: BoardIssueView = emptyIssue();
+        expect(filtersFromQs({'s.text': 'hello%20this'}).filterMatchesSearch(issue)).toBe(true);
+      });
+
+      it ('Non-match', () => {
+        const issue: BoardIssueView = emptyIssue();
+        expect(filtersFromQs({'s.text': 'hello%20that'}).filterMatchesSearch(issue)).toBe(false);
+      });
+    });
+
+    describe('Both', () => {
+      it ('Matches both', () => {
+        const issue: BoardIssueView = emptyIssue();
+        expect(filtersFromQs({'s.ids': 'ISSUE-1', 's.text': 'hello%20this'}).filterMatchesSearch(issue)).toBe(true);
+      });
+      it ('Matches id only', () => {
+        const issue: BoardIssueView = emptyIssue();
+        expect(filtersFromQs({'s.ids': 'ISSUE-1', 's.text': 'hello%20that'}).filterMatchesSearch(issue)).toBe(false);
+      });
+      it ('Matches text only', () => {
+        const issue: BoardIssueView = emptyIssue();
+        expect(filtersFromQs({'s.ids': 'ISSUE-10', 's.text': 'hello%20this'}).filterMatchesSearch(issue)).toBe(false);
+      });
+      it ('Matches none', () => {
+        const issue: BoardIssueView = emptyIssue();
+        expect(filtersFromQs({'s.ids': 'ISSUE-10', 's.text': 'hello%20that'}).filterMatchesSearch(issue)).toBe(false);
+      });
+    });
+  });
+
+
   function filtersFromQs(qs: Dictionary<string>, currentUser?: string): AllFilters {
     const projectState = {
         boardProjects: null,
@@ -449,9 +506,12 @@ describe('Apply filter tests', () => {
   }
 
   function filtersWithProjectStateFromQs(projectState: ProjectState, qs: Dictionary<string>, currentUser?: string): AllFilters {
+    const action: Action = UserSettingActions.createInitialiseFromQueryString(qs);
     const boardFilters: BoardFilterState =
-      boardFilterMetaReducer(initialBoardFilterState, UserSettingActions.createInitialiseFromQueryString(qs));
-    return new AllFilters(boardFilters, projectState, currentUser);
+      boardFilterMetaReducer(initialBoardFilterState, action);
+    const searchFilters: BoardSearchFilterState =
+      boardSearchFilterMetaReducer(initialBoardSearchFilterState, action);
+    return new AllFilters(boardFilters, searchFilters, projectState, currentUser);
   }
 
   function emptyIssue(): BoardIssueView {
@@ -460,7 +520,7 @@ describe('Apply filter tests', () => {
       projectCode: 'ISSUE',
       priority: {name: 'high', colour: null},
       type: {name: 'bug', colour: null},
-      summary: 'Hello',
+      summary: 'Hello this is an issue',
       assignee: NO_ASSIGNEE,
       components: OrderedSet<string>(['C1', 'C2']),
       labels: OrderedSet<string>(['L1', 'L2']),
@@ -470,8 +530,9 @@ describe('Apply filter tests', () => {
       selectedParallelTasks: null,
       linkedIssues: List<LinkedIssue>(),
       ownState: -1,
-      visible: true,
       projectColour: 'red',
+      visible: true,
+      matchesSearch: true,
       issueUrl: null,
       ownStateName: null,
       calculatedTotalHeight: 0,

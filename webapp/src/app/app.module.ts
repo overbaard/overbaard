@@ -49,6 +49,8 @@ import {FontMeasureComponent} from './components/font-measure/font-measure.compo
 import {FontSizeTableService} from './services/font-size-table.service';
 import {FontMeasureTableComponent} from './components/font-measure/font-measure-table.component';
 import {ResetProgressGuard} from './services/router/reset-progress.guard';
+import {FilterEntryComponent} from './components/board/settings-drawer/filter-entry.component';
+import {SearchFilterComponent} from './components/board/settings-drawer/search-filter.component';
 
 const appState: AppState = initialAppState;
 export function getInitialAppState(): AppState {
@@ -61,6 +63,8 @@ export function getInitialAppState(): AppState {
     BoardsComponent,
     BoardComponent,
     BoardSettingsDrawerComponent,
+    FilterEntryComponent,
+    SearchFilterComponent,
     ConfigurationComponent,
     BoardConfigurationComponent,
     KanbanViewComponent,

@@ -1,7 +1,9 @@
 import {
+  MatAutocompleteModule,
   MatButtonModule,
   MatCardModule,
   MatCheckboxModule,
+  MatChipsModule,
   MatDialogModule,
   MatExpansionModule,
   MatFormFieldModule,
@@ -13,6 +15,7 @@ import {
   MatSelectModule,
   MatSidenavModule,
   MatSliderModule,
+  MatSlideToggleModule,
   MatSnackBarModule,
   MatToolbarModule,
   MatTooltipModule
@@ -21,9 +24,11 @@ import {NgModule, Type} from '@angular/core';
 
 // An attempt to avoid duplicating this in the imports and exports lists
 const materialModules: Array<Type<any>> = [
+  MatAutocompleteModule,
   MatButtonModule,
   MatCardModule,
   MatCheckboxModule,
+  MatChipsModule,
   MatDialogModule,
   MatExpansionModule,
   MatFormFieldModule,
@@ -35,6 +40,7 @@ const materialModules: Array<Type<any>> = [
   MatSnackBarModule,
   MatSidenavModule,
   MatSelectModule,
+  MatSlideToggleModule,
   MatSliderModule,
   MatToolbarModule,
   MatTooltipModule];

@@ -53,7 +53,7 @@
 .colour-splitter{
   min-width: 3px;
   max-width: 3px;
-  border-bottom: 4px solid white;
+  border-bottom: 4px solid transparent;
 }
 .project-colour {
   @extend .colour;
@@ -95,7 +95,7 @@ img.avatar {
   @extend .extra-info-base;
 }
 .parallel-tasks-group {
-  border-top: 1px solid white;
+  border-top: 1px solid transparent;
   display: flex;
 }
 .new-pt-group-space {
@@ -106,7 +106,10 @@ img.avatar {
 }
 .mat-button-ripple {
 }
-
+.search-non-match {
+  filter: grayscale(40%);
+  background: $disabled-issue-colour;
+}
 
 /**
 This needs styling in the global styles.scss as mentioned in

@@ -1,4 +1,4 @@
-import {List, Map} from 'immutable';
+import {List, Map, Set} from 'immutable';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {BoardViewModelHandler} from './board-view.service';
 import {initialUserSettingState} from '../../model/board/user/user-setting.model';
@@ -41,6 +41,7 @@ import {HeaderActions, headerMetaReducer} from '../../model/board/data/header/he
 import {cloneObject} from '../../common/object-util';
 import {map, take} from 'rxjs/operators';
 import {BoardIssue} from '../../model/board/data/issue/board-issue';
+import {BoardSearchFilterActions} from '../../model/board/user/board-filter/board-search-filter.reducer';
 
 export class BoardViewObservableUtil {
   private _service: BoardViewModelHandler = new BoardViewModelHandler(null);
@@ -422,6 +423,18 @@ export class UserSettingUpdater {
 
   updateIssueSummaryLevel(level: IssueSummaryLevel): BoardViewObservableUtil {
     return this.emitState(UserSettingActions.createUpdateIssueSummaryLevel(level));
+  }
+
+  updateSearchIssueIds(...ids: string[]): BoardViewObservableUtil {
+    return this.emitState(BoardSearchFilterActions.createUpdateIssueIds(Set<string>(ids)));
+  }
+
+  updateSearchContainingText(text: string): BoardViewObservableUtil {
+    return this.emitState(BoardSearchFilterActions.createUpdateContainingText(text));
+  }
+
+  updateSearchHideNonMatching(hide: boolean): BoardViewObservableUtil {
+    return this.emitState(BoardSearchFilterActions.createUpdateHideNonMatches(hide));
   }
 
   private emitState(action: Action): BoardViewObservableUtil {

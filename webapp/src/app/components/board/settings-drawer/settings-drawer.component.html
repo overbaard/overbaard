@@ -37,137 +37,53 @@
     <mat-card-header>
       <mat-card-title><div class="mat-h4 card-header">Issue Details</div></mat-card-title>
     </mat-card-header>
-    <mat-accordion>
-      <mat-card-content>
-        <div>
-          <mat-slider
-            color="primary"
-            [min]="0"
-            [max]="3"
-            [value]="userSettings.issueDetail.issueSummaryLevel"
-            (change)="onIssueDetailsChange($event)">
-            <mat-hint>Summary level</mat-hint>
-          </mat-slider>
-        </div>
-        <div *ngIf="hasParallelTasks">
-          <mat-checkbox
-            [checked]="userSettings.issueDetail.parallelTasks"
-            color="primary"
-            (change)="onChangeShowParallelTasks($event)">Parallel Tasks</mat-checkbox>
-        </div>
-        <div *ngIf="hasLinkedIssues">
-          <mat-checkbox
-            [checked]="userSettings.issueDetail.linkedIssues"
-            color="primary"
-            (change)="onChangeShowLinkedIssues($event)">Linked Issues</mat-checkbox>
-        </div>
-      </mat-card-content>
-    </mat-accordion>
+    <mat-card-content>
+      <div>
+        <mat-slider
+          color="primary"
+          [min]="0"
+          [max]="3"
+          [value]="userSettings.issueDetail.issueSummaryLevel"
+          (change)="onIssueDetailsChange($event)">
+          <mat-hint>Summary level</mat-hint>
+        </mat-slider>
+      </div>
+      <div *ngIf="hasParallelTasks">
+        <mat-checkbox
+          [checked]="userSettings.issueDetail.parallelTasks"
+          color="primary"
+          (change)="onChangeShowParallelTasks($event)">Parallel Tasks</mat-checkbox>
+      </div>
+      <div *ngIf="hasLinkedIssues">
+        <mat-checkbox
+          [checked]="userSettings.issueDetail.linkedIssues"
+          color="primary"
+          (change)="onChangeShowLinkedIssues($event)">Linked Issues</mat-checkbox>
+      </div>
+    </mat-card-content>
   </mat-card>
   <mat-card>
     <mat-card-header>
       <mat-card-title><div class="mat-h4 card-header">Filters</div></mat-card-title>
     </mat-card-header>
     <mat-accordion>
-      <mat-expansion-panel
+      <app-search-filter
+        [issueState]="issueState"
+        [searchFilterState]="userSettings.searchFilters"
+        (selectedIssueIds)="onSelectedSearchIssueIds($event)"
+        (containingText)="onChangeContainingText($event)"
+        (hideNonMatches)="onChangeHideNonMatches($event)"
+      ></app-search-filter>
+      <app-setting-filter-entry
         *ngFor="let entry of filterList"
-        (opened)="onOpenFilterPane(entry)"
-        (closed)="onCloseFilterPanel(entry)">
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            <div class="filter-panel-header">
-              <div
-                style="flex-grow: 1"
-                matTooltip="{{filtersToDisplay === entry ? '' : getSelectionTooltip(entry)}}"
-                [matTooltipClass]="'card-tooltip'">
-                <span>
-                  {{entry.display}}
-                </span>
-              </div>
-              <div *ngIf="getSelectionTooltip(entry).length > 0 && filtersToDisplay !== entry">
-                <a
-                  mat-icon-button
-                  color="accent"
-                  class="filter-toolbar-button"
-                  (click)="onClearFilter($event, entry)"
-                  matTooltip="Clear all"
-                >
-                  <mat-icon class="filter-toolbar-button">cancel</mat-icon>
-                </a>
-                <!-- class="cancel-button" -->
-              </div>
-            </div>
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-        <!-- TODO investigate pulling this into a separate component -->
-        <div *ngIf="filtersToDisplay === entry">
-
-          <div style="display: flex">
-            <div class="space-filler"></div>
-            <div class="filter-toolbar-button">
-              <a
-                mat-icon-button
-                color="accent"
-                class="filter-toolbar-button"
-                (click)="onInvertFilter(entry)"
-                matTooltip="Invert selection"
-              >
-                <mat-icon class="filter-toolbar-button">invert_colors</mat-icon>
-              </a>
-            </div>
-            <div class="filter-toolbar-padding">
-            <a
-              mat-icon-button
-              color="accent"
-              class="filter-toolbar-button"
-              (click)="onSelectAllFilter(entry)"
-              matTooltip="Select all"
-            >
-              <mat-icon class="filter-toolbar-button">select_all</mat-icon>
-            </a>
-            </div>
-            <div class="filter-toolbar-padding">
-            <a
-              mat-icon-button
-              color="accent"
-              class="filter-toolbar-button"
-              (click)="onClearFilter($event, entry)"
-              matTooltip="Clear all"
-            >
-              <mat-icon class="filter-toolbar-button">cancel</mat-icon>
-            </a>
-            </div>
-            <!-- class="cancel-button" -->
-          </div>
-
-          <div [formGroup]="filterForm" #f="ngForm">
-            <!-- Only do this for long lists and NOT for the parallel tasks -->
-            <mat-form-field *ngIf="filtersToDisplay.key != 'Parallel Tasks' && currentFilterEntries.length > 5">
-              <input
-                matInput
-                [placeholder]="'Filter options'"
-                [(ngModel)]="filterSearch"
-                [ngModelOptions]="{standalone: true}">
-            </mat-form-field>
-            <div formGroupName="{{filtersToDisplay.key}}">
-              <div *ngFor="let entry of currentFilterEntries | formEntryFilter: filterSearch">
-                <div *ngIf="!entry.children; else parallelTasksForm">
-                  <mat-checkbox formControlName="{{entry.key}}">{{entry.display}}</mat-checkbox>
-                </div>
-                <ng-template #parallelTasksForm>
-                  <div formGroupName="{{entry.key}}">
-                    <div class="mat-h4">{{entry.display}}</div>
-                    <!-- WebStorm incorrectly picks this out as an error -->
-                    <div *ngFor="let childEntry of entry.children">
-                      <mat-checkbox formControlName="{{childEntry.key}}">{{childEntry.display}}</mat-checkbox>
-                    </div>
-                  </div>
-                </ng-template>
-              </div>
-            </div>
-          </div>
-        </div>
-      </mat-expansion-panel>
+        [filterAttributes]="entry"
+        [selected]="filtersToDisplay === entry"
+        [filters]="userSettings.filters"
+        [filterEntryDictionaryEntry] = "filterEntryDictionary[entry.key]"
+        [filterEntries]="filterEntries[entry.key]"
+        [filterForm]="filterForm"
+        (filterEntryEvent)="onFilterEntryEvent($event, entry)"
+      ></app-setting-filter-entry>
     </mat-accordion>
   </mat-card>
 </div>

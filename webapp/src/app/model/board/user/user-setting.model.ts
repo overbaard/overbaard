@@ -4,6 +4,7 @@ import {Map} from 'immutable';
 import {UserSettingState} from './user-setting';
 import {BoardViewMode} from './board-view-mode';
 import {initialIssueDetailState} from './issue-detail/issue-detail.model';
+import {initialBoardSearchFilterState} from './board-filter/board-search-filter.model';
 
 const DEFAULT_STATE: UserSettingState = {
   boardCode: '',
@@ -13,11 +14,12 @@ const DEFAULT_STATE: UserSettingState = {
   swimlane: undefined,
   swimlaneShowEmpty: false,
   filters: initialBoardFilterState,
+  searchFilters: initialBoardSearchFilterState,
   defaultColumnVisibility: true,
   columnVisibilities: Map<number, boolean>(),
   defaultCollapsedSwimlane: false,
   collapsedSwimlanes: Map<string, boolean>(),
-  issueDetail: initialIssueDetailState
+  issueDetail: initialIssueDetailState,
 };
 
 

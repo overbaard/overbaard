@@ -26,7 +26,6 @@ class UpdateFilterAction implements Action {
   }
 }
 
-
 export class BoardFilterActions {
 
   static createUpdateFilter(filter: FilterAttributes, data: Object) {

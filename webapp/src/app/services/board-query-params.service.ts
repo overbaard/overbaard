@@ -13,6 +13,7 @@ import {BoardFilterState} from '../model/board/user/board-filter/board-filter.mo
 import {BoardViewMode} from '../model/board/user/board-view-mode';
 import {Injectable} from '@angular/core';
 import {IssueSummaryLevel} from '../model/board/user/issue-summary-level';
+import {BoardSearchFilterState, BoardSearchFilterUtil} from '../model/board/user/board-filter/board-search-filter.model';
 
 @Injectable()
 export class BoardQueryParamsService {
@@ -75,7 +76,14 @@ export class BoardQueryParamsHandler {
                 }
                 this.appendSwimlaneVisibility(params, boardState, userSettingState);
               }
+              if (userSettingState.searchFilters.issueIds) {
+
+              }
+              if (userSettingState.searchFilters.containingText) {
+
+              }
               this.appendFilters(params, userSettingState);
+              this.appendSearchFilters(params, userSettingState);
               this.appendColumnVisibility(params, boardState, userSettingState);
               this._lastQueryString = params.join('&');
             }
@@ -155,6 +163,17 @@ export class BoardQueryParamsHandler {
     filters.parallelTask.forEach((set: Set<string>, key: string) => {
       this.appendFilterEntry(params, 'pt.' + encodeURIComponent(key), set);
     });
+  }
+
+  private appendSearchFilters(params: List<string>, userSettingState: UserSettingState) {
+    const searchFilters: BoardSearchFilterState = userSettingState.searchFilters;
+    this.appendFilterEntry(params, 's.ids', searchFilters.issueIds);
+    if (BoardSearchFilterUtil.containingTextAboveMinimumLength(searchFilters.containingText)) {
+      params.push(`s.text=${encodeURIComponent(searchFilters.containingText)}`);
+    }
+    if (searchFilters.hideNonMatches) {
+      params.push('s.hide=true');
+    }
   }
 
   private appendFilterEntry(params: List<string>, name: string, filters: Set<string>) {

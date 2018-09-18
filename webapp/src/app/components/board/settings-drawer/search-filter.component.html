@@ -1,0 +1,79 @@
+<mat-expansion-panel
+  (opened)="selected = true"
+  (closed)="selected = false">
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      <div class="filter-panel-header">
+        <div
+          style="flex-grow: 1"
+          matTooltip="{{selected ? '' : getSelectionTooltip()}}"
+          [matTooltipClass]="'card-tooltip'">
+                <span>Search</span>
+        </div>
+        <div *ngIf="getSelectionTooltip().length > 0 && !selected">
+          <a
+            mat-icon-button
+            color="accent"
+            class="filter-toolbar-button"
+            (click)="onClearFilter($event)"
+            matTooltip="Clear all"
+          >
+            <mat-icon class="filter-toolbar-button">cancel</mat-icon>
+          </a>
+        </div>
+      </div>
+    </mat-panel-title>
+  </mat-expansion-panel-header>
+  <div *ngIf="selected">
+    <div style="display: flex">
+      <div class="space-filler"></div>
+    </div>
+
+    <div [formGroup]="searchForm" #f="ngForm">
+      <mat-form-field>
+        <mat-chip-list
+          #selectedIssueIdsChipList
+          [aria-orientation]="'vertical'">
+          <mat-chip
+            *ngFor="let id of selectedSearchIssueIds"
+            [removable]="true"
+            (removed)="onRemoveSearchIssueId(id)">{{id}}
+            <mat-icon matChipRemove>cancel</mat-icon>
+          </mat-chip>
+        </mat-chip-list>
+        <input
+          #searchIssueIdInput
+          [placeholder]="'Issue Ids'"
+          [matChipInputFor]="selectedIssueIdsChipList"
+          [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+          [formControl]="searchIssueIdCtrl"
+          [matAutocomplete]="auto"
+          (matChipInputTokenEnd)="onAddSearchIssueId($event)">
+        <!-- (matChipInputTokenEnd)="add($event)" -->
+        <mat-autocomplete #auto="matAutocomplete" autoActiveFirstOption (optionSelected)="onSelectIssueId($event)">
+          <mat-option *ngFor="let issue of filteredIssueList" [value]="issue.key">
+            {{issue.key}} - {{issue.summary}}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+      <mat-form-field>
+        <textarea
+          #containingTextInput
+          matInput
+          matTextareaAutosize
+          matAutosizeMinRows="1"
+          matAutosizeMaxRows="25"
+          [placeholder]="'Issue Text Search'"
+          [formControl]="searchContainingTextCtrl"
+        ></textarea>
+        <mat-hint *ngIf="containingTextInput.value?.trim().length < 3" align="end">Minimum 3 characters</mat-hint>
+      </mat-form-field>
+      <mat-slide-toggle
+        [color]="'primary'"
+        [checked]="searchFilterState.hideNonMatches"
+        (change)="onChangeHideNonMatches($event)"
+      >Hide non-matching</mat-slide-toggle>
+    </div>
+  </div>
+</mat-expansion-panel>
+

@@ -1,0 +1,95 @@
+<mat-expansion-panel
+  (opened)="onOpenFilterPanel()"
+  (closed)="onCloseFilterPanel()">
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      <div class="filter-panel-header">
+        <div
+          style="flex-grow: 1"
+          matTooltip="{{selected ? '' : getSelectionTooltip()}}"
+          [matTooltipClass]="'card-tooltip'">
+                <span>
+                  {{filterAttributes.display}}
+                </span>
+        </div>
+        <div *ngIf="getSelectionTooltip().length > 0 && !selected">
+          <a
+            mat-icon-button
+            color="accent"
+            class="filter-toolbar-button"
+            (click)="onClearFilter($event)"
+            matTooltip="Clear all"
+          >
+            <mat-icon class="filter-toolbar-button">cancel</mat-icon>
+          </a>
+        </div>
+      </div>
+    </mat-panel-title>
+  </mat-expansion-panel-header>
+  <div *ngIf="selected">
+    <div style="display: flex">
+      <div class="space-filler"></div>
+      <div class="filter-toolbar-button">
+        <a
+          mat-icon-button
+          color="accent"
+          class="filter-toolbar-button"
+          (click)="onInvertFilter()"
+          matTooltip="Invert selection"
+        >
+          <mat-icon class="filter-toolbar-button">invert_colors</mat-icon>
+        </a>
+      </div>
+      <div class="filter-toolbar-padding">
+        <a
+          mat-icon-button
+          color="accent"
+          class="filter-toolbar-button"
+          (click)="onSelectAllFilter()"
+          matTooltip="Select all"
+        >
+          <mat-icon class="filter-toolbar-button">select_all</mat-icon>
+        </a>
+      </div>
+      <div class="filter-toolbar-padding">
+        <a
+          mat-icon-button
+          color="accent"
+          class="filter-toolbar-button"
+          (click)="onClearFilter($event)"
+          matTooltip="Clear all"
+        >
+          <mat-icon class="filter-toolbar-button">cancel</mat-icon>
+        </a>
+      </div>
+    </div>
+
+    <div [formGroup]="filterForm" #f="ngForm">
+      <!-- Only do this for long lists and NOT for the parallel tasks -->
+      <mat-form-field *ngIf="filterAttributes.key != 'Parallel Tasks' && filterEntries.length > 5">
+        <input
+          matInput
+          [placeholder]="'Filter options'"
+          [(ngModel)]="filterSearch"
+          [ngModelOptions]="{standalone: true}">
+      </mat-form-field>
+      <div formGroupName="{{filterAttributes.key}}">
+        <div *ngFor="let entry of filterEntries | formEntryFilter: filterSearch">
+          <div *ngIf="!entry.children; else parallelTasksForm">
+            <mat-checkbox formControlName="{{entry.key}}">{{entry.display}}</mat-checkbox>
+          </div>
+          <ng-template #parallelTasksForm>
+            <div formGroupName="{{entry.key}}">
+              <div class="mat-h4">{{entry.display}}</div>
+              <!-- WebStorm incorrectly picks this out as an error -->
+              <div *ngFor="let childEntry of entry.children">
+                <mat-checkbox formControlName="{{childEntry.key}}">{{childEntry.display}}</mat-checkbox>
+              </div>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+</mat-expansion-panel>
+

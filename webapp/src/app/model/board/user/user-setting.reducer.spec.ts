@@ -9,6 +9,7 @@ import {UserSettingState} from './user-setting';
 import {BoardViewMode} from './board-view-mode';
 import {BoardHeader} from '../../../view-model/board/board-header';
 import {IssueSummaryLevel} from './issue-summary-level';
+import {SearchFilterChecker} from './board-filter/board-search-filter.reducer.spec';
 
 describe('User setting reducer tests', () => {
   describe('Querystring tests', () => {
@@ -22,6 +23,19 @@ describe('User setting reducer tests', () => {
         UserSettingActions.createInitialiseFromQueryString(qs));
       const settingChecker: SettingChecker = new SettingChecker();
       settingChecker.boardCode = 'TEST';
+      settingChecker.check(state);
+    });
+    it ('Search filters', () => {
+      const qs: Dictionary<string> = {
+        board: 'TEST',
+        's.text': 'Some%20text'
+      };
+      const state: UserSettingState = userSettingReducer(
+        initialUserSettingState,
+        UserSettingActions.createInitialiseFromQueryString(qs));
+      const settingChecker: SettingChecker = new SettingChecker();
+      settingChecker.boardCode = 'TEST';
+      settingChecker.searchFilterChecker.containingText = 'Some text';
       settingChecker.check(state);
     });
     it ('Swimlane and project filter', () => {
@@ -633,6 +647,7 @@ class SettingChecker {
   forceBacklog = false;
   swimlane: string = null;
   filterChecker: FilterChecker = new FilterChecker();
+  searchFilterChecker: SearchFilterChecker = new SearchFilterChecker();
   defaultColumnVisibility = true;
   visibleColumns: any;
   showEmptySwimlane = false;
@@ -663,6 +678,7 @@ class SettingChecker {
     }
     expect(state.swimlaneShowEmpty).toEqual(this.showEmptySwimlane);
     this.filterChecker.check(state.filters);
+    this.searchFilterChecker.check(state.searchFilters);
     expect(state.defaultColumnVisibility).toBe(this.defaultColumnVisibility);
     if (!this.visibleColumns) {
       expect(state.columnVisibilities.size).toBe(0);

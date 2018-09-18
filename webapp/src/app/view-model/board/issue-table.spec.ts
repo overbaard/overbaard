@@ -895,6 +895,660 @@ describe('Issue table filter tests', () => {
   }
 });
 
+describe ('Issue table search filter', () => {
+
+  let standardTable: string[][];
+  let standardRank: string[];
+  beforeEach(() => {
+    standardTable = [['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']];
+    standardRank = ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6'];
+  });
+
+  describe('Not hidden', () => {
+    describe('Issue IDs', () => {
+      it ('No rank', () => {
+        doTest(false);
+      });
+
+      it ('Rank', () => {
+        doTest(true);
+      });
+
+      function doTest(rank: boolean) {
+        const util: BoardViewObservableUtil = setupTable(rank ? {view: 'rv'} : null);
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker.checkBoard(board);
+
+        });
+        util.getUserSettingUpdater().updateSearchIssueIds('ONE-2');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .nonMatchingIssues('ONE-1', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6')
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().updateSearchIssueIds('ONE-2', 'ONE-4');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .nonMatchingIssues('ONE-1', 'ONE-3', 'ONE-5', 'ONE-6')
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().updateSearchIssueIds('ONE-4');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .nonMatchingIssues('ONE-1', 'ONE-2', 'ONE-3', 'ONE-5', 'ONE-6')
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().updateSearchIssueIds();
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .checkBoard(board);
+        });
+      }
+    });
+
+    describe('Containing text', () => {
+      it ('No Rank', () => {
+        doTest(false);
+      });
+      it ('Rank', () => {
+        doTest(true);
+      });
+
+      function doTest(rank: boolean) {
+        const util: BoardViewObservableUtil = setupTable(rank ? {view: 'rv'} : null);
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().updateSearchContainingText('IssUe ##');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().updateSearchContainingText('##1');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .nonMatchingIssues('ONE-2', 'ONE-4', 'ONE-6')
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().updateSearchContainingText('##12');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .nonMatchingIssues('ONE-1', 'ONE-2', 'ONE-4', 'ONE-5', 'ONE-6')
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().updateSearchContainingText('##1');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .nonMatchingIssues('ONE-2', 'ONE-4', 'ONE-6')
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().updateSearchContainingText('##');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().updateSearchContainingText('##2');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .nonMatchingIssues('ONE-1', 'ONE-3', 'ONE-5')
+            .checkBoard(board);
+        });
+      }
+    });
+
+    describe('Issue ids and text', () => {
+      it ('No Rank', () => {
+        doTest(false);
+      });
+      it ('Rank', () => {
+        doTest(true);
+      });
+
+      function doTest(rank: boolean) {
+        const util: BoardViewObservableUtil = setupTable(rank ? {view: 'rv'} : null);
+        util.getUserSettingUpdater().updateSearchIssueIds('ONE-1', 'ONE-2', 'ONE-3');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .nonMatchingIssues('ONE-4', 'ONE-5', 'ONE-6')
+            .checkBoard(board);
+
+        });
+        util.getUserSettingUpdater().updateSearchContainingText('##1');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .nonMatchingIssues('ONE-2', 'ONE-4', 'ONE-5', 'ONE-6')
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().updateSearchContainingText('##12');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .nonMatchingIssues('ONE-1', 'ONE-2', 'ONE-4', 'ONE-5', 'ONE-6')
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().updateSearchContainingText('##1');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .nonMatchingIssues('ONE-2', 'ONE-4', 'ONE-5', 'ONE-6')
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().updateSearchIssueIds('ONE-2');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .nonMatchingIssues('ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6')
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().updateSearchContainingText('##');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .nonMatchingIssues('ONE-1', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6')
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().updateSearchIssueIds('ONE-2', 'ONE-6');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .nonMatchingIssues('ONE-1', 'ONE-3', 'ONE-4', 'ONE-5')
+            .checkBoard(board);
+        });
+      }
+    });
+  });
+
+  describe('Hidden', () => {
+    describe('Issue IDs', () => {
+      it ('No Rank', () => {
+        doTest(false);
+      });
+      it ('Rank', () => {
+        doTest(true);
+      });
+
+      function doTest(rank: boolean) {
+        const util: BoardViewObservableUtil = setupTable(rank ? {view: 'rv'} : null);
+        util.getUserSettingUpdater().updateSearchHideNonMatching(true);
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .checkBoard(board);
+
+        });
+        util.getUserSettingUpdater().updateSearchIssueIds('ONE-2');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .invisibleIssues('ONE-1', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6')
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().updateSearchIssueIds('ONE-2', 'ONE-4');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .invisibleIssues('ONE-1', 'ONE-3', 'ONE-5', 'ONE-6')
+            .checkBoard(board);
+
+        });
+        util.getUserSettingUpdater().updateSearchIssueIds('ONE-4');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .invisibleIssues('ONE-1', 'ONE-2', 'ONE-3', 'ONE-5', 'ONE-6')
+            .checkBoard(board);
+
+        });
+        util.getUserSettingUpdater().updateSearchIssueIds();
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .checkBoard(board);
+        });
+      }
+    });
+
+    describe('Containing text', () => {
+      it ('No Rank', () => {
+        doTest(false);
+      });
+      it ('Rank', () => {
+        doTest(true);
+      });
+
+      function doTest(rank: boolean) {
+        const util: BoardViewObservableUtil = setupTable(rank ? {view: 'rv'} : null);
+        util.getUserSettingUpdater().updateSearchHideNonMatching(true);
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().updateSearchContainingText('IssUe ##');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().updateSearchContainingText('##1');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .invisibleIssues('ONE-2', 'ONE-4', 'ONE-6')
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().updateSearchContainingText('##12');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .invisibleIssues('ONE-1', 'ONE-2', 'ONE-4', 'ONE-5', 'ONE-6')
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().updateSearchContainingText('##1');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .invisibleIssues('ONE-2', 'ONE-4', 'ONE-6')
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().updateSearchContainingText('##');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().updateSearchContainingText('##2');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .invisibleIssues('ONE-1', 'ONE-3', 'ONE-5')
+            .checkBoard(board);
+        });
+      }
+    });
+
+    describe('Issue ids and text', () => {
+      it ('No Rank', () => {
+        doTest(false);
+      });
+      it ('Rank', () => {
+        doTest(true);
+      });
+
+      function doTest(rank: boolean) {
+        const util: BoardViewObservableUtil = setupTable(rank ? {view: 'rv'} : null);
+        util.getUserSettingUpdater().updateSearchHideNonMatching(true);
+        util.getUserSettingUpdater().updateSearchIssueIds('ONE-1', 'ONE-2', 'ONE-3');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .invisibleIssues('ONE-4', 'ONE-5', 'ONE-6')
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().updateSearchContainingText('##1');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .invisibleIssues('ONE-2', 'ONE-4', 'ONE-5', 'ONE-6')
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().updateSearchContainingText('##12');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .invisibleIssues('ONE-1', 'ONE-2', 'ONE-4', 'ONE-5', 'ONE-6')
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().updateSearchContainingText('##1');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .invisibleIssues('ONE-2', 'ONE-4', 'ONE-5', 'ONE-6')
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().updateSearchIssueIds('ONE-2');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .invisibleIssues('ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6')
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().updateSearchContainingText('##');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .invisibleIssues('ONE-1', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6')
+            .checkBoard(board);
+        });
+        util.getUserSettingUpdater().updateSearchIssueIds('ONE-2', 'ONE-6');
+        util.easySubscribe(board => {
+          const checker: BoardChecker = new BoardChecker(standardTable);
+          if (rank) {
+            checker.rankOrder(...standardRank);
+          }
+          checker
+            .invisibleIssues('ONE-1', 'ONE-3', 'ONE-4', 'ONE-5')
+            .checkBoard(board);
+        });
+      }
+    });
+  });
+
+  // TODO!!! Rank search somewhere else
+
+  describe('Flick hidden/not hidden', () => {
+    it ('No Rank', () => {
+      doTest(false);
+    });
+    it ('Rank', () => {
+      doTest(true);
+    });
+
+    function doTest(rank: boolean) {
+      const util: BoardViewObservableUtil = setupTable(rank ? {view: 'rv'} : null);
+      util.getUserSettingUpdater().updateSearchIssueIds('ONE-1', 'ONE-2', 'ONE-3');
+      util.easySubscribe(board => {
+        const checker: BoardChecker = new BoardChecker(standardTable);
+        if (rank) {
+          checker.rankOrder(...standardRank);
+        }
+        checker
+          .nonMatchingIssues('ONE-4', 'ONE-5', 'ONE-6')
+          .checkBoard(board);
+
+      });
+      util.getUserSettingUpdater().updateSearchHideNonMatching(true);
+      util.easySubscribe(board => {
+        const checker: BoardChecker = new BoardChecker(standardTable);
+        if (rank) {
+          checker.rankOrder(...standardRank);
+        }
+        checker
+          .invisibleIssues('ONE-4', 'ONE-5', 'ONE-6')
+          .checkBoard(board);
+
+      });
+
+      util.getUserSettingUpdater().updateSearchContainingText('##1');
+      util.easySubscribe(board => {
+        const checker: BoardChecker = new BoardChecker(standardTable);
+        if (rank) {
+          checker.rankOrder(...standardRank);
+        }
+        checker
+          .invisibleIssues('ONE-2', 'ONE-4', 'ONE-5', 'ONE-6')
+          .checkBoard(board);
+      });
+      util.getUserSettingUpdater().updateSearchHideNonMatching(false);
+      util.easySubscribe(board => {
+        const checker: BoardChecker = new BoardChecker(standardTable);
+        if (rank) {
+          checker.rankOrder(...standardRank);
+        }
+        checker
+          .nonMatchingIssues('ONE-2', 'ONE-4', 'ONE-5', 'ONE-6')
+          .checkBoard(board);
+      });
+
+      util.getUserSettingUpdater().updateSearchContainingText('##12');
+      util.easySubscribe(board => {
+        const checker: BoardChecker = new BoardChecker(standardTable);
+        if (rank) {
+          checker.rankOrder(...standardRank);
+        }
+        checker
+          .nonMatchingIssues('ONE-1', 'ONE-2', 'ONE-4', 'ONE-5', 'ONE-6')
+          .checkBoard(board);
+      });
+      util.getUserSettingUpdater().updateSearchHideNonMatching(true);
+      util.easySubscribe(board => {
+        const checker: BoardChecker = new BoardChecker(standardTable);
+        if (rank) {
+          checker.rankOrder(...standardRank);
+        }
+        checker
+          .invisibleIssues('ONE-1', 'ONE-2', 'ONE-4', 'ONE-5', 'ONE-6')
+          .checkBoard(board);
+      });
+
+
+      util.getUserSettingUpdater().updateSearchContainingText('##1');
+      util.easySubscribe(board => {
+        const checker: BoardChecker = new BoardChecker(standardTable);
+        if (rank) {
+          checker.rankOrder(...standardRank);
+        }
+        checker
+          .invisibleIssues('ONE-2', 'ONE-4', 'ONE-5', 'ONE-6')
+          .checkBoard(board);
+      });
+      util.getUserSettingUpdater().updateSearchHideNonMatching(false);
+      util.easySubscribe(board => {
+        const checker: BoardChecker = new BoardChecker(standardTable);
+        if (rank) {
+          checker.rankOrder(...standardRank);
+        }
+        checker
+          .nonMatchingIssues('ONE-2', 'ONE-4', 'ONE-5', 'ONE-6')
+          .checkBoard(board);
+      });
+
+      util.getUserSettingUpdater().updateSearchIssueIds('ONE-2');
+      util.easySubscribe(board => {
+        const checker: BoardChecker = new BoardChecker(standardTable);
+        if (rank) {
+          checker.rankOrder(...standardRank);
+        }
+        checker
+          .nonMatchingIssues('ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6')
+          .checkBoard(board);
+      });
+      util.getUserSettingUpdater().updateSearchHideNonMatching(true);
+      util.easySubscribe(board => {
+        const checker: BoardChecker = new BoardChecker(standardTable);
+        if (rank) {
+          checker.rankOrder(...standardRank);
+        }
+        checker
+          .invisibleIssues('ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6')
+          .checkBoard(board);
+      });
+
+      util.getUserSettingUpdater().updateSearchContainingText('##');
+      util.easySubscribe(board => {
+        const checker: BoardChecker = new BoardChecker(standardTable);
+        if (rank) {
+          checker.rankOrder(...standardRank);
+        }
+        checker
+          .invisibleIssues('ONE-1', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6')
+          .checkBoard(board);
+      });
+      util.getUserSettingUpdater().updateSearchHideNonMatching(false);
+      util.easySubscribe(board => {
+        const checker: BoardChecker = new BoardChecker(standardTable);
+        if (rank) {
+          checker.rankOrder(...standardRank);
+        }
+        checker
+          .nonMatchingIssues('ONE-1', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6')
+          .checkBoard(board);
+      });
+
+      util.getUserSettingUpdater().updateSearchIssueIds('ONE-2', 'ONE-6');
+      util.easySubscribe(board => {
+        const checker: BoardChecker = new BoardChecker(standardTable);
+        if (rank) {
+          checker.rankOrder(...standardRank);
+        }
+        checker
+          .nonMatchingIssues('ONE-1', 'ONE-3', 'ONE-4', 'ONE-5')
+          .checkBoard(board);
+      });
+      util.getUserSettingUpdater().updateSearchHideNonMatching(true);
+      util.easySubscribe(board => {
+        const checker: BoardChecker = new BoardChecker(standardTable);
+        if (rank) {
+          checker.rankOrder(...standardRank);
+        }
+        checker
+          .invisibleIssues('ONE-1', 'ONE-3', 'ONE-4', 'ONE-5')
+          .checkBoard(board);
+      });
+    }
+  });
+
+  function setupTable(params?: Dictionary<string>): BoardViewObservableUtil {
+    const init =
+      new BoardStateInitializer()
+        .headerStateFactory(new NumberedHeaderStateFactory(3))
+        .setRank('ONE', 1, 2, 3, 4, 5, 6)
+        .mapState('ONE', 'S-1', '1-1')
+        .mapState('ONE', 'S-2', '1-2')
+        .mapState('ONE', 'S-3', '1-3')
+        .issuesFactory(
+          new SimpleIssueFactory()
+            // Numbering is <row><column>
+            .addIssue('ONE-1', 0, {summary: 'Issue ##11'})
+            .addIssue('ONE-2', 0, {summary: 'Issue ##21'})
+            .addIssue('ONE-3', 1, {summary: 'Issue ##12'})
+            .addIssue('ONE-4', 1, {summary: 'Issue ##22'})
+            .addIssue('ONE-5', 2, {summary: 'Issue ##13'})
+            .addIssue('ONE-6', 2, {summary: 'Issue ##23'})
+        );
+    const util: BoardViewObservableUtil = new BoardViewObservableUtil(params)
+      .updateBoardState(init);
+
+    return util;
+  }
+});
+
 describe('Switch View Mode (effect on Backlog) Tests', () => {
   // The key thing here is that when bringing in the backlog the BoardComponent makes another call to fetch the backlog
   // data from the server
@@ -1354,36 +2008,41 @@ function checkSameColumns(oldState: BoardViewModel, newState: BoardViewModel, ..
 
 
 class SimpleIssueFactory implements IssuesFactory {
-  _issueKeys: string[];
-  _issueStates: number[];
+  _issues: Dictionary<any>;
 
-  addIssue(key: string, state: number): SimpleIssueFactory {
-    if (!this._issueKeys) {
-      this._issueKeys = [];
-      this._issueStates = [];
+  addIssue(key: string, state: number, data?: any): SimpleIssueFactory {
+    if (!this._issues) {
+      this._issues = {};
     }
-    this._issueKeys.push(key);
-    this._issueStates.push(state);
+    this._issues[key] = !data ? {} : data;
+    this._issues[key]['state'] = state;
     return this;
   }
 
   clear() {
-    this._issueKeys = null;
-    this._issueStates = null;
+    this._issues = null;
   }
 
   createIssueStateInput(params: DeserializeIssueLookupParams): any {
-    const input: any = {};
-    for (let i = 0; i < this._issueKeys.length; i++) {
-      const id = Number(this._issueKeys[i].substr(this._issueKeys[i].indexOf('-') + 1));
-      input[this._issueKeys[i]] = {
-        key: this._issueKeys[i],
+   const input: any = {};
+    for (const key of Object.keys(this._issues)) {
+      const id = Number(key.substr(key.indexOf('-') + 1));
+      const assignee: number = id % 3 === 2 ? null : id % 3;
+      const isssue = {
+        key: key,
         type: id % 2,
         priority: id % 2,
         summary: '-',
-        state: this._issueStates[i]
       };
+
+      const data: any = this._issues[key];
+      for (const override of Object.keys(data)) {
+        isssue[override] = data[override];
+      }
+
+      input[key] = isssue;
     }
+
     return input;
   }
 }
@@ -1466,6 +2125,7 @@ class BacklogStateFactory extends NumberedHeaderStateFactory {
 
 class BoardChecker {
   private _invisibleIssues: string[] = [];
+  private _nonMatchingIssues: string[] = [];
   private _rankOrder: string[] = null;
   private _issueDetailsState: IssueDetailState;
 
@@ -1474,6 +2134,11 @@ class BoardChecker {
 
   invisibleIssues(...invisible: string[]): BoardChecker {
     this._invisibleIssues = invisible;
+    return this;
+  }
+
+  nonMatchingIssues(...nonMatching: string[]): BoardChecker {
+    this._nonMatchingIssues = nonMatching;
     return this;
   }
 
@@ -1520,6 +2185,10 @@ class BoardChecker {
     const invisibleKeys: string[] =
       issueTable.issues.filter(issue => !issue.visible).keySeq().toArray().sort((a, b) => a.localeCompare(b));
     expect(invisibleKeys).toEqual([...this._invisibleIssues].sort((a, b) => a.localeCompare(b)));
+
+    const nonMatchingIssueKeys: string[] =
+      issueTable.issues.filter(issue => !issue.matchesSearch).keySeq().toArray().sort((a, b) => a.localeCompare(b));
+    expect(nonMatchingIssueKeys).toEqual([...this._nonMatchingIssues].sort((a, b) => a.localeCompare(b)));
 
     // Check issue counts
     const totalIssueCounts: number[] = new Array<number>(this._expected.length);
