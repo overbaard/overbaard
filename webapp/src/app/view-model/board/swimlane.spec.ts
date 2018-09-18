@@ -1491,7 +1491,7 @@ describe('Swimlane observer tests', () => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .invisibleIssues(['ONE-1', 'ONE-2', 'ONE-3', 'ONE-5'])
                 .swimlanes([
-                  {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4']}])
+                  {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-4']}])
                 .checkBoard(board);
               originalView = board;
             });
@@ -1502,7 +1502,7 @@ describe('Swimlane observer tests', () => {
                 new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                   .invisibleIssues(['ONE-2', 'ONE-3', 'ONE-4', 'ONE-5'])
                   .swimlanes([
-                    {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4']}])
+                    {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1']}])
                   .checkBoard(board);
 
                 new EqualityChecker()
@@ -1510,8 +1510,129 @@ describe('Swimlane observer tests', () => {
                   .check(originalView, board);
               });
         });
-      });
 
+        describe('Search filters', () => {
+          beforeEach(() => {
+            util =
+              createUtilWithStandardIssuesAndSummaries({swimlane: 'assignee'});
+            util
+              .easySubscribe(
+                board => {
+                  new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                    .swimlanes([
+                      {key: 'bob', name: 'Bob Brent Barlow', issues: ['ONE-3']},
+                      {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4']},
+                      {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-2', 'ONE-5']}])
+                    .checkBoard(board);
+                });
+          });
+          it ('Not hidden', () => {
+            util.getUserSettingUpdater().updateSearchIssueIds('ONE-1', 'ONE-4')
+              .easySubscribe(
+                board => {
+                  new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                    .nonMatchingIssues(['ONE-2', 'ONE-3', 'ONE-5'])
+                    .swimlanes([
+                      {key: 'bob', name: 'Bob Brent Barlow', issues: ['ONE-3']},
+                      {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4']},
+                      {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-2', 'ONE-5']}])
+                    .checkBoard(board);
+                });
+            util.getUserSettingUpdater().updateSearchIssueIds('ONE-1', 'ONE-4', 'ONE-5')
+              .easySubscribe(
+                board => {
+                  new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                    .nonMatchingIssues(['ONE-2', 'ONE-3'])
+                    .swimlanes([
+                      {key: 'bob', name: 'Bob Brent Barlow', issues: ['ONE-3']},
+                      {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4']},
+                      {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-2', 'ONE-5']}])
+                    .checkBoard(board);
+                });
+            util.getUserSettingUpdater().updateSearchContainingText('Five')
+              .easySubscribe(
+                board => {
+                  new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                    .nonMatchingIssues(['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4'])
+                    .swimlanes([
+                      {key: 'bob', name: 'Bob Brent Barlow', issues: ['ONE-3']},
+                      {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4']},
+                      {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-2', 'ONE-5']}])
+                    .checkBoard(board);
+                });
+          });
+
+          it ('Hidden', () => {
+            util.getUserSettingUpdater().updateSearchHideNonMatching(true)
+              .easySubscribe(board => {
+                // No change
+                new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                  .swimlanes([
+                    {key: 'bob', name: 'Bob Brent Barlow', issues: ['ONE-3']},
+                    {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4']},
+                    {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-2', 'ONE-5']}])
+                  .checkBoard(board);
+              });
+            util.getUserSettingUpdater().updateSearchIssueIds('ONE-1', 'ONE-4')
+              .easySubscribe(
+                board => {
+                  new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                    .invisibleIssues(['ONE-2', 'ONE-3', 'ONE-5'])
+                    // Although SwimlaneInfo.showEmpty is false, that is actually handled in the component
+                    .swimlanes([
+                      {key: 'bob', name: 'Bob Brent Barlow', issues: []},
+                      {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4']},
+                      {key: NONE_FILTER_KEY, name: 'None', issues: []}])
+                    .checkBoard(board);
+                });
+            util.getUserSettingUpdater().updateSearchIssueIds('ONE-1', 'ONE-4', 'ONE-5')
+              .easySubscribe(
+                board => {
+                  new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                    .invisibleIssues(['ONE-2', 'ONE-3'])
+                    // Although SwimlaneInfo.showEmpty is false, that is actually handled in the component
+                    .swimlanes([
+                      {key: 'bob', name: 'Bob Brent Barlow', issues: []},
+                      {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4']},
+                      {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-5']}])
+                    .checkBoard(board);
+                });
+            util.getUserSettingUpdater().updateSearchContainingText('Issue Five')
+              .easySubscribe(
+                board => {
+                  new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                    .invisibleIssues(['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4'])
+                    .swimlanes([
+                      {key: 'bob', name: 'Bob Brent Barlow', issues: []},
+                      {key: 'kabir', name: 'Kabir Khan', issues: []},
+                      {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-5']}])
+                    .checkBoard(board);
+                });
+            util.getUserSettingUpdater().updateSearchContainingText('Issue F')
+              .easySubscribe(
+                board => {
+                  new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                    .invisibleIssues(['ONE-1', 'ONE-2', 'ONE-3'])
+                    .swimlanes([
+                      {key: 'bob', name: 'Bob Brent Barlow', issues: []},
+                      {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-4']},
+                      {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-5']}])
+                    .checkBoard(board);
+                });
+            util.getUserSettingUpdater().updateSearchContainingText('')
+              .easySubscribe(
+                board => {
+                  new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                    .invisibleIssues(['ONE-2', 'ONE-3'])
+                    .swimlanes([
+                      {key: 'bob', name: 'Bob Brent Barlow', issues: []},
+                      {key: 'kabir', name: 'Kabir Khan', issues: ['ONE-1', 'ONE-4']},
+                      {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-5']}])
+                    .checkBoard(board);
+                });
+          });
+        });
+      });
     });
 
     describe('Check toggle show empty swimlanes', () => {
@@ -1697,6 +1818,22 @@ describe('Swimlane observer tests', () => {
     );
   }
 
+  function createUtilWithStandardIssuesAndSummaries(params: Dictionary<string>): BoardViewObservableUtil {
+    return createUtil(params, {'ONE': [1, 2, 3, 4, 5]},
+      new SwimlaneIssueFactory()
+        .addIssue('ONE-1', 0,
+          {summary: 'Issue One'})
+        .addIssue('ONE-2', 0,
+          {summary: 'Issue Two'})
+        .addIssue('ONE-3', 0,
+          {summary: 'Issue Three'})
+        .addIssue('ONE-4', 1,
+          {summary: 'Issue Four'})
+        .addIssue('ONE-5', 1,
+          {summary: 'Issue Five'})
+    );
+  }
+
   function createUtil(params: Dictionary<string>, ranks: Dictionary<number[]>,
                       issueFactory: SwimlaneIssueFactory): BoardViewObservableUtil {
     const init: BoardStateInitializer =
@@ -1719,6 +1856,7 @@ describe('Swimlane observer tests', () => {
 
 class BoardChecker {
   private _expectedInvisible: string[] = [];
+  private _expectedNonMatchingIssues: string[] = [];
   private _expectedSwimlanes: SwimlaneCheck[];
   private _expectedShowEmptySwimlanes: boolean;
   private _expectedCollapsedSwimlanes: Set<string>;
@@ -1728,6 +1866,11 @@ class BoardChecker {
 
   invisibleIssues(invisible: string[]): BoardChecker {
     this._expectedInvisible = invisible;
+    return this;
+  }
+
+  nonMatchingIssues(nonMatching: string[]): BoardChecker {
+    this._expectedNonMatchingIssues = nonMatching;
     return this;
   }
 
@@ -1749,6 +1892,15 @@ class BoardChecker {
     const expectedVisible: string[][] = this._expectedTable.map(
       col => col.filter(k => !invisibleIssueSet.contains(k)));
 
+    // Some pre-verification of the user data
+    if (this._expectedSwimlanes) {
+      for (const slCheck of this._expectedSwimlanes) {
+        for (const issue of slCheck.issues) {
+          expect(invisibleIssueSet.contains(issue)).toBe(false, `swimlane: ${slCheck.key}; issue: ${issue}`);
+        }
+      }
+    }
+
 
     const actualTable: string[][] = [];
     issueTable.table.forEach((v, i) => {
@@ -1764,6 +1916,11 @@ class BoardChecker {
     const invisibleKeys: string[] =
       issueTable.issues.filter(issue => !issue.visible).keySeq().toArray().sort((a, b) => a.localeCompare(b));
     expect(invisibleKeys).toEqual([...this._expectedInvisible].sort((a, b) => a.localeCompare(b)));
+
+    // Check non matching issues
+    const nonMatchingKeys: string[] =
+      issueTable.issues.filter(issue => !issue.matchesSearch).keySeq().toArray().sort((a, b) => a.localeCompare(b));
+    expect(nonMatchingKeys).toEqual([...this._expectedNonMatchingIssues].sort((a, b) => a.localeCompare(b)));
 
     // Check issue counts
     const totalIssueCounts: number[] = new Array<number>(this._expectedTable.length);

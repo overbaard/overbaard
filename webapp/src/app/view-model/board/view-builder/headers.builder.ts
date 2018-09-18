@@ -145,14 +145,25 @@ export class HeadersBuilder {
   }
 
   updateIssueHeaderCounts(totalIssueCounts: List<number>, visibleIssueCounts: List<number>): HeadersBuilder {
+    let handleChange = false;
     switch (this._changeType) {
       case ChangeType.UPDATE_BOARD:
       case ChangeType.UPDATE_BOARD_AFTER_BACKLOG_TOGGLE:
       case ChangeType.LOAD_BOARD:
       case ChangeType.APPLY_FILTERS:
+      case ChangeType.TOGGLE_HIDE_SEARCH_NON_MATCHES:
+        handleChange = true;
         break;
-      default:
-        return this;
+      case ChangeType.UPDATE_SEARCH: {
+        if (this._currentUserSettingState.searchFilters.hideNonMatches) {
+          handleChange = true;
+          break;
+        }
+      }
+    }
+
+    if (!handleChange) {
+      return this;
     }
 
     const statesList: List<BoardHeader> = this.flattenHeaders();
