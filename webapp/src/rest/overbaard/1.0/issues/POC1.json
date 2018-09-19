@@ -167,7 +167,8 @@
             }
           ]
         ],
-        "ranked": ["FEAT-1", "FEAT-2", "FEAT-3", "FEAT-4", "FEAT-5", "FEAT-6", "FEAT-7", "FEAT-8", "FEAT-9", "FEAT-10"]
+        "ranked": ["FEAT-1", "FEAT-2", "FEAT-3", "FEAT-4", "FEAT-5", "FEAT-6", "FEAT-7", "FEAT-8", "FEAT-9", "FEAT-10",
+          "FEAT-10", "FEAT-11", "FEAT-12", "FEAT-13", "FEAT-14", "FEAT-15", "FEAT-16", "FEAT-17", "FEAT-18"]
       },
       {
         "code": "BUG",
@@ -190,7 +191,7 @@
       "US" : {
         "states" : ["Backlog", "Selected for Development", "In Progress", "Done"]
       },
-      "WFCORE" : {
+      "EXT" : {
         "states" : ["Backlog", "Selected for Development", "In Progress", "Done"]
       }
     }
@@ -236,7 +237,7 @@
       "linked-issues" : [
         {
           "key" : "US-3",
-          "state" : 1,
+          "state" : 2,
           "summary" : "A linked issue in the upstream project"
         },
         {
@@ -271,17 +272,18 @@
       "key": "FEAT-4",
       "state": 5,
       "summary": "javax.sql.api should declare a dependency on javax.transaction.api",
-      "priority": 0,
+      "priority": 1,
       "type": 1,
       "assignee": 1,
+      "parallel-tasks": [[3, 2], [1, 2]],
       "linked-issues": [
         {
-          "key": "WFCORE-1356",
+          "key": "EXT-123",
           "state": 4,
           "summary": "javax.sql.api should declare a dependency on javax.transaction.api"
         },
         {
-          "key": "WFCORE-561",
+          "key": "EXT-561",
           "state": 4,
           "summary": "Class loading problem with XAResource and XADataSource"
         }
@@ -292,7 +294,8 @@
       "state": 4,
       "summary": "Issue number 5 has a long description and no extra information.",
       "priority": 2,
-      "type": 0
+      "type": 0,
+      "parallel-tasks": [[3, 2], [1, 2]]
     },
     "FEAT-6" : {
       "key": "FEAT-6",
@@ -300,7 +303,8 @@
       "summary": "Issue number 6",
       "priority": 2,
       "assignee": 1,
-      "type": 0
+      "type": 0,
+      "parallel-tasks": [[3, 2], [1, 2]]
     },
     "FEAT-7" : {
       "key": "FEAT-7",
@@ -333,6 +337,70 @@
       "priority": 2,
       "assignee": 1,
       "type": 3
+    },
+    "FEAT-11" : {
+      "key": "FEAT-11",
+      "state": 2,
+      "summary": "Issue number 11",
+      "priority": 0,
+      "type": 3,
+      "parallel-tasks": [[0, 0], [0, 0]]
+    },
+    "FEAT-12" : {
+      "key": "FEAT-12",
+      "state": 2,
+      "summary": "Issue number 12",
+      "priority": 1,
+      "type": 2,
+      "parallel-tasks": [[0, 0], [0, 0]]
+    },
+    "FEAT-13" : {
+      "key": "FEAT-13",
+      "state": 2,
+      "summary": "Issue number 13",
+      "priority": 2,
+      "type": 1,
+      "parallel-tasks": [[0, 0], [0, 0]]
+    },
+    "FEAT-14" : {
+      "key": "FEAT-14",
+      "state": 2,
+      "summary": "Issue number 14",
+      "priority": 1,
+      "type": 2,
+      "parallel-tasks": [[0, 0], [0, 0]]
+    },
+    "FEAT-15" : {
+      "key": "FEAT-15",
+      "state": 1,
+      "summary": "Issue number 15",
+      "priority": 3,
+      "type": 2,
+      "parallel-tasks": [[0, 0], [0, 0]]
+    },
+    "FEAT-16" : {
+      "key": "FEAT-16",
+      "state": 1,
+      "summary": "Issue number 16",
+      "priority": 0,
+      "type": 1,
+      "parallel-tasks": [[0, 0], [0, 0]]
+    },
+    "FEAT-17" : {
+      "key": "FEAT-17",
+      "state": 0,
+      "summary": "Issue number 17",
+      "priority": 3,
+      "type": 1,
+      "parallel-tasks": [[0, 0], [0, 0]]
+    },
+    "FEAT-18" : {
+      "key": "FEAT-18",
+      "state": 0,
+      "summary": "Issue number 18",
+      "priority": 2,
+      "type": 1,
+      "parallel-tasks": [[0, 0], [0, 0]]
     }
   }
 }

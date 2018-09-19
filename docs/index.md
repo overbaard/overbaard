@@ -12,6 +12,8 @@ Effectively this means:
 are using a 'fat' browser client, all changes to the view purely happen on the client side with no need 
 for extra round trips to the server.
 
+Apart from the configuration, all the data and permissions are driven by your Jira instance.
+
 Read the guides for more features.
 
 
