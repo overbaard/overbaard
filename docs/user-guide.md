@@ -1,3 +1,7 @@
+---
+layout: default
+title: Overbård User Guide
+---
 # Overbård User Guide
 
 This guide shows you how to use Overbård as an end user once boards have been set up. We also have 
