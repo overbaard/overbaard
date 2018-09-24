@@ -26,10 +26,9 @@
     <div class="mdl-layout__drawer">
         <span class="mdl-layout-title">Overbård</span>
         <nav class="mdl-navigation">
-            <a class="mdl-navigation__link" href="user-guide.html">User Guide</a>
-            <a class="mdl-navigation__link" href="admin-guide.html">Admin Guide</a>
-            <a class="mdl-navigation__link" href="developer-guide.html">Developer Guide</a>
-            <a class="mdl-navigation__link" href="https://github.com/overbaard/overbaard">Overbård GitHub repository</a>
+            {% for item in site.data.navigation %}
+                <a class="mdl-navigation__link" href="{{ item.link }}">{{ item.name }}</a>
+            {% endfor %}
         </nav>
     </div>
     <main class="mdl-layout__content">

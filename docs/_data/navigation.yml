@@ -1,0 +1,10 @@
+- name: Documentation Home
+  link: /
+- name: User Guide
+  link: /user-guide.html
+- name: Admin Guide
+  link: /admin-guide.html
+- name: Developer Guide
+  link: /developer-guide.html
+- name: Source Code
+  link: https://github.com/overbaard/overbaard
