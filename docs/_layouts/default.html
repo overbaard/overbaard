@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+    <link rel="stylesheet" href="/assets/css/styles.css">
     <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
 </head>
 <body>
@@ -27,8 +28,14 @@
         <span class="mdl-layout-title">Overbård</span>
         <nav class="mdl-navigation">
             {% for item in site.data.navigation %}
-                <a class="mdl-navigation__link" href="{{ item.link }}">{{ item.name }}</a>
+                {% if page.url == item.link %}
+                    {% assign class = 'mdl-navigation__link mdl-navigation__link--current' %}
+                {% else %}
+                    {% assign class = 'mdl-navigation__link' %}
+                {% endif %}
+                <a class="{{class}}" href="{{ item.link }}">{{ item.name }}</a>
             {% endfor %}
+            <!-- mdl-navigation__link--current -->
         </nav>
     </div>
     <main class="mdl-layout__content">
