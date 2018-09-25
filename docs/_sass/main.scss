@@ -1,9 +1,3 @@
-body {
-  padding: 0;
-  margin: 0;
-  font-family: Roboto, sans-serif;
-}
-
 
 $primary-colour: #3F51B5!important;
 $accent-colour: #FF4081!important;
@@ -12,6 +6,26 @@ $accent-colour-light: ff79b0!important;
 $white-text: #FFF!important;
 $black-text: rgba(0,0,0,.87)!important;
 
+body {
+  padding: 0;
+  margin: 0;
+  font-family: Roboto, sans-serif;
+}
+h1 {
+  font-size: 24px;
+}
+h2 {
+  font-size: 22px;
+}
+h3 {
+  font-size: 20px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
 
 /* Styling of the general components */
 .component-header {
@@ -35,18 +49,3 @@ $black-text: rgba(0,0,0,.87)!important;
   color: $accent-colour;
 }
 
-h1 {
-  font-size: 24px;
-}
-h2 {
-  font-size: 22px;
-}
-h3 {
-  font-size: 20px;
-}
-h4 {
-  font-size: 18px;
-}
-h5 {
-  font-size: 16px;
-}

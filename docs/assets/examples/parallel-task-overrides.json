@@ -1,0 +1,156 @@
+{
+  "name": "Parallel task overrides board",
+  "code": "PT-OVERRIDES",
+  "states": [
+    {
+      "name": "Backlog",
+      "backlog": true
+    },
+    {
+      "name": "Selected for Development"
+    },
+    {
+      "name": "In Progress"
+    },
+    {
+      "name": "Done"
+    }
+  ],
+  "priorities": [
+    {
+      "name": "Highest",
+      "colour": "red"
+    },
+    {
+      "name": "High",
+      "colour": "darkred"
+    },
+    {
+      "name": "Medium",
+      "colour": "orange"
+    },
+    {
+      "name": "Low",
+      "colour": "greenyellow"
+    },
+    {
+      "name": "Lowest",
+      "colour": "green"
+    }
+  ],
+  "issue-types": [
+    {
+      "name": "Task",
+      "colour": "blue"
+    },
+    {
+      "name": "Story",
+      "colour": "green"
+    },
+    {
+      "name": "Bug",
+      "colour": "red"
+    },
+    {
+      "name": "Epic",
+      "colour": "purple"
+    }
+  ],
+  "parallel-tasks": {
+    "fields": [
+      {
+        "name": "Analysis Document",
+        "type": "parallel-task-progress",
+        "field-id": 121212121212,
+        "display": "AD"
+      },
+      {
+        "name": "Documentation",
+        "type": "parallel-task-progress",
+        "field-id": 121212121213,
+        "display": "DC"
+      },
+      {
+        "name": "Test Development",
+        "type": "parallel-task-progress",
+        "field-id": 121212121214,
+        "display": "TD"
+      },
+      {
+        "name": "Pre-Checked",
+        "type": "parallel-task-progress",
+        "field-id": 121212121215,
+        "display": "PC"
+      }
+    ]
+  },
+  "projects": [
+    {
+      "code": "PROJ",
+      "query-filter": null,
+      "colour": "#4667CA",
+      "state-links": {
+        "Backlog": "Backlog",
+        "Selected for Development": "Selected for Development",
+        "In Progress": "In Progress",
+        "Done": "Done"
+      },
+      "parallel-tasks": [
+        [
+          "Analysis Document",
+          "Documentation"
+        ],
+        [
+          "Test Development",
+          "Pre-Checked"
+        ]
+      ],
+      "overrides": {
+        "parallel-tasks": [
+          {
+            "issue-types": ["Task", "Story"],
+            "override": [
+              [
+                "Analysis Document",
+                "Documentation"
+              ]
+            ]
+          },
+          {
+            "issue-types": ["Bug"],
+            "override": null
+          }
+        ]
+      }
+    },
+    {
+      "code": "ANOTHER",
+      "query-filter": null,
+      "colour": "blue",
+      "state-links": {
+        "Backlog": "Backlog",
+        "Selected for Development": "Selected for Development",
+        "In Progress": "In Progress",
+        "Done": "Done"
+      },
+      "overrides": {
+        "parallel-tasks": [
+          {
+            "issue-types": ["Task", "Story"],
+            "override": [
+              [
+                "Analysis Document",
+                "Documentation"
+              ],
+              [
+                "Test Development",
+                "Pre-Checked"
+              ]
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "linked-projects": {}
+}

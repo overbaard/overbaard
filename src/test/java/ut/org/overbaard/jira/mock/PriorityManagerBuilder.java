@@ -42,7 +42,7 @@ public class PriorityManagerBuilder {
         return this;
     }
 
-    PriorityManager build() {
+    public PriorityManager build() {
         when(priorityManager.getPriorities()).then(invocation -> {
             List<Priority> priorities = new ArrayList<>();
             for (Priority priority : this.priorities.values()) {

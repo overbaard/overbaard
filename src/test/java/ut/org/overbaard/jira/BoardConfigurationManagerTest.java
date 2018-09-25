@@ -23,20 +23,29 @@ import static org.overbaard.jira.impl.Constants.RANK_CUSTOM_FIELD_ID;
 import static org.overbaard.jira.impl.Constants.STATES;
 
 import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.jboss.dmr.ModelNode;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.overbaard.jira.OverbaardValidationException;
 import org.overbaard.jira.api.BoardConfigurationManager;
 import org.overbaard.jira.impl.BoardConfigurationManagerBuilder;
 import org.overbaard.jira.impl.config.BoardConfig;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 
+import com.atlassian.jira.config.IssueTypeManager;
+import com.atlassian.jira.config.PriorityManager;
 import com.atlassian.jira.mock.component.MockComponentWorker;
 
 import ut.org.overbaard.jira.mock.CustomFieldManagerBuilder;
+import ut.org.overbaard.jira.mock.IssueTypeManagerBuilder;
+import ut.org.overbaard.jira.mock.PriorityManagerBuilder;
 import ut.org.overbaard.jira.mock.UserManagerBuilder;
 
 /**
@@ -220,17 +229,75 @@ public class BoardConfigurationManagerTest {
         checkConfig("config/board-linked-projects-issue-type-override-filters.json");
     }
 
+    @Test
+    public void testExampleConfigs() throws Exception {
+        URL url = BoardConfigurationManagerBuilder.class.getClassLoader().getResource("config/board-wip.json");
+        Path configDir = Paths.get(url.toURI()).getParent().toAbsolutePath();
+        Assert.assertTrue(Files.isDirectory(configDir));
+        Path configExamples = configDir.resolve("examples");
+        if (Files.exists(configExamples)) {
+            for (Path path : Files.list(configExamples).collect(Collectors.toList())) {
+                Files.deleteIfExists(path);
+            }
+        }
+        Files.deleteIfExists(configExamples);
+        Assert.assertFalse(Files.exists(configExamples));
+
+        Path sourceRoot = configDir.getParent().getParent().getParent();
+        Path examplesRelative = Paths.get("docs", "assets", "examples");
+        Path examplesSource = sourceRoot.resolve(examplesRelative);
+        Assert.assertTrue(Files.isDirectory(examplesSource));
+
+        Files.copy(examplesSource, configExamples);
+        List<Path> examplePaths = Files.list(examplesSource).collect(Collectors.toList());
+        boolean foundFiles = false;
+        for (Path path : examplePaths) {
+            Files.copy(path, configExamples.resolve(path.getFileName()));
+            String config = "config/examples/" + path.getFileName();
+
+            IssueTypeManager issueTypeManager = new IssueTypeManagerBuilder()
+                    .addIssueType("Task")
+                    .addIssueType("Story")
+                    .addIssueType("Bug")
+                    .addIssueType("Epic")
+                    .build();
+            PriorityManager priorityManager = new PriorityManagerBuilder()
+                    .addPriority("Highest")
+                    .addPriority("High")
+                    .addPriority("Medium")
+                    .addPriority("Low")
+                    .addPriority("Lowest")
+                    .build();
+            BoardConfigurationManager boardConfigurationManager = new BoardConfigurationManagerBuilder()
+                    .setIssueTypeManager(issueTypeManager)
+                    .setPriorityManager(priorityManager)
+                    .addConfigActiveObjectsFromFile(config)
+                    .setCustomFieldManager(CustomFieldManagerBuilder.loadFromResource(config))
+                    .addSettingActiveObject(RANK_CUSTOM_FIELD_ID, "10000")
+                    .build();
+
+            checkConfig(boardConfigurationManager, config);
+            foundFiles = true;
+        }
+        Assert.assertTrue(foundFiles);
+    }
+
     private void checkConfig(String config) throws IOException {
         BoardConfigurationManagerBuilder cfgManagerBuilder = new BoardConfigurationManagerBuilder()
                 .addConfigActiveObjectsFromFile(config)
                 .setCustomFieldManager(CustomFieldManagerBuilder.loadFromResource(config))
                 .addSettingActiveObject(RANK_CUSTOM_FIELD_ID, "10000");
         BoardConfigurationManager cfgManager = cfgManagerBuilder.build();
+        checkConfig(cfgManager, config);
+    }
+
+    private void checkConfig(BoardConfigurationManager cfgManager, String config) throws IOException {
 
         ModelNode original = BoardConfigurationManagerBuilder.loadConfig(config);
         original.protect();
+        String boardCode = original.get(CODE).asString();
 
-        BoardConfig boardConfig = cfgManager.getBoardConfigForBoardDisplay(null, "TST");
+        BoardConfig boardConfig = cfgManager.getBoardConfigForBoardDisplay(null, boardCode);
         Assert.assertNotNull(boardConfig);
         ModelNode serialized = boardConfig.serializeModelNodeForConfig();
         Assert.assertEquals(original, serialized);

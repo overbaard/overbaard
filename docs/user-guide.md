@@ -11,11 +11,11 @@ an [admin guide](admin-guide.md) showing how to set up new boards, and a
 To use Overbård, you need to be logged into your Jira instance. Then click on the
 'Overbård' entry in the 'Boards' menu.
 
-<img src="assets/images/user-guide/jira-menu.png" width="500px"/>
+<img src="assets/images/common/jira-menu.png" width="500px"/>
 
 You will then be presented with a list of boards configured on your Jira instance:
 
-<img src="assets/images/user-guide/boards.png" width="500px"/>
+<img src="assets/images/common/boards.png" width="500px"/>
 
 To go to a board click on the name of a board, and you will get taken to it. See the [board](#2-board) section
 for how to work with a board.

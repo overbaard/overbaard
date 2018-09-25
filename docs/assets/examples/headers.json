@@ -1,0 +1,99 @@
+{
+  "name": "Advanced headers board",
+  "code": "HEADERS",
+  "states": [
+    {
+      "name": "Backlog",
+      "backlog": true
+    },
+    {
+      "name": "High Priority Backlog",
+      "backlog": true,
+      "help": "This is the high priority backlog!\n\nSomeone important has decided these are the top priority"
+    },
+    {
+      "name": "In Progress",
+      "wip": 10,
+      "header": "Development"
+    },
+    {
+      "name": "Pull Request Sent",
+      "header": "Development",
+      "help": "A pull request has been sent"
+    },
+    {
+      "name": "QA TODO",
+      "header": "QA"
+    },
+    {
+      "name": "QA In Progress",
+      "header": "QA",
+      "help": "QA is trying to break the feature"
+    },
+    {
+      "name": "Verified"
+    },
+    {
+      "name": "Closed",
+      "done": true
+    }
+  ],
+  "priorities": [
+    {
+      "name": "Highest",
+      "colour": "red"
+    },
+    {
+      "name": "High",
+      "colour": "darkred"
+    },
+    {
+      "name": "Medium",
+      "colour": "orange"
+    },
+    {
+      "name": "Low",
+      "colour": "greenyellow"
+    },
+    {
+      "name": "Lowest",
+      "colour": "green"
+    }
+  ],
+  "issue-types": [
+    {
+      "name": "Task",
+      "colour": "blue"
+    },
+    {
+      "name": "Story",
+      "colour": "green"
+    },
+    {
+      "name": "Bug",
+      "colour": "red"
+    },
+    {
+      "name": "Epic",
+      "colour": "purple"
+    }
+  ],
+  "projects": [
+    {
+      "code": "PROJ",
+      "query-filter": null,
+      "colour": "#4667CA",
+      "state-links": {
+        "Backlog": "Backlog",
+        "High Priority Backlog": "High Priority Backlog",
+        "In Progress": "In Progress",
+        "Pull Request Sent": "Pull Request Sent",
+        "QA TODO": "QA TODO",
+        "QA In Progress": "QA In Progress",
+        "Verified": "Verified",
+        "Closed": "Closed"
+      }
+    }
+  ],
+  "linked-projects": {}
+}

@@ -1,0 +1,83 @@
+{
+  "name": "Custom field board",
+  "code": "CUSTOM",
+  "states": [
+    {
+      "name": "Backlog",
+      "backlog": true
+    },
+    {
+      "name": "Selected for Development"
+    },
+    {
+      "name": "In Progress"
+    },
+    {
+      "name": "Done"
+    }
+  ],
+  "priorities": [
+    {
+      "name": "Highest",
+      "colour": "red"
+    },
+    {
+      "name": "High",
+      "colour": "darkred"
+    },
+    {
+      "name": "Medium",
+      "colour": "orange"
+    },
+    {
+      "name": "Low",
+      "colour": "greenyellow"
+    },
+    {
+      "name": "Lowest",
+      "colour": "green"
+    }
+  ],
+  "issue-types": [
+    {
+      "name": "Task",
+      "colour": "blue"
+    },
+    {
+      "name": "Story",
+      "colour": "green"
+    },
+    {
+      "name": "Bug",
+      "colour": "red"
+    },
+    {
+      "name": "Epic",
+      "colour": "purple"
+    }
+  ],
+  "custom": [
+    {
+      "name": "Tester",
+      "type": "user",
+      "field-id": 121212121212
+    }
+  ],
+  "projects": [
+    {
+      "code": "PROJ",
+      "query-filter": null,
+      "colour": "#4667CA",
+      "state-links": {
+        "Backlog": "Backlog",
+        "Selected for Development": "Selected for Development",
+        "In Progress": "In Progress",
+        "Done": "Done"
+      },
+      "custom": [
+        "Tester"
+      ]
+    }
+  ],
+  "linked-projects": {}
+}

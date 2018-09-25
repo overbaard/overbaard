@@ -1,0 +1,83 @@
+{
+  "name": "Several projects board",
+  "code": "SEVERAL",
+  "states": [
+    {
+      "name": "My Backlog",
+      "backlog": true
+    },
+    {
+      "name": "My Selected for Development"
+    },
+    {
+      "name": "My In Progress"
+    },
+    {
+      "name": "My Done"
+    }
+  ],
+  "priorities": [
+    {
+      "name": "Highest",
+      "colour": "red"
+    },
+    {
+      "name": "High",
+      "colour": "darkred"
+    },
+    {
+      "name": "Medium",
+      "colour": "orange"
+    },
+    {
+      "name": "Low",
+      "colour": "greenyellow"
+    },
+    {
+      "name": "Lowest",
+      "colour": "green"
+    }
+  ],
+  "issue-types": [
+    {
+      "name": "Task",
+      "colour": "blue"
+    },
+    {
+      "name": "Story",
+      "colour": "green"
+    },
+    {
+      "name": "Bug",
+      "colour": "red"
+    },
+    {
+      "name": "Epic",
+      "colour": "purple"
+    }
+  ],
+  "projects": [
+    {
+      "code": "PROJ",
+      "query-filter": null,
+      "colour": "#4667CA",
+      "state-links": {
+        "Backlog": "My Backlog",
+        "Selected for Development": "My Selected for Development",
+        "In Progress": "My In Progress",
+        "Done": "My Done"
+      }
+    },
+    {
+      "code": "ANOTHER",
+      "query-filter": null,
+      "colour": "blue",
+      "state-links": {
+        "TODO": "My Backlog",
+        "In Progress": "My In Progress",
+        "Complete": "My Done"
+      }
+    }
+  ],
+  "linked-projects": {}
+}

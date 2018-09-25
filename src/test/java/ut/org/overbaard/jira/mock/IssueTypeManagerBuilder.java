@@ -40,7 +40,7 @@ public class IssueTypeManagerBuilder {
         return this;
     }
 
-    IssueTypeManager build() {
+    public IssueTypeManager build() {
         when(issueTypeManager.getIssueTypes()).then(invocation -> {
             List<IssueType> issueTypes = new ArrayList<>();
             for (Map.Entry<String, IssueType> entry : issueTypeMocks.entrySet()) {
