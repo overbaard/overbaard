@@ -11,11 +11,11 @@ an [admin guide](admin-guide.md) showing how to set up new boards, and a
 To use Overbård, you need to be logged into your Jira instance. Then click on the
 'Overbård' entry in the 'Boards' menu.
 
-<img src="/assets/images/user-guide/jira-menu.png" width="500px"/>
+<img src="assets/images/user-guide/jira-menu.png" width="500px"/>
 
 You will then be presented with a list of boards configured on your Jira instance:
 
-<img src="/assets/images/user-guide/boards.png" width="500px"/>
+<img src="assets/images/user-guide/boards.png" width="500px"/>
 
 To go to a board click on the name of a board, and you will get taken to it. See the [board](#2-board) section
 for how to work with a board.
@@ -37,7 +37,7 @@ you can track the progress of the project, create issues in case you find a bug 
 
 Having clicked on a board in the boards list, you will be presented with a view of the board:
 
-<img src="/assets/images/user-guide/board-main.png" width="500px"/>
+<img src="assets/images/user-guide/board-main.png" width="500px"/>
 
 The board is scrollable horizontally and vertically so you can see all issues in all states. If you click on the
 issue's key, in the card header, you get taken to the issue in Jira.
@@ -52,11 +52,11 @@ on the board.
 When you first view a board, the backlog is hidden, as shown in the previous section. To view issues in the backlog,
 click on the left-most column header and the backlog will be displayed:
 
-<img src="/assets/images/user-guide/board-backlog.png" width="500px"/>
+<img src="assets/images/user-guide/board-backlog.png" width="500px"/>
 
 Similarly you can expand or collapse any column by clicking on it:
 
-<img src="/assets/images/user-guide/board-collapsed-expanded.png" width="500px"/>
+<img src="assets/images/user-guide/board-collapsed-expanded.png" width="500px"/>
 
 Note that as you collapse and expand columns, the state of what is visible or not is refected in the browser
 address field so you can share links with fellow users.
@@ -79,7 +79,7 @@ configured board so you can share links with your friends.
 
 Here is the open control panel:
 
-<img src="/assets/images/user-guide/board-control-panel.png" width="500px"/>
+<img src="assets/images/user-guide/board-control-panel.png" width="500px"/>
 
 As the number of entries is longer than the window height, the control panel is scrollable. It is divided into 3
 main sections:
@@ -103,13 +103,13 @@ While the Kanban view is well known, and the standard way of displaying a Kanban
 moved issues out of the backlog into other states you lose the global overview of how far issues have progressed
 with regard to the ranking. For example in the following board (still using the Kanban view):
 
-<img src="/assets/images/user-guide/board-rankview-kanban-no-context.png" width="500px"/>
+<img src="assets/images/user-guide/board-rankview-kanban-no-context.png" width="500px"/>
 
 We can see that `FEAT-1` is higher ranked than `FEAT-2` which in turn has a higher rank than `FEAT-5`. But we don't
 know how highly ranked `FEAT-3` or `FEAT-4` are compared to `FEAT-1`, `FEAT-2` or `FEAT-3`. To find this out, we can
 switch to the Rank view:
 
-<img src="/assets/images/user-guide/board-rankview.png" width="500px"/>
+<img src="assets/images/user-guide/board-rankview.png" width="500px"/>
 
 Note that although we have not covered this yet, I have changed the 'Issue details' setting so that we see more issues.
 This view shows all the issues in global rank order, along with how far each has moved through the workflow states.
@@ -121,7 +121,7 @@ standup meeting!
 Back in the Kanban view, we can select to display the board using swimlanes. Here I have chosen to display it using
 swimlanes by issue priority:
 
-<img src="/assets/images/user-guide/board-swimlane.png" width="500px"/>
+<img src="assets/images/user-guide/board-swimlane.png" width="500px"/>
 
 By default swimlanes which have no issues associated with them will *not* be shown. To show empty swimlanes on the
 board anyway, click the 'Show Empty' button to toggle this.
@@ -129,7 +129,7 @@ board anyway, click the 'Show Empty' button to toggle this.
 Similar to how we can collapse and expand state columns by clicking on the state header, we can collapse and expand
 swimlanes by clicking on the swimlane header:
 
-<img src="/assets/images/user-guide/board-swimlane-collapsed.png" width="500px"/>
+<img src="assets/images/user-guide/board-swimlane-collapsed.png" width="500px"/>
 
 Here we have collapsed the 'Major' swimlane and the 'DT' state column.
 
@@ -156,12 +156,12 @@ for these as well. The filters work the same in both the Kanban and the Rank vie
 Within each filter entry there is an OR relationship. So if you have selected issue types 'Bug' and 'Story' as shown
 here:
 
-<img src="/assets/images/user-guide/board-filters-issue-type.png" width="500px"/>
+<img src="assets/images/user-guide/board-filters-issue-type.png" width="500px"/>
 
 Only issues that have issue type 'Bug' OR 'Story' will be shown. Across the filter types there is an AND relationship.
 So if you leave issue types 'Bug' and 'Story' selected and choose priority 'Blocker':
 
-<img src="/assets/images/user-guide/board-filters-issue-type.png" width="500px"/>
+<img src="assets/images/user-guide/board-filters-issue-type.png" width="500px"/>
 
 we end up with less issues because the query behind the scenes becomes something along the lines of:
 ```
@@ -182,19 +182,19 @@ special filter value called 'None', which allows you to pick out issues which do
 #### 2.3.3.1 Taming long filter lists
 If the list of settable values for a filter is long as shown here, you will need to scroll to see all filter values:
 
-<img src="/assets/images/user-guide/board-filters-long.png" width="500px"/>
+<img src="assets/images/user-guide/board-filters-long.png" width="500px"/>
 
 In these cases a search box appears above the list of filter values. If you know the name of the filter value you want to
 set, you can search for it:
 
-<img src="/assets/images/user-guide/board-filters-long-search.png" width="500px"/>
+<img src="assets/images/user-guide/board-filters-long-search.png" width="500px"/>
 
 #### 2.3.3.1 Search
 
 A special case of filter is Search, which appears at the top of the filters list. The standard setting greys out
 the issues that do not match the search:
 
-<img src="/assets/images/user-guide/board-search-no-hide.png" width="500px"/>
+<img src="assets/images/user-guide/board-search-no-hide.png" width="500px"/>
 
 As you can see we are looking for issues where the issue id is 'FEAT-1' or 'FEAT-5', where the summary also
 contains the text 'longi'. For the 'Issue Ids' field suggestions for issue ids are presented as you type into the
@@ -203,7 +203,7 @@ field. The 'Issue Text Search' box must contain at least three characters for it
 The final 'Hide non-matching' toggle, if set, makes the search behave more in line with normal filters by hiding,
 rather than greying out, non-matching issues:
 
-<img src="/assets/images/user-guide/board-search-hide.png" width="500px"/>
+<img src="assets/images/user-guide/board-search-hide.png" width="500px"/>
 
 #### 2.3.3.2 Filters and swimlane
 
@@ -211,13 +211,13 @@ You can combine swimlanes and filters. The below image shows the board arranged 
 but only showing the minor issues. Since we are not showing any of the other priorities their swimlanes
 are completely hidden on the board:
 
-<img src="/assets/images/user-guide/board-swimlane-filters.png" width="500px"/>
+<img src="assets/images/user-guide/board-swimlane-filters.png" width="500px"/>
 
 ## 2.4 Issue cards
 
 Let's take a look at an issue card in detail:
 
-<img src="/assets/images/user-guide/board-issue.png" width="500px"/>
+<img src="assets/images/user-guide/board-issue.png" width="500px"/>
 
 The top line contains the issue's Jira id ('FEAT-1'), the assignee initials ('KK') and a button to open the
 issue context menu. If you hover the mouse over the Jira issue id, a tooltip will display the full information
@@ -235,7 +235,7 @@ workflow. The colour for each ranges from red (not started) to green (done), Thi
 If you hover over each of these a tooltip will give the full name of the parallel task and its state.
 e.g. we can see that the 'AD' one means 'Analysis Document', and its state is 'TODO':
 
-<img src="/assets/images/user-guide/board-issue-pt-tooltip.png" width="500px"/>
+<img src="assets/images/user-guide/board-issue-pt-tooltip.png" width="500px"/>
 
 Finally we have a line containing the linked issues. For our card we list 'US-1' and 'US-2'. This means that our
 issue has links to these issues. Note that not all linked issues are shown, just ones for projects and issue types
@@ -253,7 +253,7 @@ as well as comment on issues.
 Moving in issue means moving it to another state. If you click on the 'Move' issue context menu item you get presented
 with a list of the states the issue can move to:
 
-<img src="/assets/images/user-guide/board-move.png" width="500px"/>
+<img src="assets/images/user-guide/board-move.png" width="500px"/>
 
 The list shows all the states this issue can move to, with the current state highlighted. The list is scrollable.
 
@@ -269,7 +269,7 @@ perform ranking in the Jira project (this is configured in Jira itself, **not** 
 lucky ones who can rank issues, after clicking on the 'Rank' issue context menu item you will get a list containing
 all the issues from that project:
 
-<img src="/assets/images/user-guide/board-rank.png" width="500px"/>
+<img src="assets/images/user-guide/board-rank.png" width="500px"/>
 
 The issue being ranked is highlighted. To rank it click on the issue you want to move it before.
 
@@ -279,7 +279,7 @@ The issue being ranked is highlighted. To rank it click on the issue you want to
 The 'Comment' issue context menu item will display a dialog allowing you to comment on the issue without opening the
 issue in Jira:
 
-<img src="/assets/images/user-guide/board-comment.png" width="500px"/>
+<img src="assets/images/user-guide/board-comment.png" width="500px"/>
 
 ### 2.4.2 Parallel tasks
 
@@ -292,6 +292,6 @@ clicked 'TD' (aka 'Test Development') and am presented with a pane to change its
 highlighted, and for each colour on the scale from red (not started) to green (complete) a tooltip is displayed giving
 the name of each value.
 
-<img src="/assets/images/user-guide/board-pt-change.png" width="500px"/>
+<img src="assets/images/user-guide/board-pt-change.png" width="500px"/>
 
 To change the value, click on the entry you wish to change the parallel task to.
