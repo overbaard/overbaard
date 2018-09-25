@@ -79,7 +79,7 @@ configured board so you can share links with your friends.
 
 Here is the open control panel:
 
-<img src="assets/images/user-guide/board-control-panel.png" width="500px"/>
+<img src="assets/images/user-guide/board-control-panel.png" width="250px"/>
 
 As the number of entries is longer than the window height, the control panel is scrollable. It is divided into 3
 main sections:
@@ -182,14 +182,14 @@ special filter value called 'None', which allows you to pick out issues which do
 #### 2.3.3.1 Taming long filter lists
 If the list of settable values for a filter is long as shown here, you will need to scroll to see all filter values:
 
-<img src="assets/images/user-guide/board-filters-long.png" width="500px"/>
+<img src="assets/images/user-guide/board-filters-long.png" width="250px"/>
 
 In these cases a search box appears above the list of filter values. If you know the name of the filter value you want to
 set, you can search for it:
 
-<img src="assets/images/user-guide/board-filters-long-search.png" width="500px"/>
+<img src="assets/images/user-guide/board-filters-long-search.png" width="250px"/>
 
-#### 2.3.3.1 Search
+#### 2.3.3.2 Search
 
 A special case of filter is Search, which appears at the top of the filters list. The standard setting greys out
 the issues that do not match the search:
@@ -205,7 +205,7 @@ rather than greying out, non-matching issues:
 
 <img src="assets/images/user-guide/board-search-hide.png" width="500px"/>
 
-#### 2.3.3.2 Filters and swimlane
+#### 2.3.3.3 Filters and swimlane
 
 You can combine swimlanes and filters. The below image shows the board arranged in swimlanes by priority,
 but only showing the minor issues. Since we are not showing any of the other priorities their swimlanes
@@ -217,7 +217,7 @@ are completely hidden on the board:
 
 Let's take a look at an issue card in detail:
 
-<img src="assets/images/user-guide/board-issue.png" width="500px"/>
+<img src="assets/images/user-guide/board-issue.png" width="250px"/>
 
 The top line contains the issue's Jira id ('FEAT-1'), the assignee initials ('KK') and a button to open the
 issue context menu. If you hover the mouse over the Jira issue id, a tooltip will display the full information
@@ -235,7 +235,7 @@ workflow. The colour for each ranges from red (not started) to green (done), Thi
 If you hover over each of these a tooltip will give the full name of the parallel task and its state.
 e.g. we can see that the 'AD' one means 'Analysis Document', and its state is 'TODO':
 
-<img src="assets/images/user-guide/board-issue-pt-tooltip.png" width="500px"/>
+<img src="assets/images/user-guide/board-issue-pt-tooltip.png" width="250px"/>
 
 Finally we have a line containing the linked issues. For our card we list 'US-1' and 'US-2'. This means that our
 issue has links to these issues. Note that not all linked issues are shown, just ones for projects and issue types
@@ -245,15 +245,15 @@ Now we will explore some of the areas of the issue cards which need to be covere
 
 ### 2.4.1 Issue context menu
 
-Right-clicking on an issue you get the context menu. It currently allows you to Move (Kanban view), or Rank (Rank view),
-as well as comment on issues.
+Clicking on the icon in the top right of an issue you get the context menu. It currently allows you to Move
+(Kanban view), or Rank (Rank view), as well as comment on issues.
 
 #### 2.4.1.1 Move
 
-Moving in issue means moving it to another state. If you click on the 'Move' issue context menu item you get presented
+Moving an issue means moving it to another state. If you click on the 'Move' issue context menu item you get presented
 with a list of the states the issue can move to:
 
-<img src="assets/images/user-guide/board-move.png" width="500px"/>
+<img src="assets/images/user-guide/board-move.png" width="250px"/>
 
 The list shows all the states this issue can move to, with the current state highlighted. The list is scrollable.
 
@@ -269,7 +269,7 @@ perform ranking in the Jira project (this is configured in Jira itself, **not** 
 lucky ones who can rank issues, after clicking on the 'Rank' issue context menu item you will get a list containing
 all the issues from that project:
 
-<img src="assets/images/user-guide/board-rank.png" width="500px"/>
+<img src="assets/images/user-guide/board-rank.png" width="250px"/>
 
 The issue being ranked is highlighted. To rank it click on the issue you want to move it before.
 
@@ -279,7 +279,7 @@ The issue being ranked is highlighted. To rank it click on the issue you want to
 The 'Comment' issue context menu item will display a dialog allowing you to comment on the issue without opening the
 issue in Jira:
 
-<img src="assets/images/user-guide/board-comment.png" width="500px"/>
+<img src="assets/images/user-guide/board-comment.png" width="250px"/>
 
 ### 2.4.2 Parallel tasks
 
@@ -292,6 +292,6 @@ clicked 'TD' (aka 'Test Development') and am presented with a pane to change its
 highlighted, and for each colour on the scale from red (not started) to green (complete) a tooltip is displayed giving
 the name of each value.
 
-<img src="assets/images/user-guide/board-pt-change.png" width="500px"/>
+<img src="assets/images/user-guide/board-pt-change.png" width="250px"/>
 
 To change the value, click on the entry you wish to change the parallel task to.
