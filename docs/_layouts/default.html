@@ -39,7 +39,14 @@
         </nav>
     </div>
     <main class="mdl-layout__content">
-        <div class="page-content">{{ content }}</div>
+        <div class="page-content">
+            <div class="component-header">
+                {{ page.title }}
+            </div>
+            <div class="component-body">
+                {{ content }}
+            </div>
+        </div>
     </main>
 </div>
 </body>

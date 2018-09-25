@@ -2,8 +2,7 @@
 layout: default
 title: Overbård Admin Guide
 ---
-# Overbård Admin Guide
-
+Coming soon!
 TODO Jira Agile/Software must be enabled and licensed.
 
-TODO Health panel 
+TODO Health panel
