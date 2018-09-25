@@ -1950,13 +1950,16 @@ class BoardChecker {
     expect(slInfo.showEmpty).toBe(this._expectedShowEmptySwimlanes);
 
     // Check the names and keys are as expected
-    expect(slInfo.swimlanes.size).toBe(this._expectedSwimlanes.length);
-    expect(slInfo.swimlanes.keySeq().toArray()).toEqual(this._expectedSwimlanes.map(sl => sl.key));
-    expect(slInfo.swimlanes.map(sd => sd.display).toArray()).toEqual(this._expectedSwimlanes.map(sl => sl.name));
+    expect(slInfo.allSwimlanes.size).toBe(this._expectedSwimlanes.length);
+    expect(slInfo.allSwimlanes.keySeq().toArray()).toEqual(this._expectedSwimlanes.map(sl => sl.key));
+    expect(slInfo.allSwimlanes.map(sd => sd.display).toArray()).toEqual(this._expectedSwimlanes.map(sl => sl.name));
+
+
+    // TODO also check the visible swimlanes
 
     for (const check of this._expectedSwimlanes) {
       const checkIssueSet: Set<string> = Set<string>(check.issues);
-      const sl: SwimlaneData = slInfo.swimlanes.get(check.key);
+      const sl: SwimlaneData = slInfo.allSwimlanes.get(check.key);
 
       const expectedTable: string[][] = [];
       issueTable.table.forEach((v, i) => {
@@ -2035,19 +2038,19 @@ class EqualityChecker {
     const allKeys: Set<string> =
       Set<string>().intersect(unchangedSwimlanes, changedSwimlaneColumns.keySeq());
     const missingChecks: Set<string> =
-      Set<string>().subtract(curr.swimlanes.keySeq(), allKeys);
+      Set<string>().subtract(curr.visibleSwimlanes.keySeq(), allKeys);
     if (missingChecks.size > 0) {
       fail(`The swimlane contains values ${missingChecks.toArray()}, for which there are no checks configured`);
     }
 
     unchangedSwimlanes.forEach(k => {
-      expect(curr.swimlanes.get(k)).toBeTruthy();
-      expect(curr.swimlanes.get(k)).toBe(old.swimlanes.get(k), `Different swimlane: ${k}`);
+      expect(curr.visibleSwimlanes.get(k)).toBeTruthy();
+      expect(curr.visibleSwimlanes.get(k)).toBe(old.visibleSwimlanes.get(k), `Different swimlane: ${k}`);
     });
     changedSwimlaneColumns.forEach((changedColumns, k) => {
-      expect(curr.swimlanes.get(k)).toBeTruthy();
-      const oldSlTable: List<List<BoardIssueView>> = old.swimlanes.get(k) ? old.swimlanes.get(k).table : null;
-      const newTable: List<List<BoardIssueView>> = curr.swimlanes.get(k).table;
+      expect(curr.visibleSwimlanes.get(k)).toBeTruthy();
+      const oldSlTable: List<List<BoardIssueView>> = old.visibleSwimlanes.get(k) ? old.visibleSwimlanes.get(k).table : null;
+      const newTable: List<List<BoardIssueView>> = curr.visibleSwimlanes.get(k).table;
       const expectedChanged: Set<number> = Set<number>(changedColumns);
       for (let i = 0; i < newTable.size; i++) {
         const oldCol: List<BoardIssueView> = oldSlTable ? oldSlTable.get(i) : null;

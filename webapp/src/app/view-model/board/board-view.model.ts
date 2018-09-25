@@ -47,7 +47,8 @@ const DEFAULT_ISSUE_TABLE: IssueTable = {
 
 const DEFAULT_SWIMLANE_INFO: SwimlaneInfo = {
   showEmpty: false,
-  swimlanes: OrderedMap<string, SwimlaneData>()
+  visibleSwimlanes: OrderedMap<string, SwimlaneData>(),
+  allSwimlanes: OrderedMap<string, SwimlaneData>()
 };
 
 const SWIMLANE_HEADER_HEIGHT = 36; /* header height: 30; header bottom border: 1, column top padding: 5 */
@@ -186,11 +187,14 @@ export class BoardViewModelUtil {
     return SWIMLANE_DATA_STATE_FACTORY(state);
   }
 
-  static createSwimlaneInfoView(showEmpty: boolean, swimlanes: OrderedMap<string, SwimlaneData>) {
+  static createSwimlaneInfoView(
+    showEmpty: boolean, visibleSwimlanes: OrderedMap<string, SwimlaneData>, allSwimlanes: OrderedMap<string, SwimlaneData>) {
     const state: SwimlaneInfo = {
       showEmpty: showEmpty,
-      swimlanes: swimlanes
+      visibleSwimlanes: visibleSwimlanes,
+      allSwimlanes: allSwimlanes,
     };
+
     return SWIMLANE_INFO_STATE_FACTORY(state);
   }
 

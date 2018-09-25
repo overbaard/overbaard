@@ -304,7 +304,7 @@ export class IssueTableBuilder {
       }
       case ChangeType.TOGGLE_SWIMLANE_SHOW_EMPTY: {
         const oldSwimlane = this._oldIssueTableState.swimlaneInfo;
-        return BoardViewModelUtil.createSwimlaneInfoView(this._currentUserSettingState.swimlaneShowEmpty, oldSwimlane.swimlanes);
+        return SwimlaneInfoBuilder.updateSwimlaneShowEmpty(this._currentUserSettingState, oldSwimlane);
       }
       case ChangeType.TOGGLE_SWIMLANE_COLLAPSED: {
         const oldSwimlane = this._oldIssueTableState.swimlaneInfo;

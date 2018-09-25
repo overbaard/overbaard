@@ -94,7 +94,7 @@ export class KanbanSwimlaneEntryComponent implements OnInit, OnChanges, OnDestro
     }
 
     const startAndHeightChange: SimpleChange = changes['startAndHeight'];
-    if (startAndHeightChange) {
+    if (startAndHeightChange && startAndHeightChange.currentValue) {
       this.calculateInternalOffset(false);
     }
   }

@@ -110,6 +110,26 @@ export class SwimlaneInfoBuilder {
     return new SwimlaneInfoBuilder(boardState, userSettingState, issueMatcher, builderMap, existingInfo);
   }
 
+  static updateSwimlaneShowEmpty(userSettingState: UserSettingState, swimlaneInfo: SwimlaneInfo): SwimlaneInfo {
+    const visibleSwimlanes: OrderedMap<string, SwimlaneData> =
+      this.filterVisibleSwimlanes(userSettingState, swimlaneInfo.allSwimlanes);
+
+    return BoardViewModelUtil.createSwimlaneInfoView(
+      userSettingState.swimlaneShowEmpty, visibleSwimlanes, swimlaneInfo.allSwimlanes);
+  }
+
+  private static filterVisibleSwimlanes(
+    userSettingState: UserSettingState, allSwimlanes: OrderedMap<string, SwimlaneData>): OrderedMap<string, SwimlaneData> {
+
+    if (userSettingState.swimlaneShowEmpty) {
+      return allSwimlanes;
+    } else {
+      return OrderedMap<string, SwimlaneData>(allSwimlanes.filter(data => {
+        return data.visibleIssues > 0;
+      }));
+    }
+  }
+
   private static multiStringMatcher(issueSet: OrderedSet<string>,
                                     dataBuilders: OrderedMap<string, SwimlaneDataBuilder>): SwimlaneDataBuilder[] {
     if (!issueSet || issueSet.size === 0) {
@@ -195,28 +215,34 @@ export class SwimlaneInfoBuilder {
     } else if (this._existing.showEmpty !== this._userSettingState.swimlaneShowEmpty) {
       changed = true;
     } else {
-      changed = keys.length !== this._existing.swimlanes.size;
+      changed = keys.length !== this._existing.allSwimlanes.size;
     }
 
-    const swimlanes: OrderedMap<string, SwimlaneData> = OrderedMap<string, SwimlaneData>().asMutable();
-    for (const key of keys) {
-      const dataBuilder: SwimlaneDataBuilder = this._dataBuilders.get(key);
-      if (dataBuilder.isChanged()) {
-        changed = true;
+    const allSwimlanes: OrderedMap<string, SwimlaneData> = OrderedMap<string, SwimlaneData>().withMutations(mutable => {
+      for (const key of keys) {
+        const dataBuilder: SwimlaneDataBuilder = this._dataBuilders.get(key);
+        if (dataBuilder.isChanged()) {
+          changed = true;
+        }
+        if (dataBuilder.filterVisible) {
+          mutable.set(key, dataBuilder.build());
+        }
       }
-      if (dataBuilder.filterVisible) {
-        swimlanes.set(key, dataBuilder.build());
-      }
-    }
+    });
 
     if (!changed) {
       return this._existing;
     }
-    return BoardViewModelUtil.createSwimlaneInfoView(this._userSettingState.swimlaneShowEmpty, swimlanes.asImmutable());
+
+    const visibleSwimlanes: OrderedMap<string, SwimlaneData> =
+      SwimlaneInfoBuilder.filterVisibleSwimlanes(this._userSettingState, allSwimlanes);
+
+    return BoardViewModelUtil.createSwimlaneInfoView(
+      this._userSettingState.swimlaneShowEmpty, visibleSwimlanes, allSwimlanes);
   }
 
   updateCollapsed(): SwimlaneInfo {
-    const updatedSwimlanes: Map<string, SwimlaneData> = this._existing.swimlanes.withMutations(mutable => {
+    const updatedSwimlanes: Map<string, SwimlaneData> = this._existing.allSwimlanes.withMutations(mutable => {
       this._dataBuilders.forEach((sdb, k) => {
         const existing = mutable.get(k);
         if (existing) {
@@ -228,7 +254,8 @@ export class SwimlaneInfoBuilder {
       });
     });
     return BoardViewModelUtil.updateSwimlaneInfo(this._existing, mutable => {
-      mutable.swimlanes = updatedSwimlanes;
+      mutable.visibleSwimlanes = SwimlaneInfoBuilder.filterVisibleSwimlanes(this._userSettingState, updatedSwimlanes),
+      mutable.allSwimlanes = updatedSwimlanes;
     });
   }
 }
@@ -244,7 +271,7 @@ class SwimlaneDataBuilder {
 
   constructor(private readonly _key: string, private readonly _display: string,
               states: number, private _collapsed: boolean, private _userSettingState, exisitingInfo: SwimlaneInfo) {
-    this._existing = exisitingInfo ? exisitingInfo.swimlanes.get(_key) : null;
+    this._existing = exisitingInfo ? exisitingInfo.allSwimlanes.get(_key) : null;
     this._tableBuilder = new TableBuilder<BoardIssueView>(states, this._existing ? this._existing.table : null);
     this._calculatedColumnHeights = new Array<number>(states);
     for (let i = 0 ; i < states ; i++) {
