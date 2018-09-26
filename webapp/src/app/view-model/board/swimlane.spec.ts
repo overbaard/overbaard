@@ -1636,60 +1636,128 @@ describe('Swimlane observer tests', () => {
     });
 
     describe('Check toggle show empty swimlanes', () => {
-      it('Initially false', () => {
-        // What we create here does not really matter, the main check is that the swimlane info 'showEmpty' field gets set
-        const util: BoardViewObservableUtil =
-          createUtilWithStandardIssues({swimlane: 'assignee', 'assignee': 'kabir', 'issue-type': 'task'});
-        util.easySubscribe(
-          board => {
-            // We do tests elsewhere for the content of the board/swimlanes - let's just check the SwimlaneInfo showEmpty field
-            expect(board.issueTable.swimlaneInfo).toBeTruthy();
-            expect(board.issueTable.swimlaneInfo.showEmpty).toBe(false);
-          });
-        util.getUserSettingUpdater().toggleShowEmptySwimlanes()
-          .easySubscribe(
+      describe('Swimlane filters', () => {
+        it('Initially false', () => {
+          // What we create here does not really matter, the main check is that the swimlane info 'showEmpty' field gets set
+          const util: BoardViewObservableUtil =
+            createUtilWithStandardIssues({swimlane: 'assignee', 'assignee': 'kabir', 'issue-type': 'task'});
+          util.easySubscribe(
             board => {
-              expect(board.issueTable.swimlaneInfo).toBeTruthy();
-              expect(board.issueTable.swimlaneInfo.showEmpty).toBe(true);
-            });
-
-        // Do some extra checks here which are not needed in the other similar tests
-        util.getUserSettingUpdater().updateSwimlane('project')
-          .easySubscribe(
-            board => {
+              // We do tests elsewhere for the content of the board/swimlanes - let's just check the SwimlaneInfo showEmpty field
               expect(board.issueTable.swimlaneInfo).toBeTruthy();
               expect(board.issueTable.swimlaneInfo.showEmpty).toBe(false);
             });
-        util.getUserSettingUpdater().toggleShowEmptySwimlanes()
-          .easySubscribe(
+          util.getUserSettingUpdater().toggleShowEmptySwimlanes()
+            .easySubscribe(
+              board => {
+                expect(board.issueTable.swimlaneInfo).toBeTruthy();
+                expect(board.issueTable.swimlaneInfo.showEmpty).toBe(true);
+              });
+
+          // Do some extra checks here which are not needed in the other similar tests
+          util.getUserSettingUpdater().updateSwimlane('project')
+            .easySubscribe(
+              board => {
+                expect(board.issueTable.swimlaneInfo).toBeTruthy();
+                expect(board.issueTable.swimlaneInfo.showEmpty).toBe(false);
+              });
+          util.getUserSettingUpdater().toggleShowEmptySwimlanes()
+            .easySubscribe(
+              board => {
+                expect(board.issueTable.swimlaneInfo).toBeTruthy();
+                expect(board.issueTable.swimlaneInfo.showEmpty).toBe(true);
+              });
+          util.getUserSettingUpdater().updateSwimlane(null)
+            .easySubscribe(
+              board => {
+                expect(board.issueTable.swimlaneInfo).toBeFalsy();
+              });
+        });
+
+        it('Initially true', () => {
+          // What we create here does not really matter, the main check is that the swimlane info 'showEmpty' field gets set
+          const util: BoardViewObservableUtil =
+            createUtilWithStandardIssues({showEmptySl: 'true', swimlane: 'assignee', 'assignee': 'kabir', 'issue-type': 'task'});
+          util.easySubscribe(
             board => {
+              // We do tests elsewhere for the content of the board/swimlanes - let's just check the SwimlaneInfo showEmpty field
               expect(board.issueTable.swimlaneInfo).toBeTruthy();
               expect(board.issueTable.swimlaneInfo.showEmpty).toBe(true);
             });
-        util.getUserSettingUpdater().updateSwimlane(null)
-          .easySubscribe(
-            board => {
-              expect(board.issueTable.swimlaneInfo).toBeFalsy();
-            });
+          util.getUserSettingUpdater().toggleShowEmptySwimlanes()
+            .easySubscribe(
+              board => {
+                expect(board.issueTable.swimlaneInfo).toBeTruthy();
+                expect(board.issueTable.swimlaneInfo.showEmpty).toBe(false);
+              });
+
+        });
       });
 
-      it('Initially true', () => {
-        // What we create here does not really matter, the main check is that the swimlane info 'showEmpty' field gets set
-        const util: BoardViewObservableUtil =
-          createUtilWithStandardIssues({showEmptySl: 'true', swimlane: 'assignee', 'assignee': 'kabir', 'issue-type': 'task'});
-        util.easySubscribe(
-          board => {
-            // We do tests elsewhere for the content of the board/swimlanes - let's just check the SwimlaneInfo showEmpty field
-            expect(board.issueTable.swimlaneInfo).toBeTruthy();
-            expect(board.issueTable.swimlaneInfo.showEmpty).toBe(true);
-          });
-        util.getUserSettingUpdater().toggleShowEmptySwimlanes()
-          .easySubscribe(
-            board => {
-              expect(board.issueTable.swimlaneInfo).toBeTruthy();
-              expect(board.issueTable.swimlaneInfo.showEmpty).toBe(false);
-            });
+      describe('Search', () => {
+        it ('Initially false', () => {
+          const util: BoardViewObservableUtil =
+            createUtilWithStandardIssues({swimlane: 'assignee', 's.ids': 'ONE-5', 's.hide': 'true'});
+          const checker: BoardChecker =
+            new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+              .invisibleIssues(['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4'])
+              .swimlanes([
+                {key: 'bob', name: 'Bob Brent Barlow', issues: []},
+                {key: 'kabir', name: 'Kabir Khan', issues: []},
+                {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-5']}]);
 
+          util.easySubscribe(
+            board => {
+              checker.checkBoard(board);
+            });
+          util.getUserSettingUpdater().toggleShowEmptySwimlanes()
+            .easySubscribe(
+              board => {
+                checker
+                  .showEmptySwimlanes(true)
+                  .checkBoard(board);
+              });
+          util.getUserSettingUpdater().toggleShowEmptySwimlanes()
+            .easySubscribe(
+              board => {
+                checker
+                  .showEmptySwimlanes(false)
+                  .checkBoard(board);
+              });
+        });
+
+        it ('Initially true', () => {
+          const util: BoardViewObservableUtil =
+            createUtilWithStandardIssues({showEmptySl: 'true', swimlane: 'assignee', 's.ids': 'ONE-5', 's.hide': 'true'});
+          const checker: BoardChecker =
+            new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+              .invisibleIssues(['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4'])
+              .swimlanes([
+                {key: 'bob', name: 'Bob Brent Barlow', issues: []},
+                {key: 'kabir', name: 'Kabir Khan', issues: []},
+                {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-5']}]);
+
+          util.easySubscribe(
+            board => {
+              checker
+                .showEmptySwimlanes(true)
+                .checkBoard(board);
+            });
+          util.getUserSettingUpdater().toggleShowEmptySwimlanes()
+            .easySubscribe(
+              board => {
+                checker
+                  .showEmptySwimlanes(false)
+                  .checkBoard(board);
+              });
+          util.getUserSettingUpdater().toggleShowEmptySwimlanes()
+            .easySubscribe(
+              board => {
+                checker
+                  .showEmptySwimlanes(true)
+                  .checkBoard(board);
+              });
+        });
       });
     });
 
@@ -1858,7 +1926,7 @@ class BoardChecker {
   private _expectedInvisible: string[] = [];
   private _expectedNonMatchingIssues: string[] = [];
   private _expectedSwimlanes: SwimlaneCheck[];
-  private _expectedShowEmptySwimlanes: boolean;
+  private _expectedShowEmptySwimlanes = false;
   private _expectedCollapsedSwimlanes: Set<string>;
 
   constructor(private _expectedTable: string[][]) {
@@ -1874,8 +1942,12 @@ class BoardChecker {
     return this;
   }
 
-  swimlanes(swimlanes: SwimlaneCheck[], showEmpty: boolean = false): BoardChecker {
+  swimlanes(swimlanes: SwimlaneCheck[]): BoardChecker {
     this._expectedSwimlanes = swimlanes;
+    return this;
+  }
+
+  showEmptySwimlanes(showEmpty: boolean): BoardChecker {
     this._expectedShowEmptySwimlanes = showEmpty;
     return this;
   }
@@ -1950,13 +2022,14 @@ class BoardChecker {
     expect(slInfo.showEmpty).toBe(this._expectedShowEmptySwimlanes);
 
     // Check the names and keys are as expected
-    expect(slInfo.swimlanes.size).toBe(this._expectedSwimlanes.length);
-    expect(slInfo.swimlanes.keySeq().toArray()).toEqual(this._expectedSwimlanes.map(sl => sl.key));
-    expect(slInfo.swimlanes.map(sd => sd.display).toArray()).toEqual(this._expectedSwimlanes.map(sl => sl.name));
+    expect(slInfo.allSwimlanes.size).toBe(this._expectedSwimlanes.length);
+    expect(slInfo.allSwimlanes.keySeq().toArray()).toEqual(this._expectedSwimlanes.map(sl => sl.key));
+    expect(slInfo.allSwimlanes.map(sd => sd.display).toArray()).toEqual(this._expectedSwimlanes.map(sl => sl.name));
 
+    // Check the normal swimlanes
     for (const check of this._expectedSwimlanes) {
       const checkIssueSet: Set<string> = Set<string>(check.issues);
-      const sl: SwimlaneData = slInfo.swimlanes.get(check.key);
+      const sl: SwimlaneData = slInfo.allSwimlanes.get(check.key);
 
       const expectedTable: string[][] = [];
       issueTable.table.forEach((v, i) => {
@@ -1977,6 +2050,21 @@ class BoardChecker {
         expect(sl.collapsed).toBe(true);
       } else {
         expect(sl.collapsed).toBe(false);
+      }
+    }
+
+    // Now check the visible swimlanes
+    for (const check of this._expectedSwimlanes) {
+      const swimlane = slInfo.visibleSwimlanes.get(check.key);
+      if (check.issues.length === 0) {
+        if (!this._expectedShowEmptySwimlanes) {
+          expect(swimlane).toBeFalsy();
+        } else {
+          expect(swimlane).toBeTruthy();
+        }
+      } else {
+        expect(swimlane).toBeTruthy();
+        expect(swimlane).toEqual(slInfo.allSwimlanes.get(check.key));
       }
     }
   }
@@ -2035,19 +2123,19 @@ class EqualityChecker {
     const allKeys: Set<string> =
       Set<string>().intersect(unchangedSwimlanes, changedSwimlaneColumns.keySeq());
     const missingChecks: Set<string> =
-      Set<string>().subtract(curr.swimlanes.keySeq(), allKeys);
+      Set<string>().subtract(curr.visibleSwimlanes.keySeq(), allKeys);
     if (missingChecks.size > 0) {
       fail(`The swimlane contains values ${missingChecks.toArray()}, for which there are no checks configured`);
     }
 
     unchangedSwimlanes.forEach(k => {
-      expect(curr.swimlanes.get(k)).toBeTruthy();
-      expect(curr.swimlanes.get(k)).toBe(old.swimlanes.get(k), `Different swimlane: ${k}`);
+      expect(curr.visibleSwimlanes.get(k)).toBeTruthy();
+      expect(curr.visibleSwimlanes.get(k)).toBe(old.visibleSwimlanes.get(k), `Different swimlane: ${k}`);
     });
     changedSwimlaneColumns.forEach((changedColumns, k) => {
-      expect(curr.swimlanes.get(k)).toBeTruthy();
-      const oldSlTable: List<List<BoardIssueView>> = old.swimlanes.get(k) ? old.swimlanes.get(k).table : null;
-      const newTable: List<List<BoardIssueView>> = curr.swimlanes.get(k).table;
+      expect(curr.visibleSwimlanes.get(k)).toBeTruthy();
+      const oldSlTable: List<List<BoardIssueView>> = old.visibleSwimlanes.get(k) ? old.visibleSwimlanes.get(k).table : null;
+      const newTable: List<List<BoardIssueView>> = curr.visibleSwimlanes.get(k).table;
       const expectedChanged: Set<number> = Set<number>(changedColumns);
       for (let i = 0; i < newTable.size; i++) {
         const oldCol: List<BoardIssueView> = oldSlTable ? oldSlTable.get(i) : null;

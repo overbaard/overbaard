@@ -98,7 +98,7 @@ export class KanbanSwimlaneViewComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     const swimlaneInfoChange: SimpleChange = changes['swimlaneInfo'];
     if (swimlaneInfoChange && swimlaneInfoChange.currentValue !== swimlaneInfoChange.previousValue) {
-      this._swimlanes = List<SwimlaneData>(this.swimlaneInfo.swimlanes.values());
+      this._swimlanes = List<SwimlaneData>(this.swimlaneInfo.visibleSwimlanes.values());
       this._splitter.updateList(this._swimlanes);
       this.startAndHeights = this._splitter.startPositions;
       // console.log('----> topOffsets' + JSON.stringify(this.topOffsets));
