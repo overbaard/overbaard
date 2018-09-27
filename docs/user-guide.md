@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Overbård User Guide
+title: User Guide
 ---
 This guide shows you how to use Overbård as an end user once boards have been set up. We also have
 an [admin guide](admin-guide.md) showing how to set up new boards, and a
@@ -9,11 +9,11 @@ an [admin guide](admin-guide.md) showing how to set up new boards, and a
 # 1 Finding Overbård
 
 To use Overbård, you need to be logged into your Jira instance. Then click on the
-'Overbård' entry in the 'Boards' menu.
+`Overbård` entry in the `Boards` menu.
 
 <img src="assets/images/common/jira-menu.png" width="500px"/>
 
-You will then be presented with a list of boards configured on your Jira instance:
+You will then be presented with a list of Overbård boards configured on your Jira instance:
 
 <img src="assets/images/common/boards.png" width="500px"/>
 
@@ -29,7 +29,7 @@ following links:
 and is out of scope for this user guide.
 * Back to Jira - takes you to the host Jira instance.
 * Help - takes you to this guide.
-* GitHub - takes you to the https://github.com/overbaard/overbaard GitHub repository where
+* GitHub - takes you to [Overbård on GitHub](https://github.com/overbaard/overbaard) where
 you can track the progress of the project, create issues in case you find a bug etc.
 
 
@@ -41,8 +41,6 @@ Having clicked on a board in the boards list, you will be presented with a view 
 
 The board is scrollable horizontally and vertically so you can see all issues in all states. If you click on the
 issue's key, in the card header, you get taken to the issue in Jira.
-
-<!-- TODO discuss linked issues -->
 
 The board polls Jira on a regular basis, so changes made to issues on the board will get reflected
 on the board.
@@ -84,19 +82,19 @@ Here is the open control panel:
 As the number of entries is longer than the window height, the control panel is scrollable. It is divided into 3
 main sections:
 
-* General - this toggles the view
-* Issue details - controls the verbosity of what is shown in the issue cards
-* Filters - used to search for issues
+* `General` - this toggles the view
+* `Issue details` - controls the verbosity of what is shown in the issue cards
+* `Filters` - used to search for issues
 
 ### 2.3.1 General
 
 This section controls the view of the board. It has two settings:
-* View Mode - this defaults to the 'Kanban' view which is what we have been seeing so far. The other setting is the
-'Rank' view.
-* Swimlane - the default is no swimlanes. When the Rank view is shown, this setting is not displayed.
-On all boards in the Kanban view you can select swimlanes for Project, Issue Type, Priority, Assignee, Component,
-Label and Fix Version. Also, if the board administrator has configured certain custom fields to be available in the
-board they will be part of the swimlane options.
+* `View Mode` - this defaults to the `Kanban` view which is what we have been seeing so far. The other setting is the
+`Rank` view.
+* `Swimlane` - the default is no swimlanes. When the Rank view is shown, this setting is not displayed.
+On all boards in the Kanban view you can select swimlanes for `Project`, `Issue Type`, `Priority`, `Assignee`, 
+`Component`, `Label` and `Fix Version`. Also, if the board administrator has configured certain custom fields to 
+be available in the board they will be part of the swimlane options too.
 
 #### 2.3.1.1 Rank view
 While the Kanban view is well known, and the standard way of displaying a Kanban board, for huge projects once you have
@@ -124,14 +122,14 @@ swimlanes by issue priority:
 <img src="assets/images/user-guide/board-swimlane.png" width="500px"/>
 
 By default swimlanes which have no issues associated with them will *not* be shown. To show empty swimlanes on the
-board anyway, click the 'Show Empty' button to toggle this.
+board anyway, click the `Show Empty` button to toggle this.
 
 Similar to how we can collapse and expand state columns by clicking on the state header, we can collapse and expand
 swimlanes by clicking on the swimlane header:
 
 <img src="assets/images/user-guide/board-swimlane-collapsed.png" width="500px"/>
 
-Here we have collapsed the 'Major' swimlane and the 'DT' state column.
+Here we have collapsed the `Major` swimlane and the `DT` state column.
 
 ### 2.3.2 Issue details
 By default the issue cards are shown including all the available information. In some cases it can be nice to have
@@ -149,58 +147,61 @@ of each card. Note that these are only shown if the board is configured to show 
 The final main section in the control panel are the setting of filters. Click on each of the accordion entries to get
 a wider view.
 
-On all boards in the Kanban view there will be an entry for Search, Project, Issue Type, Priority, Assignee, Component,
-Label and Fix Version. If the board has been configured to use custom fields or parallel tasks, there will be entries
-for these as well. The filters work the same in both the Kanban and the Rank views.
+On all boards in the Kanban view there will be an entry for `Search`, `Project`, `Issue Type`, `Priority`, `Assignee`, 
+`Component`, `Label` and `Fix Version`. If the board has been configured to use custom fields or parallel tasks, there 
+will be entries for these as well. The filters work the same in both the Kanban and the Rank views.
 
 Within each filter entry there is an OR relationship. So if you have selected issue types 'Bug' and 'Story' as shown
 here:
 
 <img src="assets/images/user-guide/board-filters-issue-type.png" width="500px"/>
 
-Only issues that have issue type 'Bug' OR 'Story' will be shown. Across the filter types there is an AND relationship.
-So if you leave issue types 'Bug' and 'Story' selected and choose priority 'Blocker':
+Only issues that have issue type `Bug` OR `Story` will be shown. Across the filter types there is an AND relationship.
+So if you leave issue types `Bug` and `Story` selected and choose priority `Blocker`:
 
-<img src="assets/images/user-guide/board-filters-issue-type.png" width="500px"/>
+<img src="assets/images/user-guide/board-filters-issue-type-priority.png" width="500px"/>
 
 we end up with less issues because the query behind the scenes becomes something along the lines of:
 ```
 (issueType = 'Bug' OR issueType = 'Story') AND priority = 'Blocker'
 ```
 
-In the previous image it is worth pointing out the icon next to 'Issue Type' in the collapsed filter entry. This
+In the previous image it is worth pointing out the icon next to `Issue Type` in the collapsed filter entry. This
 indicates that some filters have been set, and if you hover over the filter name, you will see which filters have
-been set without needing to expand it again. If you click on the icon, it will clear the 'Issue Type' filters.
-Similarly, in the open 'Priority' filter entry the three icons allow you to:
+been set without needing to expand it again. If you click on the icon, it will clear the `Issue Type` filters.
+Similarly, in the open `Priority` filter entry the three icons allow you to:
 * invert the selection
 * select all filters (which is effectively the same as selecting none)
 * clear the filters
 
-Note that for filters for fields in Jira that allow a null value (such as Assignee, Labels, Components etc) there is a
-special filter value called 'None', which allows you to pick out issues which do not have the field in question set.
+Note that for filters for fields in Jira that allow a null value (such as `Assignee`, `Labels`, 
+`Components` etc.) there is a special filter value called `None`, which allows you to pick out issues which do not 
+have the field in question set.
+
+In addition the `Assignee` filter has a `Current User` option, which allows you to quickly pick out your issues.
 
 #### 2.3.3.1 Taming long filter lists
 If the list of settable values for a filter is long as shown here, you will need to scroll to see all filter values:
 
 <img src="assets/images/user-guide/board-filters-long.png" width="250px"/>
 
-In these cases a search box appears above the list of filter values. If you know the name of the filter value you want to
-set, you can search for it:
+In these cases a search box appears above the list of filter values. If you know the name of the filter 
+value you want to set, you can search for it:
 
 <img src="assets/images/user-guide/board-filters-long-search.png" width="250px"/>
 
 #### 2.3.3.2 Search
 
-A special case of filter is Search, which appears at the top of the filters list. The standard setting greys out
+A special case of filter is `Search`, which appears at the top of the filters list. The standard setting greys out
 the issues that do not match the search:
 
 <img src="assets/images/user-guide/board-search-no-hide.png" width="500px"/>
 
-As you can see we are looking for issues where the issue id is 'FEAT-1' or 'FEAT-5', where the summary also
-contains the text 'longi'. For the 'Issue Ids' field suggestions for issue ids are presented as you type into the
-field. The 'Issue Text Search' box must contain at least three characters for it to have any effect.
+As you can see we are looking for issues where the issue id is `FEAT-1` or `FEAT-5`, where the summary also
+contains the text `longi`. For the `Issue Ids` field suggestions for issue ids are presented as you type into the
+field. The `Issue Text Search` box must contain at least three characters for it to have any effect.
 
-The final 'Hide non-matching' toggle, if set, makes the search behave more in line with normal filters by hiding,
+The final `Hide non-matching` toggle, if set, makes the search behave more in line with normal filters by hiding,
 rather than greying out, non-matching issues:
 
 <img src="assets/images/user-guide/board-search-hide.png" width="500px"/>
@@ -219,7 +220,7 @@ Let's take a look at an issue card in detail:
 
 <img src="assets/images/user-guide/board-issue.png" width="250px"/>
 
-The top line contains the issue's Jira id ('FEAT-1'), the assignee initials ('KK') and a button to open the
+The top line contains the issue's Jira id (`FEAT-1`), the assignee initials (`KK`) and a button to open the
 issue context menu. If you hover the mouse over the Jira issue id, a tooltip will display the full information
 about the issue.
 
@@ -229,15 +230,15 @@ type. If you hover your cursor over one of these a tooltip will show the meaning
 
 The main section of the card contains the issue summary, and an avatar for the assignee on the right.
 
-The 'AP', 'TP', 'CD', 'TP' entries are called *parallel tasks*. Not all boards are configured to have these, but on
+The `AD`, `TP`, `CD` and `TD` entries are called *Parallel Tasks*. Not all boards are configured to have these, but on
 boards that have these they represent the completeness of a subtask that must be done as part of an issue's
 workflow. The colour for each ranges from red (not started) to green (done), Think checkboxes on steroids!
 If you hover over each of these a tooltip will give the full name of the parallel task and its state.
-e.g. we can see that the 'AD' one means 'Analysis Document', and its state is 'TODO':
+e.g. we can see that the `AD` one means `Analysis Document`, and its state is `TODO`:
 
 <img src="assets/images/user-guide/board-issue-pt-tooltip.png" width="250px"/>
 
-Finally we have a line containing the linked issues. For our card we list 'US-1' and 'US-2'. This means that our
+Finally we have a line containing the linked issues. For our card we list `US-1` and `US-2`. This means that our
 issue has links to these issues. Note that not all linked issues are shown, just ones for projects and issue types
 the administrator set up.
 
@@ -257,15 +258,16 @@ with a list of the states the issue can move to:
 
 The list shows all the states this issue can move to, with the current state highlighted. The list is scrollable.
 
-*Note that Overbård assumes a workflow that allows moving to any state is allowed. If your Jira project uses a workflow that
-has some restrictions on state movement, an error message will be displayed.*
+*Note that Overbård assumes a workflow that allows moving to any state. If your Jira project uses a 
+workflow that has some restrictions on state movement, an error message will be displayed if you attempt
+to make an illegal state transition.*
 
 This option is currently only available in the Kanban view.
 
 #### 2.4.1.2 Rank
 
 This option is only available in the Rank view, and **only** if you are logged in as a user who has permissions to
-perform ranking in the Jira project (this is configured in Jira itself, **not** in Overbård). If you are one of the
+perform ranking in the Jira project (this is configured in Jira itself, not in Overbård). If you are one of the
 lucky ones who can rank issues, after clicking on the 'Rank' issue context menu item you will get a list containing
 all the issues from that project:
 
@@ -288,9 +290,9 @@ by drop down list custom fields in Jira, so although they are shown in Overbård
 using standard Jira mechanisms, and is visible in the native Jira issues themselves.
 
 To change the value of a parallel task in the issue we have been using as an example, click on it. In this case I have
-clicked 'TD' (aka 'Test Development') and am presented with a pane to change its value. The current setting is
-highlighted, and for each colour on the scale from red (not started) to green (complete) a tooltip is displayed giving
-the name of each value.
+clicked `TD` (aka `Test Development`) and am presented with a pane to change its value. The current setting is
+highlighted, and all the possible values are listed with a colour on a scale from red (not started) to 
+green (complete). If you hover over one of the colours a tooltip is displayed giving the name of the value.
 
 <img src="assets/images/user-guide/board-pt-change.png" width="250px"/>
 

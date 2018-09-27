@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Overbård Admin Guide
+title: Admin Guide
 ---
 
 # 1 Prerequisites
@@ -13,28 +13,42 @@ follow these [steps](jira-software-license.md).
 Also, this guide assumes that you are familiar with, or able to look up in the Jira documentation, how to configure 
 the underlying Jira concepts such as setting up projects, tweaking workflows and creating custom fields.
 
+# 2 Installing Overbård
 
-# 2 Configuration page
-Go to your Jira instance, make sure you are logged in and click on the ‘Overbård’ entry in the ‘Boards’ menu.
+To install Overbård on your Jira instance you need to have the Jira administrator permission.
+
+You can either build it yourself as mentioned in the [Developer Guide](developer-guide.md). But it is easier 
+to download it from the Overbård [Releases](https://github.com/overbaard/overbaard/releases) page. Once you have
+it on your computer go to go to your Jira instance in the browser and select `Add-Ons` from the settings menu (the
+cog in the top-right):
+<img src="assets/images/admin-guide/add-ons-menu.png" width="250px"/>
+
+On the resulting page, click the `Manage apps` link and then the `Upload app` link on the next page (these will only 
+be visible if you actually are an Jira administrator). In the dialog to `Upload app', select the saved jar.
+
+In the future we might publish the plugin on the Atlassian Marketplace for easier installation.
+
+# 3 Configuration page
+Go to your Jira instance, make sure you are logged in and click on the `Overbård` entry in the `Boards` menu.
 
 <img src="assets/images/common/jira-menu.png" width="500px"/>
 
-You will then be presented with a list of boards configured on your Jira instance:
+You will then be presented with a list of Overbård boards configured on your Jira instance:
 
 <img src="assets/images/common/boards.png" width="500px"/>
 
-Then click on the hamburger icon in the top left, and select 'Config' from the left menu. You will now be presented
+Then click on the hamburger icon in the top left, and select `Config` from the left menu. You will now be presented
 with the configuration page, where you can add new boards, and edit the configuration of existing ones. Boards are
 configured using JSON, and the syntax will be explained in this guide.
 
 <img src="assets/images/admin-guide/config-page.png" width="500px"/>
 
-## 2.1 Rank custom field id
+## 3.1 Rank custom field id
 An important step is to configure the rank custom field id. To do this, go to 
 [http://my.jira.org/rest/api/2/field](http://my.jira.org/rest/api/2/field). Substitute 
 [http://my.jira.org](http://my.jira.org) with the url of your Jira instance. If you are a developer
 running Jira locally via the Atlassian SDK, this URL will by default be 
-[http://localhost:2990/jira/rest/api/2/field](http://localhost:2990/jira/rest/api/2/field). Search for 'Rank' and get
+[http://localhost:2990/jira/rest/api/2/field](http://localhost:2990/jira/rest/api/2/field). Search for `Rank` and get
 the custom field id.
 
 On my local instance this looks like:
@@ -44,26 +58,26 @@ On my local instance this looks like:
 "clauseNames":["cf[10005]","Rank"],"schema":{"type":"any",
 "custom":"com.pyxis.greenhopper.jira:gh-lexo-rank","customId":10005}}
 ```
-so the id of the 'Rank' custom field is 10005. 
+so the id of the `Rank` custom field is `10005`. 
 
-Enter the value you found into the 'Rank custom field id' field on the bottom of the configuration page.
+Enter the value you found into the `Rank custom field id` field on the bottom of the configuration page.
 
-# 3 Setting up a simple board
+# 4 Setting up a simple board
 The following example discusses how to set up a very basic board, using a project with the standard states
-when you create a project in Jira with the 'Kanban software development' workflow. Don't worry if you have an existing
+when you create a project in Jira with the `Kanban software development` workflow. Don't worry if you have an existing
 project with different states, the concepts are the same.
 
 The full JSON config can be found at [simple.json](assets/examples/simple.json). Let's look at it in details,
 and describe the main sections.
 
-## 3.1 Global config
+## 4.1 Global config
 
 ```
 {
   "name": "Simple board",
   "code": "SIMPLE",
 ```
-First we define the 'name' of the board, which is what will appear in the list of boards. The 'code' is used 
+First we define the `name` of the board, which is what will appear in the list of boards. The `code` is used 
 in the URL used to link to the boards.
 
 Next we define the states/columns for the board.
@@ -85,7 +99,7 @@ Next we define the states/columns for the board.
   ],
 ```
 We can call the columns what we like, we will map them later to project states when we choose the projects to include 
-in the board. Note that the `"backlog": true` setting for the 'My backlog' state column means that the column will
+in the board. Note that the `"backlog": true` setting for the `My backlog` state column means that the column will
 be considered the backlog. When loading a board, the backlog column is displayed in a different colour, and is 
 collapsed by default.
 
@@ -137,7 +151,7 @@ this determines the order that these entries will show up in the board control p
     }
   ],
 ```
-## 3.2 Projects config
+## 4.2 Projects config
 Next we have the configuration of the projects to display on the board. For this simple example we only display
 one.
 ```
@@ -145,17 +159,17 @@ one.
     {
       "code": "PROJ",
 ```
-'code' is the key of the project in Jira that we want to show on the board.
+`code` is the key of the project in Jira that we want to show on the board.
 ```
       "query-filter": null,
 ```
-'query-filter' is optional, and is not set in this example. Behind the scenes, Overbård will execute a JQL query along the
-lines of `project=PROJ [query-filter] ORDER BY Rank` so the 'query-filter' is a great way to narrow down the issues
+`query-filter` is optional, and is not set in this example. Behind the scenes, Overbård will execute a JQL query along the
+lines of `project=PROJ [query-filter] ORDER BY Rank` so the `query-filter` is a great way to narrow down the issues
 loaded for the board.
 ```
       "colour": "#4667CA",
 ```
-'colour' specifies the html colour code to use for issues from the specified project.
+`colour` specifies the html colour code to use for issues from the specified project.
 ```  
       "state-links": {
         "Backlog" : "My Backlog",
@@ -164,23 +178,23 @@ loaded for the board.
         "Done" : "My Done"
       }
 ```
-Finally we have a 'state-links' map which maps the states from the project's workflow to the state column names 
+Finally we have a `state-links` map which maps the states from the project's workflow to the state column names 
 we created earlier.
 ``` 
     }
   ],
   "linked-projects" : {}
 ```
-The 'linked-projects' are not needed, but are left here empty. They will be discussed later.
+The `linked-projects` are not needed, but are left here empty. They will be discussed later.
 ```  
 }
 ```
 
-# 4 Board with several projects
+# 5 Board with several projects
 
 The previous section shows a simple board with just one project. We can also add several projects to our board.
 The full JSON config can be found at [several-projects.json](assets/examples/several-projects.json). Most of
-the JSON is the same as in the previous example; the difference is in the 'projects' section:
+the JSON is the same as in the previous example; the difference is in the `projects` section:
 ```
   "projects": [
     {
@@ -207,19 +221,19 @@ the JSON is the same as in the previous example; the difference is in the 'proje
 
   ],
 ```
-As you can see we have added another project called 'ANOTHER' to the array of projects to be shown on the board. It has
-a different 'colour' so we can easily see which issue cards belong to which project on the board. The configuration for
-'PROJ' is the same as in the previous example. 
+As you can see we have added another project called `ANOTHER` to the array of projects to be shown on the board. It has
+a different `colour` so we can easily see which issue cards belong to which project on the board. The configuration for
+`PROJ` is the same as in the previous example. 
 
-It is worth noting that the 'ANOTHER' project uses a different workflow from 'PROJ'. It has less states, and the states
-have different names from the states used in the 'PROJ' project.
+It is worth noting that the `ANOTHER` project uses a different workflow from `PROJ`. It has less states, and the states
+have different names from the states used in the `PROJ` project.
 
 One thing to note is that there is no overall ranking across projects. Rather issues are presented in rank order for 
-each project separately. The order of the display of issues by project is the same as their order in the 'projects' 
+each project separately. The order of the display of issues by project is the same as their order in the `projects` 
 array. In other words, for this example, that means that in each column on the board, issues from 
-'PROJ' will be displayed in rank order, and then the issues from 'ANOTHER' will be displayed in rank order.   
+`PROJ` will be displayed in rank order, and then the issues from `ANOTHER` will be displayed in rank order.   
 
-# 5 Board with advanced headers
+# 6 Board with advanced headers
 
 We will now have a look at some of the more advanced configuration options to set up the headers.
 The full JSON config can be found at [headers.json](assets/examples/headers.json). Again we will focus on the
@@ -261,7 +275,7 @@ The above two states are grouped using the `header` field. They will still both 
 but will be grouped under a header. The header can be used to collapse/expand all the contained states at the same time.
 Note that when using `header` the states must be contiguous, no gaps are allowed. 
 
-The 'In Progress' state has a wip limit of 10. If the state has more issue than that the column counts in the 
+The `In Progress` state has a wip limit of 10. If the state has more issue than that the column counts in the 
 header will become red.
 
  
@@ -276,13 +290,13 @@ header will become red.
       "help": "QA is trying to break the feature"
     },
 ```    
-Above we have two states under the 'QA' header.  
+Above we have two states under the `QA` header.  
 ```
     {
       "name": "Verified"
     },
 ```
-Although we have been using headers for our states so far, we don't have to do that for all states. The 'Verified'
+Although we have been using headers for our states so far, we don't have to do that for all states. The `Verified`
 state shown above does not use headers.
 ```
     {
@@ -314,12 +328,12 @@ we do the project state-links for which issues to ignore
     }
   ],  
 ```
-In our 'PROJ' project, we map issues in the 'Closed' and 'Shipped' states from PROJ's workflow to the 'Closed' column 
-on the board. Remember that the 'Closed' column is not actually shown since it is marked with `"done": true`. Rather 
+In our `PROJ` project, we map issues in the `Closed` and `Shipped` states from `PROJ`'s workflow to the `Closed` column 
+on the board. Remember that the `Closed` column is not actually shown since it is marked with `"done": true`. Rather 
 what happens, is that when executing the JQL to load the board into the Overbård server-side cache, issues from
 these states are omitted. It is a mechanism to not load now irrelevant issues into Overbård. 
 
-# 6 Board with custom fields
+# 7 Board with custom fields
 
 By default Overbård will automatically populate swimlanes and options for filtering from the issue data for:
 
@@ -338,15 +352,15 @@ in the previous sections that some minimum configuration is needed to set these 
 However, we can further extend the functionality of Overbård to do this for custom fields. So far (because they were 
  needed for managing the JBoss EAP project at Red Hat) it supports two types:
 
-* `version` - For my project we have a custom field called 'Target Release'. It is a custom field which allows selection
-of one release. The 'version' custom field type is suitable for such a custom field. 
-* `user` - For EAP we have a custom fields called 'Tester' and 'Documenter'. In Jira these are 'User Picker (single user)' 
-custom fields. The 'user' custom field type is suitable for such a custom field. 
+* `version` - For my project we have a custom field called `Target Release`. It is a custom field which allows selection
+of one release. The `version` custom field type is suitable for such a custom field. 
+* `user` - For EAP we have a custom fields called `Tester` and `Documenter`. In Jira these are `User Picker (single user)` 
+custom fields. The `user` custom field type is suitable for such a custom field. 
 
 If you want support for other types of custom fields, open an [issue](https://github.com/overbaard/overbaard/issues)
 and we can discuss the viability.
 
-Let's take a look at how to configure a 'Tester' custom field (of type 'user')for a board. The full JSON config
+Let's take a look at how to configure a `Tester` custom field (of type `user`) for a board. The full JSON config
 can be found at [custom-field.json](assets/examples/custom-field.json). The important parts are discussed below.
 
 In the global part of the configuration we declare the custom fields we are interested in.
@@ -355,18 +369,18 @@ In the global part of the configuration we declare the custom fields we are inte
     {
       "name": "Tester",
 ```
-'name' is the name that will be used for the field when presented in the list of swimlanes options and in its 
+`name` is the name that will be used for the field when presented in the list of swimlanes options and in its 
 corresponding filter header.
 ```
       "type": "user",
 ```
-We specify that it is of type 'user' as discussed above.
+We specify that it is of type `user` as discussed above.
 ```      
       "field-id": 121212121212
 ```
 This is the Jira id of the field we are interested in. You can find this by going to 
 [http://my.jira.org/rest/api/2/field](http://my.jira.org/rest/api/2/field) (adjusting the URL as mentioned earlier), 
-or by going to the 'Issue Types' screen in the Jira Administration section of your Jira instance.
+or by going to the `Issue Types` screen in the Jira Administration section of your Jira instance.
 ```
     }
   ],
@@ -388,21 +402,21 @@ more than one project and custom fields might not be relevant to all of them.
         "Tester"
       ]
 ```
-Here we have listed the custom fields that we should use for the 'PROJ' project. It is a list of the 'name' fields
+Here we have listed the custom fields that we should use for the `PROJ` project. It is a list of the `name` fields
 of the custom fields we want to use for the project. Now when loading the board, Overbård will inspect all issues
-in the 'PROJ' project and also look for the values of this field, which will be available in the 'Tester' filter and 
+in the `PROJ` project and also look for the values of this field, which will be available in the `Tester` filter and 
 swimlanes!
 ```      
     }
 ```
 
-# 7 Linked projects/issues 
+# 8 Linked projects/issues 
 
 As discussed in the [User Guide](user-guide.md) we can configure a board's issue cards to show links to linked issues 
 from other projects. This section describes how to do this. The full JSON config
 can be found at [linked-issues.json](assets/examples/linked-issues.json), and the important parts are discussed below.
 
-First we need to populate the 'linked-issues' section that we have touched upon before:
+First we need to populate the `linked-issues` section that we have touched upon before:
 ```
   "linked-projects": {
     "FIRST": {
@@ -422,15 +436,15 @@ First we need to populate the 'linked-issues' section that we have touched upon 
     }
   }
 ```
-We have declared two projects that we are interested in: 'FIRST' and 'SECOND'. For each project, we list the
+We have declared two projects that we are interested in: `FIRST` and `SECOND`. For each project, we list the
 states from their individual workflows. These are listed in order, and are used as a lookup to determine a colour
-for the linked issue in board issue it is linked to from. For example a 'SECOND' issue in the 'Backlog' state will appear
-as red, and a 'SECOND' issue in 'Verified' will appear as green.
+for the linked issue in board issue it is linked to from. For example a `SECOND` issue in the `Backlog` state will appear
+as red, and a `SECOND` issue in `Verified` will appear as green.
 
 Next we need to reference these linked projects from our main projects. Again we might have more than one project
 configured for the board, and they might have different interests in which issues from the linked projects they should
-display. In the following example the 'PROJ' project is set up to reference both linked projects, via the 'linked-issues'
-field. The 'linked-issues' field has a 'filter' attribute that can be used to narrow down which issues are selected.  
+display. In the following example the `PROJ` project is set up to reference both linked projects, via the `linked-issues`
+field. The `linked-issues` field has a `filter` attribute that can be used to narrow down which issues are selected.  
 ```
   "projects": [
     {
@@ -445,20 +459,20 @@ field. The 'linked-issues' field has a 'filter' attribute that can be used to na
           "projects": [
             "FIRST"
 ```
-We are interested in issues from the 'FIRST' linked project. Although this list just contains one entry, we could have
+We are interested in issues from the `FIRST` linked project. Although this list just contains one entry, we could have
 added more.
 ```            
           ],
           "filter": {}
 ```
-The filter is empty so any issue from 'FIRST' linked to by 'PROJ' issues will be shown on the board.
+The filter is empty so any issue from `FIRST` linked to by `PROJ` issues will be shown on the board.
 ```          
         },
         {
           "projects": [
             "SECOND"
 ```
-Here we are interested in issues from the 'SECOND' project.
+Here we are interested in issues from the `SECOND` project.
 ```            
           ],
           "filter": {
@@ -478,12 +492,12 @@ Here we are interested in issues from the 'SECOND' project.
             ]
           }
 ```
-This filter specifies that the 'PROJ' issue cards should include linked issues from the 'SECOND' project but only if the
-linked 'SECOND' issue:
-* has a type of 'Bug' or Task, and
-* has a priority of 'Highest', and
-* is labelled with the 'Upstream_feature' label, and
-* the link type is either 'cloned to' or 'cloned from'
+This filter specifies that the `PROJ` issue cards should include linked issues from the `SECOND` project but only if the
+linked `SECOND` issue:
+* has a type of `Bug` or `Task`, and
+* has a priority of `Highest`, and
+* is labelled with the `Upstream_feature` label, and
+* the link type is either `cloned to` or `cloned from`
 
 You can use as few or as many of these fields as you like to narrow down exactly which linked issues you are interested 
 in.
@@ -493,7 +507,7 @@ in.
     }
 ``` 
 
-# 8 Parallel tasks
+# 9 Parallel tasks
 
 As mentioned in the [User Guide](user-guide.md) Overbård has a feature called Parallel Tasks. The way we use them on 
 the EAP project is that there are a set of requirements worked on by different teams that should be satisfied by the time
@@ -507,16 +521,16 @@ These are things which:
 * need to be done for all new features
 * often involve cross-team collaboration
 * each have more than one state (so a simple checkbox won't do). E.g. the Analysis Document Parallel Task has the states
-'TODO', 'In Progress', 'Review", 'Approved' 
+`TODO`, `In Progress`, `Review`, `Approved` 
 * if split up into Jira sub-tasks would seriously clutter up the board, with no immediate view of how each issue's
 tasks are progressing.
 
 To set up Parallel Tasks in Overbård, you first need to configure a custom field for each Parallel Task in Jira. The
-custom fields must be of the type 'Select List (single choice)'. For each field give them the values you want (in the 
-Analysis Document example mentioned, you would specify 'TODO', 'In Progress', 'Review" and 'Approved' ), and set the 
+custom fields must be of the type `Select List (single choice)`. For each field give them the values you want (in the 
+Analysis Document example mentioned, you would specify `TODO`, `In Progress`, `Review` and `Approved` ), and set the 
 first one as the default value. The order of the values is important and should be from start to finish, as the colour
 shown for each parallel task on the issue cards gives an indication of how far the task has progressed, with red being 
-'not started' (i.e. the first ) value and green being the 'finished' (i.e. the last) value.
+`not started` (i.e. the first ) value and green being the `finished` (i.e. the last) value.
 
 Then associate these custom fields with the screens for your project.
 
@@ -590,7 +604,7 @@ project might have different or intersecting parallel task requirements):
 Note that the parallel tasks are grouped, so that `AD` (Analysis Document) and `DC` (Documentation) will appear in 
 one group and `TD` (Test Development) and `PC` (Pre-Checked) will appear in another.
 
-# 9 Issue type overrides
+# 10 Issue type overrides
 
 This a slightly more advanced topic, which builds on what we have learnt so far. We have seen how to map project states
 to the Overbård columns, and how to configure parallel tasks and linked issues on a per project basis. However, for the 
@@ -598,7 +612,7 @@ state mappings, different issue types can have different workflows which in turn
 Similarly, parallel tasks and linked issues may be relevant to one issue type but not the others, or different issue 
 types might have different parallel task and linked issue needs.
 
-# 9.1 State mapping overrides
+# 10.1 State mapping overrides
 [state-mapping-overrides.json](assets/examples/state-mapping-overrides.json) shows a sample config for configuring
 different state mappings for different issue types.
 
@@ -633,7 +647,7 @@ In short what the below snippet does is define different state mappings for issu
   ],
 ```
 
-# 9.2 Parallel task overrides
+# 10.2 Parallel task overrides
 [parallel-task-overrides.json](assets/examples/parallel-task-overrides.json) shows a JSON config for setting up
 different parallel tasks for different issue types. 
 
@@ -723,7 +737,7 @@ will not have parallel tasks.
   ],
 ```
 
-# 9.3 Linked issue overrides
+# 10.3 Linked issue overrides
 [linked-issue-overrides.json](assets/examples/linked-issue-overrides.json) shows a JSON config for setting up
 different parallel tasks for different issue types. As before let's look at the `linked-projects` section first. It
 looks a lot like it did before but `SECOND` has a new `type-states` map. This is needed if the `SECOND` project
@@ -842,13 +856,13 @@ the board.
   ],
 ```
 
-# 10 Diagnosing problems
+# 11 Diagnosing problems
 
 When entering the board configuration, if you have got something wrong the server will validate the JSON to see if it
 is valid configuration. It will also (at least in most cases!) display an error message to help you pinpoint what went 
 wrong.
 
-## 10.1 Health Panel
+## 11.1 Health Panel
 
 Once you have successfully saved the board config, if you go and view the board, you might get a message about an error
 having happened loading the board, and be asked to view the health panel. The health panel is accessed by clicking
