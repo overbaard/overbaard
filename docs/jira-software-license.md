@@ -3,7 +3,7 @@ layout: default
 title: Getting a Jira Software License
 ---
 
-    The part of Jira that allows you to use the Agile features, on which Overbård is based, is part of *Jira Software*.
+The part of Jira that allows you to use the Agile features, on which Overbård is based, is part of *Jira Software*.
 Jira Software is not installed on a Jira instance by default. This guide will explain how to obtain and install a
 Jira Software license. 
 
