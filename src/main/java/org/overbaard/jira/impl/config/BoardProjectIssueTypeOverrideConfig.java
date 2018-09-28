@@ -294,7 +294,7 @@ public class BoardProjectIssueTypeOverrideConfig {
 
             ModelNode issueTypesNode = overrideNode.get(Constants.ISSUE_TYPES);
             List<String> issueTypes = loadAndValidateIssueTypes(issueTypesNode, projectCode, STATE_LINKS, existingIssueTypes);
-            BoardProjectStateMapper stateMapper = BoardProjectStateMapper.load(overrideNode.get(OVERRIDE), boardStates);
+            BoardProjectStateMapper stateMapper = BoardProjectStateMapper.load(projectCode, issueTypes, overrideNode.get(OVERRIDE), boardStates);
             return new StateLinksConfigOverride(issueTypes, stateMapper);
         }
     }
