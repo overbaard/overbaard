@@ -179,6 +179,7 @@ public class BoardConfigurationManagerTest {
                 new DoneModifier(false, false, true, true));
     }
 
+
     @Test
     public void testLoadConfigurationWithCustomFields() throws IOException {
         checkConfig("config/board-custom.json");
@@ -228,6 +229,18 @@ public class BoardConfigurationManagerTest {
     public void testLoadConfigurationWithLinkedIssuesIssueTypeOverrideFilters() throws IOException {
         checkConfig("config/board-linked-projects-issue-type-override-filters.json");
     }
+
+    @Test(expected = OverbaardValidationException.class)
+    public void testBadBoardStateFromProject() throws IOException {
+        checkConfig("config/board-tdp-bad-state-link.json");
+    }
+
+    @Test(expected = OverbaardValidationException.class)
+    public void testBadBoardStateFromOverride() throws IOException {
+        checkConfig("config/board-issue-type-override-bad-state-link.json");
+    }
+
+
 
     @Test
     public void testExampleConfigs() throws Exception {
@@ -284,15 +297,14 @@ public class BoardConfigurationManagerTest {
 
     private void checkConfig(String config) throws IOException {
         BoardConfigurationManagerBuilder cfgManagerBuilder = new BoardConfigurationManagerBuilder()
-                .addConfigActiveObjectsFromFile(config)
-                .setCustomFieldManager(CustomFieldManagerBuilder.loadFromResource(config))
-                .addSettingActiveObject(RANK_CUSTOM_FIELD_ID, "10000");
+            .addConfigActiveObjectsFromFile(config)
+            .setCustomFieldManager(CustomFieldManagerBuilder.loadFromResource(config))
+            .addSettingActiveObject(RANK_CUSTOM_FIELD_ID, "10000");
         BoardConfigurationManager cfgManager = cfgManagerBuilder.build();
         checkConfig(cfgManager, config);
     }
 
     private void checkConfig(BoardConfigurationManager cfgManager, String config) throws IOException {
-
         ModelNode original = BoardConfigurationManagerBuilder.loadConfig(config);
         original.protect();
         String boardCode = original.get(CODE).asString();

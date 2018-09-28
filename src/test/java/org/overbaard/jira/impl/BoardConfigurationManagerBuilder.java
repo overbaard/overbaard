@@ -192,7 +192,7 @@ public class BoardConfigurationManagerBuilder {
         return new BoardConfigurationManagerImpl(jiraInjectables);
     }
 
-    public static ModelNode loadConfig(String resource) throws IOException {
+    public static ModelNode  loadConfig(String resource) throws IOException {
         InputStream in = BoardConfigurationManagerBuilder.class.getClassLoader().getResourceAsStream(resource);
         Assert.assertNotNull(resource, in);
         try (InputStream bin = new BufferedInputStream(in)){
