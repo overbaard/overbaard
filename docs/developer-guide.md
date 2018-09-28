@@ -14,7 +14,7 @@ To develop Overbård locally you need to set up your development environment. Yo
 Since Angular 2 is used for the display logic, it is worth looking at the quickstart at 
 [https://angular.io](https://angular.io).
 
-# 1.1 Atlassian SDK
+## 1.1 Atlassian SDK
 
 The Atlassian SDK provides the APIs used for developing the plugin. It has tools for packaging the plugin to be 
 deployed in the server, and also provides a development Jira instance where you can run and debug the plugin in a 
@@ -30,7 +30,7 @@ if you hit a problem on your platform. If you this, remember to adjust your `PAT
 .m2/settings.xml to include the local repository `${ATLASSIAN_SDK}/repository` and the online repository 
 `https://maven.atlassian.com/content/groups/public`.
 
-# 1.2 Yarn
+## 1.2 Yarn
 To install Yarn, follow the installation instructions on the [Yarn site](https://yarnpkg.com). 
 
 # 2 First time setup
@@ -194,7 +194,7 @@ depending on the focus of your current task, you can either do:
 * or both the UI steps and the Atlassian SDK steps if you are working on something involving the server. The SDK steps 
 will package the jar containing the plugin.
 
-# 3.1 Atlassian SDK 
+## 3.1 Atlassian SDK 
 
 These commands happen from the root (`$OB_DIR`) folder of the project (i.e where `pom.xml` is located). I normally use one window 
 for running the server instance and another to package the project. Stopping and starting the server takes a lot of 
@@ -220,7 +220,7 @@ Overbård plugin jar. We have some system properties to do more work.
   * `-Dob.ui` - this is like `-Dob.ui` but slower as it does optimisations for building the web application
    files for a production environment. This option should be used if you ever do a proper release of Overbård.
    
-# 3.2 UI
+## 3.2 UI
 
 Each of the following UI steps happen from the `$OB_DIR/webapp` folder, and a separate terminal window is needed 
 for each one.
