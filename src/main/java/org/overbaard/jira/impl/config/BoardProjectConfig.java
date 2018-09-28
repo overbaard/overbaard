@@ -129,7 +129,7 @@ public class BoardProjectConfig extends ProjectConfig<BoardProjectStateMapper> {
         BoardProjectIssueTypeOverrideConfig issueTypeOverrides =
                 BoardProjectIssueTypeOverrideConfig.load(project.get(Constants.OVERRIDES), boardStates, parallelTaskConfig, projectCode, issueTypes, linkedProjectNames);
         ModelNode statesLinks = Util.getRequiredChild(project, "Project", projectCode, Constants.STATE_LINKS);
-        BoardProjectStateMapper stateMapper = BoardProjectStateMapper.load(statesLinks, boardStates);
+        BoardProjectStateMapper stateMapper = BoardProjectStateMapper.load(projectCode, null, statesLinks, boardStates);
         return new BoardProjectConfig(
                 projectCode, loadQueryFilter(project), colour,
                 stateMapper,

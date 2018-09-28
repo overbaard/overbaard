@@ -4,11 +4,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.Property;
+import org.overbaard.jira.OverbaardValidationException;
 
 /**
  * @author <a href="mailto:kabir.khan@jboss.com">Kabir Khan</a>
@@ -42,12 +44,18 @@ public class BoardProjectStateMapper extends ProjectStateList {
         this.ownDoneStateNames = Collections.unmodifiableSet(ownDoneStateNames);
     }
 
-    static BoardProjectStateMapper load(ModelNode statesLinks, BoardStates boardStates) {
+    static BoardProjectStateMapper load(String project, List<String> issueTypes, ModelNode statesLinks, BoardStates boardStates) {
+        Set<String> validBoardStateNames = new HashSet<>(boardStates.getStateNames());
         Map<String, String> ownToBoardStates = new LinkedHashMap<>();
         Map<String, String> boardToOwnStates = new HashMap<>();
         for (Property prop : statesLinks.asPropertyList()) {
             final String ownState = prop.getName();
             final String boardState = prop.getValue().asString();
+
+            if (!validBoardStateNames.contains(boardState)) {
+                createInvalidBoardStateException(project, issueTypes, ownState, boardState);
+            }
+
             ownToBoardStates.put(ownState, boardState);
             boardToOwnStates.put(boardState, ownState);
         }
@@ -66,6 +74,15 @@ public class BoardProjectStateMapper extends ProjectStateList {
                 Collections.unmodifiableMap(states),
                 Collections.unmodifiableMap(ownToBoardStates),
                 Collections.unmodifiableMap(boardToOwnStates));
+    }
+
+    private static void createInvalidBoardStateException(String project, List<String> issueTypes, String ownState, String boardState) {
+        StringBuilder sb = new StringBuilder("Project state '" + ownState + "' in project '" + project + "'");
+        if (issueTypes != null) {
+            sb.append(" in the overrides for issue types: " + issueTypes);
+        }
+        sb.append(" references a board state '" + boardState + "' which is not set up for the board.");
+        throw new OverbaardValidationException(sb.toString());
     }
 
     public Integer mapOwnStateOntoBoardStateIndex(String state) {
