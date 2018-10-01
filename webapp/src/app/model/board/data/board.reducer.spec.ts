@@ -117,11 +117,10 @@ describe('Board reducer tests', () => {
     it('Full', () => {
       // Configures everything that can be
       const boardState: BoardState = boardReducer(
-        initialBoardState, BoardActions.createDeserializeBoard('http://jira.example.com/', getTestBoardsInput()));
+        initialBoardState, BoardActions.createDeserializeBoard(getTestBoardsInput()));
       expect(boardState.viewId).toBe(10);
       expect(boardState.currentUser).toBe('bob');
       expect(boardState.rankCustomFieldId).toBe(12345);
-      expect(boardState.jiraUrl).toBe('http://jira.example.com/');
 
       // Do some sanity checking of the contents. The individual reducer tests do in-depth checking
 
@@ -212,10 +211,9 @@ describe('Board reducer tests', () => {
       delete input['blacklist'];
       // Configures everything that can be
       const boardState: BoardState = boardReducer(
-        initialBoardState, BoardActions.createDeserializeBoard('http://jira1.example.com/', input));
+        initialBoardState, BoardActions.createDeserializeBoard(input));
       expect(boardState.viewId).toBe(10);
       expect(boardState.rankCustomFieldId).toBe(12345);
-      expect(boardState.jiraUrl).toBe('http://jira1.example.com/');
 
       // Do some sanity checking of the contents. The individual reducer tests do in-depth checking
 
@@ -278,7 +276,7 @@ describe('Board reducer tests', () => {
     let boardState: BoardState;
     beforeEach(() => {
       boardState = boardReducer(
-        initialBoardState, BoardActions.createDeserializeBoard('http://www.example.com/jira/', getTestBoardsInput()));
+        initialBoardState, BoardActions.createDeserializeBoard(getTestBoardsInput()));
     });
 
     it ('Empty', () => {

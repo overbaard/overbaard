@@ -13,6 +13,7 @@ import {IssueTableBuilder} from './issue-table.builder';
 export class BoardViewBuilder {
   constructor(
     private readonly _fontSizeTable: FontSizeTableService,
+    private readonly _jiraUrl: string,
     private readonly _changeType: ChangeType,
     private readonly _oldBoardView: BoardViewModel,
     private readonly _oldBoardState: BoardState,
@@ -30,7 +31,7 @@ export class BoardViewBuilder {
 
     const issueTableBuilder: IssueTableBuilder =
       new IssueTableBuilder(
-        this._fontSizeTable,
+        this._fontSizeTable, this._jiraUrl,
         this._changeType, this._oldBoardView.issueTable, this._currentBoardState,
         this._lastUserSettingState, this._currentUserSettingState);
     const issueTable: IssueTable = issueTableBuilder.build();

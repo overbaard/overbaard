@@ -14,13 +14,14 @@ import {userSettingSelector} from '../../model/board/user/user-setting.reducer';
 import {FontSizeTableService} from '../../services/font-size-table.service';
 import {ChangeType} from './view-builder/change-type';
 import {BoardViewBuilder} from './view-builder/board-view.builder';
+import {UrlService} from '../../services/url.service';
 
 @Injectable()
 export class BoardViewModelService {
   private readonly _boardViewModelHandler: BoardViewModelHandler;
 
-  constructor(private _store: Store<AppState>, private _fontSizeTable: FontSizeTableService) {
-    this._boardViewModelHandler = new BoardViewModelHandler(this._fontSizeTable);
+  constructor(private _store: Store<AppState>, private _fontSizeTable: FontSizeTableService, urlService: UrlService) {
+    this._boardViewModelHandler = new BoardViewModelHandler(this._fontSizeTable, urlService.jiraUrl);
   }
 
   getBoardViewModel(): Observable<BoardViewModel> {
@@ -41,7 +42,7 @@ export class BoardViewModelHandler {
   private _lastBoardView: BoardViewModel = initialBoardViewModel;
   private _forcedRefresh = false;
 
-  constructor(private readonly _fontSizeTable: FontSizeTableService) {
+  constructor(private readonly _fontSizeTable: FontSizeTableService, private _jiraUrl: string) {
   }
 
   getBoardViewModel(boardState$: Observable<BoardState>,
@@ -104,7 +105,7 @@ export class BoardViewModelHandler {
 
           let boardView: BoardViewModel = this._lastBoardView;
           if (changeType != null) {
-            boardView = new BoardViewBuilder(this._fontSizeTable, changeType, this._lastBoardView,
+            boardView = new BoardViewBuilder(this._fontSizeTable, this._jiraUrl, changeType, this._lastBoardView,
               this._lastBoardState, boardState, this._lastUserSettingState, userSettingState)
               .build();
           }

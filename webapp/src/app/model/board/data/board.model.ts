@@ -17,7 +17,6 @@ const DEFAULT_STATE: BoardState = {
   viewId: -1,
   currentUser: null,
   rankCustomFieldId: -1,
-  jiraUrl: null,
   headers: initialHeaderState,
   assignees: initialAssigneeState,
   issueTypes: initialIssueTypeState,

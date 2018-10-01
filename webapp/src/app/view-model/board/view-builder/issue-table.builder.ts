@@ -19,6 +19,7 @@ import {TableBuilder} from './table.builder';
 import {RankViewBuilder} from './rank-view.builder';
 import {SwimlaneInfoBuilder} from './swimlane-info.builder';
 import {IssueHeightCalculator} from './issue-height-calculator';
+import {UrlService} from '../../../services/url.service';
 
 export class IssueTableBuilder {
   // Initialised in createTableAndRankView
@@ -35,6 +36,7 @@ export class IssueTableBuilder {
 
   constructor(
     private readonly _fontSizeTable: FontSizeTableService,
+    private readonly _jiraUrl: string,
     private readonly _changeType: ChangeType,
     private readonly _oldIssueTableState: IssueTable,
     private readonly _currentBoardState: BoardState,
@@ -127,7 +129,7 @@ export class IssueTableBuilder {
       summaryLines = List<string>(heightCalculator.summaryLines);
     }
     return BoardIssueViewUtil.createBoardIssue(
-      issue, this._currentBoardState.jiraUrl, colour, ownStateName, true, true, summaryLines, height);
+      issue, this._jiraUrl, colour, ownStateName, true, true, summaryLines, height);
   }
 
 

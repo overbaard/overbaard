@@ -46,7 +46,7 @@ export class BoardService {
       .subscribe(
         data => {
           // console.log(JSON.stringify(data, null, 2));
-          this._store.dispatch(BoardActions.createDeserializeBoard(this._restUrlService.jiraUrl, data));
+          this._store.dispatch(BoardActions.createDeserializeBoard(data));
           this.recreateChangePollerAndStartPolling(boardCode, backlog, false);
           if (firstLoad) {
             this.loadStateHelpTexts(boardCode);
