@@ -15,7 +15,6 @@ export interface BoardState {
   viewId: number;
   currentUser: string;
   rankCustomFieldId: number;
-  jiraUrl: string;
   headers: HeaderState;
   assignees: AssigneeState;
   issueTypes: IssueTypeState;

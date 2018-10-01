@@ -44,7 +44,7 @@ import {BoardIssue} from '../../model/board/data/issue/board-issue';
 import {BoardSearchFilterActions} from '../../model/board/user/board-filter/board-search-filter.reducer';
 
 export class BoardViewObservableUtil {
-  private _service: BoardViewModelHandler = new BoardViewModelHandler(null);
+  private _service: BoardViewModelHandler = new BoardViewModelHandler(null, 'http://jira.example.com/');
   private _userSettingState: UserSettingState = initialUserSettingState;
   private _userSettingSubject$: BehaviorSubject<UserSettingState> = new BehaviorSubject(initialUserSettingState);
   private _boardState: BoardState = initialBoardState;
