@@ -35,6 +35,7 @@ describe('Assignee reducer tests', () => {
     it('Initial state', () => {
       expect(assigneeState.assignees.size).toEqual(2);
       const keys: string[] = assigneeState.assignees.keySeq().toArray();
+      expect(keys.length).toEqual(2);
       expect(keys[0]).toEqual('bob');
       expect(keys[1]).toEqual('kabir');
 
@@ -48,6 +49,20 @@ describe('Assignee reducer tests', () => {
       const newState: AssigneeState =
         assigneeMetaReducer(assigneeState, AssigneeActions.createAddInitialAssignees(getTestAssigneesInput()));
       expect(newState).toBe(assigneeState);
+    });
+
+    it ('Full refresh, but less assignees', () => {
+      const input: any[] = [];
+      input.push(getTestAssigneesInput()[1]);
+
+      const newState: AssigneeState =
+        assigneeMetaReducer(assigneeState, AssigneeActions.createAddInitialAssignees(input));
+      const keys: string[] = newState.assignees.keySeq().toArray();
+      expect(keys.length).toEqual(1);
+      expect(keys[0]).toEqual('kabir');
+
+      checkAssignee(newState.assignees.get('kabir'),
+        'kabir', 'Kabir Khan', 'KK', 'kabir@example.com', 'https://example.com/kabir.png');
     });
   });
 
