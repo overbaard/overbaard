@@ -12,13 +12,13 @@
     Select a board to update its config. For boards where you have the 'administer project' permission for the
     main projects, you can edit and delete boards.
   </div>
-  <div *ngIf="(config$ | async)?.boards.size === 0 ; else showBoards">
+  <div *ngIf="(config$ | async).boards.size === 0 ; else showBoards">
     No boards are configured yet. Add some below.
   </div>
   <ng-template #showBoards>
     <mat-accordion>
       <mat-expansion-panel
-        *ngFor="let board of (config$ | async)?.boards.values()"
+        *ngFor="let board of (config$ | async).boards.values()"
         (opened)="onOpenBoardForEdit(board['id'])"
         (closed)="onCloseBoardForEdit(board['id'])">
         <mat-expansion-panel-header>
@@ -70,7 +70,7 @@
       </div>
     </form>
   </div>
-  <div *ngIf="(config$ | async)?.canEditRankCustomFieldId">
+  <div *ngIf="(config$ | async).canEditRankCustomFieldId">
     <hr/>
     <div class="mat-h2">Rank custom field id</div>
     <div>Enter the custom field id for Jira Agile's 'Rank' attribute:</div>
