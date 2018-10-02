@@ -1,8 +1,8 @@
 import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {BoardsService} from '../../services/boards.service';
 import {AppHeaderService} from '../../services/app-header.service';
-import {Observable, Subject} from 'rxjs';
-import {OrderedMap} from 'immutable';
+import {BehaviorSubject, Observable, Observer, Subject} from 'rxjs';
+import {Iterator, OrderedMap} from 'immutable';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {map, take} from 'rxjs/operators';
 
@@ -17,7 +17,11 @@ export class ConfigurationComponent implements OnInit {
 
   // There isn't much going on with data here, so we're not using redux in this area (for now). Instead we push
   // the current data to this subject
-  config$: Subject<ConfigBoardsView> = new Subject();
+  config$: Subject<ConfigBoardsView> = new BehaviorSubject<ConfigBoardsView>(
+    {
+      boards: OrderedMap<number, any>(),
+      canEditRankCustomFieldId: false,
+      rankCustomFieldId: 0});
 
   // For editing and deleting boards
   selected = -1;
@@ -114,7 +118,9 @@ export class ConfigurationComponent implements OnInit {
     // TODO progress and errors
     this._boardsService.createBoard(json)
       .pipe(
-        map<any, ConfigBoardsView>(data => this.toConfigBoardView(data)),
+        map<any, ConfigBoardsView>(data => {
+          return this.toConfigBoardView(data);
+        }),
         take(1)
       )
       .subscribe(
@@ -138,7 +144,6 @@ export class ConfigurationComponent implements OnInit {
       return;
     }
     // TODO progress and errors
-    console.log('Saved edited board');
     this._boardsService.saveBoard(this.selected, boardJson)
       .pipe(
         map<any, ConfigBoardsView>(data => this.toConfigBoardView(data)),
