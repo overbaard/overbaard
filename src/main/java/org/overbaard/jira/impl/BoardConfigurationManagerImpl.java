@@ -391,7 +391,8 @@ public class BoardConfigurationManagerImpl implements BoardConfigurationManager 
             //The project is empty, start checking once they add something
             return true;
         }
-        for (String projectCode : boardConfig.get(PROJECTS).keys()) {
+        for (ModelNode project : boardConfig.get(PROJECTS).asList()) {
+            String projectCode = project.get(CODE).asString();
             if (!hasPermission(user, projectCode, permissions)) {
                 return false;
             }
