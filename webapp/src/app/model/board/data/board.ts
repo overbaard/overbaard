@@ -10,6 +10,7 @@ import {ProjectState} from './project/project.model';
 import {RankState} from './rank/rank.model';
 import {IssueState} from './issue/issue.model';
 import {BlacklistState} from './blacklist/blacklist.model';
+import {ManualSwimlaneState} from './manual-swimlane/manual-swimlane.model';
 
 export interface BoardState {
   viewId: number;
@@ -27,4 +28,5 @@ export interface BoardState {
   ranks: RankState;
   issues: IssueState;
   blacklist: BlacklistState;
+  manualSwimlanes: ManualSwimlaneState;
 }

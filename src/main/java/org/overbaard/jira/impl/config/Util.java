@@ -15,7 +15,11 @@
  */
 package org.overbaard.jira.impl.config;
 
+import java.util.List;
+
 import org.jboss.dmr.ModelNode;
+import org.jboss.dmr.ModelType;
+import org.overbaard.jira.OverbaardValidationException;
 
 /**
  * @author Kabir Khan
@@ -27,6 +31,28 @@ class Util {
             throw new IllegalStateException(type + " '" + typeName + "' does not have a '" + childName +"' field");
         }
         return value;
+    }
+
+    static String getRequiredString(ModelNode modelNode, String name, String missingError, String typeError) {
+        if (!modelNode.hasDefined(name)) {
+            throw new OverbaardValidationException(missingError);
+        }
+        final ModelNode stringNode = modelNode.get(name);
+        if (stringNode.getType() != ModelType.STRING) {
+            throw new OverbaardValidationException(typeError);
+        }
+        return stringNode.asString();
+    }
+
+    static List<ModelNode> validateMinSizeArray(ModelNode modelNode, int minSize, String typeError, String sizeError) {
+        if (modelNode.getType() != ModelType.LIST) {
+            throw new OverbaardValidationException(typeError);
+        }
+        List<ModelNode> listNode = modelNode.asList();
+        if (listNode.size() < minSize) {
+            throw new OverbaardValidationException(sizeError);
+        }
+        return listNode;
     }
 
 }

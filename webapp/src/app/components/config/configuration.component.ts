@@ -1,10 +1,12 @@
 import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {BoardsService} from '../../services/boards.service';
 import {AppHeaderService} from '../../services/app-header.service';
-import {BehaviorSubject, Observable, Observer, Subject} from 'rxjs';
+import {BehaviorSubject, config, Observable, Observer, Subject} from 'rxjs';
 import {Iterator, OrderedMap} from 'immutable';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {map, take} from 'rxjs/operators';
+import {IssueQlUtil} from '../../common/parsers/issue-ql/issue-ql.util';
+import * as issueQlParser from '../../common/parsers/issue-ql/pegjs/issue-ql.generated';
 
 @Component({
   selector: 'app-configuration',
@@ -111,8 +113,14 @@ export class ConfigurationComponent implements OnInit {
   onSaveCreatedBoard() {
     console.log('Saving created board');
     const json: string  = this.createForm.controls['createJson'].value;
-    if (!this.checkJson(json)) {
+    const jsonObject: Object = this.checkJson(json);
+    if (!jsonObject) {
       this.createError = 'Contents must be valid json';
+      return;
+    }
+    const issueQlError = this.checkManualSwimlanesIssueQl(jsonObject);
+    if (issueQlError) {
+      this.createError = issueQlError;
       return;
     }
     // TODO progress and errors
@@ -139,10 +147,17 @@ export class ConfigurationComponent implements OnInit {
 
   onSaveEditedBoard(boardJson: string) {
     console.log('Saving edited board');
-    if (!this.checkJson(boardJson)) {
+    const jsonObject: Object = this.checkJson(boardJson);
+    if (!jsonObject) {
       this.editError = 'Contents must be valid json';
       return;
     }
+    const issueQlError = this.checkManualSwimlanesIssueQl(jsonObject);
+    if (issueQlError) {
+      this.editError = issueQlError;
+      return;
+    }
+
     // TODO progress and errors
     this._boardsService.saveBoard(this.selected, boardJson)
       .pipe(
@@ -169,12 +184,11 @@ export class ConfigurationComponent implements OnInit {
   }
 
 
-  private checkJson(value: string): boolean {
+  private checkJson(value: string): Object {
     try {
-      JSON.parse(value);
-      return true;
+      return JSON.parse(value);
     } catch (e) {
-      return false;
+      return null;
     }
   }
 
@@ -190,6 +204,42 @@ export class ConfigurationComponent implements OnInit {
     };
   }
 
+  private checkManualSwimlanesIssueQl(boardConfig: Object): string {
+    const cfg: any = boardConfig['config'];
+    if (!cfg) {
+      // Proper validation happens on server
+      return;
+    }
+    const mslConfig = cfg['manual-swimlanes'];
+    if (mslConfig) {
+      if (!Array.isArray(mslConfig)) {
+        // Proper validation happens on server
+        return null;
+      }
+      for (const msl of mslConfig) {
+        const entries: any = msl['entries'];
+        if (!Array.isArray(entries)) {
+          // Proper validation happens on server
+          return null;
+        }
+        for (const entry of entries) {
+          let iql = entry['issue-ql'];
+          if (!iql) {
+            // Proper validation happens on server
+            return null;
+          }
+          iql = iql.trim();
+          let error: issueQlParser.SyntaxError;
+          if (iql.length > 0) {
+            error = IssueQlUtil.validateIssueQl(iql);
+            if (error) {
+              return `"Invalid Issue QL: "${iql}". The parser error is: ${error}"`;
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 interface ConfigBoardsView {

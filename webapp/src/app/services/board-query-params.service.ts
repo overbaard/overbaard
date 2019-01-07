@@ -171,6 +171,9 @@ export class BoardQueryParamsHandler {
     if (BoardSearchFilterUtil.containingTextAboveMinimumLength(searchFilters.containingText)) {
       params.push(`s.text=${encodeURIComponent(searchFilters.containingText)}`);
     }
+    if (searchFilters.issueQl) {
+      params.push(`s.iql=${encodeURIComponent(searchFilters.issueQl)}`);
+    }
     if (searchFilters.hideNonMatches) {
       params.push('s.hide=true');
     }

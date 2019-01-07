@@ -62,14 +62,27 @@
           matInput
           matTextareaAutosize
           matAutosizeMinRows="1"
-          matAutosizeMaxRows="25"
+          matAutosizeMaxRows="10"
           [placeholder]="'Issue Text Search'"
           [formControl]="searchContainingTextCtrl"
         ></textarea>
         <mat-hint *ngIf="containingTextInput.value?.trim().length < 3" align="end">Minimum 3 characters</mat-hint>
       </mat-form-field>
+      <mat-form-field
+        (click)="onShowEditIssueQlDialog($event)"
+      >
+        <textarea
+          #containingTextInput
+          matInput
+          matTextareaAutosize
+          matAutosizeMinRows="1"
+          matAutosizeMaxRows="10"
+          [placeholder]="'IssueQL'"
+          [formControl]="searchIssueQlCtrl"
+        ></textarea>
+      </mat-form-field>
       <mat-slide-toggle
-        [color]="'primary'"
+        [color]="'accent'"
         [checked]="searchFilterState.hideNonMatches"
         (change)="onChangeHideNonMatches($event)"
       >Hide non-matching</mat-slide-toggle>

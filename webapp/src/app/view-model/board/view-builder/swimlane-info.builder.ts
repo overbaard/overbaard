@@ -16,6 +16,11 @@ import {SwimlaneData} from '../swimlane-data';
 import {BoardViewModelUtil} from '../board-view.model';
 import {TableBuilder} from './table.builder';
 import {UserSettingUtil} from '../../../model/board/user/user-setting.model';
+import {BoardIssue} from '../../../model/board/data/issue/board-issue';
+import {ManualSwimlane, ManualSwimlaneEntry} from '../../../model/board/data/manual-swimlane/manual-swimlane.model';
+import {IssueQlUtil} from '../../../common/parsers/issue-ql/issue-ql.util';
+import {IssueQlMatcher} from '../../../common/parsers/issue-ql/issue-ql.matcher';
+import {IssueVisitor} from '../../../common/parsers/issue-ql/issue.visitor';
 
 export class SwimlaneInfoBuilder {
   static create(boardState: BoardState,
@@ -91,6 +96,7 @@ export class SwimlaneInfoBuilder {
       default: {
         const customFields: OrderedMap<string, CustomField> = boardState.customFields.fields.get(userSettingState.swimlane);
         if (customFields) {
+          // See if it is a custom field
           customFields.forEach(
             f => {
               builderMap.set(f.key,
@@ -100,6 +106,15 @@ export class SwimlaneInfoBuilder {
             const issueField: CustomField = issue.customFields.get(userSettingState.swimlane);
             return [dataBuilders.get(issueField ? issueField.key : NONE_FILTER_KEY)];
           });
+        } else {
+          const manualSwimlane: ManualSwimlane = boardState.manualSwimlanes.swimlanes.get(userSettingState.swimlane);
+          if (manualSwimlane) {
+            manualSwimlane.swimlaneEntries.forEach(e => {
+              builderMap.set(e.name,
+                new SwimlaneDataBuilder(e.name, e.name, states, collapsed(userSettingState, name), userSettingState, existingInfo));
+            });
+            issueMatcher = ((issue, dataBuilders) => this.issueQlMatcher(manualSwimlane, issue, dataBuilders, builderNone));
+          }
         }
       }
     }
@@ -136,6 +151,33 @@ export class SwimlaneInfoBuilder {
       return [dataBuilders.get(NONE_FILTER_KEY)];
     }
     return issueSet.map(v => dataBuilders.get(v)).toArray();
+  }
+
+  private static issueQlMatcher(
+    manualSwimlane: ManualSwimlane,
+    issue: BoardIssue,
+    dataBuilders: Map<string, SwimlaneDataBuilder>,
+    builderNone: SwimlaneDataBuilder): SwimlaneDataBuilder[] {
+
+    const entries: OrderedMap<string, ManualSwimlaneEntry> = manualSwimlane.swimlaneEntries;
+    const matchingBuilders: SwimlaneDataBuilder[] = [];
+
+    dataBuilders.forEach(builder => {
+      if (builder === builderNone) {
+        return;
+      }
+
+      const matcher = new IssueQlMatcher(entries.get(builder.key).parsedIssueQl);
+      if (matcher.matchIssue(new IssueVisitor(issue))) {
+        matchingBuilders.push(builder);
+      }
+    });
+
+    if (matchingBuilders.length === 0) {
+      matchingBuilders.push(builderNone);
+    }
+
+    return matchingBuilders;
   }
 
   private constructor(

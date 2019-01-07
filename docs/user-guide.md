@@ -190,7 +190,7 @@ value you want to set, you can search for it:
 
 <img src="assets/images/user-guide/board-filters-long-search.png" width="250px"/>
 
-#### 2.3.3.2 Search
+#### 2.3.3.2 Search and Issue QL
 
 A special case of filter is `Search`, which appears at the top of the filters list. The standard setting greys out
 the issues that do not match the search:
@@ -200,6 +200,9 @@ the issues that do not match the search:
 As you can see we are looking for issues where the issue id is `FEAT-1` or `FEAT-5`, where the summary also
 contains the text `longi`. For the `Issue Ids` field suggestions for issue ids are presented as you type into the
 field. The `Issue Text Search` box must contain at least three characters for it to have any effect.
+
+There is also an Issue QL field that you can use to enter more advanced queries, see the 
+[Issue QL Guide](issue-ql.md) for more details.
 
 The final `Hide non-matching` toggle, if set, makes the search behave more in line with normal filters by hiding,
 rather than greying out, non-matching issues:

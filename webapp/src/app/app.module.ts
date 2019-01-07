@@ -51,6 +51,7 @@ import {FontMeasureTableComponent} from './components/font-measure/font-measure-
 import {ResetProgressGuard} from './services/router/reset-progress.guard';
 import {FilterEntryComponent} from './components/board/settings-drawer/filter-entry.component';
 import {SearchFilterComponent} from './components/board/settings-drawer/search-filter.component';
+import {IssueQlDialogComponent} from './components/board/settings-drawer/issue-ql-dialog.component';
 
 const appState: AppState = initialAppState;
 export function getInitialAppState(): AppState {
@@ -93,10 +94,12 @@ export function getInitialAppState(): AppState {
     ScrollListenerDirective,
     FilterFormEntryPipe,
     FontMeasureComponent,
-    FontMeasureTableComponent
+    FontMeasureTableComponent,
+    IssueQlDialogComponent
   ],
   entryComponents: [
     CommentIssueDialogComponent,
+    IssueQlDialogComponent,
     MoveIssueDialogComponent,
     ParallelTaskSelectorComponent,
     RankIssueDialogComponent,

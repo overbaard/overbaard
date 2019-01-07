@@ -3,6 +3,8 @@ import {Set} from 'immutable';
 import {UserSettingActions} from '../user-setting.reducer';
 import {BoardSearchFilterState, initialBoardSearchFilterState} from './board-search-filter.model';
 import {BoardSearchFilterActions, boardSearchFilterMetaReducer} from './board-search-filter.reducer';
+import {IssueQlNode} from '../../../../common/parsers/issue-ql/ast/node.iql';
+import {IssueQlUtil} from '../../../../common/parsers/issue-ql/issue-ql.util';
 
 describe('BoardSearchFilter reducer tests', () => {
 
@@ -20,7 +22,8 @@ describe('BoardSearchFilter reducer tests', () => {
       const qs: Dictionary<string> = {
         's.ids': 'TEST-1,TEST-2',
         's.text': 'Some%20text',
-        's.hide': 'true'
+        's.hide': 'true',
+        's.iql': encodeURIComponent('labels="test"')
       };
       const state: BoardSearchFilterState = boardSearchFilterMetaReducer(
         initialBoardSearchFilterState,
@@ -29,15 +32,9 @@ describe('BoardSearchFilter reducer tests', () => {
       filterChecker.containingText = 'Some text';
       filterChecker.issueIds = ['TEST-1', 'TEST-2'];
       filterChecker.hideNonMatches = true;
+      filterChecker.issueQl = 'labels="test"';
       filterChecker.check(state);
     });
-
-    function checkSetContents(set: Set<string>, expected: string[]) {
-      expect(set.size).toEqual(expected.length, 'state.field=' + name);
-      for (const curr of expected) {
-        expect(set.contains(curr)).toBe(true);
-      }
-    }
   });
 
   describe('Update tests', () => {
@@ -46,7 +43,8 @@ describe('BoardSearchFilter reducer tests', () => {
       const qs: Dictionary<string> = {
         's.ids': 'TEST-1,TEST-2',
         's.text': 'Some%20text',
-        's.hide': 'false'
+        's.hide': 'false',
+        's.iql': encodeURIComponent('labels="test"')
       };
       state = boardSearchFilterMetaReducer(
         initialBoardSearchFilterState,
@@ -58,6 +56,7 @@ describe('BoardSearchFilter reducer tests', () => {
       const checker: SearchFilterChecker = new SearchFilterChecker();
       checker.issueIds = ['TEST-1', 'TEST-3'];
       checker.containingText = 'Some text';
+      checker.issueQl = 'labels="test"';
       checker.check(state);
     });
 
@@ -67,6 +66,7 @@ describe('BoardSearchFilter reducer tests', () => {
       const checker: SearchFilterChecker = new SearchFilterChecker();
       checker.issueIds = [];
       checker.containingText = 'Some text';
+      checker.issueQl = 'labels="test"';
       checker.check(state);
     });
 
@@ -75,6 +75,7 @@ describe('BoardSearchFilter reducer tests', () => {
       const checker: SearchFilterChecker = new SearchFilterChecker();
       checker.issueIds = ['TEST-1', 'TEST-2'];
       checker.containingText = 'Hello there';
+      checker.issueQl = 'labels="test"';
       checker.check(state);
     });
 
@@ -83,6 +84,25 @@ describe('BoardSearchFilter reducer tests', () => {
       state = boardSearchFilterMetaReducer(state, BoardSearchFilterActions.createUpdateContainingText(null));
       const checker: SearchFilterChecker = new SearchFilterChecker();
       checker.issueIds = ['TEST-1', 'TEST-2'];
+      checker.issueQl = 'labels="test"';
+      checker.check(state);
+    });
+
+    it ('Update IssueQl', () => {
+      state = boardSearchFilterMetaReducer(state, BoardSearchFilterActions.createUpdateIssueQl('labels="test123"'));
+      const checker: SearchFilterChecker = new SearchFilterChecker();
+      checker.issueIds = ['TEST-1', 'TEST-2'];
+      checker.containingText = 'Some text';
+      checker.issueQl = 'labels="test123"';
+      checker.check(state);
+    });
+
+    it ('Reset IssueQl', () => {
+      // Don't think the component will use null for this value, but test it just in case
+      state = boardSearchFilterMetaReducer(state, BoardSearchFilterActions.createUpdateIssueQl(''));
+      const checker: SearchFilterChecker = new SearchFilterChecker();
+      checker.issueIds = ['TEST-1', 'TEST-2'];
+      checker.containingText = 'Some text';
       checker.check(state);
     });
 
@@ -91,6 +111,7 @@ describe('BoardSearchFilter reducer tests', () => {
       const checker: SearchFilterChecker = new SearchFilterChecker();
       checker.issueIds = ['TEST-1', 'TEST-2'];
       checker.containingText = 'Some text';
+      checker.issueQl = 'labels="test"';
       checker.hideNonMatches = true;
       checker.check(state);
       state = boardSearchFilterMetaReducer(state, BoardSearchFilterActions.createUpdateHideNonMatches(false));
@@ -104,11 +125,20 @@ export class SearchFilterChecker {
   containingText = '';
   issueIds: string[] = [];
   hideNonMatches = false;
+  issueQl = '';
 
   check(filterState: BoardSearchFilterState) {
     this.checkFilter(this.issueIds, filterState.issueIds);
     expect(this.containingText).toEqual(filterState.containingText);
     expect(this.hideNonMatches).toEqual(filterState.hideNonMatches);
+    expect(this.issueQl).toEqual(filterState.issueQl);
+    if (this.issueQl) {
+      expect(filterState.parsedIssueQl).toBeTruthy();
+      const expectedParsed = IssueQlUtil.createIssueQlNode(this.issueQl);
+      expect(filterState.parsedIssueQl).toEqual(expectedParsed);
+    } else {
+      expect(filterState.parsedIssueQl).toBeFalsy();
+    }
   }
 
   checkFilter(expected: string[], actual: Set<string>) {

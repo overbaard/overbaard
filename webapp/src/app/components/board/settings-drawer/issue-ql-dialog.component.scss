@@ -1,0 +1,20 @@
+@import "../../../../styles";
+.dialog-wrapper {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  min-width: 350px;
+  max-width: 350px;
+}
+.mat-h4 {
+  margin: 0px;
+  color: $primary-colour;
+}
+.mat-dialog-content {
+  padding: 0px;
+  margin: 0px;
+}
+
+.help-button {
+  @include sized-icon-button-class(24px, 24px, 24px);
+}

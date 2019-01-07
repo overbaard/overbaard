@@ -475,7 +475,20 @@ describe('Apply filter tests', () => {
       });
     });
 
-    describe('Both', () => {
+    describe('IssueQL', () => {
+      it ('Matches', () => {
+        const issue: BoardIssueView = emptyIssue();
+        const iql = 'component = "C2"';
+        expect(filtersFromQs({'s.iql': iql}).filterMatchesSearch(issue)).toBe(true);
+      });
+      it ('Non-matches', () => {
+        const issue: BoardIssueView = emptyIssue();
+        const iql = 'component != "C2"';
+        expect(filtersFromQs({'s.iql': iql}).filterMatchesSearch(issue)).toBe(false);
+      });
+    });
+
+    describe('Issue keys and Containing text', () => {
       it ('Matches both', () => {
         const issue: BoardIssueView = emptyIssue();
         expect(filtersFromQs({'s.ids': 'ISSUE-1', 's.text': 'hello%20this'}).filterMatchesSearch(issue)).toBe(true);
@@ -491,6 +504,29 @@ describe('Apply filter tests', () => {
       it ('Matches none', () => {
         const issue: BoardIssueView = emptyIssue();
         expect(filtersFromQs({'s.ids': 'ISSUE-10', 's.text': 'hello%20that'}).filterMatchesSearch(issue)).toBe(false);
+      });
+    });
+
+    describe('Issue keys and IssueQL', () => {
+      it ('Matches both', () => {
+        const issue: BoardIssueView = emptyIssue();
+        const iql = 'component = "C2"';
+        expect(filtersFromQs({'s.ids': 'ISSUE-1', 's.iql': iql}).filterMatchesSearch(issue)).toBe(true);
+      });
+      it ('Matches id only', () => {
+        const issue: BoardIssueView = emptyIssue();
+        const iql = 'component != "C2"';
+        expect(filtersFromQs({'s.ids': 'ISSUE-1', 's.iql': iql}).filterMatchesSearch(issue)).toBe(false);
+      });
+      it ('Matches IssueQL only', () => {
+        const issue: BoardIssueView = emptyIssue();
+        const iql = 'component = "C2"';
+        expect(filtersFromQs({'s.ids': 'ISSUE-10', 's.iql': iql}).filterMatchesSearch(issue)).toBe(false);
+      });
+      it ('Matches none', () => {
+        const issue: BoardIssueView = emptyIssue();
+        const iql = 'component != "C2"';
+        expect(filtersFromQs({'s.ids': 'ISSUE-10', 's.iql': iql}).filterMatchesSearch(issue)).toBe(false);
       });
     });
   });

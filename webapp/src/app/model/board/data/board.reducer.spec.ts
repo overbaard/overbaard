@@ -22,6 +22,8 @@ import {BoardState} from './board';
 import {initialBoardState} from './board.model';
 import {HeaderState} from './header/header.state';
 import {TypedRecord} from 'typed-immutable-record';
+import {getTestManualSwimlanesInput} from './manual-swimlane/manual-swimlane.reducer.spec';
+import {ManualSwimlane} from './manual-swimlane/manual-swimlane.model';
 
 export function getTestBoardsInput(): any {
   return cloneObject(
@@ -47,6 +49,7 @@ export function getTestBoardsInput(): any {
       priorities: getTestPrioritiesInput(),
       'issue-types': getTestIssueTypesInput(),
       custom: getTestCustomFieldsInput(),
+      'manual-swimlanes': getTestManualSwimlanesInput(),
       projects: {
         main: [
           {
@@ -160,6 +163,10 @@ describe('Board reducer tests', () => {
       expect(customFields.get('Custom-1').size).toBe(3);
       expect(customFields.get('Custom-2').size).toBe(2);
 
+      const manualSwimlanes: OrderedMap<string, ManualSwimlane> = boardState.manualSwimlanes.swimlanes;
+      expect(manualSwimlanes.size).toBe(1);
+      expect(manualSwimlanes.get('Manual-Swimlane').swimlaneEntries.size).toBe(2);
+
       const projectState: ProjectState = boardState.projects;
       expect(projectState.boardProjects.size).toEqual(1);
       const project1: BoardProject = projectState.boardProjects.get('P1');
@@ -202,6 +209,7 @@ describe('Board reducer tests', () => {
       delete input['labels'];
       delete input['fix-versions'];
       delete input['custom'];
+      delete input['manual-swimlanes'];
       delete input['projects']['main'][0]['parallel-tasks'];
       delete input['issues']['P1-1']['components'];
       delete input['issues']['P1-1']['labels'];
@@ -247,6 +255,9 @@ describe('Board reducer tests', () => {
 
       const customFields: OrderedMap<string, OrderedMap<string, CustomField>> = boardState.customFields.fields;
       expect(customFields.size).toBe(0);
+
+      const manualSwimlanes: OrderedMap<string, ManualSwimlane> = boardState.manualSwimlanes.swimlanes;
+      expect(manualSwimlanes.size).toBe(0);
 
       const projectState: ProjectState = boardState.projects;
       expect(projectState.boardProjects.size).toEqual(1);
@@ -341,7 +352,7 @@ describe('Board reducer tests', () => {
       expect(newState.viewId).toBe(11);
       // These will never change via changes
       checkSameStateEntries(boardState, newState, 'currentUser', 'jiraUrl', 'rankCustomField', '_headers',
-        'headers', 'priorities', 'issueTypes', 'projects');
+        'headers', 'priorities', 'issueTypes', 'projects', 'manualSwimlanes');
 
       // Do some sanity checking of the contents. The individual reducer tests do in-depth checking
 
@@ -406,7 +417,7 @@ describe('Board reducer tests', () => {
 
       checkSameStateEntries(boardState, newState, 'currentUser', 'jiraUrl', '_headers', 'headers', 'assignees', 'issueTypes',
         'priorities', 'components',
-        'labels', 'fixVersions', 'customFields', 'projects', 'issues');
+        'labels', 'fixVersions', 'customFields', 'projects', 'issues', 'manualSwimlanes');
 
       const rankState: RankState = newState.ranks;
       expect(rankState.rankedIssueKeys.size).toBe(1);
@@ -435,7 +446,7 @@ describe('Board reducer tests', () => {
 
       checkSameStateEntries(boardState, newState, 'currentUser', 'jiraUrl', '_headers', 'headers', 'assignees',
         'issueTypes', 'priorities', 'components',
-        'labels', 'fixVersions', 'customFields', 'projects', 'issues');
+        'labels', 'fixVersions', 'customFields', 'projects', 'issues', 'manualSwimlanes');
 
       const rankState: RankState = newState.ranks;
       expect(rankState.rankedIssueKeys.size).toBe(1);

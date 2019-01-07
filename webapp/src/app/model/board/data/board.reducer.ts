@@ -26,6 +26,8 @@ import {RankActions, rankMetaReducer} from './rank/rank.reducer';
 import {HeaderState} from './header/header.state';
 import {BoardState} from './board';
 import {BoardUtil, initialBoardState} from './board.model';
+import {manualSwimlaneReducer, ManualSwimlanesActions} from './manual-swimlane/manual-swimlane.reducer';
+import {initialManualSwimlaneState, ManualSwimlaneState} from './manual-swimlane/manual-swimlane.model';
 
 
 const metaReducers = {
@@ -37,6 +39,7 @@ const metaReducers = {
   labels: labelMetaReducer,
   fixVersions: fixVersionMetaReducer,
   customFields: customFieldMetaReducer,
+  manualSwimlanes: manualSwimlaneReducer,
   projects: projectMetaReducer,
   ranks: rankMetaReducer,
   issues: issueMetaReducer,
@@ -125,6 +128,10 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
       const customFieldState: CustomFieldState = input['custom'] ?
         metaReducers.customFields(state.customFields, CustomFieldActions.createDeserializeCustomFields(input['custom']))
         : initialCustomFieldState;
+      const manualSwimlaneState: ManualSwimlaneState = input['manual-swimlanes'] ?
+        metaReducers.manualSwimlanes(
+          state.manualSwimlanes, ManualSwimlanesActions.createDeserializeManualSwimlanes(input['manual-swimlanes']))
+        : initialManualSwimlaneState;
 
       // This will always be present
       const projectState: ProjectState =
@@ -162,6 +169,7 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
         mutable.fixVersions = fixVersionState;
         mutable.labels = labelState;
         mutable.customFields = customFieldState;
+        mutable.manualSwimlanes = manualSwimlaneState;
         mutable.projects = projectState;
         mutable.issues = issueState;
         mutable.ranks = rankState;

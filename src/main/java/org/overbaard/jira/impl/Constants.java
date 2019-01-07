@@ -45,6 +45,7 @@ public class Constants {
     public static final String DONE = "done";
     public static final String EDIT = "edit";
     public static final String EMAIL = "email";
+    public static final String ENTRIES = "entries";
     public static final String FIELDS = "fields";
     public static final String FIELD_ID = "field-id";
     public static final String FILTER = "filter";
@@ -56,6 +57,7 @@ public class Constants {
     public static final String ID = "id";
     public static final String INDEX = "index";
     public static final String ISSUE_TYPES = "issue-types";
+    public static final String ISSUE_QL = "issue-ql";
     public static final String ISSUES = "issues";
     public static final String KEY = "key";
     public static final String LABELS = "labels";
@@ -64,6 +66,7 @@ public class Constants {
     public static final String LINK_NAMES = "link-names";
     public static final String LINKED_PROJECTS = "linked-projects";
     public static final String MAIN = "main";
+    public static final String MANUAL_SWIMLANES = "manual-swimlanes";
     public static final String NAME = "name";
     public static final String NEW = "new";
     public static final String OPTIONS = "options";

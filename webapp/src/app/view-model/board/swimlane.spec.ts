@@ -12,7 +12,6 @@ import {SwimlaneData} from './swimlane-data';
 import {BoardHeader} from './board-header';
 import {IssueTable} from './issue-table';
 import {BoardIssueView} from './board-issue-view';
-import {take} from 'rxjs/operators';
 
 describe('Swimlane observer tests', () => {
 
@@ -123,6 +122,18 @@ describe('Swimlane observer tests', () => {
                   {key: 'c2-A', name: 'First C2', issues: ['ONE-1', 'ONE-2', 'ONE-3']},
                   {key: 'c2-B', name: 'Second C2', issues: ['ONE-4']},
                   {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-5']}])
+                .checkBoard(board);
+            });
+      });
+      it('Manual Swimlane', () => {
+        createUtilWithStandardIssues({swimlane: 'Manual-Swimlane'})
+          .easySubscribe(
+            board => {
+              new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                .swimlanes([
+                  {key: 'One Lane', name: 'One Lane', issues: ['ONE-2', 'ONE-3']},
+                  {key: 'Another Lane', name: 'Another Lane', issues: ['ONE-3', 'ONE-4']},
+                  {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-1', 'ONE-5']}])
                 .checkBoard(board);
             });
       });
@@ -259,6 +270,17 @@ describe('Swimlane observer tests', () => {
                   {key: 'c2-A', name: 'First C2', issues: ['ONE-1', 'ONE-2', 'ONE-3']},
                   {key: 'c2-B', name: 'Second C2', issues: ['ONE-4']},
                   {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-5']}])
+                .checkBoard(board);
+            });
+        util.getUserSettingUpdater()
+          .updateSwimlane('Manual-Swimlane')
+          .easySubscribe(
+            board => {
+              new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                .swimlanes([
+                  {key: 'One Lane', name: 'One Lane', issues: ['ONE-2', 'ONE-3']},
+                  {key: 'Another Lane', name: 'Another Lane', issues: ['ONE-3', 'ONE-4']},
+                  {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-1', 'ONE-5']}])
                 .checkBoard(board);
             });
       });
@@ -476,6 +498,7 @@ describe('Swimlane observer tests', () => {
 
               });
         });
+
         it('Several', () => {
           util
             .getBoardStateUpdater()
@@ -698,6 +721,7 @@ describe('Swimlane observer tests', () => {
               });
         });
       });
+
       describe('CustomField', () => {
         beforeEach(() => {
           util = createUtilWithStandardIssues({swimlane: 'Custom-2'});
@@ -756,6 +780,100 @@ describe('Swimlane observer tests', () => {
                 new EqualityChecker()
                   .cleanSwimlanes('c2-A', NONE_FILTER_KEY)
                   .addChangedSwimlaneColumns('c2-B', 0)
+                  .check(originalView, board);
+              });
+        });
+      });
+
+      describe('Manual Swimlane', () => {
+        beforeEach(() => {
+          util = createUtilWithStandardIssues({swimlane: 'Manual-Swimlane'});
+          util.easySubscribe(board => originalView = board);
+
+        });
+        it('None', () => {
+          util
+            .getBoardStateUpdater()
+            .issueChanges({new: [{key: 'ONE-6', state: '1-1', summary: 'Test', priority: 'Major', type: 'task'}]})
+            .rankChanges({ONE: [{index: 5, key: 'ONE-6'}]})
+            .emit()
+            .easySubscribe(
+              board => {
+                new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
+                  .swimlanes([
+                    {key: 'One Lane', name: 'One Lane', issues: ['ONE-2', 'ONE-3']},
+                    {key: 'Another Lane', name: 'Another Lane', issues: ['ONE-3', 'ONE-4']},
+                    {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-1', 'ONE-5', 'ONE-6']}])
+                  .checkBoard(board);
+
+                new EqualityChecker()
+                  .cleanSwimlanes('One Lane', 'Another Lane')
+                  .addChangedSwimlaneColumns(NONE_FILTER_KEY, 0)
+                  .check(originalView, board);
+              });
+        });
+        it('One', () => {
+          util
+            .getBoardStateUpdater()
+            .issueChanges({
+              new: [{
+                key: 'ONE-6',
+                state: '1-1',
+                summary: 'Test',
+                priority: 'Major',
+                type: 'task',
+                components: ['C-30']
+              }]
+            })
+            .rankChanges({ONE: [{index: 5, key: 'ONE-6'}]})
+            .emit()
+            .easySubscribe(
+              board => {
+                new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
+                  .swimlanes([
+                    {key: 'One Lane', name: 'One Lane', issues: ['ONE-2', 'ONE-3']},
+                    {key: 'Another Lane', name: 'Another Lane', issues: ['ONE-3', 'ONE-4', 'ONE-6']},
+                    {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-1', 'ONE-5']}])
+                  .checkBoard(board);
+
+                new EqualityChecker()
+                  .cleanSwimlanes('One Lane', NONE_FILTER_KEY)
+                  .addChangedSwimlaneColumns('Another Lane', 0)
+                  .check(originalView, board);
+
+              });
+        });
+
+        it('Several', () => {
+          util
+            .getBoardStateUpdater()
+            .issueChanges({
+              new:
+                [{
+                  key: 'ONE-6',
+                  state: '1-1',
+                  summary: 'Test',
+                  priority: 'Major',
+                  type: 'task',
+                  components: ['C-30'],
+                  labels: ['L-10']
+                }]
+            })
+            .rankChanges({ONE: [{index: 5, key: 'ONE-6'}]})
+            .emit()
+            .easySubscribe(
+              board => {
+                new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3', 'ONE-6'], ['ONE-4', 'ONE-5'], []])
+                  .swimlanes([
+                    {key: 'One Lane', name: 'One Lane', issues: ['ONE-2', 'ONE-3', 'ONE-6']},
+                    {key: 'Another Lane', name: 'Another Lane', issues: ['ONE-3', 'ONE-4', 'ONE-6']},
+                    {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-1', 'ONE-5']}])
+                  .checkBoard(board);
+
+                new EqualityChecker()
+                  .cleanSwimlanes(NONE_FILTER_KEY)
+                  .addChangedSwimlaneColumns('One Lane', 0)
+                  .addChangedSwimlaneColumns('Another Lane', 0)
                   .check(originalView, board);
               });
         });
@@ -937,6 +1055,7 @@ describe('Swimlane observer tests', () => {
                 });
           });
         });
+
         describe('Components', () => {
           beforeEach(() => {
             util = createUtilWithStandardIssues({swimlane: 'component'});
@@ -1015,6 +1134,7 @@ describe('Swimlane observer tests', () => {
                 });
           });
         });
+
         describe('Fix Versions', () => {
           beforeEach(() => {
             util = createUtilWithStandardIssues({swimlane: 'fix-version'});
@@ -1102,6 +1222,7 @@ describe('Swimlane observer tests', () => {
                 });
           });
         });
+
         describe('Labels', () => {
           beforeEach(() => {
             util = createUtilWithStandardIssues({swimlane: 'label'});
@@ -1180,6 +1301,7 @@ describe('Swimlane observer tests', () => {
                 });
           });
         });
+
         describe('CustomField', () => {
           beforeEach(() => {
             util = createUtilWithStandardIssues({swimlane: 'Custom-2'});
@@ -1233,6 +1355,80 @@ describe('Swimlane observer tests', () => {
                 });
           });
         });
+
+        describe('Manual Swimlane', () => {
+          beforeEach(() => {
+            util = createUtilWithStandardIssues({swimlane: 'Manual-Swimlane'});
+            util.easySubscribe(board => originalView = board);
+
+          });
+          it('None', () => {
+            util
+              .getBoardStateUpdater()
+              .issueChanges({update: [{key: 'ONE-4', 'clear-components': true}]})
+              .emit()
+              .easySubscribe(
+                board => {
+                  new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                    .swimlanes([
+                      {key: 'One Lane', name: 'One Lane', issues: ['ONE-2', 'ONE-3']},
+                      {key: 'Another Lane', name: 'Another Lane', issues: ['ONE-3']},
+                      {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-1', 'ONE-4', 'ONE-5']}])
+                    .checkBoard(board);
+
+                  new EqualityChecker()
+                    .cleanSwimlanes('One Lane')
+                    .addChangedSwimlaneColumns('Another Lane', 1)
+                    .addChangedSwimlaneColumns(NONE_FILTER_KEY, 1)
+                    .check(originalView, board);
+                });
+          });
+          it('One', () => {
+            util
+              .getBoardStateUpdater()
+              .issueChanges({update: [{key: 'ONE-5', components: ['C-30']}]})
+              .emit()
+              .easySubscribe(
+                board => {
+                  new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                    .swimlanes([
+                      {key: 'One Lane', name: 'One Lane', issues: ['ONE-2', 'ONE-3']},
+                      {key: 'Another Lane', name: 'Another Lane', issues: ['ONE-3', 'ONE-4', 'ONE-5']},
+                      {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-1']}])
+                    .checkBoard(board);
+
+                  new EqualityChecker()
+                    .cleanSwimlanes('One Lane')
+                    .addChangedSwimlaneColumns('Another Lane', 1)
+                    .addChangedSwimlaneColumns(NONE_FILTER_KEY, 1)
+                    .check(originalView, board);
+                });
+          });
+          it('Several', () => {
+            util
+              .getBoardStateUpdater()
+              .issueChanges({
+                update: [{key: 'ONE-5', components: ['C-30'], labels: ['L-10']}]
+              })
+              .emit()
+              .easySubscribe(
+                  board => {
+                    new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                      .swimlanes([
+                        {key: 'One Lane', name: 'One Lane', issues: ['ONE-2', 'ONE-3', 'ONE-5']},
+                        {key: 'Another Lane', name: 'Another Lane', issues: ['ONE-3', 'ONE-4', 'ONE-5']},
+                        {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-1']}])
+                      .checkBoard(board);
+
+                    new EqualityChecker()
+                      .addChangedSwimlaneColumns('One Lane', 1)
+                      .addChangedSwimlaneColumns('Another Lane', 1)
+                      .addChangedSwimlaneColumns(NONE_FILTER_KEY, 1)
+                      .check(originalView, board);
+                });
+          });
+        });
+
       });
     });
 
