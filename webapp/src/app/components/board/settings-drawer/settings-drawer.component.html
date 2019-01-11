@@ -72,6 +72,7 @@
         [searchFilterState]="userSettings.searchFilters"
         (selectedIssueIds)="onSelectedSearchIssueIds($event)"
         (containingText)="onChangeContainingText($event)"
+        (issueQl)="onChangeIssueQl($event)"
         (hideNonMatches)="onChangeHideNonMatches($event)"
       ></app-search-filter>
       <app-setting-filter-entry

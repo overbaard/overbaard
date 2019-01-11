@@ -507,7 +507,35 @@ in.
     }
 ``` 
 
-# 9 Parallel tasks
+# 9 Manual swimlanes
+The [User Guide](user-guide.md) talks about the various swimlanes that get enabled automatically when setting up an
+Overbård board. However, you can also set up additional swimlanes manually for more targetted views for your users.
+To do this you add the `manual-swimlanes` section to your board config and add entries to it.
+```
+  "manual-swimlanes": [
+    {
+      "name": "Manual Swimlane",
+      "entries" : [
+        {
+          "name": "High priority bugs",
+          "issue-ql": "priority IN ('Highest', 'High') AND type = 'Bug'"
+        },
+        {
+          "name": "High priority tasks",
+          "issue-ql": "priority IN ('Highest', 'High') AND type = 'Task' s"
+        }
+      ]
+    }
+  ]
+``` 
+In the `Swimlane` drop-down list in the control panel, the user will now see an additonal entry called `Manual Swimlanes`
+(after `Search`, `Project`, `Issue Type` etc.), and when selecting that swimlane view they will have two lanes, the first 
+called `High priority bugs` and the second called `High priority tasks` (at the end there will be also be a 
+`None` swimlane for all issues which are not part of either of the two manually configured swimlanes). 
+Each swimlane entry contains an `issue-ql` entry. This is an 'Issue QL' string used to pick out issues we want 
+to be displayed in each swimlane. For more information about Issue QL, see the [Issue QL Guide](issue-ql.md). 
+
+# 10 Parallel tasks
 
 As mentioned in the [User Guide](user-guide.md) Overbård has a feature called Parallel Tasks. The way we use them on 
 the EAP project is that there are a set of requirements worked on by different teams that should be satisfied by the time
@@ -604,7 +632,7 @@ project might have different or intersecting parallel task requirements):
 Note that the parallel tasks are grouped, so that `AD` (Analysis Document) and `DC` (Documentation) will appear in 
 one group and `TD` (Test Development) and `PC` (Pre-Checked) will appear in another.
 
-# 10 Issue type overrides
+# 11 Issue type overrides
 
 This a slightly more advanced topic, which builds on what we have learnt so far. We have seen how to map project states
 to the Overbård columns, and how to configure parallel tasks and linked issues on a per project basis. However, for the 
@@ -612,7 +640,7 @@ state mappings, different issue types can have different workflows which in turn
 Similarly, parallel tasks and linked issues may be relevant to one issue type but not the others, or different issue 
 types might have different parallel task and linked issue needs.
 
-# 10.1 State mapping overrides
+# 11.1 State mapping overrides
 [state-mapping-overrides.json](assets/examples/state-mapping-overrides.json) shows a sample config for configuring
 different state mappings for different issue types.
 
@@ -647,7 +675,7 @@ In short what the below snippet does is define different state mappings for issu
   ],
 ```
 
-# 10.2 Parallel task overrides
+# 11.2 Parallel task overrides
 [parallel-task-overrides.json](assets/examples/parallel-task-overrides.json) shows a JSON config for setting up
 different parallel tasks for different issue types. 
 
@@ -737,7 +765,7 @@ will not have parallel tasks.
   ],
 ```
 
-# 10.3 Linked issue overrides
+# 11.3 Linked issue overrides
 [linked-issue-overrides.json](assets/examples/linked-issue-overrides.json) shows a JSON config for setting up
 different parallel tasks for different issue types. As before let's look at the `linked-projects` section first. It
 looks a lot like it did before but `SECOND` has a new `type-states` map. This is needed if the `SECOND` project
@@ -856,13 +884,13 @@ the board.
   ],
 ```
 
-# 11 Diagnosing problems
+# 12 Diagnosing problems
 
 When entering the board configuration, if you have got something wrong the server will validate the JSON to see if it
 is valid configuration. It will also (at least in most cases!) display an error message to help you pinpoint what went 
 wrong.
 
-## 11.1 Health Panel
+## 12.1 Health Panel
 
 Once you have successfully saved the board config, if you go and view the board, you might get a message about an error
 having happened loading the board, and be asked to view the health panel. The health panel is accessed by clicking

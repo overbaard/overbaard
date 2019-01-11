@@ -1,0 +1,72 @@
+{
+  "name": "Test Downstream Project",
+  "code": "TST",
+  "states": [
+    {"name": "S-A"},
+    {"name": "S-B"},
+    {"name": "S-C"},
+    {"name": "S-D"}
+  ],
+  "priorities": [
+    {"name": "highest", "colour": "colour-highest"},
+    {"name": "high", "colour": "colour-high"},
+    {"name": "low", "colour": "colour-low"},
+    {"name": "lowest", "colour": "colour-lowest"}
+  ],
+  "issue-types": [
+    {"name": "task", "colour": "colour-task"},
+    {"name": "bug", "colour": "colour-bug"},
+    {"name": "feature", "colour": "colour-feature"}
+  ],
+  "manual-swimlanes": [
+    {
+      "name": "Manual Swimlane",
+      "entries" : [
+        {
+          "name": "First lane",
+          "issue-ql": "priority = 'highest' OR assignee = 'kabir'"
+        },
+        {
+          "name": "Second Lane",
+          "issue-ql": "assignee IS EMPTY"
+        }
+      ]
+    },
+    {
+      "name": "Manual Swimlane 2",
+      "entries" : [
+        {
+          "name": "First lane",
+          "issue-ql": "priority = 'highest' OR assignee = 'kabir'"
+        },
+        {
+          "name": "Second Lane",
+          "issue-ql": "assignee IS EMPTY"
+        }
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "code": "TDP",
+      "query-filter": null,
+      "colour": "#4667CA",
+      "state-links": {
+        "TDP-A" : "S-A",
+        "TDP-B" : "S-B",
+        "TDP-C" : "S-C",
+        "TDP-D" : "S-D"
+      }
+    },
+    {
+      "code": "TBG",
+      "query-filter": null,
+      "colour": "#CA6746",
+      "state-links": {
+        "TBG-X": "S-B",
+        "TBG-Y": "S-C"
+      }
+    }
+  ],
+  "linked-projects": {}
+}

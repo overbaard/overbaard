@@ -1,15 +1,20 @@
 import {Map, Set} from 'immutable';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
+import {IssueQlNode} from '../../../../common/parsers/issue-ql/ast/node.iql';
 
 export interface BoardSearchFilterState {
   issueIds: Set<string>;
   containingText: string;
+  issueQl: string;
+  parsedIssueQl: IssueQlNode;
   hideNonMatches: boolean;
 }
 
 const DEFAULT_STATE: BoardSearchFilterState = {
   issueIds: Set<string>(),
   containingText: '',
+  issueQl: '',
+  parsedIssueQl: null,
   hideNonMatches: false
 };
 

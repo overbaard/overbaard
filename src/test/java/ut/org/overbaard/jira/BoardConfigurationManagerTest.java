@@ -185,6 +185,22 @@ public class BoardConfigurationManagerTest {
         checkConfig("config/board-custom.json");
     }
 
+
+    @Test
+    public void testLoadConfigurationWithManualSwimlanes() throws IOException {
+        checkConfig("config/board-manual-swimlanes.json");
+    }
+
+    @Test
+    public void testLoadConfigurationWithCustomFieldsAndManualSwimlanes() throws IOException {
+        checkConfig("config/board-custom-and-manual-swimlanes.json");
+    }
+
+    @Test(expected = OverbaardValidationException.class)
+    public void testLoadConfigurationWithCustomFieldsAndManualSwimlanesClashingNames() throws IOException {
+        checkConfig("config/board-custom-and-manual-swimlanes-clashing-names.json");
+    }
+
     @Test
     public void testLoadConfigurationWithParallelTasks() throws IOException {
         checkConfig("config/board-parallel-tasks.json");
@@ -239,8 +255,6 @@ public class BoardConfigurationManagerTest {
     public void testBadBoardStateFromOverride() throws IOException {
         checkConfig("config/board-issue-type-override-bad-state-link.json");
     }
-
-
 
     @Test
     public void testExampleConfigs() throws Exception {

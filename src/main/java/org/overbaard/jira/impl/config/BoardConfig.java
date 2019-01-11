@@ -24,6 +24,7 @@ import static org.overbaard.jira.impl.Constants.ISSUE_TYPES;
 import static org.overbaard.jira.impl.Constants.LINKED;
 import static org.overbaard.jira.impl.Constants.LINKED_PROJECTS;
 import static org.overbaard.jira.impl.Constants.MAIN;
+import static org.overbaard.jira.impl.Constants.MANUAL_SWIMLANES;
 import static org.overbaard.jira.impl.Constants.NAME;
 import static org.overbaard.jira.impl.Constants.PARALLEL_TASKS;
 import static org.overbaard.jira.impl.Constants.PRIORITIES;
@@ -71,6 +72,7 @@ public class BoardConfig {
     private final Map<String, BoardProjectConfig> boardProjects;
     private final Map<String, LinkedProjectConfig> linkedProjects;
     private final Map<String, NameAndColour> priorities;
+    private final ManualSwimlanesConfig manualSwimlanesConfig;
     private final Map<String, Integer> priorityIndex;
     private final List<String> priorityNames;
     private final Map<String, NameAndColour> issueTypes;
@@ -86,6 +88,7 @@ public class BoardConfig {
                         Map<String, BoardProjectConfig> boardProjects, Map<String, LinkedProjectConfig> linkedProjects,
                         Map<String, NameAndColour> priorities, Map<String, NameAndColour> issueTypes,
                         CustomFieldRegistry<CustomFieldConfig> customFields,
+                        ManualSwimlanesConfig manualSwimlanesConfig,
                         BoardParallelTaskConfig parallelTaskConfig) {
 
         this.id = id;
@@ -98,6 +101,7 @@ public class BoardConfig {
         this.linkedProjects = linkedProjects;
 
         this.priorities = priorities;
+        this.manualSwimlanesConfig = manualSwimlanesConfig;
         Map<String, Integer> priorityIndex = new HashMap<>();
         List<String> priorityNames = new ArrayList<>();
         getIndexMap(priorities, priorityIndex, priorityNames);
@@ -132,6 +136,9 @@ public class BoardConfig {
                 new CustomFieldRegistry<>(Collections.unmodifiableMap(loadCustomFields(jiraInjectables, boardNode)));
         final BoardParallelTaskConfig parallelTaskConfig = loadBoardParallelTasks(jiraInjectables, customFields, boardNode);
 
+        final ManualSwimlanesConfig manualSwimlanesConfig =
+                ManualSwimlanesConfig.loadAndValidate(boardNode.get(MANUAL_SWIMLANES), customFields);
+
         final ModelNode projects = Util.getRequiredChild(boardNode, "Group", boardName, PROJECTS);
         if (projects.getType() != ModelType.LIST) {
             throw new IllegalStateException("'projects' must be an array");
@@ -164,6 +171,7 @@ public class BoardConfig {
                 Collections.unmodifiableMap(loadPriorities(jiraInjectables.getPriorityManager(), boardNode.get(PRIORITIES).asList())),
                 issueTypes,
                 customFields,
+                manualSwimlanesConfig,
                 parallelTaskConfig);
         return boardConfig;
     }
@@ -306,6 +314,10 @@ public class BoardConfig {
             issueType.serialize(issueTypesNode);
         }
 
+        if (manualSwimlanesConfig != null) {
+            boardNode.get(MANUAL_SWIMLANES).set(manualSwimlanesConfig.serialize());
+        }
+
         final ModelNode projects = boardNode.get(PROJECTS);
 
         final ModelNode main = projects.get(MAIN);
@@ -351,6 +363,11 @@ public class BoardConfig {
             ModelNode parallelTaskFieldsNode = boardNode.get(PARALLEL_TASKS, FIELDS);
             parallelTaskFieldsNode.set(parallelTaskConfig.serializeForConfig());
         }
+
+        if (manualSwimlanesConfig != null) {
+            boardNode.get(MANUAL_SWIMLANES).set(manualSwimlanesConfig.serialize());
+        }
+
 
         final ModelNode projectsNode = boardNode.get(PROJECTS);
         projectsNode.setEmptyList();

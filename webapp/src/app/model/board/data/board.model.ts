@@ -12,6 +12,7 @@ import {initialBlacklistState} from './blacklist/blacklist.model';
 import {initialHeaderState} from './header/header.model';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {BoardState} from './board';
+import {initialManualSwimlaneState} from './manual-swimlane/manual-swimlane.model';
 
 const DEFAULT_STATE: BoardState = {
   viewId: -1,
@@ -25,6 +26,7 @@ const DEFAULT_STATE: BoardState = {
   labels: initialLabelState,
   fixVersions: initialFixVersionState,
   customFields: initialCustomFieldState,
+  manualSwimlanes: initialManualSwimlaneState,
   projects: initialProjectState,
   ranks: initialRankState,
   issues: initialIssueState,

@@ -19,7 +19,6 @@ import {TableBuilder} from './table.builder';
 import {RankViewBuilder} from './rank-view.builder';
 import {SwimlaneInfoBuilder} from './swimlane-info.builder';
 import {IssueHeightCalculator} from './issue-height-calculator';
-import {UrlService} from '../../../services/url.service';
 
 export class IssueTableBuilder {
   // Initialised in createTableAndRankView

@@ -15,14 +15,14 @@ import {
 import {FormControl, FormGroup} from '@angular/forms';
 import {Subject} from 'rxjs';
 import {startWith, takeUntil} from 'rxjs/operators';
-import {MatAutocompleteSelectedEvent, MatChipInputEvent, MatSlideToggleChange} from '@angular/material';
+import {MatAutocompleteSelectedEvent, MatChipInputEvent, MatDialog, MatSlideToggleChange} from '@angular/material';
 import {SPACE} from '@angular/cdk/keycodes';
 import {IssueState} from '../../../model/board/data/issue/issue.model';
 import {Set} from 'immutable';
 import {BoardIssue} from '../../../model/board/data/issue/board-issue';
-import {BoardFilterState} from '../../../model/board/user/board-filter/board-filter.model';
 import {ProgressLogService} from '../../../services/progress-log.service';
 import {BoardSearchFilterState} from '../../../model/board/user/board-filter/board-search-filter.model';
+import {IssueQlDialogComponent} from './issue-ql-dialog.component';
 
 
 @Component({
@@ -46,9 +46,13 @@ export class SearchFilterComponent implements OnInit, OnChanges, OnDestroy {
   containingText: EventEmitter<string> = new EventEmitter<string>();
 
   @Output()
+  issueQl: EventEmitter<string> = new EventEmitter<string>();
+
+  @Output()
   hideNonMatches: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   @ViewChild('searchIssueIdInput') searchIssueIdInput: ElementRef;
+
 
   // Set/read by the template
   selected: boolean;
@@ -56,6 +60,7 @@ export class SearchFilterComponent implements OnInit, OnChanges, OnDestroy {
   searchForm: FormGroup;
   searchIssueIdCtrl: FormControl;
   searchContainingTextCtrl: FormControl;
+  searchIssueQlCtrl: FormControl;
 
   tooltip: string;
 
@@ -63,13 +68,14 @@ export class SearchFilterComponent implements OnInit, OnChanges, OnDestroy {
   filteredIssueList: BoardIssue[];
   selectedSearchIssueIds: string[] = [];
   searchContainingText: string;
+  searchIssueQl: string;
 
   readonly separatorKeysCodes: number[] = [SPACE];
 
 
   private _destroy$: Subject<void> = new Subject<void>();
 
-  constructor(private _progressLogService: ProgressLogService) {
+  constructor(private _menuDialog: MatDialog, private _progressLogService: ProgressLogService) {
   }
 
 
@@ -78,7 +84,14 @@ export class SearchFilterComponent implements OnInit, OnChanges, OnDestroy {
     this.searchIssueIdCtrl = new FormControl();
     this.searchForm.addControl('searchIssueId', this.searchIssueIdCtrl);
     this.searchContainingTextCtrl = new FormControl(this.searchFilterState.containingText);
-    this.searchForm.addControl('searchContainingText', new FormControl(this.searchFilterState.containingText));
+    this.searchForm.addControl('searchContainingText', this.searchContainingTextCtrl);
+
+    // Although we don't really use this disabled text area for input, it seems easier to do it via a form control binding
+    // than to auto resize programmatically when the text entered from the IssueQl dialog changes
+    this.searchIssueQlCtrl = new FormControl(this.searchFilterState.issueQl);
+    this.searchIssueQlCtrl.disable(); // disabling in the template gives a weird error
+    this.searchForm.addControl('searchIssueQl', this.searchIssueQlCtrl);
+
 
     this.searchIssueIdCtrl.valueChanges.pipe(
       takeUntil(this._destroy$),
@@ -89,21 +102,6 @@ export class SearchFilterComponent implements OnInit, OnChanges, OnDestroy {
     this.searchContainingTextCtrl.valueChanges.pipe(
       takeUntil(this._destroy$),
     ).subscribe((value: string) => {
-
-      // TODO Do all this length stuff when populating the view model instead
-      /*let emit = false;
-      if (value && value.length > 2) {
-        if (this.searchContainingText !== value) {
-          emit = true;
-          this.searchContainingText = value;
-        }
-      } else if (this.searchContainingText && this.searchContainingText.length > 2) {
-        emit = true;
-        this.searchContainingText = null;
-      }
-      if (emit) {
-        this.emitContainingText();
-      }*/
       this.searchContainingText = value ? value : '';
       // TODO - debounce this a bit
       this.emitContainingText();
@@ -125,8 +123,10 @@ export class SearchFilterComponent implements OnInit, OnChanges, OnDestroy {
         const searchFilterState: BoardSearchFilterState = searchFilterStateChange.currentValue;
         this.selectedSearchIssueIds = searchFilterState.issueIds.toArray().sort();
         this.searchContainingText = searchFilterState.containingText;
+        this.searchIssueQl = searchFilterState.issueQl;
         if (!searchFilterStateChange.isFirstChange()) {
           this.searchContainingTextCtrl.setValue(searchFilterState.containingText);
+          this.searchIssueQlCtrl.setValue(searchFilterState.issueQl);
         }
       }
     }
@@ -140,7 +140,7 @@ export class SearchFilterComponent implements OnInit, OnChanges, OnDestroy {
 
   getSelectionTooltip(): string {
     if (!this.tooltip) {
-      if (this.selectedSearchIssueIds.length > 0 || this.searchContainingText) {
+      if (this.selectedSearchIssueIds.length > 0 || this.searchContainingText || this.searchIssueQl.length > 0) {
         let tooltip = '';
         if (this.selectedSearchIssueIds.length > 0) {
           tooltip += 'Issue Ids:\n';
@@ -155,6 +155,13 @@ export class SearchFilterComponent implements OnInit, OnChanges, OnDestroy {
           tooltip += 'Text:\n';
           tooltip += this.searchContainingText;
         }
+        if (this.searchIssueQl.length > 0) {
+          if (tooltip.length > 0) {
+            tooltip += '\n';
+          }
+          tooltip += 'IssueQl:\n';
+          tooltip += this.searchIssueQl;
+        }
         this.tooltip = 'Search:\n\n' + tooltip;
       } else {
         this.tooltip = '';
@@ -168,7 +175,9 @@ export class SearchFilterComponent implements OnInit, OnChanges, OnDestroy {
     event.stopPropagation();
     this.selectedSearchIssueIds = [];
     this.searchContainingTextCtrl.setValue(null);
+    this.searchIssueQlCtrl.setValue(null);
     this.emitSelectedIssueIds();
+    this.issueQl.emit('');
   }
 
 
@@ -253,4 +262,21 @@ export class SearchFilterComponent implements OnInit, OnChanges, OnDestroy {
   onChangeHideNonMatches(event: MatSlideToggleChange) {
     this.hideNonMatches.emit(event.checked);
   }
+
+  onShowEditIssueQlDialog(event: MouseEvent) {
+    event.preventDefault();
+    const dialogRef = this._menuDialog.open(IssueQlDialogComponent, {
+      data: {
+        issueQl: this.searchIssueQl
+      }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // A cancel will be undefined, so being here means the user pressed 'save'
+        const issueQl = result['issueQl'];
+        this.issueQl.emit(issueQl);
+      }
+    });
+  }
+
 }

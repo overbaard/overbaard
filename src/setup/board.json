@@ -32,6 +32,21 @@
     {"name": "Bug", "colour": "red"},
     {"name": "Epic", "colour": "purple"}
   ],
+  "manual-swimlanes": [
+    {
+      "name": "Manual Swimlane",
+      "entries" : [
+        {
+          "name": "High priority bugs",
+          "issue-ql": "priority IN ('Highest', 'High') AND type = 'Bug'"
+        },
+        {
+          "name": "High priority tasks",
+          "issue-ql": "priority IN ('Highest', 'High') AND type = 'Task' s"
+        }
+      ]
+    }
+  ],
   "projects": [
     {
       "code": "FEAT",

@@ -15,6 +15,7 @@ import {IssueSummaryLevel} from '../model/board/user/issue-summary-level';
 import {IssueDetailUtil} from '../model/board/user/issue-detail/issue-detail.model';
 import {take} from 'rxjs/operators';
 import {BoardSearchFilterUtil, initialBoardSearchFilterState} from '../model/board/user/board-filter/board-search-filter.model';
+import {IssueQlUtil} from '../common/parsers/issue-ql/issue-ql.util';
 
 describe('Boards Query Parameters Service Tests', () => {
   const userSettingSubject: Subject<UserSettingState> = new BehaviorSubject<UserSettingState>(initialUserSettingState);
@@ -151,9 +152,13 @@ describe('Boards Query Parameters Service Tests', () => {
             'PT&2': Set<string>(['PT2&=A', 'PT2&=B']),
           });
         });
+
+        const iql = 'labels = "Test" AND component IN ("CA", "CB")';
         mutable.searchFilters = BoardSearchFilterUtil.updateBoardSearchFilterState(initialBoardSearchFilterState, mutable2 => {
           mutable2.issueIds = Set<string>(['TEST-1', 'TEST-2']);
           mutable2.containingText = 'Some text';
+          mutable2.issueQl = iql;
+          mutable2.parsedIssueQl = IssueQlUtil.createIssueQlNode(iql),
           mutable2.hideNonMatches = true;
         });
       });

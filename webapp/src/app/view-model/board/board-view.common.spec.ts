@@ -42,6 +42,10 @@ import {cloneObject} from '../../common/object-util';
 import {map, take} from 'rxjs/operators';
 import {BoardIssue} from '../../model/board/data/issue/board-issue';
 import {BoardSearchFilterActions} from '../../model/board/user/board-filter/board-search-filter.reducer';
+import {
+  getTestManualSwimlanesInput,
+  getTestManualSwimlanesState
+} from '../../model/board/data/manual-swimlane/manual-swimlane.reducer.spec';
 
 export class BoardViewObservableUtil {
   private _service: BoardViewModelHandler = new BoardViewModelHandler(null, 'http://jira.example.com/');
@@ -201,6 +205,7 @@ export class BoardStateInitializer {
       mutable.fixVersions = getTestFixVersionState();
       mutable.labels = getTestLabelState();
       mutable.customFields = getTestCustomFieldState();
+      mutable.manualSwimlanes = getTestManualSwimlanesState();
       mutable.ranks = this.createRankState();
       mutable.issues = this.createIssueState(mainUtil.boardState, getDeserializeIssueLookupParams(headerState, projectState));
     });
@@ -431,6 +436,10 @@ export class UserSettingUpdater {
 
   updateSearchContainingText(text: string): BoardViewObservableUtil {
     return this.emitState(BoardSearchFilterActions.createUpdateContainingText(text));
+  }
+
+  updateSearchIssueQl(text: string): BoardViewObservableUtil {
+    return this.emitState(BoardSearchFilterActions.createUpdateIssueQl(text));
   }
 
   updateSearchHideNonMatching(hide: boolean): BoardViewObservableUtil {

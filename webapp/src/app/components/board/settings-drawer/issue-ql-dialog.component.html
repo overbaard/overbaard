@@ -1,0 +1,52 @@
+<div class="dialog-wrapper">
+  <div class="mat-h4">
+    Enter your IssueQL for advanced filtering
+    <a
+      mat-icon-button
+      color="accent"
+      class="help-button"
+      matTooltip="Issue QL help"
+      target="_blank"
+      href="https://overbaard.github.io/overbaard/issue-ql.html"
+    >
+      <mat-icon class="help-button">help</mat-icon>
+    </a>
+
+  </div>
+<!--
+  <div>
+    <a href="">Issue QL help</a>
+  </div>
+-->
+  <form (ngSubmit)="onSave()">
+    <mat-form-field style="width: 100%">
+      <textarea
+        matInput
+        matTextareaAutosize
+        matAutosizeMinRows="10"
+        matAutosizeMaxRows="10"
+        name="issueQl"
+        [formControl]="issueQlControl"
+        [errorStateMatcher]="errorStateMatcher"
+      >
+      </textarea>
+      <mat-error *ngIf="issueQlControl.hasError('issueQl')">
+        The IssueQL is not valid!
+      </mat-error>
+    </mat-form-field>
+    <div>
+      <a
+        href="cancel"
+        (click)="onCancel($event)"
+        mat-raised-button
+        color="accent"
+      >Cancel</a>
+      <button
+        type="submit"
+        [disabled]="!issueQlControl.valid"
+        mat-raised-button
+        color="primary"
+      >Save</button>
+    </div>
+  </form>
+</div>

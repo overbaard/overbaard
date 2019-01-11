@@ -26,6 +26,9 @@ import {
 } from '../../model/board/data/project/project.model';
 import {P} from '@angular/core/src/render3';
 import {BoardSearchFilterState, BoardSearchFilterUtil} from '../../model/board/user/board-filter/board-search-filter.model';
+import {IssueQlNode} from '../../common/parsers/issue-ql/ast/node.iql';
+import {IssueQlMatcher} from '../../common/parsers/issue-ql/issue-ql.matcher';
+import {IssueVisitor} from '../../common/parsers/issue-ql/issue.visitor';
 
 export class AllFilters {
   private readonly _project: SimpleFilter;
@@ -41,6 +44,7 @@ export class AllFilters {
   private readonly _parallelTaskFilterPositionsByProjectIssueTypeOverride: Map<string, Map<string, Map<string, ParallelTaskPosition>>>;
   private readonly _searchContainingText: string;
   private readonly _searchIssueIds: Set<string>;
+  private readonly _searchIssueQlMatcher: IssueQlMatcher;
 
   constructor(boardFilters: BoardFilterState, searchFilters: BoardSearchFilterState, projectState: ProjectState, currentUser: string) {
     this._project = new SimpleFilter(PROJECT_ATTRIBUTES, boardFilters.project);
@@ -83,6 +87,7 @@ export class AllFilters {
     });
     this._searchContainingText = searchFilters.containingText.toLocaleLowerCase();
     this._searchIssueIds = searchFilters.issueIds;
+    this._searchIssueQlMatcher = searchFilters.parsedIssueQl ? new IssueQlMatcher(searchFilters.parsedIssueQl) : null;
   }
 
   private createParallelTaskIssueTypeOverrideIndices(parallelTaskIssueTypeOverrides: Map<string, List<List<ParallelTask>>>):
@@ -201,6 +206,12 @@ export class AllFilters {
     }
     if (BoardSearchFilterUtil.containingTextAboveMinimumLength(this._searchContainingText)) {
       if (issue.summary.toLocaleLowerCase().indexOf(this._searchContainingText) < 0) {
+        return false;
+      }
+    }
+    if (this._searchIssueQlMatcher) {
+      const matches = this._searchIssueQlMatcher.matchIssue(new IssueVisitor(issue));
+      if (!matches) {
         return false;
       }
     }

@@ -43,6 +43,7 @@ import {FilterEntryEvent} from './filter-entry.event';
 import {getNonParallelTaskSet} from './settings-drawer.util';
 import {IssueState} from '../../../model/board/data/issue/issue.model';
 import {BoardSearchFilterActions} from '../../../model/board/user/board-filter/board-search-filter.reducer';
+import {ManualSwimlane, manualSwimlanesSelector} from '../../../model/board/data/manual-swimlane/manual-swimlane.model';
 
 @Component({
   selector: 'app-board-settings-drawer',
@@ -151,6 +152,19 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
     this.swimlaneList = this.filterList
       .filter(fa => fa.swimlaneOption)
       .map(fa => FilterFormEntry(fa.key, fa.display));
+    // Add the manual swimlanes here since they are not part of the filters
+    this._store.select(manualSwimlanesSelector)
+      .pipe(
+        take(1),
+      )
+      .subscribe(
+        (manualSwimlanes: OrderedMap<string, ManualSwimlane>) => {
+          manualSwimlanes.forEach(manualSwimlane => {
+            this.swimlaneList.push(FilterFormEntry(manualSwimlane.name, manualSwimlane.name));
+          });
+        }
+      );
+
 
     this._store.select(linkedProjectsSelector)
       .pipe(
@@ -416,6 +430,10 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
 
   onChangeContainingText(event: string) {
     this._store.dispatch(BoardSearchFilterActions.createUpdateContainingText(event));
+  }
+
+  onChangeIssueQl(event: string) {
+    this._store.dispatch(BoardSearchFilterActions.createUpdateIssueQl(event));
   }
 
   onChangeHideNonMatches(event: boolean) {
