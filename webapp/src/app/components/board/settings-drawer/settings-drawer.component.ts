@@ -6,7 +6,7 @@ import {AbstractControl, FormControl, FormGroup} from '@angular/forms';
 import {Observable, Subject} from 'rxjs';
 import {boardProjectsSelector, linkedProjectsSelector} from '../../../model/board/data/project/project.reducer';
 import {BoardFilterState} from '../../../model/board/user/board-filter/board-filter.model';
-import {List, OrderedMap, Set} from 'immutable';
+import {List, OrderedMap, Set, Map} from 'immutable';
 import {issuesTypesSelector} from '../../../model/board/data/issue-type/issue-type.reducer';
 import {prioritiesSelector} from '../../../model/board/data/priority/priority.reducer';
 import {assigneesSelector} from '../../../model/board/data/assignee/assignee.reducer';
@@ -44,6 +44,7 @@ import {getNonParallelTaskSet} from './settings-drawer.util';
 import {IssueState} from '../../../model/board/data/issue/issue.model';
 import {BoardSearchFilterActions} from '../../../model/board/user/board-filter/board-search-filter.reducer';
 import {ManualSwimlane, manualSwimlanesSelector} from '../../../model/board/data/manual-swimlane/manual-swimlane.model';
+import {Epic, epicsByProjectSelector} from '../../../model/board/data/epic/epic.model';
 
 @Component({
   selector: 'app-board-settings-drawer',
@@ -152,7 +153,27 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
     this.swimlaneList = this.filterList
       .filter(fa => fa.swimlaneOption)
       .map(fa => FilterFormEntry(fa.key, fa.display));
-    // Add the manual swimlanes here since they are not part of the filters
+
+    // Add the Epics and manual swimlanes here since they are not part of the filters
+    this._store.select(epicsByProjectSelector)
+      .pipe(
+        take(1)
+      )
+      .subscribe(
+        (epicsByProject: Map<string, OrderedMap<string, Epic>>) => {
+          let hasEpics = false;
+          epicsByProject.forEach(epics => {
+            if (epics.size > 0) {
+              hasEpics = true;
+              return false;
+            }
+          });
+          if (hasEpics) {
+            this.swimlaneList.push(FilterFormEntry('epic', 'Epic'));
+          }
+        }
+      );
+
     this._store.select(manualSwimlanesSelector)
       .pipe(
         take(1),

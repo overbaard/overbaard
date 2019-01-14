@@ -119,8 +119,8 @@ public class OverbaardFacadeImpl implements JiraFacade, InitializingBean, Dispos
     }
 
     @Override
-    public void saveCustomFieldId(ApplicationUser user, ModelNode idNode) {
-        boardConfigurationManager.saveRankCustomFieldId(user, idNode);
+    public void saveCustomFieldIds(ApplicationUser user, ModelNode idNode) {
+        boardConfigurationManager.saveCustomFieldIds(user, idNode);
     }
 
     @Override

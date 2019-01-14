@@ -11,6 +11,7 @@ import {RankState} from './rank/rank.model';
 import {IssueState} from './issue/issue.model';
 import {BlacklistState} from './blacklist/blacklist.model';
 import {ManualSwimlaneState} from './manual-swimlane/manual-swimlane.model';
+import {EpicState} from './epic/epic.model';
 
 export interface BoardState {
   viewId: number;
@@ -24,6 +25,7 @@ export interface BoardState {
   labels: LabelState;
   fixVersions: FixVersionState;
   customFields: CustomFieldState;
+  epics: EpicState;
   projects: ProjectState;
   ranks: RankState;
   issues: IssueState;

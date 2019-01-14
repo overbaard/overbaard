@@ -62,12 +62,15 @@ export class BoardsService {
       }));
   }
 
-  saveRankCustomFieldId(id: number): Observable<Object> {
+  saveCustomFieldsIds(rank: number, epicLink: number, epicName: number): Observable<Object> {
     const progress: Progress = this._progressLog.startUserAction();
 
-    const path: string = this._restUrlService.caclulateRestUrl(UrlService.OVERBAARD_REST_PREFIX + '/rankCustomFieldId');
+    const path: string = this._restUrlService.caclulateRestUrl(UrlService.OVERBAARD_REST_PREFIX + '/customFieldIds');
     console.log('Saving custom field id ' + path);
-    const payload: string = JSON.stringify({id: id});
+    const payload: string = JSON.stringify({
+      'rank-custom-field-id': rank,
+      'epic-link-custom-field-id': epicLink,
+      'epic-name-custom-field-id': epicName});
     return this.executeRequest(
       progress,
       this._httpClient

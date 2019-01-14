@@ -1,3 +1,11 @@
+@import "../../../styles";
 .almost_full-width {
   width: 90%;
+}
+a {
+  color: $accent-colour;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
 }

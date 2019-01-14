@@ -35,6 +35,7 @@ import org.overbaard.jira.impl.Constants;
 public class BoardProjectConfig extends ProjectConfig<BoardProjectStateMapper> {
     private final String queryFilter;
     private final String colour;
+    private final Boolean enableEpics;
 
     private final List<String> customFieldNames;
     private final ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig;
@@ -49,12 +50,14 @@ public class BoardProjectConfig extends ProjectConfig<BoardProjectStateMapper> {
     private BoardProjectConfig(
             final String code, final String queryFilter,
             final String colour,
+            final Boolean enableEpics,
             final BoardProjectStateMapper stateMapper,
             final List<String> customFieldNames,
             final ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig,
             final List<LinkedIssueFilterConfig> linkedIssueFilterConfigs,
             final BoardProjectIssueTypeOverrideConfig issueTypeOverrideConfig) {
         super(code, stateMapper);
+        this.enableEpics = enableEpics;
         this.queryFilter = queryFilter;
         this.colour = colour;
         this.parallelTaskGroupsConfig = parallelTaskGroupsConfig;
@@ -71,6 +74,11 @@ public class BoardProjectConfig extends ProjectConfig<BoardProjectStateMapper> {
                                    Set<String> linkedProjectNames) {
         String projectCode = Util.getRequiredChild(project, "Project", null, Constants.CODE).asString();
         String colour = Util.getRequiredChild(project, "Project", projectCode, Constants.COLOUR).asString();
+        Boolean enableEpics = null;
+        // Epics support is optional/experimental
+        if (project.hasDefined(Constants.ENABLE_EPICS)) {
+            enableEpics = project.get(Constants.ENABLE_EPICS).asBoolean();
+        }
 
         final List<String> customFieldNames;
         if (!project.hasDefined(Constants.CUSTOM)) {
@@ -132,6 +140,7 @@ public class BoardProjectConfig extends ProjectConfig<BoardProjectStateMapper> {
         BoardProjectStateMapper stateMapper = BoardProjectStateMapper.load(projectCode, null, statesLinks, boardStates);
         return new BoardProjectConfig(
                 projectCode, loadQueryFilter(project), colour,
+                enableEpics,
                 stateMapper,
                 Collections.unmodifiableList(customFieldNames),
                 projectParallelTaskGroupsConfig,
@@ -159,6 +168,13 @@ public class BoardProjectConfig extends ProjectConfig<BoardProjectStateMapper> {
         return colour;
     }
 
+    public boolean isEnableEpics() {
+        if (enableEpics == null) {
+            return false;
+        }
+        return enableEpics;
+    }
+
     public BoardProjectIssueTypeOverrideConfig getIssueTypeOverrideConfig() {
         return issueTypeOverrideConfig;
     }
@@ -171,6 +187,8 @@ public class BoardProjectConfig extends ProjectConfig<BoardProjectStateMapper> {
 
         projectNode.get(Constants.COLOUR).set(colour);
 
+        projectNode.get(Constants.ENABLE_EPICS).set(isEnableEpics());
+
         return projectNode;
     }
 
@@ -179,6 +197,9 @@ public class BoardProjectConfig extends ProjectConfig<BoardProjectStateMapper> {
         projectNode.get(Constants.CODE).set(code);
         projectNode.get(Constants.QUERY_FILTER).set(queryFilter == null ? new ModelNode() : new ModelNode(queryFilter));
         projectNode.get(Constants.COLOUR).set(colour);
+        if (enableEpics != null) {
+            projectNode.get(Constants.ENABLE_EPICS).set(enableEpics);
+        }
 
         if (customFieldNames.size() > 0) {
             final ModelNode customFieldsNode = projectNode.get(Constants.CUSTOM);

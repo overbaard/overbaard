@@ -15,6 +15,8 @@
  */
 package org.overbaard.jira.impl.board;
 
+import static org.overbaard.jira.impl.Constants.EPICS;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -159,14 +161,24 @@ public class Board {
         for (ModelNode project : mainProjectsParent.asList()) {
             projectLookup.put(project.get(Constants.CODE).asString(), project);
         }
+        ModelNode epicsByProject = new ModelNode();
         for (Map.Entry<String, BoardProject> projectEntry : projects.entrySet()) {
             final String projectCode = projectEntry.getKey();
             ModelNode project = projectLookup.get(projectCode);
             projectEntry.getValue().serialize(jiraInjectables, this, project, user, backlog);
+
+
+            ModelNode epicsNode = projectEntry.getValue().serializeEpics();
+            if (epicsNode != null) {
+                epicsByProject.get(projectEntry.getKey()).set(epicsNode);
+            }
+        }
+
+        if (epicsByProject.isDefined()) {
+            outputNode.get(EPICS).set(epicsByProject);
         }
 
         blacklist.serialize(outputNode);
-
         return outputNode;
     }
 
@@ -244,6 +256,10 @@ public class Board {
             this.jiraInjectables = jiraInjectables;
             this.boardConfig = boardConfig;
             this.boardOwner = boardOwner;
+        }
+
+        public ApplicationUser getBoardOwner() {
+            return boardOwner;
         }
 
         Integer getIssueTypeIndexRecordingMissing(String issueKey, String issueTypeName) {

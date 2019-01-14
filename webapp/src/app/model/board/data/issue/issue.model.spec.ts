@@ -18,6 +18,8 @@ import {getTestPriorityState} from '../priority/priority.reducer.spec';
 import {getTestIssueTypeState} from '../issue-type/issue-type.reducer.spec';
 import {BoardIssue} from './board-issue';
 import {LinkedIssue} from './linked-issue';
+import {Epic} from '../epic/epic.model';
+import {getTestEpicState} from '../epic/epic.reducer.spec';
 
 describe('Issue unit tests', () => {
 
@@ -28,6 +30,7 @@ describe('Issue unit tests', () => {
     const assignees: OrderedMap<string, Assignee> = getTestAssigneeState().assignees;
     const priorities: OrderedMap<string, Priority> = getTestPriorityState().priorities;
     const issueTypes: OrderedMap<string, IssueType> = getTestIssueTypeState().types;
+    const epicsByProject: Map<string, OrderedMap<string, Epic>> = getTestEpicState().epicsByProject;
     const components: List<string> = getTestComponentState().components;
     const labels: List<string> = getTestLabelState().labels;
     const fixVersions: List<string> = getTestFixVersionState().versions;
@@ -49,6 +52,7 @@ describe('Issue unit tests', () => {
       .setAssignees(assignees)
       .setPriorities(priorities)
       .setIssueTypes(issueTypes)
+      .setEpicsByProject(epicsByProject)
       .setComponents(components)
       .setLabels(labels)
       .setFixVersions(fixVersions)
@@ -266,6 +270,31 @@ describe('Issue unit tests', () => {
         'Issue summary', 4)
         .key('P2-100')
         .selectedParallelTaskOptions([2, 1], [3])
+        .check();
+    });
+
+    it ('Parent Key', () => {
+      input['parent'] = 'P2-999';
+      const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
+      new IssueChecker(issue,
+        lookupParams.issueTypes.get('task'),
+        lookupParams.priorities.get('Blocker'),
+        lookupParams.assignees.get('bob'),
+        'Issue summary', 4)
+        .parentKey('P2-999')
+        .check();
+    });
+
+
+    it ('Epic', () => {
+      input['epic'] = 1;
+      const issue: BoardIssue = IssueUtil.fromJS(input, lookupParams);
+      new IssueChecker(issue,
+        lookupParams.issueTypes.get('task'),
+        lookupParams.priorities.get('Blocker'),
+        lookupParams.assignees.get('bob'),
+        'Issue summary', 4)
+        .epic('P2-901', 'P2 Second Epic')
         .check();
     });
   });
@@ -1208,6 +1237,8 @@ export class IssueChecker {
   private _fixVersions: string[];
   private _customFields: Dictionary<CustomField>;
   private _parallelTasks: number[][];
+  private _epic: Epic;
+  private _parentKey: string;
 
 
 
@@ -1264,6 +1295,16 @@ export class IssueChecker {
     return this;
   }
 
+  epic(key: string, name: string): IssueChecker {
+    this._epic = {key: key, name: name};
+    return this;
+  }
+
+  parentKey(key: string): IssueChecker {
+    this._parentKey = key;
+    return this;
+  }
+
   check() {
     expect(this._issue.key).toEqual(this._key);
     expect(this._issue.projectCode).toEqual(IssueUtil.productCodeFromKey(this._key));
@@ -1299,6 +1340,19 @@ export class IssueChecker {
     }
 
     expect(this._issue.ownState).toBe(this._ownState);
+
+    if (!this._parentKey) {
+      expect(this._issue.parentKey).toBeFalsy();
+    } else {
+      expect(this._issue.parentKey).toBe(this._parentKey);
+    }
+
+    if (!this._epic) {
+      expect(this._issue.epic).toBeFalsy();
+    } else {
+      expect(this._issue.epic.key).toEqual(this._epic.key);
+      expect(this._issue.epic.name).toEqual(this._epic.name);
+    }
 
     if (this._linkedIssues) {
       expect(this._issue.linkedIssues).toBeTruthy();

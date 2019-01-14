@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.jboss.dmr.ModelNode;
+import org.overbaard.jira.OverbaardLogger;
 import org.overbaard.jira.impl.Constants;
 import org.overbaard.jira.impl.config.BoardConfig;
 import org.overbaard.jira.impl.config.BoardProjectConfig;
@@ -34,7 +35,10 @@ import org.overbaard.jira.impl.config.ParallelTaskGroupPosition;
 import org.overbaard.jira.impl.config.ProjectConfig;
 import org.overbaard.jira.impl.config.ProjectParallelTaskConfig;
 import org.overbaard.jira.impl.config.ProjectParallelTaskGroupsConfig;
+import org.overbaard.jira.impl.util.IndexedMap;
 
+import com.atlassian.jira.issue.CustomFieldManager;
+import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.link.IssueLink;
 import com.atlassian.jira.issue.link.IssueLinkManager;
 import com.atlassian.jira.util.Consumer;
@@ -88,6 +92,10 @@ public abstract class Issue {
 
     boolean hasLinkedIssues() {
         return false;
+    }
+
+    String getEpicKey() {
+        return null;
     }
 
     Iterable<LinkedIssue> getLinkedIssues() {
@@ -155,6 +163,8 @@ public abstract class Issue {
         //TODO parallel task values
 
         //TODO linked issues
+
+        // TODO Epic and parent issues
         return builder.build();
     }
 
@@ -278,7 +288,7 @@ public abstract class Issue {
 
     abstract BoardChangeRegistry.IssueChange convertToCreateIssueChange(BoardChangeRegistry registry, BoardConfig boardConfig);
 
-    private static class BoardIssue extends Issue {
+    static class BoardIssue extends Issue {
         private final Assignee assignee;
         private final Set<MultiSelectNameOnlyValue.Component> components;
         private final Set<MultiSelectNameOnlyValue.Label> labels;
@@ -287,14 +297,18 @@ public abstract class Issue {
         private final Integer issueTypeIndex;
         /** The index of the priority in the owning board config */
         private final Integer priorityIndex;
+        private final String parentIssueKey;
+        private final String epicKey;
+        private final Integer epicIndex;
         private final List<LinkedIssue> linkedIssues;
         private final Map<String, CustomFieldValue> customFieldValues;
         private final List<List<Integer>> parallelTaskFieldGroupValues;
 
         public BoardIssue(BoardProjectConfig project, String key, String state, Integer stateIndex, String summary,
                           Integer issueTypeIndex, String issueTypeName, Integer priorityIndex, Assignee assignee,
-                          Set<MultiSelectNameOnlyValue.Component> components, Set<MultiSelectNameOnlyValue.Label> labels, Set<MultiSelectNameOnlyValue.FixVersion> fixVersions,
-                          List<LinkedIssue> linkedIssues,
+                          Set<MultiSelectNameOnlyValue.Component> components, Set<MultiSelectNameOnlyValue.Label> labels,
+                          Set<MultiSelectNameOnlyValue.FixVersion> fixVersions,
+                          String parentIssueKey, String epicKey, Integer epicIndex, List<LinkedIssue> linkedIssues,
                           Map<String, CustomFieldValue> customFieldValues,
                           List<List<Integer>> parallelTaskFieldGroupValues) {
             super(project, key, state, stateIndex, issueTypeName, summary);
@@ -304,9 +318,17 @@ public abstract class Issue {
             this.components = components;
             this.labels = labels;
             this.fixVersions = fixVersions;
+            this.parentIssueKey = parentIssueKey;
+            this.epicKey = epicKey;
+            this.epicIndex = epicIndex;
             this.linkedIssues = linkedIssues;
             this.customFieldValues = customFieldValues;
             this.parallelTaskFieldGroupValues = parallelTaskFieldGroupValues;
+        }
+
+        @Override
+        public String getEpicKey() {
+            return epicKey;
         }
 
         boolean hasLinkedIssues() {
@@ -355,6 +377,12 @@ public abstract class Issue {
             if (hasLinkedIssues()) {
                 final ModelNode linkedIssuesNode = issueNode.get(Constants.LINKED_ISSUES);
                 linkedIssues.forEach(linkedIssue -> linkedIssuesNode.add(linkedIssue.getModelNodeForFullRefresh(board)));
+            }
+            if (parentIssueKey != null) {
+                issueNode.get(Constants.PARENT).set(parentIssueKey);
+            }
+            if (epicIndex != null) {
+                issueNode.get(Constants.EPIC).set(epicIndex);
             }
 
             return issueNode;
@@ -410,6 +438,9 @@ public abstract class Issue {
         private Integer priorityIndex;
         private String state;
         private Integer stateIndex;
+        private String parentIssueKey;
+        private String epicKey;
+        private Integer epicIndex;
         private Set<LinkedIssue> linkedIssues;
         //Will only be set for an update
         private Map<String, CustomFieldValue> originalCustomFieldValues;
@@ -448,6 +479,9 @@ public abstract class Issue {
             this.priorityIndex = existing.priorityIndex;
             this.state = existing.getState();
             this.stateIndex = existing.getStateIndex();
+            this.parentIssueKey = existing.parentIssueKey;
+            this.epicKey = existing.epicKey;
+            this.epicIndex = existing.epicIndex;
             if (existing.linkedIssues.size() > 0) {
                 Set<LinkedIssue> linkedIssues = createLinkedIssueSet();
                 linkedIssues.addAll(existing.linkedIssues);
@@ -470,15 +504,13 @@ public abstract class Issue {
             setPriority(issue.getPriorityObject().getName());
             setState(this.issueTypeName, issue.getStatusObject().getName());
 
-            //Load the custom fields
+            //Load the custom fields, epics and parents
             issueLoadStrategy.handle(issue, this);
 
             final IssueLinkManager issueLinkManager = project.getIssueLinkManager();
             addLinkedIssues(issueLinkManager.getOutwardLinks(issue.getId()), true);
             addLinkedIssues(issueLinkManager.getInwardLinks(issue.getId()), false);
         }
-
-
 
         private Builder setIssueKey(String issueKey) {
             this.issueKey = issueKey;
@@ -584,15 +616,18 @@ public abstract class Issue {
         Issue build() {
             issueLoadStrategy.finish();
             if (issueTypeIndex != null && priorityIndex != null && stateIndex != null) {
+
+                // issueLoadStrategy.finish() above will set this the epicKey and load up the indices of the epics
+                this.epicIndex = project.getEpicIndex(epicKey);
+
                 List<LinkedIssue> linkedList = linkedIssues == null ?
                         Collections.emptyList() : Collections.unmodifiableList(new ArrayList<>(linkedIssues));
 
-                //Map<String, CustomFieldValue> builtCustomFieldValues
                 return new BoardIssue(
                         project.getConfig(), issueKey, state, stateIndex, summary,
                         issueTypeIndex, issueTypeName, priorityIndex, assignee, components,
                         labels, fixVersions,
-                        linkedList,
+                        parentIssueKey, epicKey, epicIndex, linkedList,
                         mergeCustomFieldValues(),
                         mergeParallelTaskFieldGroupValues());
             }
@@ -716,6 +751,16 @@ public abstract class Issue {
         public void clearParallelTaskGroupValues() {
             clearParallelTaskGroupValues = true;
         }
+
+        public Builder setEpicKey(String epicKey) {
+            this.epicKey = epicKey;
+            return this;
+        }
+
+        public Builder setParentIssueKey(String parentKey) {
+            this.parentIssueKey = parentKey;
+            return this;
+        }
     }
 
     /**
@@ -727,10 +772,16 @@ public abstract class Issue {
      * <p>For unit tests we currently use the lazy loading mechanism to load the custom fields, this is mainly
      * to avoid having to set up the mocks at present.</p>
      */
-    private static class LazyLoadStrategy implements IssueLoadStrategy {
+    static class LazyLoadStrategy implements IssueLoadStrategy {
         private final BoardProject.Accessor project;
+        private boolean finished;
+        private final Map<String, Issue.Builder> buildersByKey = new HashMap<>();
 
-        private LazyLoadStrategy(BoardProject.Accessor project) {
+        private final Map<String, String> childToParentIssueKeys = new HashMap<>();
+        private final Map<String, String> issuesToEpics = new HashMap<>();
+        private final Map<String, Epic> newEpics = new HashMap<>();
+
+        LazyLoadStrategy(BoardProject.Accessor project) {
             this.project = project;
         }
 
@@ -738,13 +789,117 @@ public abstract class Issue {
 
         @Override
         public void handle(com.atlassian.jira.issue.Issue issue, Builder builder) {
+            buildersByKey.put(issue.getKey(), builder);
+
             builder.setCustomFieldValues(CustomFieldValue.loadCustomFieldValues(project, issue));
             CustomFieldValue.loadParallelTaskValues(project, issue, builder);
+
+            com.atlassian.jira.issue.Issue parent = issue.getParentObject();
+            if (parent != null) {
+                childToParentIssueKeys.put(issue.getKey(), parent.getKey());
+
+            }
+
+            // TODO get from configuration
+            final long epicLinkCustomField = project.getBoard().getConfig().getEpicLinkCustomFieldId();
+            final long epicSummaryCustomField = project.getBoard().getConfig().getEpicSummaryCustomFieldId();
+
+            if (project.projectConfig.isEnableEpics()) {
+                CustomFieldManager customFieldManager = project.getJiraInjectables().getCustomFieldManager();
+                CustomField epicLinkField = customFieldManager.getCustomFieldObject(epicLinkCustomField);
+                if (epicLinkField != null) {
+                    Object epicKeyObject = issue.getCustomFieldValue(epicLinkField);
+                    if (epicKeyObject instanceof com.atlassian.jira.issue.Issue) {
+                        com.atlassian.jira.issue.Issue epicIssue = (com.atlassian.jira.issue.Issue) epicKeyObject;
+                        String epicKey = epicIssue.getKey();
+
+                        Epic epic = project.getEpic(epicKey);
+                        if (epic == null) {
+                            epic = newEpics.get(epicKey);
+                            if (epic == null) {
+                                CustomField epicSummaryField = customFieldManager.getCustomFieldObject(epicSummaryCustomField);
+                                if (epicSummaryField != null) {
+                                    String epicSummary = (String)epicIssue.getCustomFieldValue(epicSummaryField);
+                                    epic = new Epic(epicKey, epicSummary);
+                                    newEpics.put(epicKey, epic);
+                                } else {
+                                    OverbaardLogger.LOGGER.warn("Could not load 'Epic Summary' field for Epic: " + epicKey);
+                                }
+                            }
+                        }
+                        if (epic != null) {
+                            issuesToEpics.put(issue.getKey(), epicKey);
+                        }
+                    }
+                }
+            }
+
         }
 
         @Override
         public void finish() {
+            if (finished) {
+                return;
+            }
+            finished = true;
 
+            processParentTasksAndEpics();
+
+            if (newEpics.size() > 0) {
+                final Map<String, Epic> allEpics = new HashMap<>(newEpics);
+                project.collectAllEpics(allEpics);
+                IndexedMap<String, Epic> orderedEpics =
+                        getEpicsInRankOrder(
+                                project.getJiraInjectables().getSearchService(),
+                                project.getBoard().getBoardOwner(),
+                                allEpics);
+                project.setOrderedEpics(orderedEpics);
+
+            }
+        }
+
+        private void processParentTasksAndEpics() {
+            final boolean epics = project.getConfig().isEnableEpics();
+            if (epics) {
+                for (Map.Entry<String, String> issueToEpic : issuesToEpics.entrySet()) {
+                    Issue.Builder builder = buildersByKey.get(issueToEpic.getKey());
+                    if (builder == null) {
+                        OverbaardLogger.LOGGER.warn("Could not find a builder for " + issueToEpic.getKey() + " to set epic (lazy)");
+                    }
+
+                    builder.setEpicKey(issueToEpic.getValue());
+                }
+            }
+
+            for (Map.Entry<String, String> childToParent : childToParentIssueKeys.entrySet()) {
+                final String childKey = childToParent.getKey();
+                final String parentKey = childToParent.getValue();
+                Issue.Builder builder = buildersByKey.get(childToParent.getKey());
+                if (builder == null) {
+                    OverbaardLogger.LOGGER.warn("Could not find a builder for " + childKey + " to set parent (lazy)");
+                    continue;
+                }
+
+                builder.setParentIssueKey(parentKey);
+                if (epics) {
+                    String epic = issuesToEpics.get(parentKey);
+                    if (epic == null) {
+                        // When running in Jira we will not hit this path when loading the board initially. However,
+                        // we will in the unit tests.
+                        // Otherwise, when loading a single issue (or updating one) it is not guaranteed that the issue
+                        // is in the issuesToEpics map, as that only contains issues that were updated in this change.
+                        Epic parentEpic = project.getEpicForIssue(parentKey);
+                        if (parentEpic != null) {
+                            epic = parentEpic.getKey();
+                        }
+
+                    }
+
+                    if (epic != null) {
+                        builder.setEpicKey(epic);
+                    }
+                }
+            }
         }
     }
  }

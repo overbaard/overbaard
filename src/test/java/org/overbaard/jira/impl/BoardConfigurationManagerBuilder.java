@@ -205,7 +205,6 @@ public class BoardConfigurationManagerBuilder implements ConfigurationManagerInj
         final SearchService searchService = null;
         final UserService userService = null;
         final VersionManager versionManager = null;
-
         JiraInjectables jiraInjectables = new JiraInjectables(
                 activeObjects,
                 applicationProperties,

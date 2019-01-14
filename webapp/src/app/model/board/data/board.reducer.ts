@@ -28,6 +28,8 @@ import {BoardState} from './board';
 import {BoardUtil, initialBoardState} from './board.model';
 import {manualSwimlaneReducer, ManualSwimlanesActions} from './manual-swimlane/manual-swimlane.reducer';
 import {initialManualSwimlaneState, ManualSwimlaneState} from './manual-swimlane/manual-swimlane.model';
+import {EpicActions, epicMetaReducer} from './epic/epic.reducer';
+import {EpicState, initialEpicState} from './epic/epic.model';
 
 
 const metaReducers = {
@@ -35,6 +37,7 @@ const metaReducers = {
   assignees: assigneeMetaReducer,
   issueTypes: issueTypeMetaReducer,
   priorities: priorityMetaReducer,
+  epics: epicMetaReducer,
   components: componentMetaReducer,
   labels: labelMetaReducer,
   fixVersions: fixVersionMetaReducer,
@@ -114,8 +117,10 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
         metaReducers.priorities(state.priorities, PriorityActions.createDeserializePriorities(input['priorities']));
       const issueTypeState: IssueTypeState =
         metaReducers.issueTypes(state.issueTypes, IssueTypeActions.createDeserializeIssueTypes(input['issue-types']));
-
       // These might not be there
+      const epicState: EpicState = input['epics'] ?
+        metaReducers.epics(state.epics, EpicActions.createDeserializeAll(input['epics']))
+        : initialEpicState;
       const componentState: ComponentState = input['components'] ?
         metaReducers.components(state.components, ComponentActions.createDeserializeComponents(input['components']))
         : initialComponentState;
@@ -143,6 +148,7 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
         .setAssignees(assigneeState.assignees)
         .setPriorities(priorityState.priorities)
         .setIssueTypes(issueTypeState.types)
+        .setEpicsByProject(epicState.epicsByProject)
         .setComponents(componentState.components)
         .setLabels(labelState.labels)
         .setFixVersions(fixVersionState.versions)
@@ -165,6 +171,7 @@ export function boardReducer(state: BoardState = initialBoardState, action: Acti
         mutable.assignees = assigneeState;
         mutable.issueTypes = issueTypeState;
         mutable.priorities = priorityState;
+        mutable.epics = epicState;
         mutable.components = componentState;
         mutable.fixVersions = fixVersionState;
         mutable.labels = labelState;

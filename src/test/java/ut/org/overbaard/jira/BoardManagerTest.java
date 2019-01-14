@@ -27,6 +27,8 @@ import static org.overbaard.jira.impl.Constants.CUSTOM;
 import static org.overbaard.jira.impl.Constants.DISPLAY;
 import static org.overbaard.jira.impl.Constants.DONE;
 import static org.overbaard.jira.impl.Constants.EMAIL;
+import static org.overbaard.jira.impl.Constants.EPIC;
+import static org.overbaard.jira.impl.Constants.EPICS;
 import static org.overbaard.jira.impl.Constants.FIX_VERSIONS;
 import static org.overbaard.jira.impl.Constants.ISSUES;
 import static org.overbaard.jira.impl.Constants.ISSUE_TYPES;
@@ -39,6 +41,7 @@ import static org.overbaard.jira.impl.Constants.OPTIONS;
 import static org.overbaard.jira.impl.Constants.OVERRIDE;
 import static org.overbaard.jira.impl.Constants.OVERRIDES;
 import static org.overbaard.jira.impl.Constants.PARALLEL_TASKS;
+import static org.overbaard.jira.impl.Constants.PARENT;
 import static org.overbaard.jira.impl.Constants.PRIORITIES;
 import static org.overbaard.jira.impl.Constants.PRIORITY;
 import static org.overbaard.jira.impl.Constants.PROJECTS;
@@ -71,6 +74,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.overbaard.jira.impl.BoardManagerBuilder;
 import org.overbaard.jira.impl.OverbaardIssueEvent;
+import org.overbaard.jira.impl.board.Epic;
 import org.overbaard.jira.impl.board.ProjectParallelTaskOptionsLoaderBuilder;
 
 import com.atlassian.jira.issue.search.SearchException;
@@ -3384,6 +3388,49 @@ public class BoardManagerTest extends AbstractBoardTest {
         checkIssue(allIssues, "TDP-1", IssueType.TASK, Priority.HIGH, "One", 0, new AssigneeChecker(0), ParallelTaskGroupValueChecker.NONE);
     }
 
+    @Test
+    public void testLoadBoardWithEpicsAndParentIssues() throws Exception {
+        //Override the default configuration set up by the @Before method to one with backlog states set up
+        initializeMocks("config/board-enable-epics.json");
+
+        issueRegistry.addEpic("TDP-100", "Some Epic");
+        issueRegistry.addEpic("TDP-101", "Another Epic");
+
+        issueRegistry.issueBuilder("TDP", "task", "high", "One", "TDP-A")
+                .buildAndRegister();      //1
+        issueRegistry.setEpic("TDP-1", "TDP-100");
+
+        issueRegistry.issueBuilder("TDP", "task", "high", "Two", "TDP-B")
+                .buildAndRegister();      //2
+        issueRegistry.setEpic("TDP-2", "TDP-101");
+
+        issueRegistry.issueBuilder("TDP", "task", "high", "Three", "TDP-C")
+                .buildAndRegister();      //3
+        issueRegistry.setParent("TDP-3", "TDP-2");
+
+        issueRegistry.issueBuilder("TDP", "task", "high", "Four", "TDP-C")
+                .buildAndRegister();      //4
+
+        issueRegistry.issueBuilder("TBG", "task", "high", "One", "TBG-X")
+                .buildAndRegister();      //1
+
+        ModelNode boardNode = getJson(0,
+                new BoardEpicChecker(
+                        new Epic("TDP-101", "Another Epic"),
+                        new Epic("TDP-100", "Some Epic")));
+
+        ModelNode allIssues = getIssuesCheckingSize(boardNode, 5);
+        checkIssue(allIssues, "TDP-1", IssueType.TASK, Priority.HIGH, "One", 0,
+                new EpicChecker(1));
+        checkIssue(allIssues, "TDP-2", IssueType.TASK, Priority.HIGH, "Two", 1,
+                new EpicChecker(0));
+        checkIssue(allIssues, "TDP-3", IssueType.TASK, Priority.HIGH, "Three", 2,
+                new ParentChecker("TDP-2"), new EpicChecker(0));
+        checkIssue(allIssues, "TDP-4", IssueType.TASK, Priority.HIGH, "Four", 2);
+        checkIssue(allIssues, "TBG-1", IssueType.TASK, Priority.HIGH, "One", 0);
+        checkProjectRankedIssues(boardNode, "TDP", 1, 2, 3, 4);
+        checkProjectRankedIssues(boardNode, "TBG", 1);
+    }
 
     private ModelNode getJson(int expectedViewId, BoardDataChecker... checkers) throws SearchException {
         return getJson(expectedViewId, false, checkers);
@@ -3403,6 +3450,7 @@ public class BoardManagerTest extends AbstractBoardTest {
         checkerMap.put(BoardTesterChecker.class, BoardTesterChecker.NONE);
         checkerMap.put(BoardDocumenterChecker.class, BoardDocumenterChecker.NONE);
         checkerMap.put(BoardBlacklistChecker.class, BoardBlacklistChecker.NONE);
+        checkerMap.put(BoardEpicChecker.class, BoardEpicChecker.NONE);
         boolean hasCustom = false;
         for (BoardDataChecker checker : checkers) {
             if (checker.getClass() == BoardTesterChecker.class && checker != BoardTesterChecker.NONE) {
@@ -3493,6 +3541,8 @@ public class BoardManagerTest extends AbstractBoardTest {
         checkerMap.put(TesterChecker.class, TesterChecker.NONE);
         checkerMap.put(DocumenterChecker.class, DocumenterChecker.NONE);
         checkerMap.put(ParallelTaskGroupValueChecker.class, ParallelTaskGroupValueChecker.NONE);
+        checkerMap.put(ParentChecker.class, ParentChecker.NONE);
+        checkerMap.put(EpicChecker.class, EpicChecker.NONE);
         for (IssueChecker checker : issueCheckers) {
             checkerMap.put(checker.getClass(), checker);
         }
@@ -3586,6 +3636,41 @@ public class BoardManagerTest extends AbstractBoardTest {
         }
     }
 
+    private static class ParentChecker implements IssueChecker {
+        static final ParentChecker NONE = new ParentChecker(null);
+        private final String expected;
+
+        public ParentChecker(String expected) {
+            this.expected = expected;
+        }
+
+        @Override
+        public void check(ModelNode issue) {
+            if (expected == null) {
+                Assert.assertFalse(issue.hasDefined(PARENT));
+            } else {
+                Assert.assertEquals(expected, issue.get(PARENT).asString());
+            }
+        }
+    }
+
+    private static class EpicChecker implements IssueChecker {
+        static final EpicChecker NONE = new EpicChecker(-1);
+        private final int expectedIndex;
+
+        public EpicChecker(int expectedIndex) {
+            this.expectedIndex = expectedIndex;
+        }
+
+        @Override
+        public void check(ModelNode issue) {
+            if (expectedIndex < 0) {
+                Assert.assertFalse(issue.hasDefined(EPIC));
+            } else {
+                Assert.assertEquals(expectedIndex, issue.get(EPIC).asInt());
+            }
+        }
+    }
     private abstract static class MultiSelectNameOnlyChecker implements IssueChecker {
         private final String name;
         private int[] expected;
@@ -3810,6 +3895,51 @@ public class BoardManagerTest extends AbstractBoardTest {
                 Set<String> expectedSet = new HashSet<>(Arrays.asList(entries));
                 for (ModelNode entry : entryList) {
                     Assert.assertTrue(expectedSet.contains(entry.asString()));
+                }
+            }
+        }
+    }
+
+    private static class BoardEpicChecker implements BoardDataChecker {
+        static final BoardEpicChecker NONE = new BoardEpicChecker();
+        private Map<String, List<Epic>> epicsByProject;
+
+        BoardEpicChecker(Epic...epics) {
+            if (epics.length > 0) {
+                epicsByProject = new HashMap<>();
+                for (Epic epic : epics) {
+                    String projectCode = epic.getKey().substring(0, epic.getKey().indexOf("-"));
+                    List<Epic> epicsForProject = epicsByProject.get(projectCode);
+                    if (epicsForProject == null) {
+                        epicsForProject = new ArrayList<>();
+                        epicsByProject.put(projectCode, epicsForProject);
+                    }
+                    epicsForProject.add(epic);
+
+                }
+            }
+        }
+
+        @Override
+        public void check(ModelNode board) {
+            if (epicsByProject == null) {
+                Assert.assertFalse(board.has(EPICS));
+                return;
+            }
+            ModelNode epicsNode = board.get(EPICS);
+            Assert.assertTrue(epicsNode.isDefined());
+
+            Assert.assertEquals(epicsByProject.keySet(), new HashSet<>(epicsNode.keys()));
+
+            for (Map.Entry<String, List<Epic>> entry : epicsByProject.entrySet()) {
+                List<ModelNode> epicNodes = epicsNode.get(entry.getKey()).asList();
+                List<Epic> epics = entry.getValue();
+                Assert.assertEquals(epics.size(), epicNodes.size());
+                for (int i = 0 ; i < epics.size() ; i++) {
+                    ModelNode epicNode = epicNodes.get(i);
+                    Epic epic = epics.get(i);
+                    Assert.assertEquals(epic.getKey(), epicNode.get(KEY).asString());
+                    Assert.assertEquals(epic.getName(), epicNode.get(NAME).asString());
                 }
             }
         }

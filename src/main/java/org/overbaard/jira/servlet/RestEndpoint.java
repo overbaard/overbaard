@@ -203,10 +203,10 @@ public class RestEndpoint {
     }
 
     @PUT
-    @Path("rankCustomFieldId")
-    public Response saveCustomFieldId(String value) {
+    @Path("customFieldIds")
+    public Response saveCustomFieldIds(String value) {
         ApplicationUser user = getUser();
-        jiraFacade.saveCustomFieldId(user, ModelNode.fromJSONString(value));
+        jiraFacade.saveCustomFieldIds(user, ModelNode.fromJSONString(value));
         String json = "{}";
         return createResponse(json);
     }

@@ -16,6 +16,8 @@ import {Dictionary} from '../../../../common/dictionary';
 import {getTestProjectsInput} from '../project/project.reducer.spec';
 import {ProjectActions, projectMetaReducer} from '../project/project.reducer';
 import {initialProjectState, ProjectState} from '../project/project.model';
+import {EpicActions, epicMetaReducer} from '../epic/epic.reducer';
+import {initialEpicState} from '../epic/epic.model';
 
 function getTestIssuesInput() {
   return cloneObject({
@@ -23,6 +25,7 @@ function getTestIssuesInput() {
       key: 'ISSUE-1',
       type: 0,
       priority: 0,
+      epic: 0,
       summary: 'One',
       assignee: 0,
       state: 0,
@@ -39,7 +42,8 @@ function getTestIssuesInput() {
       priority: 1,
       summary: 'Two',
       assignee: 1,
-      state: 1
+      state: 1,
+      parent: 'ISSUE-1'
     },
     'ISSUE-3': {
       key: 'ISSUE-3',
@@ -74,6 +78,10 @@ describe('Issue reducer tests', () => {
       .setAssignees(getTestAssigneeState().assignees)
       .setPriorities(getTestPriorityState().priorities)
       .setIssueTypes(getTestIssueTypeState().types)
+      .setEpicsByProject(
+        epicMetaReducer(
+          initialEpicState,
+          EpicActions.createDeserializeAll({'ISSUE': [{key: 'ISSUE-1000', name: 'ONE'}, {key: 'ISSUE-1001', name: 'TWO'}]})).epicsByProject)
       .setComponents(getTestComponentState().components)
       .setLabels(getTestLabelState().labels)
       .setLinkedProjects(projectState.linkedProjects)
@@ -92,11 +100,13 @@ describe('Issue reducer tests', () => {
       new IssueChecker(issueArray[0],
         lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Blocker'), lookupParams.assignees.get('bob'), 'One', 0)
         .key('ISSUE-1')
+        .epic('ISSUE-1000', 'ONE')
         .addLinkedIssue('L1-1', 'Linked 1', 2, 'L1-3')
         .check();
       new IssueChecker(issueArray[1],
         lookupParams.issueTypes.get('bug'), lookupParams.priorities.get('Major'), lookupParams.assignees.get('kabir'), 'Two', 1)
         .key('ISSUE-2')
+        .parentKey('ISSUE-1')
         .check();
       new IssueChecker(issueArray[2],
         lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Blocker'), lookupParams.assignees.get('bob'), 'Three', 0)
@@ -141,6 +151,7 @@ describe('Issue reducer tests', () => {
       new IssueChecker(issueArray[0],
         lookupParams.issueTypes.get('bug'), lookupParams.priorities.get('Major'), lookupParams.assignees.get('kabir'), 'Dos', 1)
         .key('ISSUE-2')
+        .parentKey('ISSUE-1')
         .check();
       new IssueChecker(issueArray[2],
         lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Major'), NO_ASSIGNEE, 'Five', 1)
@@ -191,11 +202,13 @@ describe('Issue reducer tests', () => {
       new IssueChecker(issueArray[0],
         lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Blocker'), lookupParams.assignees.get('bob'), 'One', 0)
         .key('ISSUE-1')
+        .epic('ISSUE-1000', 'ONE')
         .addLinkedIssue('L1-1', 'Linked 1', 2, 'L1-3')
         .check();
       new IssueChecker(issueArray[1],
         lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Blocker'), lookupParams.assignees.get('kabir'), 'Two', 1)
         .key('ISSUE-2')
+        .parentKey('ISSUE-1')
         .check();
       new IssueChecker(issueArray[2],
         lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Blocker'), lookupParams.assignees.get('bob'), 'Trois', 0)
@@ -237,11 +250,13 @@ describe('Issue reducer tests', () => {
       new IssueChecker(issueArray[0],
         lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Blocker'), lookupParams.assignees.get('bob'), 'One', 0)
         .key('ISSUE-1')
+        .epic('ISSUE-1000', 'ONE')
         .addLinkedIssue('L1-1', 'Linked 1', 2, 'L1-3')
         .check();
       new IssueChecker(issueArray[1],
         lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Blocker'), lookupParams.assignees.get('kabir'), 'Two', 1)
         .key('ISSUE-2')
+        .parentKey('ISSUE-1')
         .check();
       new IssueChecker(issueArray[2],
         lookupParams.issueTypes.get('task'), lookupParams.priorities.get('Blocker'), lookupParams.assignees.get('bob'), 'Three', 0)
@@ -269,6 +284,7 @@ describe('Issue reducer tests', () => {
       new IssueChecker(issueArray[0],
         lookupParams.issueTypes.get('bug'), lookupParams.priorities.get('Major'), lookupParams.assignees.get('kabir'), 'Two', 1)
         .key('ISSUE-2')
+        .parentKey('ISSUE-1')
         .check();
       expect(newState.lastChanged.size).toBe(3);
       checkIssueChanges(newState, {'ISSUE-1': IssueChange.DELETE, 'ISSUE-3': IssueChange.DELETE, 'ISSUE-4': IssueChange.DELETE});

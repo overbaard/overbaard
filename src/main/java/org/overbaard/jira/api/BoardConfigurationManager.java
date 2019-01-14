@@ -95,7 +95,7 @@ public interface BoardConfigurationManager {
      * @param user the logged in user
      * @param idNode an object containing the id
      */
-    void saveRankCustomFieldId(ApplicationUser user, ModelNode idNode);
+    void saveCustomFieldIds(ApplicationUser user, ModelNode idNode);
 
     String getBoardJsonConfig(ApplicationUser user, int boardId);
 

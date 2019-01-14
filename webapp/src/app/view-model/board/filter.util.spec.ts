@@ -556,6 +556,8 @@ describe('Apply filter tests', () => {
       projectCode: 'ISSUE',
       priority: {name: 'high', colour: null},
       type: {name: 'bug', colour: null},
+      epic: null,
+      parentKey: null,
       summary: 'Hello this is an issue',
       assignee: NO_ASSIGNEE,
       components: OrderedSet<string>(['C1', 'C2']),
