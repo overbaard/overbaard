@@ -29,6 +29,7 @@ import org.overbaard.jira.api.BoardManager;
 import org.overbaard.jira.api.NextRankedIssueUtil;
 import org.overbaard.jira.impl.BoardConfigurationManagerBuilder;
 import org.overbaard.jira.impl.BoardManagerBuilder;
+import org.overbaard.jira.impl.ConfigurationManagerInjectables;
 import org.overbaard.jira.impl.OverbaardIssueEvent;
 
 import com.atlassian.jira.bc.issue.search.SearchService;
@@ -76,24 +77,26 @@ public abstract class AbstractBoardTest {
     }
 
     protected void initializeMocks(String cfgResource, AdditionalBuilderInit init) throws Exception {
-        this.boardConfigurationManager = new BoardConfigurationManagerBuilder()
+        BoardConfigurationManagerBuilder builder = new BoardConfigurationManagerBuilder();
+        this.boardConfigurationManager = builder
                 .addConfigActiveObjectsFromFile(cfgResource)
                 .addSettingActiveObject(RANK_CUSTOM_FIELD_ID, "10000")
                 .setCustomFieldManager(CustomFieldManagerBuilder.loadFromResource(cfgResource))
                 .build();
-        initializeMocks(this.boardConfigurationManager, init);
+        initializeMocks(this.boardConfigurationManager, builder, init);
     }
 
     protected void initializeMocks(ModelNode config, AdditionalBuilderInit init) throws Exception {
-        this.boardConfigurationManager = new BoardConfigurationManagerBuilder()
+        BoardConfigurationManagerBuilder builder = new BoardConfigurationManagerBuilder();
+        this.boardConfigurationManager = builder
                 .addConfigActiveObjectsFromModel(config)
                 .addSettingActiveObject(RANK_CUSTOM_FIELD_ID, "10000")
                 .setCustomFieldManager(CustomFieldManagerBuilder.loadFromModel(config))
                 .build();
-        initializeMocks(this.boardConfigurationManager, init);
+        initializeMocks(this.boardConfigurationManager, builder, init);
     }
 
-    private void initializeMocks(BoardConfigurationManager cfgManager, AdditionalBuilderInit init) throws Exception {
+    private void initializeMocks(BoardConfigurationManager cfgManager, ConfigurationManagerInjectables configurationManagerInjectables, AdditionalBuilderInit init) throws Exception {
         MockComponentWorker worker = new MockComponentWorker();
         userManager = new UserManagerBuilder()
                 .addDefaultUsers()
@@ -110,8 +113,7 @@ public abstract class AbstractBoardTest {
         IssueLinkManager issueLinkManager = new IssueLinkManagerBuilder().build();
         worker.init();
 
-        BoardManagerBuilder boardManagerBuilder = new BoardManagerBuilder()
-                .setBoardConfigurationManager(cfgManager)
+        BoardManagerBuilder boardManagerBuilder = new BoardManagerBuilder(cfgManager, configurationManagerInjectables)
                 .setUserManager(userManager)
                 .setSearchService(searchService)
                 .setIssueLinkManager(issueLinkManager)

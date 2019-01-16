@@ -21,44 +21,39 @@ import org.overbaard.jira.api.NextRankedIssueUtil;
 import org.overbaard.jira.api.ProjectParallelTaskOptionsLoader;
 import org.overbaard.jira.impl.board.ProjectParallelTaskOptionsLoaderBuilder;
 
-import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.jira.avatar.AvatarService;
 import com.atlassian.jira.bc.issue.IssueService;
 import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.bc.user.UserService;
-import com.atlassian.jira.config.IssueTypeManager;
-import com.atlassian.jira.config.PriorityManager;
-import com.atlassian.jira.issue.CustomFieldManager;
 import com.atlassian.jira.issue.customfields.manager.OptionsManager;
 import com.atlassian.jira.issue.link.IssueLinkManager;
 import com.atlassian.jira.issue.search.SearchContextFactory;
-import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.project.version.VersionManager;
-import com.atlassian.jira.security.GlobalPermissionManager;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.sal.api.ApplicationProperties;
 
 import ut.org.overbaard.jira.mock.AvatarServiceBuilder;
-import ut.org.overbaard.jira.mock.PermissionManagerBuilder;
-import ut.org.overbaard.jira.mock.ProjectManagerBuilder;
 
 /**
  * @author Kabir Khan
  */
 public class BoardManagerBuilder {
 
+    private final BoardConfigurationManager boardConfigurationManager;
+    private final ConfigurationManagerInjectables configurationManagerInjectables;
     private SearchService searchService;
     private AvatarService avatarService = AvatarServiceBuilder.getUserNameUrlMock();
     private IssueLinkManager issueLinkManager;
     private UserManager userManager;
-    private BoardConfigurationManager boardConfigurationManager;
-    private ProjectManager projectManager = ProjectManagerBuilder.getAnyProjectManager();
-    private PermissionManager permissionManager = PermissionManagerBuilder.getAllowsAll();
+    private PermissionManager permissionManager;
     private NextRankedIssueUtil nextRankedIssueUtil;
     private ProjectParallelTaskOptionsLoader projectParallelTaskOptionsLoader = new ProjectParallelTaskOptionsLoaderBuilder().build();
 
-    public BoardManagerBuilder() {
+    public BoardManagerBuilder(BoardConfigurationManager boardConfigurationManager, ConfigurationManagerInjectables configurationManagerInjectables) {
+        this.boardConfigurationManager = boardConfigurationManager;
+        this.configurationManagerInjectables = configurationManagerInjectables;
+        this.permissionManager = configurationManagerInjectables.getPermissionManager();
     }
 
     public BoardManagerBuilder setSearchService(SearchService searchService) {
@@ -76,18 +71,8 @@ public class BoardManagerBuilder {
         return this;
     }
 
-    public BoardManagerBuilder setBoardConfigurationManager(BoardConfigurationManager boardConfigurationManager) {
-        this.boardConfigurationManager = boardConfigurationManager;
-        return this;
-    }
-
     public BoardManagerBuilder setUserManager(UserManager userManager) {
         this.userManager = userManager;
-        return this;
-    }
-
-    public BoardManagerBuilder setProjectManager(ProjectManager projectManager) {
-        this.projectManager = projectManager;
         return this;
     }
 
@@ -108,31 +93,26 @@ public class BoardManagerBuilder {
 
     public BoardManager build() {
         //These are not needed for this code path at the moment
-        final ActiveObjects activeObjects = null;
         final ApplicationProperties applicationProperties = null;
-        final CustomFieldManager customFieldManager = null;
-        final GlobalPermissionManager globalPermissionManager = null;
         final IssueService issueService = null;
-        final IssueTypeManager issueTypeManager = null;
         final OptionsManager optionsManager = null;
-        final PriorityManager priorityManager = null;
         final SearchContextFactory searchContextFactory = null;
         final UserService userService = null;
         final VersionManager versionManager = null;
 
         JiraInjectables jiraInjectables = new JiraInjectables(
-                activeObjects,
+                configurationManagerInjectables.getActiveObjects(),
                 applicationProperties,
                 avatarService,
-                customFieldManager,
-                globalPermissionManager,
+                configurationManagerInjectables.getCustomFieldManager(),
+                configurationManagerInjectables.getGlobalPermissionManager(),
                 issueService,
                 issueLinkManager,
-                issueTypeManager,
+                configurationManagerInjectables.getIssueTypeManager(),
                 optionsManager,
                 permissionManager,
-                projectManager,
-                priorityManager,
+                configurationManagerInjectables.getProjectManager(),
+                configurationManagerInjectables.getPriorityManager(),
                 searchContextFactory,
                 searchService,
                 userService,

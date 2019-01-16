@@ -67,7 +67,7 @@ import ut.org.overbaard.jira.mock.PriorityManagerBuilder;
 /**
  * @author Kabir Khan
  */
-public class BoardConfigurationManagerBuilder {
+public class BoardConfigurationManagerBuilder implements ConfigurationManagerInjectables {
 
     private final ActiveObjects activeObjects = mock(ActiveObjects.class);
     private final ProjectManager projectManager = mock(ProjectManager.class);
@@ -87,6 +87,41 @@ public class BoardConfigurationManagerBuilder {
             addConfigActiveObjectsFromModel(entry);
         }
         return this;
+    }
+
+    @Override
+    public PermissionManager getPermissionManager() {
+        return permissionManager;
+    }
+
+    @Override
+    public ActiveObjects getActiveObjects() {
+        return activeObjects;
+    }
+
+    @Override
+    public ProjectManager getProjectManager() {
+        return projectManager;
+    }
+
+    @Override
+    public CustomFieldManager getCustomFieldManager() {
+        return customFieldManager;
+    }
+
+    @Override
+    public IssueTypeManager getIssueTypeManager() {
+        return issueTypeManager;
+    }
+
+    @Override
+    public PriorityManager getPriorityManager() {
+        return priorityManager;
+    }
+
+    @Override
+    public GlobalPermissionManager getGlobalPermissionManager() {
+        return globalPermissionManager;
     }
 
     public BoardConfigurationManagerBuilder addConfigActiveObjectsFromModel(ModelNode entry) throws IOException {
