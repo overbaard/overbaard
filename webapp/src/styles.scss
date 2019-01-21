@@ -1,5 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
-@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+/*@import "~@angular/material/prebuilt-themes/indigo-pink.css";*/
 @import '~material-design-icons/iconfont/material-icons.css';
 
 /* It would be nice to figure out how to store this locally */
@@ -26,10 +26,10 @@ Components wanting this padding should introduce it again
 }
 
 /* If we change the theme, we need to update these */
-$primary-colour: #3F51B5!important;
-$accent-colour: #FF4081!important;
-$primary-colour-light: #757de8!important;
-$accent-colour-light: ff79b0!important;
+$primary-colour: #1d679c!important;
+$accent-colour: #ff4080!important;
+$primary-colour-light: #3d96cb!important;
+$accent-colour-light: ff6498!important;
 $white-text: #FFF!important;
 $black-text: rgba(0,0,0,.87)!important;
 .primary-color {

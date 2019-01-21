@@ -1,0 +1,83 @@
+@import '~@angular/material/theming';
+
+// From https://material.angular.io/guide/theming
+
+@include mat-core();
+
+
+// These are taken from https://material.io/design/color/#tools-for-picking-colors using
+// #1d689c as the primary colour input, and #ff4081 as the secondary colour input
+// #1d679c comes from
+// http://design.jboss.org/overbard/logo/images/overbard_logo_r4v1.png and
+// https://docs.google.com/presentation/d/1maQguTE7YOp0JGAWTJEABVkwa331OlHo5KTWMdsNFL0/edit?usp=sharing
+$overbaard-primary: (
+  50: #e4f2f7,
+  100: #bcdeee,
+  200: #95c9e3,
+  300: #70b4d7,
+  400: #55a4d1,
+  500: #3d96cb,
+  600: #3289b4,
+  700: #2677ad,
+  800: #1d689c, // The colour tool returns this as #1d679c, manually override this here. This is the 'root' of the theme
+  900: #oe4b7d,
+  A100: #bcdeee,
+  A200: #95c9e3,
+  A400: #55a4d1,
+  A700: #2677ad,
+  contrast: (
+    50: $dark-primary-text,
+    100: $dark-primary-text,
+    200: $dark-primary-text,
+    300: $dark-primary-text,
+    400: $dark-primary-text,
+    500: $light-primary-text,
+    600: $light-primary-text,
+    700: $light-primary-text,
+    800: $light-primary-text,
+    900: $light-primary-text,
+    A100: $dark-primary-text,
+    A200: $light-primary-text,
+    A400: $light-primary-text,
+    A700: $light-primary-text,
+  )
+);
+$overbaard-secondary: (
+  50: #ffe5ed,
+  100: #ffbdd3,
+  200: #ff92b6,
+  300: #ff6498,
+  400: #ff4080, // The colour tool returns this as #ff4080, go with that since it is only off by one. This is the root of the theme
+  500: #ff1868,
+  600: #ed1366,
+  700: #d60e61,
+  800: #c2075e,
+  900: #9c0258,
+  A100: #ffbdd3,
+  A200: #ff92b6,
+  A400: #ff4080,
+  A700: #d60e61,
+  contrast: (
+    50: $dark-primary-text,
+    100: $dark-primary-text,
+    200: $dark-primary-text,
+    300: $dark-primary-text,
+    400: $light-primary-text, // Changed to light text
+    500: $light-primary-text,
+    600: $light-primary-text,
+    700: $light-primary-text,
+    800: $light-primary-text,
+    900: $light-primary-text,
+    A100: $dark-primary-text,
+    A200: $light-primary-text,
+    A400: $light-primary-text,
+    A700: $light-primary-text,
+  )
+);
+
+$overbaard-app-primary: mat-palette($overbaard-primary, 800, 500, 900);
+$overbaard-app-accent: mat-palette($overbaard-secondary, 400, 300, 700);
+
+$overbaard-app-theme: mat-light-theme($overbaard-app-primary, $overbaard-app-accent);
+
+@include angular-material-theme($overbaard-app-theme);

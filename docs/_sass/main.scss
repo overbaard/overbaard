@@ -1,8 +1,8 @@
 
-$primary-colour: #3F51B5!important;
-$accent-colour: #FF4081!important;
-$primary-colour-light: #757de8!important;
-$accent-colour-light: ff79b0!important;
+$primary-colour: #1d679c!important;
+$accent-colour: #ff4080!important;
+$primary-colour-light: #3d96cb!important;
+$accent-colour-light: ff6498!important;
 $white-text: #FFF!important;
 $black-text: rgba(0,0,0,.87)!important;
 
@@ -27,7 +27,25 @@ h5 {
   font-size: 16px;
 }
 
-/* Styling of the general components */
+
+a:not(.mdl-navigation__link) {
+    color: $accent-colour;
+}
+.mdl-layout__header {
+    background-color: $primary-colour;
+}
+.side-drawer-logo-container {
+  min-height: 40px;
+  max-height: 40px;
+  padding-left: 59px;
+  padding-top: 6px;
+  padding-bottom: 2px;
+}
+.large-logo {
+    display: flex;
+    justify-content: center;
+/*    width: 100%;*/
+}
 .component-header {
   margin-top: 0px;
   background-color: $primary-colour;
@@ -49,3 +67,7 @@ h5 {
   color: $primary-colour;
 }
 
+.logo-toolbar-container {
+   margin-top: 13px;
+   margin-bottom: 19px;
+}

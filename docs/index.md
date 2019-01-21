@@ -2,6 +2,13 @@
 layout: default
 title: Documentation Home
 ---
+
+
+<div class="large-logo">
+    <img src="assets/images/overbard_logo_color_200px.png">
+</div>
+
+
 ```
 'Bård' is a Norwegian name pronounced 'board' (alternative spelling: 'baard').
 ```
