@@ -22,6 +22,7 @@
               "src/rest"
             ],
             "styles": [
+              "src/overbaard-app-theme.scss",
               "src/styles.scss"
             ],
             "scripts": []

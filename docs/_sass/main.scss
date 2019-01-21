@@ -1,8 +1,8 @@
 
-$primary-colour: #3F51B5!important;
-$accent-colour: #FF4081!important;
-$primary-colour-light: #757de8!important;
-$accent-colour-light: ff79b0!important;
+$primary-colour: #1d679c!important;
+$accent-colour: #ff4080!important;
+$primary-colour-light: #3d96cb!important;
+$accent-colour-light: ff6498!important;
 $white-text: #FFF!important;
 $black-text: rgba(0,0,0,.87)!important;
 
@@ -27,6 +27,13 @@ h5 {
   font-size: 16px;
 }
 
+
+a:not(.mdl-navigation__link) {
+    color: $accent-colour;
+}
+.mdl-layout__header {
+    background-color: $primary-colour;
+}
 /* Styling of the general components */
 .component-header {
   margin-top: 0px;
