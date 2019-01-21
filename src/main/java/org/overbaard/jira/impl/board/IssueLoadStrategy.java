@@ -17,6 +17,7 @@
 package org.overbaard.jira.impl.board;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -70,6 +71,10 @@ interface IssueLoadStrategy {
             SearchService searchService,
             ApplicationUser owner,
             Map<String, Epic> unsortedEpics) {
+
+        if (unsortedEpics.size() == 0) {
+            return new IndexedMap<>(Collections.emptyMap());
+        }
 
         final ClassLoader cl = RawSqlLoader.class.getClassLoader();
         if (cl instanceof BundleReference == false) {
