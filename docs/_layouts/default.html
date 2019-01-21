@@ -7,6 +7,7 @@
 
     <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <!-- We override the colours from this theme manually -->
     <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
     <link rel="stylesheet" href="./assets/css/styles.css">
     <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
@@ -19,13 +20,13 @@
     <header class="mdl-layout__header">
         <div class="mdl-layout__header-row">
             <!-- Title -->
-            <span class="mdl-layout-title">Overbård Documentation</span>
+            <span class="mdl-layout-title logo-toolbar-container"><img src="assets/images/overbard_logotype_white_100px.svg" height="32px"></span>
             <!-- Add spacer, to align navigation to the right -->
             <div class="mdl-layout-spacer"></div>
         </div>
     </header>
     <div class="mdl-layout__drawer">
-        <span class="mdl-layout-title">Overbård</span>
+        <div class="side-drawer-logo-container"><img src="assets/images/overbard_logo_color_100px.png"></div>
         <nav class="mdl-navigation">
             {% for item in site.data.navigation %}
                 {% if page.url == item.link %}
@@ -40,9 +41,11 @@
     </div>
     <main class="mdl-layout__content">
         <div class="page-content">
+            {%  if page.url != '/' %}
             <div class="component-header">
                 {{ page.title }}
             </div>
+            {% endif %}
             <div class="component-body">
                 {{ content }}
             </div>

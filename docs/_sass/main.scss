@@ -34,7 +34,18 @@ a:not(.mdl-navigation__link) {
 .mdl-layout__header {
     background-color: $primary-colour;
 }
-/* Styling of the general components */
+.side-drawer-logo-container {
+  min-height: 40px;
+  max-height: 40px;
+  padding-left: 59px;
+  padding-top: 6px;
+  padding-bottom: 2px;
+}
+.large-logo {
+    display: flex;
+    justify-content: center;
+/*    width: 100%;*/
+}
 .component-header {
   margin-top: 0px;
   background-color: $primary-colour;
@@ -56,3 +67,7 @@ a:not(.mdl-navigation__link) {
   color: $primary-colour;
 }
 
+.logo-toolbar-container {
+   margin-top: 13px;
+   margin-bottom: 19px;
+}
