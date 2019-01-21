@@ -2,9 +2,9 @@
   <mat-sidenav-container #navigation class="sidenav-container">
     <mat-sidenav mode="over" #navigation class="sidenav-navigation">
       <div style="display: flex; flex-direction: column; width: 100%; height: 100%">
-        <mat-toolbar [style.height.px]="toolbarHeight">
-          <span class="sidenav-header">Overbård</span>
-        </mat-toolbar>
+        <div class="sidenav-header">
+          <img src="{{localImageUrl('overbard_logo_color_100px.png')}}">
+        </div>
         <mat-nav-list>
           <a *ngFor="let navItem of navItems ; trackBy: navItemTrackByFn"
              mat-list-item
@@ -53,7 +53,7 @@
         <mat-icon>menu</mat-icon>
       </button>
     </span>
-      <span>Overbård</span>
+      <span class="logo-container"><img src="{{localImageUrl('overbard_logotype_white_100px.svg')}}" height="32px"></span>
     </mat-toolbar>
     <div class="inner-sidenav-content">
       <app-font-measure style="min-width: 0px; max-width: 0px ; overflow: hidden ; position: absolute ; top: 0px; left: 0px; z-index: -10"></app-font-measure>
