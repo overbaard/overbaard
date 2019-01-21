@@ -122,7 +122,7 @@ export class SwimlaneInfoBuilder {
           if (manualSwimlane) {
             manualSwimlane.swimlaneEntries.forEach(e => {
               builderMap.set(e.name,
-                new SwimlaneDataBuilder(e.name, e.name, states, collapsed(userSettingState, name), userSettingState, existingInfo));
+                new SwimlaneDataBuilder(e.name, e.name, states, collapsed(userSettingState, e.name), userSettingState, existingInfo));
             });
             issueMatcher = ((issue, dataBuilders) => this.issueQlMatcher(manualSwimlane, issue, dataBuilders, builderNone));
           }
