@@ -9,6 +9,7 @@ import {cloneObject} from '../../../../common/object-util';
 import {BoardIssue} from './board-issue';
 import {LinkedIssue} from './linked-issue';
 import {ColourTable} from '../../../../common/colour-table';
+import {Epic} from '../epic/epic.model';
 
 export interface IssueState {
   issues: Map<string, BoardIssue>;
@@ -37,6 +38,8 @@ const DEFAULT_ISSUE: BoardIssue = {
   assignee: NO_ASSIGNEE,
   priority: null,
   type: null,
+  epic: null,
+  parentKey: null,
   components: null,
   labels: null,
   fixVersions: null,
@@ -95,6 +98,8 @@ export class DeserializeIssueLookupParams {
   private _issueTypesList: List<IssueType>;
   private _priorities: OrderedMap<string, Priority> = OrderedMap<string, Priority>();
   private _prioritiesList: List<Priority>;
+  private _epicsByProject: Map<string, OrderedMap<string, Epic>> = Map<string, OrderedMap<string, Epic>>();
+  private _epicsListsByProjectMap: Map<string, List<Epic>>;
   private _components: List<string> = List<string>();
   private _labels: List<string> = List<string>();
   private _fixVersions: List<string> = List<string>();
@@ -119,6 +124,11 @@ export class DeserializeIssueLookupParams {
 
   setPriorities(value: OrderedMap<string, Priority>): DeserializeIssueLookupParams {
     this._priorities = value;
+    return this;
+  }
+
+  setEpicsByProject(value: Map<string, OrderedMap<string, Epic>>): DeserializeIssueLookupParams {
+    this._epicsByProject = value;
     return this;
   }
 
@@ -188,6 +198,15 @@ export class DeserializeIssueLookupParams {
       this._prioritiesList = this._priorities.toList();
     }
     return this._prioritiesList;
+  }
+
+  get epicsListsByProjectMap(): Map<string, List<Epic>> {
+    if (!this._epicsListsByProjectMap) {
+      this._epicsListsByProjectMap = this._epicsByProject.map( value => {
+        return value.toList();
+      }).toMap();
+    }
+    return this._epicsListsByProjectMap;
   }
 
   get linkedProjects(): Map<string, LinkedProject> {
@@ -324,6 +343,14 @@ export class IssueUtil {
     const issueType: IssueType = params.issueTypesList.get(input['type']);
     input['type'] = issueType;
 
+    if (input['parent']) {
+      input['parentKey'] = input['parent'];
+      delete input['parent'];
+    }
+    if (!isNaN(input['epic'])) {
+      const epic: Epic = params.epicsListsByProjectMap.get(projectCode).get(input['epic']);
+      input['epic'] = epic;
+    }
     if (input['components']) {
       input['components'] = IssueUtil.lookupStringsFromIndexArray(input['components'], params.components);
     }
@@ -456,6 +483,8 @@ export class IssueUtil {
       summary: input['summary'],
       assignee: input['unassigned'] ? NO_ASSIGNEE : params.assignees.get(input['assignee']),
       priority: params.priorities.get(input['priority']),
+      epic: null,       // TODO when we handle changes
+      parentKey: null,  // TODO when we handle changes
       type: params.issueTypes.get(input['type']),
       components: IssueUtil.getClearableStringSet(input, 'clear-components', 'components'),
       labels: IssueUtil.getClearableStringSet(input, 'clear-labels', 'labels'),
@@ -477,6 +506,7 @@ export class IssueUtil {
         // When the issue type changes, we overwrite the parallel tasks completely
         mutable.selectedParallelTasks = null;
       }
+
 
       for (const key of Object.keys(change)) {
         const value = change[key];

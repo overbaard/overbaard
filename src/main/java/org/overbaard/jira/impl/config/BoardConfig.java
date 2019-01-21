@@ -66,8 +66,11 @@ public class BoardConfig {
     private final String code;
     private final String name;
     private final String owningUserKey;
-    /** The 'Rank' custom field as output by  */
+    /** Custom field ids  */
     private final long rankCustomFieldId;
+    private final long epicLinkCustomFieldId;
+    private final long epicSummaryCustomFieldId;
+
     private final BoardStates boardStates;
     private final Map<String, BoardProjectConfig> boardProjects;
     private final Map<String, LinkedProjectConfig> linkedProjects;
@@ -84,6 +87,8 @@ public class BoardConfig {
 
     private BoardConfig(int id, String code, String name, String owningUserKey,
                         long rankCustomFieldId,
+                        long epicLinkCustomFieldId,
+                        long epicSummaryCustomFieldId,
                         BoardStates boardStates,
                         Map<String, BoardProjectConfig> boardProjects, Map<String, LinkedProjectConfig> linkedProjects,
                         Map<String, NameAndColour> priorities, Map<String, NameAndColour> issueTypes,
@@ -96,6 +101,8 @@ public class BoardConfig {
         this.name = name;
         this.owningUserKey = owningUserKey;
         this.rankCustomFieldId = rankCustomFieldId;
+        this.epicLinkCustomFieldId = epicLinkCustomFieldId;
+        this.epicSummaryCustomFieldId = epicSummaryCustomFieldId;
         this.boardStates = boardStates;
         this.boardProjects = boardProjects;
         this.linkedProjects = linkedProjects;
@@ -120,13 +127,16 @@ public class BoardConfig {
     }
 
     public static BoardConfig loadAndValidate(JiraInjectables jiraInjectables, int id,
-                                              String owningUserKey, String configJson, long rankCustomFieldId) {
+                                              String owningUserKey, String configJson,
+                                              long rankCustomFieldId, long epicLinkCustomFieldId,
+                                              long epicSummaryCustomFieldId) {
         ModelNode boardNode = ModelNode.fromJSONString(configJson);
-        return loadAndValidate(jiraInjectables, id, owningUserKey, boardNode, rankCustomFieldId);
+        return loadAndValidate(jiraInjectables, id, owningUserKey, boardNode, rankCustomFieldId, epicLinkCustomFieldId, epicSummaryCustomFieldId);
     }
 
     public static BoardConfig loadAndValidate(JiraInjectables jiraInjectables,
-                                              int id, String owningUserKey, ModelNode boardNode, long rankCustomFieldId) {
+                                              int id, String owningUserKey, ModelNode boardNode,
+                                              long rankCustomFieldId, long epicLinkCustomFieldId, long epicSummaryCustomFieldId) {
         final String code = Util.getRequiredChild(boardNode, "Group", null, CODE).asString();
         final String boardName = Util.getRequiredChild(boardNode, "Group", null, NAME).asString();
 
@@ -165,6 +175,8 @@ public class BoardConfig {
 
         final BoardConfig boardConfig = new BoardConfig(id, code, boardName, owningUserKey,
                 rankCustomFieldId,
+                epicLinkCustomFieldId,
+                epicSummaryCustomFieldId,
                 boardStates,
                 Collections.unmodifiableMap(mainProjects),
                 Collections.unmodifiableMap(linkedProjects),
@@ -265,6 +277,14 @@ public class BoardConfig {
 
     public String getName() {
         return name;
+    }
+
+    public long getEpicSummaryCustomFieldId() {
+        return epicSummaryCustomFieldId;
+    }
+
+    public long getEpicLinkCustomFieldId() {
+        return epicLinkCustomFieldId;
     }
 
     public Collection<BoardProjectConfig> getBoardProjects() {

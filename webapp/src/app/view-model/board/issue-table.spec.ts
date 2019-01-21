@@ -3,13 +3,15 @@ import {DeserializeIssueLookupParams} from '../../model/board/data/issue/issue.m
 import {HeaderState} from '../../model/board/data/header/header.state';
 import {HeaderActions, headerMetaReducer} from '../../model/board/data/header/header.reducer';
 import {IssueTable} from './issue-table';
-import {List, OrderedSet, Set} from 'immutable';
+import {is, List, OrderedSet, Set} from 'immutable';
 import {Dictionary} from '../../common/dictionary';
 import {BoardViewModel} from './board-view';
 import {BoardHeader} from './board-header';
 import {initialIssueDetailState, IssueDetailState} from '../../model/board/user/issue-detail/issue-detail.model';
 import {BoardIssueView} from './board-issue-view';
 import {IssueSummaryLevel} from '../../model/board/user/issue-summary-level';
+import {IssueChecker} from '../../model/board/data/issue/issue.model.spec';
+import {Epic} from '../../model/board/data/epic/epic.model';
 
 describe('Issue Table observer tests', () => {
 
@@ -35,7 +37,7 @@ describe('Issue Table observer tests', () => {
         it('No rank', () => {
           doTest(false);
         });
-        it('No rank', () => {
+        it('Rank', () => {
           doTest(true);
         });
 
@@ -153,6 +155,66 @@ describe('Issue Table observer tests', () => {
               }
               checker.checkBoard(board);
             });
+        }
+      });
+      describe('Epics and Parents', () => {
+        it('No rank', () => {
+          doTest(false);
+        });
+        it('Rank', () => {
+          doTest(true);
+        });
+
+        function doTest(rank: boolean) {
+          init
+            .setRank('ONE', 5, 1, 2, 3, 4, 6)
+            .epics({
+              'ONE': [
+                {key: 'ONE-900', name: 'Some Epic'},
+                {key: 'ONE-901', name: 'Another Epic'}
+              ]
+            })
+            .issuesFactory(
+              issueFactory
+                .addIssue('ONE-1', 0, {parent: 'ONE-2'})
+                .addIssue('ONE-2', 1)
+                .addIssue('ONE-3', 2, {epic: 1, parent: 'ONE-4'})
+                .addIssue('ONE-4', 3, {epic: 1})
+                .addIssue('ONE-5', 2, {epic: 0})
+                .addIssue('ONE-6', 2)
+            );
+          new BoardViewObservableUtil(rank ? {view: 'rv'} : null)
+            .updateBoardState(init)
+            .easySubscribe((board: BoardViewModel) => {
+              const checker: BoardChecker = new BoardChecker([['ONE-1'], ['ONE-2'], ['ONE-5', 'ONE-3', 'ONE-6'], ['ONE-4']]);
+              if (rank) {
+                checker.rankOrder('ONE-5', 'ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-6');
+              }
+              checker.checkBoard(board);
+
+              // Do some extra checking here of the issues for epics and parents
+              checkEpicAndParent(board.issueTable.issues.get('ONE-1'), null, 'ONE-2');
+              checkEpicAndParent(board.issueTable.issues.get('ONE-2'), null, null);
+              checkEpicAndParent(board.issueTable.issues.get('ONE-3'), {key: 'ONE-901', name: 'Another Epic'}, 'ONE-4');
+              checkEpicAndParent(board.issueTable.issues.get('ONE-4'), {key: 'ONE-901', name: 'Another Epic'}, null);
+              checkEpicAndParent(board.issueTable.issues.get('ONE-5'), {key: 'ONE-900', name: 'Some Epic'}, null);
+              checkEpicAndParent(board.issueTable.issues.get('ONE-6'), null, null);
+            });
+        }
+
+        function checkEpicAndParent(issue: BoardIssueView, epic: Epic, parentKey: string) {
+          if (epic) {
+            expect(issue.epic).toBeTruthy();
+            expect(issue.epic.key).toBe(epic.key);
+            expect(issue.epic.name).toBe(epic.name);
+          } else {
+            expect(issue.epic).toBeFalsy();
+          }
+          if (parentKey) {
+            expect(issue.parentKey).toBe(parentKey);
+          } else {
+            expect(issue.parentKey).toBeFalsy();
+          }
         }
       });
     });

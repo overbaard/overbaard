@@ -80,7 +80,7 @@ public interface JiraFacade {
      * @param user the logged in user
      * @param idNode an object containing the id
      */
-    void saveCustomFieldId(ApplicationUser user, ModelNode idNode);
+    void saveCustomFieldIds(ApplicationUser user, ModelNode idNode);
 
     /**
      * Loads the Overbård version from the manifest file

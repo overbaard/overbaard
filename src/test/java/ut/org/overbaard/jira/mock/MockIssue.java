@@ -17,6 +17,7 @@ package ut.org.overbaard.jira.mock;
 
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -24,6 +25,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import org.ofbiz.core.entity.GenericValue;
+import org.overbaard.jira.impl.board.Epic;
 
 import com.atlassian.jira.bc.project.component.ProjectComponent;
 import com.atlassian.jira.issue.Issue;
@@ -38,6 +40,8 @@ import com.atlassian.jira.issue.status.Status;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.project.version.Version;
 import com.atlassian.jira.user.ApplicationUser;
+
+import ut.org.overbaard.jira.TestConstants;
 
 /**
  * Mockito seems to get confused with deep mocks, so hardcode these value objects
@@ -55,6 +59,9 @@ public class MockIssue implements Issue {
     private final Set<Label> labels;
     private final Set<Version> fixVersions;
     private final Status state;
+
+    private String parentKey;
+    private MockIssue epic;
 
     private final Map<Long, Object> customFields = new HashMap<>();
 
@@ -244,6 +251,9 @@ public class MockIssue implements Issue {
 
     @Override
     public Object getCustomFieldValue(CustomField customField) {
+        if (customField.getIdAsLong().equals(TestConstants.EPIC_LINK_CUSTOM_FIELD_ID) && epic != null) {
+            return epic;
+        }
         return customFields.get(customField.getIdAsLong());
     }
 
@@ -294,6 +304,11 @@ public class MockIssue implements Issue {
 
     @Override
     public Issue getParentObject() {
+        if (parentKey != null) {
+            // We're only interested in the key
+            return new MockIssue(parentKey, null, null, null, null,
+                    Collections.emptySet(), Collections.emptySet(), Collections.emptySet(), null);
+        }
         return null;
     }
 
@@ -389,5 +404,15 @@ public class MockIssue implements Issue {
         } else {
             customFields.put(customFieldId, value);
         }
+    }
+
+    public void setEpic(Epic epic) {
+        this.epic = new MockIssue(epic.getKey(), null, null, null, null,
+                Collections.emptySet(), Collections.emptySet(), Collections.emptySet(), null);
+        this.epic.setCustomField(TestConstants.EPIC_NAME_CUSTOM_FIELD_ID, epic.getName());
+    }
+
+    public void setParent(String parentKey) {
+        this.parentKey = parentKey;
     }
 }

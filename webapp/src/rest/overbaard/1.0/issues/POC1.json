@@ -100,6 +100,13 @@
       }
     ]
   },
+  "epics": {
+    "FEAT": [
+      {"key":  "FEAT-2", "name": "Serious issue epic name"},
+      {"key":  "FEAT-7", "name": "Issue 7 epic name"},
+      {"key":  "FEAT-11", "name": "Issue 11 epic name"}
+    ]
+  },
   "manual-swimlanes": [
     {
       "name": "Manual Swimlane",
@@ -218,6 +225,8 @@
       "summary": "Issue number 1. This has a longish description.",
       "priority": 0,
       "type": 2,
+      "epic": 0,
+      "parent": "FEAT-3",
       "components": [0, 1],
       "fix-versions": [0,1],
       "labels": [0, 1],
@@ -268,6 +277,7 @@
       "summary": "Issue number 3. This has a really, really long description which will span a lot. Whoever wrote this should perhaps use the description field instead of putting everything into the issue summary!",
       "priority": 2,
       "type": 0,
+      "epic": 1,
       "assignee": 0,
       "parallel-tasks": [[3, 2], [1, 2]],
       "linked-issues" : [
@@ -289,6 +299,7 @@
       "summary": "javax.sql.api should declare a dependency on javax.transaction.api",
       "priority": 1,
       "type": 1,
+      "epic": 2,
       "assignee": 1,
       "parallel-tasks": [[3, 2], [1, 2]],
       "linked-issues": [

@@ -15,6 +15,8 @@
  */
 package ut.org.overbaard.jira;
 
+import static org.overbaard.jira.impl.Constants.EPIC_LINK_CUSTOM_FIELD_ID;
+import static org.overbaard.jira.impl.Constants.EPIC_NAME_CUSTOM_FIELD_ID;
 import static org.overbaard.jira.impl.Constants.RANK_CUSTOM_FIELD_ID;
 
 import java.util.Collections;
@@ -80,7 +82,9 @@ public abstract class AbstractBoardTest {
         BoardConfigurationManagerBuilder builder = new BoardConfigurationManagerBuilder();
         this.boardConfigurationManager = builder
                 .addConfigActiveObjectsFromFile(cfgResource)
-                .addSettingActiveObject(RANK_CUSTOM_FIELD_ID, "10000")
+                .addSettingActiveObject(RANK_CUSTOM_FIELD_ID, TestConstants.RANK_CUSTOM_FIELD_ID.toString())
+                .addSettingActiveObject(EPIC_LINK_CUSTOM_FIELD_ID, TestConstants.EPIC_LINK_CUSTOM_FIELD_ID.toString())
+                .addSettingActiveObject(EPIC_NAME_CUSTOM_FIELD_ID, TestConstants.EPIC_NAME_CUSTOM_FIELD_ID.toString())
                 .setCustomFieldManager(CustomFieldManagerBuilder.loadFromResource(cfgResource))
                 .build();
         initializeMocks(this.boardConfigurationManager, builder, init);
@@ -90,7 +94,9 @@ public abstract class AbstractBoardTest {
         BoardConfigurationManagerBuilder builder = new BoardConfigurationManagerBuilder();
         this.boardConfigurationManager = builder
                 .addConfigActiveObjectsFromModel(config)
-                .addSettingActiveObject(RANK_CUSTOM_FIELD_ID, "10000")
+                .addSettingActiveObject(RANK_CUSTOM_FIELD_ID, TestConstants.RANK_CUSTOM_FIELD_ID.toString())
+                .addSettingActiveObject(EPIC_LINK_CUSTOM_FIELD_ID, TestConstants.EPIC_LINK_CUSTOM_FIELD_ID.toString())
+                .addSettingActiveObject(EPIC_NAME_CUSTOM_FIELD_ID, TestConstants.EPIC_NAME_CUSTOM_FIELD_ID.toString())
                 .setCustomFieldManager(CustomFieldManagerBuilder.loadFromModel(config))
                 .build();
         initializeMocks(this.boardConfigurationManager, builder, init);

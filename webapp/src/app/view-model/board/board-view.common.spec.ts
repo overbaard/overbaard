@@ -46,6 +46,9 @@ import {
   getTestManualSwimlanesInput,
   getTestManualSwimlanesState
 } from '../../model/board/data/manual-swimlane/manual-swimlane.reducer.spec';
+import {Epic, EpicState, initialEpicState} from '../../model/board/data/epic/epic.model';
+import {getTestEpicState} from '../../model/board/data/epic/epic.reducer.spec';
+import {EpicActions, epicMetaReducer} from '../../model/board/data/epic/epic.reducer';
 
 export class BoardViewObservableUtil {
   private _service: BoardViewModelHandler = new BoardViewModelHandler(null, 'http://jira.example.com/');
@@ -145,6 +148,8 @@ export class BoardStateInitializer {
   private _stateMap: Dictionary<StateMapping[]> = {};
   private _issueTypeStateMap: Dictionary<Dictionary<StateMapping[]>> = {};
 
+  private _epicState: EpicState = initialEpicState;
+
   constructor() {
   }
 
@@ -190,6 +195,11 @@ export class BoardStateInitializer {
     return this;
   }
 
+  epics(epicInput: Dictionary<Epic[]>):  BoardStateInitializer {
+    this._epicState = epicMetaReducer(initialEpicState, EpicActions.createDeserializeAll(epicInput));
+    return this;
+  }
+
   // Internal use only
   emitBoardChange(mainUtil: BoardViewObservableUtil): void {
     const headerState: HeaderState = this._headerStateFactory.createHeaderState(mainUtil.boardState.headers);
@@ -205,9 +215,12 @@ export class BoardStateInitializer {
       mutable.fixVersions = getTestFixVersionState();
       mutable.labels = getTestLabelState();
       mutable.customFields = getTestCustomFieldState();
+      mutable.epics = this._epicState;
       mutable.manualSwimlanes = getTestManualSwimlanesState();
       mutable.ranks = this.createRankState();
-      mutable.issues = this.createIssueState(mainUtil.boardState, getDeserializeIssueLookupParams(headerState, projectState));
+      mutable.issues = this.createIssueState(
+        mainUtil.boardState,
+        getDeserializeIssueLookupParams(headerState, projectState, this._epicState));
     });
     mainUtil.emitBoardState(boardState);
   }
@@ -324,7 +337,10 @@ export class BoardStateUpdater {
           IssueActions.createChangeIssuesAction(
             this._issueChanges ? this._issueChanges : {},
             currentIssues,
-            getDeserializeIssueLookupParams(this._mainUtil.boardState.headers, this._mainUtil.boardState.projects)));
+            getDeserializeIssueLookupParams(
+              this._mainUtil.boardState.headers,
+              this._mainUtil.boardState.projects,
+              this._mainUtil.boardState.epics)));
         if (this._rankChanges || this._rankDeleted) {
           mutable.ranks = rankMetaReducer(
             this._mainUtil.boardState.ranks,
@@ -452,7 +468,8 @@ export class UserSettingUpdater {
   }
 }
 
-function getDeserializeIssueLookupParams(headerState: HeaderState, projectState: ProjectState): DeserializeIssueLookupParams {
+function getDeserializeIssueLookupParams(
+  headerState: HeaderState, projectState: ProjectState, epicState: EpicState): DeserializeIssueLookupParams {
   return new DeserializeIssueLookupParams()
     .setBoardStates(headerState.states)
     .setIssueTypes(getTestIssueTypeState().types)
@@ -462,7 +479,8 @@ function getDeserializeIssueLookupParams(headerState: HeaderState, projectState:
     .setComponents(getTestComponentState().components)
     .setFixVersions(getTestFixVersionState().versions)
     .setLabels(getTestLabelState().labels)
-    .setCustomFields(getTestCustomFieldState().fields);
+    .setCustomFields(getTestCustomFieldState().fields)
+    .setEpicsByProject(epicState.epicsByProject);
 }
 
 class StateMapping {

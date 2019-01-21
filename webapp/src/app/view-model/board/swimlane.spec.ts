@@ -12,6 +12,7 @@ import {SwimlaneData} from './swimlane-data';
 import {BoardHeader} from './board-header';
 import {IssueTable} from './issue-table';
 import {BoardIssueView} from './board-issue-view';
+import {Epic} from '../../model/board/data/epic/epic.model';
 
 describe('Swimlane observer tests', () => {
 
@@ -134,6 +135,18 @@ describe('Swimlane observer tests', () => {
                   {key: 'One Lane', name: 'One Lane', issues: ['ONE-2', 'ONE-3']},
                   {key: 'Another Lane', name: 'Another Lane', issues: ['ONE-3', 'ONE-4']},
                   {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-1', 'ONE-5']}])
+                .checkBoard(board);
+            });
+      });
+      it ('Epics', () => {
+        createUtilWithStandardIssues({swimlane: 'epic'})
+          .easySubscribe(
+            board => {
+              new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
+                .swimlanes([
+                  {key: 'ONE-1000', name: 'Some Epic', issues: ['ONE-1', 'ONE-3']},
+                  {key: 'ONE-2000', name: 'Another Epic', issues: ['ONE-2', 'ONE-4']},
+                  {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-5']}])
                 .checkBoard(board);
             });
       });
@@ -2070,15 +2083,21 @@ describe('Swimlane observer tests', () => {
     return createUtil(params, {'ONE': [1, 2, 3, 4, 5]},
       new SwimlaneIssueFactory()
         .addIssue('ONE-1', 0,
-          {components: [0], 'fix-versions': [0, 1, 2], custom: {'Custom-2': 0}})
+          {components: [0], 'fix-versions': [0, 1, 2], custom: {'Custom-2': 0}, epic: 0})
         .addIssue('ONE-2', 0,
-          {components: [1], 'fix-versions': [0], labels: [0, 1, 2], custom: {'Custom-2': 0}})
+          {components: [1], 'fix-versions': [0], labels: [0, 1, 2], custom: {'Custom-2': 0}, epic: 1})
         .addIssue('ONE-3', 0,
-          {components: [2], 'fix-versions': [1], labels: [0], custom: {'Custom-2': 0}})
+          {components: [2], 'fix-versions': [1], labels: [0], custom: {'Custom-2': 0}, epic: 0})
         .addIssue('ONE-4', 1,
-          {components: [0, 1, 2], labels: [1], custom: {'Custom-2': 1}})
+          {components: [0, 1, 2], labels: [1], custom: {'Custom-2': 1}, epic: 1})
         .addIssue('ONE-5', 1,
-          {'fix-versions': [2], labels: [2]})
+          {'fix-versions': [2], labels: [2]}),
+      {
+        'ONE': [
+          {key: 'ONE-1000', name: 'Some Epic'},
+          {key: 'ONE-2000', name: 'Another Epic'}
+        ]
+      }
     );
   }
 
@@ -2099,11 +2118,15 @@ describe('Swimlane observer tests', () => {
   }
 
   function createUtil(params: Dictionary<string>, ranks: Dictionary<number[]>,
-                      issueFactory: SwimlaneIssueFactory): BoardViewObservableUtil {
+                      issueFactory: SwimlaneIssueFactory,
+                      epicInput?: Dictionary<Epic[]>): BoardViewObservableUtil {
     const init: BoardStateInitializer =
       new BoardStateInitializer()
-        .headerStateFactory(new NumberedHeaderStateFactory(3))
-        .issuesFactory(issueFactory)
+        .headerStateFactory(new NumberedHeaderStateFactory(3));
+    if (epicInput) {
+      init.epics(epicInput);
+    }
+    init.issuesFactory(issueFactory)
         .mapState('ONE', 'S-1', '1-1')
         .mapState('ONE', 'S-2', '1-2')
         .mapState('ONE', 'S-3', '1-3')

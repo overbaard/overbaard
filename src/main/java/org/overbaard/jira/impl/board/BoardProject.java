@@ -15,6 +15,8 @@
  */
 package org.overbaard.jira.impl.board;
 
+import static org.overbaard.jira.impl.Constants.KEY;
+import static org.overbaard.jira.impl.Constants.NAME;
 import static org.overbaard.jira.impl.Constants.OVERRIDES;
 
 import java.util.ArrayList;
@@ -39,6 +41,7 @@ import org.overbaard.jira.impl.config.LinkedProjectConfig;
 import org.overbaard.jira.impl.config.ParallelTaskCustomFieldConfig;
 import org.overbaard.jira.impl.config.ParallelTaskGroupPosition;
 import org.overbaard.jira.impl.config.ProjectParallelTaskConfig;
+import org.overbaard.jira.impl.util.IndexedMap;
 
 import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.bc.project.component.ProjectComponent;
@@ -69,11 +72,13 @@ public class BoardProject {
 
     private volatile Board board;
     private final BoardProjectConfig projectConfig;
+    private final IndexedMap<String, Epic> epics;
     private final List<String> rankedIssueKeys;
     private final ParallelTaskOptions parallelTaskOptions;
 
-    private BoardProject(BoardProjectConfig projectConfig, List<String> rankedIssueKeys, ParallelTaskOptions parallelTaskOptions) {
+    private BoardProject(BoardProjectConfig projectConfig, IndexedMap<String, Epic> epics, List<String> rankedIssueKeys, ParallelTaskOptions parallelTaskOptions) {
         this.projectConfig = projectConfig;
+        this.epics = epics != null ? epics : new IndexedMap<>(Collections.emptyMap());
         this.rankedIssueKeys = rankedIssueKeys;
         this.parallelTaskOptions = parallelTaskOptions;
     }
@@ -141,7 +146,20 @@ public class BoardProject {
         }
     }
 
-
+    ModelNode serializeEpics() {
+        if (epics.size() > 0) {
+            ModelNode epicsNode = new ModelNode();
+            epicsNode.setEmptyList();
+            for (Epic epic : epics.values()) {
+                ModelNode epicNode = new ModelNode();
+                epicNode.get(KEY).set(epic.getKey());
+                epicNode.get(NAME).set(epic.getName());
+                epicsNode.add(epicNode);
+            }
+            return epicsNode;
+        }
+        return null;
+    }
 
     static Builder builder(JiraInjectables jiraInjectables, ProjectParallelTaskOptionsLoader projectParallelTaskOptionsLoader, Board.Builder builder, BoardProjectConfig projectConfig,
                            ApplicationUser boardOwner) {
@@ -283,6 +301,7 @@ public class BoardProject {
         protected final BoardProjectConfig projectConfig;
         protected final ApplicationUser boardOwner;
 
+
         public Accessor(JiraInjectables jiraInjectables, Board.Accessor board, BoardProjectConfig projectConfig, ApplicationUser boardOwner) {
             this.jiraInjectables = jiraInjectables;
             this.board = board;
@@ -375,6 +394,15 @@ public class BoardProject {
 
         abstract ParallelTaskOptions getParallelTaskOptions();
 
+        abstract Integer getEpicIndex(String epicKey);
+
+        abstract Epic getEpic(String epicKey);
+
+        public abstract Epic getEpicForIssue(String parentKey);
+
+        public abstract void collectAllEpics(Map<String, Epic> map);
+
+        public abstract void setOrderedEpics(IndexedMap<String, Epic> orderedEpics);
     }
 
     /**
@@ -384,6 +412,7 @@ public class BoardProject {
         private final List<String> rankedIssueKeys = new ArrayList<>();
         private final Map<String, List<String>> issueKeysByState = new HashMap<>();
         private final ParallelTaskOptions parallelTaskOptions;
+        private IndexedMap<String, Epic> orderedEpics;
 
 
         private Builder(JiraInjectables jiraInjectables, Board.Accessor board, BoardProjectConfig projectConfig,
@@ -399,6 +428,37 @@ public class BoardProject {
             return this;
         }
 
+
+        public void setOrderedEpics(IndexedMap<String, Epic> orderedEpics) {
+            this.orderedEpics = orderedEpics;
+        }
+
+        @Override
+        public Integer getEpicIndex(String epicKey) {
+            if (this.orderedEpics == null) {
+                return null;
+            }
+            return this.orderedEpics.getIndex(epicKey);
+        }
+
+        @Override
+        Epic getEpic(String epicKey) {
+            if (this.orderedEpics == null) {
+                return null;
+            }
+            return this.orderedEpics.get(epicKey);
+        }
+
+        @Override
+        public Epic getEpicForIssue(String parentKey) {
+            return null;
+        }
+
+        @Override
+        public void collectAllEpics(Map<String, Epic> map) {
+            // For the current usage, there will be no epics here
+        }
+
         public ParallelTaskOptions getParallelTaskOptions() {
             return parallelTaskOptions;
         }
@@ -410,7 +470,12 @@ public class BoardProject {
             SearchResults searchResults =
                         searchService.search(boardOwner, query, PagerFilter.getUnlimitedFilter());
 
-            final BulkIssueLoadStrategy issueLoadStrategy = BulkIssueLoadStrategy.create(this);
+            /*// TODO Use the bulk one again
+            System.out.println("Hardcoding lazy load - REMOVE THIS");
+            IssueLoadStrategy issueLoadStrategy = new Issue.LazyLoadStrategy(this);
+            */
+            final IssueLoadStrategy issueLoadStrategy = IssueLoadStrategy.Factory.create(this);
+
             List<Issue.Builder> issueBuilders = new ArrayList<>();
             for (com.atlassian.jira.issue.Issue jiraIssue : searchResults.getIssues()) {
                 Issue.Builder issueBuilder = Issue.builder(this, issueLoadStrategy);
@@ -430,7 +495,7 @@ public class BoardProject {
         BoardProject build() {
             return new BoardProject(
                     projectConfig,
-                    Collections.unmodifiableList(rankedIssueKeys),
+                    orderedEpics, Collections.unmodifiableList(rankedIssueKeys),
                     parallelTaskOptions);
         }
 
@@ -447,6 +512,7 @@ public class BoardProject {
         private final NextRankedIssueUtil nextRankedIssueUtil;
         private Issue newIssue;
         private List<String> rankedIssueKeys;
+        private IndexedMap<String, Epic> orderedEpics;
 
 
         Updater(JiraInjectables jiraInjectables, NextRankedIssueUtil nextRankedIssueUtil, Board.Accessor board, BoardProject project,
@@ -455,6 +521,55 @@ public class BoardProject {
             this.nextRankedIssueUtil = nextRankedIssueUtil;
             OverbaardLogger.LOGGER.debug("BoardProject.Updater - init {}", project.projectConfig.getCode());
             this.project = project;
+        }
+
+        @Override
+        public Integer getEpicIndex(String epicKey) {
+            if (project.projectConfig.isEnableEpics()) {
+                IndexedMap<String, Epic> epics = orderedEpics != null ? orderedEpics : project.epics;
+                if (epics != null) {
+                    return epics.getIndex(epicKey);
+                }
+            }
+            return null;
+        }
+
+        @Override
+        Epic getEpic(String epicKey) {
+            if (project.projectConfig.isEnableEpics()) {
+                IndexedMap<String, Epic> epics = orderedEpics != null ? orderedEpics : project.epics;
+                if (epics != null) {
+                    return epics.get(epicKey);
+                }
+            }
+            return null;
+        }
+
+        @Override
+        public Epic getEpicForIssue(String parentKey) {
+            Issue issue = project.board.getIssue(parentKey);
+            if (issue != null) {
+                String epicKey = issue.getEpicKey();
+                if (epicKey != null) {
+                    return project.epics.get(epicKey);
+                }
+            }
+            return null;
+        }
+
+        @Override
+        public void collectAllEpics(Map<String, Epic> map) {
+            if (project.projectConfig.isEnableEpics()) {
+                IndexedMap<String, Epic> epics = orderedEpics != null ? orderedEpics : project.epics;
+                if (epics != null) {
+                    map.putAll(epics.map());
+                }
+            }
+        }
+
+        @Override
+        public void setOrderedEpics(IndexedMap<String, Epic> orderedEpics) {
+            this.orderedEpics = orderedEpics;
         }
 
         Issue createIssue(String issueKey, String issueType, String priority, String summary,
@@ -561,8 +676,8 @@ public class BoardProject {
             List<String> rankedIssueKeys =
                     this.rankedIssueKeys != null ?
                             Collections.unmodifiableList(this.rankedIssueKeys) : project.rankedIssueKeys;
-
-            return new BoardProject(projectConfig, rankedIssueKeys, project.parallelTaskOptions);
+            IndexedMap<String, Epic> epics = orderedEpics != null ? orderedEpics : project.epics;
+            return new BoardProject(projectConfig, project.epics, rankedIssueKeys, project.parallelTaskOptions);
         }
     }
 

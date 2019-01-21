@@ -13,6 +13,7 @@ import {initialHeaderState} from './header/header.model';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {BoardState} from './board';
 import {initialManualSwimlaneState} from './manual-swimlane/manual-swimlane.model';
+import {initialEpicState} from './epic/epic.model';
 
 const DEFAULT_STATE: BoardState = {
   viewId: -1,
@@ -26,11 +27,12 @@ const DEFAULT_STATE: BoardState = {
   labels: initialLabelState,
   fixVersions: initialFixVersionState,
   customFields: initialCustomFieldState,
-  manualSwimlanes: initialManualSwimlaneState,
+  epics: initialEpicState,
   projects: initialProjectState,
   ranks: initialRankState,
   issues: initialIssueState,
-  blacklist: initialBlacklistState
+  blacklist: initialBlacklistState,
+  manualSwimlanes: initialManualSwimlaneState
 };
 
 interface BoardStateRecord extends TypedRecord<BoardStateRecord>, BoardState {

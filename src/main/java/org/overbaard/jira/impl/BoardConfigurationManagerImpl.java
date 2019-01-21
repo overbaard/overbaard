@@ -15,13 +15,15 @@
  */
 package org.overbaard.jira.impl;
 
+import static org.overbaard.jira.impl.Constants.CAN_EDIT_CUSTOM_FIELDS;
 import static org.overbaard.jira.impl.Constants.CODE;
 import static org.overbaard.jira.impl.Constants.CONFIGS;
 import static org.overbaard.jira.impl.Constants.EDIT;
+import static org.overbaard.jira.impl.Constants.EPIC_LINK_CUSTOM_FIELD_ID;
+import static org.overbaard.jira.impl.Constants.EPIC_NAME_CUSTOM_FIELD_ID;
 import static org.overbaard.jira.impl.Constants.ID;
 import static org.overbaard.jira.impl.Constants.NAME;
 import static org.overbaard.jira.impl.Constants.PROJECTS;
-import static org.overbaard.jira.impl.Constants.RANK_CUSTOM_FIELD;
 import static org.overbaard.jira.impl.Constants.RANK_CUSTOM_FIELD_ID;
 
 import java.util.ArrayList;
@@ -67,8 +69,10 @@ public class BoardConfigurationManagerImpl implements BoardConfigurationManager 
 
     private final JiraInjectables jiraInjectables;
 
-    /** The 'Rank' custom field id */
+    /** Custom field ids */
     private volatile long rankCustomFieldId = -1;
+    private volatile long epicLinkCustomFieldId = -1;
+    private volatile long epicNameCustomFieldId = -1;
 
     @Inject
     public BoardConfigurationManagerImpl(JiraInjectables jiraInjectables) {
@@ -104,7 +108,10 @@ public class BoardConfigurationManagerImpl implements BoardConfigurationManager 
         config.get(CONFIGS).set(configsList);
 
         if (forConfig) {
-            addCustomFieldInfo(user, config.get(RANK_CUSTOM_FIELD));
+            config.get(CAN_EDIT_CUSTOM_FIELDS).set(canEditCustomFields(user));
+            config.get(RANK_CUSTOM_FIELD_ID).set(getRankCustomFieldId());
+            config.get(EPIC_LINK_CUSTOM_FIELD_ID).set(getEpicLinkCustomFieldId());
+            config.get(EPIC_NAME_CUSTOM_FIELD_ID).set(getEpicNameCustomFieldId());
         }
 
         return config.toJSONString(true);
@@ -122,12 +129,6 @@ public class BoardConfigurationManagerImpl implements BoardConfigurationManager 
         });
         ModelNode configJson = ModelNode.fromJSONString(cfgs[0].getConfigJson());
         return configJson.toJSONString(true);
-    }
-
-    private void addCustomFieldInfo(ApplicationUser user, ModelNode customFieldConfig) {
-        long customFieldId = getRankCustomFieldId();
-        customFieldConfig.get(ID).set(customFieldId);
-        customFieldConfig.get(EDIT).set(canEditCustomField(user));
     }
 
     @Override
@@ -156,7 +157,8 @@ public class BoardConfigurationManagerImpl implements BoardConfigurationManager 
             if (cfgs != null && cfgs.length == 1) {
                 BoardCfg cfg = cfgs[0];
                 boardConfig = BoardConfig.loadAndValidate(jiraInjectables, cfg.getID(),
-                        cfg.getOwningUser(), cfg.getConfigJson(), getRankCustomFieldId());
+                        cfg.getOwningUser(), cfg.getConfigJson(), getRankCustomFieldId(),
+                        getEpicLinkCustomFieldId(), getEpicNameCustomFieldId());
 
                 BoardConfig old = boardConfigs.putIfAbsent(code, boardConfig);
                 if (old != null) {
@@ -177,7 +179,8 @@ public class BoardConfigurationManagerImpl implements BoardConfigurationManager 
         final ModelNode validConfig;
         try {
             boardConfig = BoardConfig.loadAndValidate(jiraInjectables, id,
-                    user.getKey(), config, getRankCustomFieldId());
+                    user.getKey(), config, getRankCustomFieldId(),
+                    getEpicLinkCustomFieldId(), getEpicNameCustomFieldId());
 
             validConfig = boardConfig.serializeModelNodeForConfig();
         } catch (Exception e) {
@@ -265,43 +268,59 @@ public class BoardConfigurationManagerImpl implements BoardConfigurationManager 
     }
 
     @Override
-    public void saveRankCustomFieldId(ApplicationUser user, ModelNode idNode) {
-        if (!canEditCustomField(user)) {
+    public void saveCustomFieldIds(ApplicationUser user, ModelNode idsNode) {
+        if (!canEditCustomFields(user)) {
             throw new OverbaardPermissionException("Only Jira Administrators can edit the custom field id");
         }
-        final int id;
-        try {
-            id = idNode.get(ID).asInt();
-        } catch (Exception e) {
-            throw new OverbaardValidationException("The id needs to be a number");
+
+        for (String customFieldKey : idsNode.keys()) {
+            try {
+                idsNode.get(customFieldKey).asInt();
+            } catch (Exception e) {
+                throw new OverbaardValidationException(customFieldKey + " needs to be a number");
+            }
         }
-        String idValue = String.valueOf(id);
 
         final ActiveObjects activeObjects = jiraInjectables.getActiveObjects();
 
         activeObjects.executeInTransaction(new TransactionCallback<Void>() {
             @Override
             public Void doInTransaction() {
-                Setting[] settings =  activeObjects.find(Setting.class, Query.select().where("name = ?", RANK_CUSTOM_FIELD_ID));
 
-                if (settings.length == 0) {
-                    //Insert
-                    final Setting setting = activeObjects.create(
-                            Setting.class,
-                            new DBParam("NAME", RANK_CUSTOM_FIELD_ID),
-                            new DBParam("VALUE", idValue));
-                    setting.save();
-                } else {
-                    //update
-                    Setting setting = settings[0];
-                    setting.setValue(idValue);
-                    setting.save();
+                for (String customFieldKey : idsNode.keys()) {
+                    String customFieldId = idsNode.get(customFieldKey).asString();
+
+                    Setting[] settings =  activeObjects.find(Setting.class, Query.select().where("name = ?", customFieldKey));
+                    if (settings.length == 0) {
+                        //Insert
+                        final Setting setting = activeObjects.create(
+                                Setting.class,
+                                new DBParam("NAME", customFieldKey),
+                                new DBParam("VALUE", customFieldId));
+                        setting.save();
+                    } else {
+                        //update
+                        Setting setting = settings[0];
+                        setting.setValue(customFieldId);
+                        setting.save();
+                    }
+
+                    // Set these to -1 so that they are reloaded. This is the safest if the Tx fails
+                    switch (customFieldKey) {
+                        case RANK_CUSTOM_FIELD_ID:
+                            rankCustomFieldId = -1;
+                            break;
+                        case EPIC_LINK_CUSTOM_FIELD_ID:
+                            epicLinkCustomFieldId = -1;
+                            break;
+                        case EPIC_NAME_CUSTOM_FIELD_ID:
+                            epicNameCustomFieldId = -1;
+                    }
                 }
-                rankCustomFieldId = Integer.valueOf(idValue);
-
                 return null;
             }
         });
+
     }
 
     @Override
@@ -335,23 +354,48 @@ public class BoardConfigurationManagerImpl implements BoardConfigurationManager 
     }
 
     public long getRankCustomFieldId() {
-        long customFieldId = this.rankCustomFieldId;
-        if (customFieldId < 0) {
-            final ActiveObjects activeObjects = jiraInjectables.getActiveObjects();
-
-            Setting[] settings = activeObjects.executeInTransaction(new TransactionCallback<Setting[]>() {
-                @Override
-                public Setting[] doInTransaction() {
-                    return activeObjects.find(Setting.class, Query.select().where("name = ?", RANK_CUSTOM_FIELD_ID));
-                }
-            });
-            if (settings.length == 1) {
-                customFieldId = Integer.valueOf(settings[0].getValue());
-                this.rankCustomFieldId = customFieldId;
-            }
+        long id = this.rankCustomFieldId;
+        if (id < 0) {
+            id = loadCustomFieldId(RANK_CUSTOM_FIELD_ID);
+            this.rankCustomFieldId = id;
         }
-        return customFieldId;
+        return id;
     }
+
+    public long getEpicLinkCustomFieldId() {
+        long id = this.epicLinkCustomFieldId;
+        if (id < 0) {
+            id = loadCustomFieldId(EPIC_LINK_CUSTOM_FIELD_ID);
+            this.epicLinkCustomFieldId = id;
+        }
+        return id;
+    }
+
+    public long getEpicNameCustomFieldId() {
+        long id = this.epicNameCustomFieldId;
+        if (id < 0) {
+            id = loadCustomFieldId(EPIC_NAME_CUSTOM_FIELD_ID);
+            this.epicNameCustomFieldId = id;
+        }
+        return id;
+    }
+
+    private long loadCustomFieldId(String name) {
+        final ActiveObjects activeObjects = jiraInjectables.getActiveObjects();
+
+        Setting[] settings = activeObjects.executeInTransaction(new TransactionCallback<Setting[]>() {
+            @Override
+            public Setting[] doInTransaction() {
+                return activeObjects.find(Setting.class, Query.select().where("name = ?", name));
+            }
+        });
+        if (settings.length == 1) {
+            return Long.valueOf(settings[0].getValue());
+        }
+        return -1;
+    }
+
+
 
     //Permission methods
     private boolean canEditBoard(ApplicationUser user, ModelNode boardConfig) {
@@ -368,8 +412,8 @@ public class BoardConfigurationManagerImpl implements BoardConfigurationManager 
         return hasPermissionBoard(user, boardConfig, ProjectPermissions.TRANSITION_ISSUES);
     }
 
-    private boolean canEditCustomField(ApplicationUser user) {
-        //Only Jira Administrators can tweak the custom field id
+    private boolean canEditCustomFields(ApplicationUser user) {
+        //Only Jira Administrators can tweak the custom field ids
         return isJiraAdministrator(user);
     }
 

@@ -35,6 +35,8 @@ import org.overbaard.jira.impl.BoardConfigurationManagerBuilder;
 import com.atlassian.jira.issue.CustomFieldManager;
 import com.atlassian.jira.issue.fields.CustomField;
 
+import ut.org.overbaard.jira.TestConstants;
+
 /**
  * @author Kabir Khan
  */
@@ -84,6 +86,13 @@ public class CustomFieldManagerBuilder {
 
     public CustomFieldManager build() {
         //getCustomFieldObject(Long)
+        customFields.put(
+                TestConstants.EPIC_LINK_CUSTOM_FIELD_ID,
+                new MockCustomField(TestConstants.EPIC_LINK_CUSTOM_FIELD_ID, "Epic Link"));
+        customFields.put(
+                TestConstants.EPIC_NAME_CUSTOM_FIELD_ID,
+                new MockCustomField(TestConstants.EPIC_NAME_CUSTOM_FIELD_ID, "Epic Name"));
+
         when(customFieldManager.getCustomFieldObject(any(Long.class))).then(invocation -> {
             Long id = (Long)invocation.getArguments()[0];
             return customFields.get(id);

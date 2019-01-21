@@ -108,7 +108,18 @@ export class BoardIssueComponent implements OnInit, OnChanges, AfterViewInit {
       let tooltip =
         `${this.issue.key}
 
-        Project State: ${this.issue.ownStateName}
+        Project State: ${this.issue.ownStateName}`;
+
+      if (this.issue.epic) {
+        tooltip += `
+          Epic: ${this.issue.epic.name} (${this.issue.epic.key}) `;
+      }
+      if (this.issue.parentKey) {
+        tooltip += `
+          Parent issue: ${this.issue.parentKey}`;
+      }
+
+      tooltip += `
         Assignee: ${this.issue.assignee.name}
         Priority: ${this.issue.priority.name}
         Type: ${this.issue.type.name}

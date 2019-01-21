@@ -246,6 +246,11 @@ public class BoardConfigurationManagerTest {
         checkConfig("config/board-linked-projects-issue-type-override-filters.json");
     }
 
+    @Test
+    public void testLoadConfigurationWithEnableEpics() throws IOException {
+        checkConfig("config/board-enable-epics.json");
+    }
+
     @Test(expected = OverbaardValidationException.class)
     public void testBadBoardStateFromProject() throws IOException {
         checkConfig("config/board-tdp-bad-state-link.json");

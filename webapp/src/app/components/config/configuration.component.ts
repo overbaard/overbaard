@@ -7,6 +7,7 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {map, take} from 'rxjs/operators';
 import {IssueQlUtil} from '../../common/parsers/issue-ql/issue-ql.util';
 import * as issueQlParser from '../../common/parsers/issue-ql/pegjs/issue-ql.generated';
+import {UrlService} from '../../services/url.service';
 
 @Component({
   selector: 'app-configuration',
@@ -22,8 +23,10 @@ export class ConfigurationComponent implements OnInit {
   config$: Subject<ConfigBoardsView> = new BehaviorSubject<ConfigBoardsView>(
     {
       boards: OrderedMap<number, any>(),
-      canEditRankCustomFieldId: false,
-      rankCustomFieldId: 0});
+      canEditCustomFields: false,
+      rankCustomFieldId: 0,
+      epicLinkCustomFieldId: 0,
+      epicNameCustomFieldId: 0});
 
   // For editing and deleting boards
   selected = -1;
@@ -35,10 +38,13 @@ export class ConfigurationComponent implements OnInit {
   createError: string;
 
   // For saving the rank id
-  rankCustomFieldIdForm: FormGroup;
+  customFieldsForm: FormGroup;
+
+  fieldsRestApiUrl: string;
 
   constructor(private _boardsService: BoardsService,
-              appHeaderService: AppHeaderService) {
+              appHeaderService: AppHeaderService,
+              private _urlService: UrlService) {
     appHeaderService.setTitle('Configuration');
   }
 
@@ -47,6 +53,7 @@ export class ConfigurationComponent implements OnInit {
     this.createForm = new FormGroup({
       createJson: new FormControl('', Validators.required)
     });
+    this.fieldsRestApiUrl = this._urlService.caclulateRestUrl('rest/api/2/field');
   }
 
   private loadBoards() {
@@ -58,8 +65,10 @@ export class ConfigurationComponent implements OnInit {
       )
       .subscribe(
         value => {
-          this.rankCustomFieldIdForm = new FormGroup({
-            rankCustomFieldId: new FormControl(value.rankCustomFieldId, Validators.pattern('[0-9]*'))
+          this.customFieldsForm = new FormGroup({
+            rankCustomFieldId: new FormControl(value.rankCustomFieldId, Validators.pattern('[0-9]*')),
+            epicLinkCustomFieldId: new FormControl(value.epicLinkCustomFieldId, Validators.pattern('[0-9]*')),
+            epicNameCustomFieldId: new FormControl(value.epicNameCustomFieldId, Validators.pattern('[0-9]*'))
           });
           this.config$.next(value);
         });
@@ -172,7 +181,10 @@ export class ConfigurationComponent implements OnInit {
 
   onSaveCustomFieldId() {
     // TODO handle progress and errors
-    this._boardsService.saveRankCustomFieldId(this.rankCustomFieldIdForm.value.rankCustomFieldId)
+    this._boardsService.saveCustomFieldsIds(
+      this.customFieldsForm.value['rankCustomFieldId'],
+      this.customFieldsForm.value['epicLinkCustomFieldId'],
+      this.customFieldsForm.value['epicNameCustomFieldId'])
       .pipe(
         take(1)
       )
@@ -199,8 +211,10 @@ export class ConfigurationComponent implements OnInit {
 
     return {
       boards: boards,
-      canEditRankCustomFieldId: data['rank-custom-field']['edit'],
-      rankCustomFieldId: data['rank-custom-field']['id']
+      canEditCustomFields: data['can-edit-custom-fields'],
+      rankCustomFieldId: data['rank-custom-field-id'],
+      epicLinkCustomFieldId: data['epic-link-custom-field-id'],
+      epicNameCustomFieldId: data['epic-name-custom-field-id'],
     };
   }
 
@@ -244,6 +258,8 @@ export class ConfigurationComponent implements OnInit {
 
 interface ConfigBoardsView {
   boards: OrderedMap<number, any>;
-  canEditRankCustomFieldId: boolean;
+  canEditCustomFields: boolean;
   rankCustomFieldId: number;
+  epicLinkCustomFieldId: number;
+  epicNameCustomFieldId: number;
 }

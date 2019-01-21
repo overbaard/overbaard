@@ -23,13 +23,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.ofbiz.core.entity.jdbc.SQLProcessor;
-import org.osgi.framework.BundleReference;
 import org.overbaard.jira.OverbaardLogger;
 import org.overbaard.jira.api.ParallelTaskOptions;
 import org.overbaard.jira.impl.config.CustomFieldConfig;
 import org.overbaard.jira.impl.config.ParallelTaskCustomFieldConfig;
 import org.overbaard.jira.impl.config.ParallelTaskGroupPosition;
 import org.overbaard.jira.impl.config.ProjectParallelTaskGroupsConfig;
+import org.overbaard.jira.impl.util.IndexedMap;
 
 /**
  * <p>Bulk loads up things like custom fields using a direct sql query.</p>
@@ -50,15 +50,23 @@ class BulkIssueLoadStrategy implements IssueLoadStrategy {
 
     private static final String dataSourceName = "defaultDS";
     private final BoardProject.Builder project;
+    private final boolean customFieldsOrParallelTasks;
     private final Map<Long, BulkLoadContext<?>> customFieldContexts = new HashMap<>();
     private final Map<Long, ParallelTaskCustomFieldConfig> parallelTaskFields;
     private final List<Long> ids = new ArrayList<>();
     private final Map<Long, String> issues = new HashMap<>();
     private final Map<Long, Issue.Builder> builders = new HashMap<>();
+    private final Map<String, Issue.Builder> buildersByKey = new HashMap<>();
+    private final Map<String, String> childToParentIssueKeys = new HashMap<>();
+    private final Map<String, String> issuesToEpics = new HashMap<>();
+    private final Map<String, Epic> unsortedEpics = new HashMap<>();
     private boolean finished = false;
 
-    public BulkIssueLoadStrategy(BoardProject.Builder project) {
+    public BulkIssueLoadStrategy(
+            BoardProject.Builder project,
+            boolean customFieldsOrParallelTasks) {
         this.project = project;
+        this.customFieldsOrParallelTasks = customFieldsOrParallelTasks;
         for (String cfName : project.getConfig().getCustomFieldNames()) {
             //These do not have the values loaded on project load. Rather values referenced by issues are what is used to
             // populate the 'lookup table'. To avoid repeatedly querying Jira for what the ids represent, use the caching
@@ -74,25 +82,12 @@ class BulkIssueLoadStrategy implements IssueLoadStrategy {
         parallelTaskFields = project.getConfig().getAllParallelTaskCustomFieldConfigs();
     }
 
-    static BulkIssueLoadStrategy create(BoardProject.Builder project) {
-        if (project.getConfig().getCustomFieldNames().size() == 0 && project.getConfig().getInternalAdvanced().getParallelTaskGroupsConfig() == null) {
-            //There are no custom fields or parallel tasks so we are not needed
-            return null;
-        }
-        final ClassLoader cl = RawSqlLoader.class.getClassLoader();
-        if (cl instanceof BundleReference) {
-            return new BulkIssueLoadStrategy(project);
-        }
-        //We are running in a unit test, so we don't use this strategy (see class javadoc)
-        return null;
-
-    }
-
     @Override
     public void handle(com.atlassian.jira.issue.Issue issue, Issue.Builder builder) {
         ids.add(issue.getId());
         issues.put(issue.getId(), issue.getKey());
         builders.put(issue.getId(), builder);
+        buildersByKey.put(issue.getKey(), builder);
     }
 
     @Override
@@ -114,21 +109,62 @@ class BulkIssueLoadStrategy implements IssueLoadStrategy {
     }
 
     private void bulkLoadData(SQLProcessor sqlProcessor) {
+        // Load up the ids of the link types, we'll need those for figuring out the sub-tasks and the epic links
+        String loadIdsSql = "select id, linkname " +
+                "from issuelinktype " +
+                "where linkname = 'jira_subtask_link' " +
+                "or linkname = 'Epic-Story Link' " +
+                "order by linkname";
+        long subtaskLinkId = -1;
+        long epicLinkId = -1;
+        try (ResultSet rs = sqlProcessor.executeQuery(loadIdsSql)){
+            while (rs.next()) {
+                Long id = rs.getLong(1);
+                String name = rs.getString(2);
+                if (name.equals("jira_subtask_link")) {
+                    subtaskLinkId = id;
+                } else {
+                    epicLinkId = id;
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+
         final List<Long> idBatch = new ArrayList<>();
         for (int i = 0 ; i < ids.size() ; i++) {
             idBatch.add(ids.get(i));
             if (idBatch.size() == BATCH_SIZE) {
-                loadDataForBatch(sqlProcessor, idBatch);
+                loadBatch(sqlProcessor, idBatch, subtaskLinkId, epicLinkId);
                 idBatch.clear();
             }
         }
         if (idBatch.size() > 0) {
-            loadDataForBatch(sqlProcessor, idBatch);
+            loadBatch(sqlProcessor, idBatch, subtaskLinkId, epicLinkId);
         }
+
+        processParentTasksAndEpics();
+
+        IndexedMap<String, Epic> orderedEpics =
+                getEpicsInRankOrder(
+                        project.getJiraInjectables().getSearchService(),
+                        project.getBoard().getBoardOwner(),
+                        unsortedEpics);
+        project.setOrderedEpics(orderedEpics);
     }
 
-    private void loadDataForBatch(SQLProcessor sqlProcessor, List<Long> idBatch) {
-        final String sql = createSql(idBatch);
+    private void loadBatch(SQLProcessor sqlProcessor, List<Long> idBatch, long subtaskLinkId, long epicLinkId) {
+        loadCustomFieldDataForBatch(sqlProcessor, idBatch);
+        loadParentTasks(sqlProcessor, idBatch, subtaskLinkId);
+        loadEpics(sqlProcessor, idBatch, epicLinkId);
+    }
+
+    private void loadCustomFieldDataForBatch(SQLProcessor sqlProcessor, List<Long> idBatch) {
+        if (!customFieldsOrParallelTasks) {
+            return;
+        }
+        final String sql = createLoadCustomFieldsSql(idBatch);
 
         try (ResultSet rs = sqlProcessor.executeQuery(sql)){
             while (rs.next()) {
@@ -188,7 +224,7 @@ class BulkIssueLoadStrategy implements IssueLoadStrategy {
         }
     }
 
-    private String createSql(List<Long> idBatch) {
+    private String createLoadCustomFieldsSql(List<Long> idBatch) {
         StringBuilder sb = new StringBuilder()
                 .append("select j.id, cv.customfield, cv.stringvalue, cv.numbervalue, it.pname as type ")
                 .append("from project p, jiraissue j, customfieldvalue cv, issuetype it ")
@@ -218,8 +254,74 @@ class BulkIssueLoadStrategy implements IssueLoadStrategy {
             }
         }
         sb.append(") and ");
-        sb.append("j.id in (");
-        first = true;
+        sb.append("j.id in " + createInIdsClause(idBatch));
+
+        final String sql = sb.toString();
+        OverbaardLogger.LOGGER.debug("SQL query: {}", sql);
+        return sql;
+    }
+
+    private void loadParentTasks(SQLProcessor sqlProcessor, List<Long> idBatch, long subTaskLinkId) {
+        StringBuilder sb = new StringBuilder()
+                .append("SELECT ")
+                .append("child.issueNum as issueNum, parentProject.pkey as parentProjectCode, parent.issueNum as parentNum ")
+                .append("FROM ")
+                .append("JiraIssue child, JiraIssue parent, Project childProject, Project parentProject, IssueLink il ")
+                .append("WHERE ")
+                .append("child.project = childProject.id and child.id = il.destination and ")
+                .append("parent.id = il.source and parent.project = parentProject.id and ")
+                .append("childProject.pkey = '" + project.getCode() + "' and ")
+                .append("il.linktype = " + subTaskLinkId + " and ")
+                .append("il.destination in " + createInIdsClause(idBatch));
+
+        try (ResultSet rs = sqlProcessor.executeQuery(sb.toString())){
+            while (rs.next()) {
+                String childKey = project.getCode() + "-" + rs.getLong(1);
+                String parentKey = rs.getString(2) + "-" + rs.getLong(3);
+                childToParentIssueKeys.put(childKey, parentKey);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void loadEpics(SQLProcessor sqlProcessor, List<Long> idBatch, long epicLinkId) {
+        if (!project.getConfig().isEnableEpics()) {
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder()
+                .append("SELECT ")
+                .append("issue.issueNum as issueNum, epicProject.pkey as epicProjectCode, ")
+                .append("epic.issueNum as epicNum, cfv.stringvalue as summary ")
+                .append("FROM ")
+                .append("JiraIssue issue, JiraIssue epic, Project issueProject, ")
+                .append("Project epicProject, IssueLink il, CustomFieldValue cfv ")
+                .append("WHERE ")
+                .append("issue.project = issueProject.id and issue.id = il.destination and ")
+                .append("epic.id = il.source and\tepic.project = epicProject.id and cfv.issue = epic.id and ")
+                .append("epicProject.pkey = '" + project.getCode() + "' and ")
+                .append("il.linkType = " + epicLinkId + " and ")
+                .append("cfv.customfield = " + project.getBoard().getConfig().getEpicSummaryCustomFieldId() + " and ")
+                .append("il.destination in " + createInIdsClause(idBatch));
+
+        try (ResultSet rs = sqlProcessor.executeQuery(sb.toString())){
+            while (rs.next()) {
+                String issueKey = project.getCode() + "-" + rs.getLong(1);
+                String epicKey = rs.getString(2) + "-" + rs.getLong(3);
+                String epicSummary = rs.getString(4);
+                issuesToEpics.put(issueKey, epicKey);
+                unsortedEpics.put(epicKey, new Epic(epicKey, epicSummary));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    private String createInIdsClause(List<Long> idBatch) {
+        StringBuilder sb = new StringBuilder("(");
+        boolean first = true;
         for (Long issueId : ids) {
             if (first) {
                 first = false;
@@ -229,10 +331,39 @@ class BulkIssueLoadStrategy implements IssueLoadStrategy {
             sb.append(issueId.toString());
         }
         sb.append(")");
-
-        final String sql = sb.toString();
-        OverbaardLogger.LOGGER.debug("SQL query: {}", sql);
-        return sql;
+        return sb.toString();
     }
 
+    private void processParentTasksAndEpics() {
+        final boolean epics = project.getConfig().isEnableEpics();
+        if (epics) {
+            for (Map.Entry<String, String> issueToEpic : issuesToEpics.entrySet()) {
+                Issue.Builder builder = buildersByKey.get(issueToEpic.getKey());
+                if (builder == null) {
+                    OverbaardLogger.LOGGER.warn("Could not find a builder for " + issueToEpic.getKey() + " to set epic");
+                    continue;
+                }
+
+                builder.setEpicKey(issueToEpic.getValue());
+            }
+        }
+
+        for (Map.Entry<String, String> childToParent : childToParentIssueKeys.entrySet()) {
+            final String childKey = childToParent.getKey();
+            final String parentKey = childToParent.getValue();
+            Issue.Builder builder = buildersByKey.get(childToParent.getKey());
+            if (builder == null) {
+                OverbaardLogger.LOGGER.warn("Could not find a builder for " + childKey + " to set parent");
+                continue;
+            }
+
+            builder.setParentIssueKey(parentKey);
+            if (epics) {
+                final String epic = issuesToEpics.get(parentKey);
+                if (epic != null) {
+                    builder.setEpicKey(epic);
+                }
+            }
+        }
+    }
 }

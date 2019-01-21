@@ -64,8 +64,8 @@
       }
     }
   ],
-  "rank-custom-field": {
-    "id": 10005,
-    "edit": true
-  }
+  "can-edit-custom-fields": true,
+  "rank-custom-field-id": 10005,
+  "epic-link-custom-field-id": 10000,
+  "epic-summary-custom-field-id": 10001
 }

@@ -70,20 +70,54 @@
       </div>
     </form>
   </div>
-  <div *ngIf="(config$ | async).canEditRankCustomFieldId">
+  <div *ngIf="(config$ | async).canEditCustomFields">
     <hr/>
-    <div class="mat-h2">Rank custom field id</div>
-    <div>Enter the custom field id for Jira Agile's 'Rank' attribute:</div>
+    <div class="mat-h2">Custom field Ids</div>
     <div>
-      <form (ngSubmit)="onSaveCustomFieldId()" [formGroup]="rankCustomFieldIdForm" #f="ngForm">
+      Enter the custom field id for each of the indicated custom fields. You can find these
+      <a
+        href="{{fieldsRestApiUrl}}"
+        target="_blank"
+        color="primary"
+      >here</a> by looking for the
+      entries with the name of each of the below fields.
+    </div>
+    <div>
+      <form (ngSubmit)="onSaveCustomFieldId(f)" [formGroup]="customFieldsForm" #f="ngForm">
         <div>
           <mat-form-field>
             <input
               matInput
               required="required"
               type="number"
-              formControlName="rankCustomFieldId"/>
+              formControlName="rankCustomFieldId"
+              placeholder="Rank"/>
           </mat-form-field>
+        </div>
+        <div>
+          <mat-form-field>
+            <input
+              matInput
+              required="required"
+              type="number"
+              formControlName="epicLinkCustomFieldId"
+              placeholder="Epic Link"/>
+          </mat-form-field>
+        </div>
+        <div>
+          <mat-form-field>
+            <input
+              matInput
+              required="required"
+              type="number"
+              formControlName="epicNameCustomFieldId"
+              placeholder="Epic Name"/>
+          </mat-form-field>
+        </div>
+        <div>
+          <mat-error *ngIf="f.form.dirty && !f.form.valid">
+            All field ids must be positive numbers.
+          </mat-error>
         </div>
         <div>
           <button

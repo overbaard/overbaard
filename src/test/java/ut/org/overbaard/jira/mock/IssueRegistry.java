@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.overbaard.jira.api.NextRankedIssueUtil;
+import org.overbaard.jira.impl.board.Epic;
 import org.overbaard.jira.impl.config.BoardProjectConfig;
 import org.junit.Assert;
 
@@ -44,10 +45,27 @@ import com.atlassian.jira.user.util.UserManager;
  */
 public class IssueRegistry implements NextRankedIssueUtil {
     private final UserManager userManager;
+    private final Map<String, Map<String, Epic>> epicsByProject = new HashMap<>();
     private final Map<String, Map<String, MockIssue>> issuesByProject = new HashMap<>();
 
     public IssueRegistry(UserManager userManager) {
         this.userManager = userManager;
+    }
+
+    /**
+     * Epics don't necessarily have to be one of the issues loaded up by the loader
+     * @param key
+     * @param name
+     */
+    public IssueRegistry addEpic(String key, String name) {
+        String projectCode = key.substring(0, key.indexOf("-"));
+        Map<String, Epic> epics = epicsByProject.get(projectCode);
+        if (epics == null) {
+            epics = new LinkedHashMap<>();
+            epicsByProject.put(projectCode, epics);
+        }
+        epics.put(key, new Epic(key, name));
+        return this;
     }
 
     public CreateIssueBuilder issueBuilder(
@@ -94,17 +112,23 @@ public class IssueRegistry implements NextRankedIssueUtil {
     }
 
     public void setCustomField(String issueKey, Long customFieldId, Object value) {
-        String projectCode = issueKey.substring(0, issueKey.indexOf("-"));
-        Map<String, MockIssue> issues = issuesByProject.get(projectCode);
-        Assert.assertNotNull(issues);
-        MockIssue issue = issues.get(issueKey);
-        Assert.assertNotNull(issue);
-
+        MockIssue issue = getIssue(issueKey);
         issue.setCustomField(customFieldId, value);
     }
 
     public void setParallelTaskField(String issueKey, Long upstreamId, String optionKey) {
         setCustomField(issueKey, upstreamId, optionKey);
+    }
+
+    public void setEpic(String issueKey, String epicKey) {
+        MockIssue issue = getIssue(issueKey);
+        Epic epic = epicsByProject.get(getProjectCode(epicKey)).get(epicKey);
+        issue.setEpic(epic);
+    }
+
+    public void setParent(String issueKey, String parentKey) {
+        MockIssue issue = getIssue(issueKey);
+        issue.setParent(parentKey);
     }
 
     List<Issue> getIssueList(String searchIssueKey, String project, String searchStatus, Collection<String> doneStatesFilter) {
@@ -129,9 +153,12 @@ public class IssueRegistry implements NextRankedIssueUtil {
         return ret;
     }
 
-    public Issue getIssue(String issueKey) {
+    public MockIssue getIssue(String issueKey) {
         Map<String, MockIssue> issues = issuesByProject.get(getProjectCode(issueKey));
-        return issues.get(issueKey);
+        Assert.assertNotNull(issues);
+        MockIssue issue = issues.get(issueKey);
+        Assert.assertNotNull(issue);
+        return issue;
     }
 
     public void rerankIssue(String issueKey, String beforeIssueKey) {
@@ -192,6 +219,7 @@ public class IssueRegistry implements NextRankedIssueUtil {
         private Set<ProjectComponent> components;
         private Set<Label> labels;
         private Set<Version> fixVersions;
+        private String parentKey;
 
         private CreateIssueBuilder(String projectCode, String issueType, String priority, String summary, String state) {
             this(projectCode, MockIssueType.create(issueType), MockPriority.create(priority), summary, MockStatus.create(state));
@@ -244,6 +272,11 @@ public class IssueRegistry implements NextRankedIssueUtil {
 
         public CreateIssueBuilder fixVersions(Set<Version> fixVersions) {
             this.fixVersions = fixVersions;
+            return this;
+        }
+
+        public CreateIssueBuilder parentKey(String parentKey) {
+            this.parentKey = parentKey;
             return this;
         }
 

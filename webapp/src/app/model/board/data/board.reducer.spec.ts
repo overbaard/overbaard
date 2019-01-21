@@ -6,7 +6,7 @@ import {getTestIssueTypesInput} from './issue-type/issue-type.reducer.spec';
 import {getTestLabelsInput} from './label/label.reducer.spec';
 import {getTestCustomFieldsInput} from './custom-field/custom-field.reducer.spec';
 import {getTestBlacklistInput} from './blacklist/blacklist.reducer.spec';
-import {List, Map, OrderedMap} from 'immutable';
+import {List, OrderedMap, Map} from 'immutable';
 import {Assignee, NO_ASSIGNEE} from './assignee/assignee.model';
 import {Priority} from './priority/priority.model';
 import {IssueType} from './issue-type/issue-type.model';
@@ -24,6 +24,8 @@ import {HeaderState} from './header/header.state';
 import {TypedRecord} from 'typed-immutable-record';
 import {getTestManualSwimlanesInput} from './manual-swimlane/manual-swimlane.reducer.spec';
 import {ManualSwimlane} from './manual-swimlane/manual-swimlane.model';
+import {getTestEpicsInput} from './epic/epic.reducer.spec';
+import {Epic} from './epic/epic.model';
 
 export function getTestBoardsInput(): any {
   return cloneObject(
@@ -50,6 +52,7 @@ export function getTestBoardsInput(): any {
       'issue-types': getTestIssueTypesInput(),
       custom: getTestCustomFieldsInput(),
       'manual-swimlanes': getTestManualSwimlanesInput(),
+      epics: getTestEpicsInput(),
       projects: {
         main: [
           {
@@ -90,6 +93,7 @@ export function getTestBoardsInput(): any {
           summary: 'Issue one',
           priority: 1,
           type: 1,
+          epic: 0,
           components: [1],
           labels: [0, 1],
           custom: {'Custom-1': 0, 'Custom-2': 1},
@@ -158,6 +162,14 @@ describe('Board reducer tests', () => {
       expect(issueTypes.get('bug').name).toEqual('bug');
       expect(issueTypes.get('feature').name).toEqual('feature');
 
+      const epicsByProject: Map<string, OrderedMap<string, Epic>> = boardState.epics.epicsByProject;
+      expect(epicsByProject.size).toBe(2);
+      expect(epicsByProject.get('P1').size).toBe(1);
+      expect(epicsByProject.get('P1').get('P1-900').name).toBe('P1 First Epic');
+      expect(epicsByProject.get('P2').size).toBe(2);
+      expect(epicsByProject.get('P2').get('P2-900').name).toBe('P2 First Epic');
+      expect(epicsByProject.get('P2').get('P2-901').name).toBe('P2 Second Epic');
+
       const customFields: OrderedMap<string, OrderedMap<string, CustomField>> = boardState.customFields.fields;
       expect(customFields.size).toBe(2);
       expect(customFields.get('Custom-1').size).toBe(3);
@@ -192,6 +204,7 @@ describe('Board reducer tests', () => {
         .customField('Custom-2', 'c2-B', 'Second C2')
         .addLinkedIssue('L1-1', 'Linked 1', 1, 'L1-2')
         .selectedParallelTaskOptions([0])
+        .epic('P1-900', 'P1 First Epic')
         .check();
       const issue2 = issues.get('P1-2');
       expect(issue2.key).toEqual('P1-2');
@@ -210,12 +223,14 @@ describe('Board reducer tests', () => {
       delete input['fix-versions'];
       delete input['custom'];
       delete input['manual-swimlanes'];
+      delete input['epics'];
       delete input['projects']['main'][0]['parallel-tasks'];
       delete input['issues']['P1-1']['components'];
       delete input['issues']['P1-1']['labels'];
       delete input['issues']['P1-1']['custom'];
       delete input['issues']['P1-1']['parallel-tasks'];
       delete input['issues']['P1-2']['parallel-tasks'];
+      delete input['issues']['P1-1']['epic'];
       delete input['blacklist'];
       // Configures everything that can be
       const boardState: BoardState = boardReducer(
@@ -352,7 +367,7 @@ describe('Board reducer tests', () => {
       expect(newState.viewId).toBe(11);
       // These will never change via changes
       checkSameStateEntries(boardState, newState, 'currentUser', 'jiraUrl', 'rankCustomField', '_headers',
-        'headers', 'priorities', 'issueTypes', 'projects', 'manualSwimlanes');
+        'headers', 'priorities', 'issueTypes', 'projects', 'manualSwimlanes', 'epics');
 
       // Do some sanity checking of the contents. The individual reducer tests do in-depth checking
 
@@ -417,7 +432,7 @@ describe('Board reducer tests', () => {
 
       checkSameStateEntries(boardState, newState, 'currentUser', 'jiraUrl', '_headers', 'headers', 'assignees', 'issueTypes',
         'priorities', 'components',
-        'labels', 'fixVersions', 'customFields', 'projects', 'issues', 'manualSwimlanes');
+        'labels', 'fixVersions', 'customFields', 'projects', 'issues', 'manualSwimlanes', 'epics');
 
       const rankState: RankState = newState.ranks;
       expect(rankState.rankedIssueKeys.size).toBe(1);
@@ -446,7 +461,7 @@ describe('Board reducer tests', () => {
 
       checkSameStateEntries(boardState, newState, 'currentUser', 'jiraUrl', '_headers', 'headers', 'assignees',
         'issueTypes', 'priorities', 'components',
-        'labels', 'fixVersions', 'customFields', 'projects', 'issues', 'manualSwimlanes');
+        'labels', 'fixVersions', 'customFields', 'projects', 'issues', 'manualSwimlanes', 'epics');
 
       const rankState: RankState = newState.ranks;
       expect(rankState.rankedIssueKeys.size).toBe(1);

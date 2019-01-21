@@ -93,6 +93,17 @@ export class SwimlaneInfoBuilder {
           });
         issueMatcher = ((issue, dataBuilders) => this.multiStringMatcher(issue.fixVersions, dataBuilders));
         break;
+      case 'epic': {
+        boardState.epics.epicsByProject.forEach(epicsForProject => {
+          epicsForProject.forEach(epic => {
+            builderMap.set(epic.key,
+              new SwimlaneDataBuilder(epic.key, epic.name, states, collapsed(userSettingState, epic.key), userSettingState, existingInfo));
+          });
+          issueMatcher = ((issue, dataBuilders) =>
+              [dataBuilders.get(issue.epic ? issue.epic.key : NONE_FILTER_KEY)]);
+        });
+        break;
+      }
       default: {
         const customFields: OrderedMap<string, CustomField> = boardState.customFields.fields.get(userSettingState.swimlane);
         if (customFields) {
