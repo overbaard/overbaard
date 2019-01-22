@@ -16,6 +16,9 @@
              target="_blank"
              class="issue-link"
              >{{issue.key}}</a></span>
+        <span *ngIf="issueDetailState.rankingOrder" class="mat-h6">
+          ({{rankOrder}}/{{totalProjectIssues}})
+        </span>
         <span class="space-filler"></span>
       </span>
       <span class="mat-h4" matTooltip="{{issue.assignee.name}}">{{issue.assignee.initials}}</span>

@@ -17,9 +17,11 @@ import {UpdateParallelTaskEvent} from '../../../../events/update-parallel-task.e
 import {IssueDetailState} from '../../../../model/board/user/issue-detail/issue-detail.model';
 import {Observable, Subject} from 'rxjs';
 import {RankViewEntry} from '../../../../view-model/board/rank-view-entry';
-import {List} from 'immutable';
+import {is, List, Map} from 'immutable';
 import {takeUntil} from 'rxjs/operators';
 import {ScrollHeightSplitter} from '../../../../common/scroll-height-splitter';
+import {Dictionary} from '../../../../common/dictionary';
+import {BoardIssueView} from '../../../../view-model/board/board-issue-view';
 
 @Component({
   selector: 'app-rank-view-container',
@@ -44,6 +46,9 @@ export class RankViewContainerComponent implements OnInit, OnChanges, OnDestroy 
   @Input()
   topOffsetObserver$: Observable<number>;
 
+  @Input()
+  rankOrdersByProject: Map<string, Map<string, number>>;
+
   @Output()
   updateParallelTask: EventEmitter<UpdateParallelTaskEvent> = new EventEmitter<UpdateParallelTaskEvent>();
 
@@ -60,6 +65,8 @@ export class RankViewContainerComponent implements OnInit, OnChanges, OnDestroy 
   visibleEntries: List<RankViewEntry>;
   beforePadding = 0;
   afterPadding = 0;
+
+
 
   constructor(private _zone: NgZone, private _changeDetectorRef: ChangeDetectorRef) {
   }
@@ -98,6 +105,14 @@ export class RankViewContainerComponent implements OnInit, OnChanges, OnDestroy 
     }
   }
 
+  private getRankOrder(rankEntry: RankViewEntry): number {
+    const issue: BoardIssueView = rankEntry.issue;
+    return this.rankOrdersByProject.get(issue.projectCode).get(issue.key);
+  }
+
+  private getTotalIssuesForProject(rankEntry: RankViewEntry): number {
+    return this.rankOrdersByProject.get(rankEntry.issue.projectCode).size;
+  }
 
   private calculateVisibleEntries(forceUpdate: boolean = false) {
     this._splitter.updateVirtualScrollInfo(

@@ -25,6 +25,7 @@ export class IssueTableBuilder {
   private _rankView: List<RankViewEntry>;
   private _old_style_table: List<List<string>>;
   private _table: List<List<BoardIssueView>>;
+  private _issueRanksByProject: Map<string, Map<string, number>>;
 
   private _totalIssueCounts: List<number>;
   private _visibleIssueCounts: List<number>;
@@ -43,6 +44,7 @@ export class IssueTableBuilder {
     private readonly _currentUserSettingState: UserSettingState) {
     this._table = _oldIssueTableState.table;
     this._rankView = _oldIssueTableState.rankView;
+    this._issueRanksByProject = _oldIssueTableState.issueRanksByProject;
 
   }
 
@@ -64,7 +66,8 @@ export class IssueTableBuilder {
     if (issues === this._oldIssueTableState.issues &&
       this._table === this._oldIssueTableState.table &&
       this._rankView === this._oldIssueTableState.rankView &&
-      swimlaneInfo === this._oldIssueTableState.swimlaneInfo) {
+      swimlaneInfo === this._oldIssueTableState.swimlaneInfo &&
+      this._issueRanksByProject === this._oldIssueTableState.issueRanksByProject) {
       return this._oldIssueTableState;
     }
 
@@ -74,6 +77,7 @@ export class IssueTableBuilder {
       this._visibleIssueCounts,
       this._rankView,
       this._table,
+      this._issueRanksByProject,
       swimlaneInfo);
   }
 
@@ -242,7 +246,16 @@ export class IssueTableBuilder {
     }
 
     this._currentBoardState.projects.boardProjects.forEach((project, key) => {
-      this.addProjectIssues(issues, totalIssues, visibleIssues, tableBuilder, rankViewBuilder, project);
+      const oldIssueRanks: Map<string, number> =
+        this._issueRanksByProject.has(key) ? this._issueRanksByProject.get(key) : Map<string, number>();
+      const issueRanks: Dictionary<number> = {};
+
+      this.addProjectIssues(issues, totalIssues, visibleIssues, tableBuilder, rankViewBuilder, project, issueRanks);
+
+      const newRanks: Map<string, number> = Map<string, number>(issueRanks);
+      if (!newRanks.equals(oldIssueRanks)) {
+        this._issueRanksByProject = this._issueRanksByProject.set(key, newRanks);
+      }
     });
 
     this._totalIssueCounts = List<number>(totalIssues);
@@ -259,16 +272,28 @@ export class IssueTableBuilder {
     visibleIssues: number[],
     tableBuilder: TableBuilder<BoardIssueView>,
     rankViewBuilder: RankViewBuilder,
-    project: BoardProject) {
+    project: BoardProject,
+    issueRanks: Dictionary<number>) {
 
     const rankedKeysForProject: List<string> = this._currentBoardState.ranks.rankedIssueKeys.get(project.key);
     if (!rankedKeysForProject) {
       return;
     }
 
+    let rankOrder = 0;
     const ownToBoardIndex: OwnToBoardStateMappings = OwnToBoardStateMappings.create(this._currentBoardState.headers, project);
     rankedKeysForProject.forEach((key) => {
+      if (this._currentUserSettingState.issueDetail.rankingOrder) {
+        rankOrder++;
+        issueRanks[key] = rankOrder;
+      }
+
       const issue: BoardIssueView = issues.get(key);
+      if (!this._currentUserSettingState.showBacklog && !issue) {
+        // The server sends us the full list of issues, whether or not the backlog is visible or not. However, backlog issues are
+        // not part of the issue map, so we can't load the issue here.
+        return;
+      }
       // find the index and add the issue
       const boardIndex: number = ownToBoardIndex.getBoardIndex(issue);
 

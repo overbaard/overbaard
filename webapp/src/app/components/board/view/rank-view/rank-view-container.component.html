@@ -4,6 +4,8 @@
   [rankEntry]="rankEntry"
   [issueDetailState]="issueDetailState"
   [statesDummyArray]="statesDummyArray"
+  [rankOrder]="getRankOrder(rankEntry)"
+  [totalProjectIssues]="getTotalIssuesForProject(rankEntry)"
   (updateParallelTask)="onUpdateParallelTask($event)"
 >
 </app-rank-view-entry>

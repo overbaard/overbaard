@@ -9,8 +9,10 @@ export interface IssueTable {
   totalIssues: List<number>;
   visibleIssues: List<number>;
 
+
   // Fields used by the UI
   rankView: List<RankViewEntry>;
   table: List<List<BoardIssueView>>;
+  issueRanksByProject: Map<string, Map<string, number>>;
   swimlaneInfo: SwimlaneInfo;
 }
