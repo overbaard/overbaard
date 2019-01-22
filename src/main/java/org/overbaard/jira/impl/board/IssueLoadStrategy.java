@@ -123,7 +123,7 @@ interface IssueLoadStrategy {
     class Factory {
         static IssueLoadStrategy create(BoardProject.Builder project) {
             final boolean customFieldsOrParallelTasks =
-                    project.getConfig().getCustomFieldNames().size() == 0 && project.getConfig().getInternalAdvanced().getParallelTaskGroupsConfig() == null;
+                    project.getConfig().getCustomFieldNames().size() > 0 || project.getConfig().getInternalAdvanced().getParallelTaskGroupsConfig() != null;
             final ClassLoader cl = RawSqlLoader.class.getClassLoader();
             if (cl instanceof BundleReference) {
                 return new BulkIssueLoadStrategy(project, customFieldsOrParallelTasks);
