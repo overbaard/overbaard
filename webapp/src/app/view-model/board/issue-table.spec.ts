@@ -3,14 +3,13 @@ import {DeserializeIssueLookupParams} from '../../model/board/data/issue/issue.m
 import {HeaderState} from '../../model/board/data/header/header.state';
 import {HeaderActions, headerMetaReducer} from '../../model/board/data/header/header.reducer';
 import {IssueTable} from './issue-table';
-import {is, List, OrderedSet, Set} from 'immutable';
+import {List, OrderedSet, Set} from 'immutable';
 import {Dictionary} from '../../common/dictionary';
 import {BoardViewModel} from './board-view';
 import {BoardHeader} from './board-header';
 import {initialIssueDetailState, IssueDetailState} from '../../model/board/user/issue-detail/issue-detail.model';
 import {BoardIssueView} from './board-issue-view';
 import {IssueSummaryLevel} from '../../model/board/user/issue-summary-level';
-import {IssueChecker} from '../../model/board/data/issue/issue.model.spec';
 import {Epic} from '../../model/board/data/epic/epic.model';
 
 describe('Issue Table observer tests', () => {
@@ -918,7 +917,8 @@ describe('Issue table filter tests', () => {
             .issueDetailState({
               issueSummaryLevel: IssueSummaryLevel.SHORT_SUMMARY_NO_AVATAR,
               linkedIssues: true,
-              parallelTasks: true
+              parallelTasks: true,
+              rankingOrder: false
             });
         if (rank) {
           checker.rankOrder(...standardRank);

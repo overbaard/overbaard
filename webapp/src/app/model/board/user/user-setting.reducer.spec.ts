@@ -46,7 +46,8 @@ describe('User setting reducer tests', () => {
         swimlane: 'assignee',
         'isl': '0',
         'vpt': 'true',
-        'vli': 'true'
+        'vli': 'true',
+        'vro': 'true'
       };
       const state: UserSettingState = userSettingReducer(
         initialUserSettingState,
@@ -56,6 +57,7 @@ describe('User setting reducer tests', () => {
       settingChecker.filterChecker.project = ['P1'];
       settingChecker.swimlane = 'assignee';
       settingChecker.issueSummaryLevel = IssueSummaryLevel.HEADER_ONLY;
+      settingChecker.rankingOrder = true;
       settingChecker.check(state);
     });
     it ('With Querystring, bl=false and visible columns', () => {
@@ -166,6 +168,17 @@ describe('User setting reducer tests', () => {
 
       state = userSettingReducer(state, UserSettingActions.createUpdateShowLinkedIssues(true));
       checker.linkedIssues = true;
+      checker.check(state);
+    });
+    it ('Update show ranking order', () => {
+      state = userSettingReducer(state, UserSettingActions.createUpdateShowRankingOrder(true));
+      const checker: SettingChecker = new SettingChecker();
+      checker.boardCode = 'TEST';
+      checker.rankingOrder = true;
+      checker.check(state);
+
+      state = userSettingReducer(state, UserSettingActions.createUpdateShowRankingOrder(false));
+      checker.rankingOrder = false;
       checker.check(state);
     });
     it ('Update swimlane', () => {
@@ -656,6 +669,7 @@ class SettingChecker {
   issueSummaryLevel: IssueSummaryLevel = IssueSummaryLevel.FULL;
   parallelTasks = true;
   linkedIssues = true;
+  rankingOrder = false;
 
   constructor() {
     for (const key of Object.keys(this.filterChecker)) {
@@ -694,5 +708,6 @@ class SettingChecker {
     expect(state.issueDetail.issueSummaryLevel).toBe(this.issueSummaryLevel);
     expect(state.issueDetail.parallelTasks).toBe(this.parallelTasks);
     expect(state.issueDetail.linkedIssues).toBe(this.linkedIssues);
+    expect(state.issueDetail.rankingOrder).toBe(this.rankingOrder);
   }
 }

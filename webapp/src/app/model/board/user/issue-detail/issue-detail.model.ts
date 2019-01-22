@@ -5,12 +5,14 @@ export interface IssueDetailState {
   issueSummaryLevel: IssueSummaryLevel;
   parallelTasks: boolean;
   linkedIssues: boolean;
+  rankingOrder: boolean;
 }
 
 const DEFAULT_ISSUE_DETAIL_STATE: IssueDetailState = {
   issueSummaryLevel: IssueSummaryLevel.FULL,
   parallelTasks: true,
-  linkedIssues: true
+  linkedIssues: true,
+  rankingOrder: false
 };
 
 interface IssueDetailStateRecord extends TypedRecord<IssueDetailStateRecord>, IssueDetailState {

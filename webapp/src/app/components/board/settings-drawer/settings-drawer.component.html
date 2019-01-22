@@ -60,6 +60,12 @@
           color="primary"
           (change)="onChangeShowLinkedIssues($event)">Linked Issues</mat-checkbox>
       </div>
+      <div>
+        <mat-checkbox
+          [checked]="userSettings.issueDetail.rankingOrder"
+          color="primary"
+          (change)="onChangeShowRankingOrder($event)">Ranking Order</mat-checkbox>
+      </div>
     </mat-card-content>
   </mat-card>
   <mat-card>

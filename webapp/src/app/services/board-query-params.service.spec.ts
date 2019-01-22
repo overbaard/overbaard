@@ -7,7 +7,7 @@ import {BoardUtil, initialBoardState} from '../model/board/data/board.model';
 import {Dictionary} from '../common/dictionary';
 import {UserSettingActions, userSettingReducer} from '../model/board/user/user-setting.reducer';
 import {BoardViewMode} from '../model/board/user/board-view-mode';
-import {List, Map, Set} from 'immutable';
+import {is, List, Map, Set} from 'immutable';
 import {BoardFilterUtil, initialBoardFilterState} from '../model/board/user/board-filter/board-filter.model';
 import {HeaderUtil, initialHeaderState} from '../model/board/data/header/header.model';
 import {HeaderState} from '../model/board/data/header/header.state';
@@ -94,6 +94,7 @@ describe('Boards Query Parameters Service Tests', () => {
         mutable.issueDetail = IssueDetailUtil.updateIssueDetailState(mutable.issueDetail, issueDetail => {
           issueDetail.issueSummaryLevel = IssueSummaryLevel.FULL;
           issueDetail.parallelTasks = true;
+          issueDetail.rankingOrder = false;
         });
       });
       userSettingSubject.next(newSetting);
@@ -132,6 +133,8 @@ describe('Boards Query Parameters Service Tests', () => {
         mutable.issueDetail = IssueDetailUtil.updateIssueDetailState(mutable.issueDetail, issueDetail => {
           issueDetail.issueSummaryLevel = IssueSummaryLevel.SHORT_SUMMARY_NO_AVATAR;
           issueDetail.parallelTasks = false;
+          issueDetail.linkedIssues = false;
+          issueDetail.rankingOrder = true;
         });
         mutable.forceBacklog = true;
         mutable.swimlane = 'project'; // Not really valid when we use rank but still
