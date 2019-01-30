@@ -24,7 +24,7 @@ export class CommentIssueDialogComponent implements OnInit {
     public dialogRef: MatDialogRef<CommentIssueDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private _store: Store<AppState>) {
-    this.issue = data['issueQ'];
+    this.issue = data['issue'];
     this._boardService = data['boardService'];
   }
 

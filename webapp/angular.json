@@ -43,8 +43,34 @@
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.prod.ts"
                 }
+              ],
+              "assets": [
+                "src/assets",
+                "src/favicon.ico"
               ]
-            }
+            },
+            "demo": {
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.demo.ts"
+                }
+              ],
+              "assets": [
+                "src/assets",
+                "src/favicon.ico",
+                "src/demo"
+              ]}
+
           }
         },
         "serve": {
@@ -55,6 +81,9 @@
           "configurations": {
             "production": {
               "browserTarget": "overbaard:build:production"
+            },
+            "demo": {
+              "browserTarget": "overbaard:build:demo"
             }
           }
         },

@@ -1,0 +1,9 @@
+{
+  "Backlog": "Unordered issues.",
+  "Kickoff": "Planning and information gathering.",
+  "Dev In Progress": "Development is happening.",
+  "Review": "A pull request has been opened, and is undergoing review.",
+  "QA TODO": "The issue is part of a build ready for testing.",
+  "QA In Progress": "The issue is being tested.",
+  "Verified": "The feature has been verified. All is good!"
+}

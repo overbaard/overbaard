@@ -24,6 +24,6 @@ export class BlacklistDialogComponent implements OnInit {
   }
 
   issueUrl(key: string): string {
-    return this._urlService.jiraUrl + key;
+    return this._urlService.jiraUrl + 'browse/' + key;
   }
 }

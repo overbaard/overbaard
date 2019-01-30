@@ -1,10 +1,11 @@
 import {Injectable} from '@angular/core';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
-import {BoardState} from '../model/board/data/board';
+import {environment} from '../../environments/environment';
 
 @Injectable()
 export class UrlService {
 
+  private static DEMO_FRAGMENT = 'github.io/ob-demo/';
   private static OVERBAARD_FRAGMENT = 'overbaard';
   static readonly OVERBAARD_REST_PREFIX = 'rest/' + UrlService.OVERBAARD_FRAGMENT + '/1.0';
 
@@ -12,46 +13,42 @@ export class UrlService {
 
   constructor() {
     const location: Location = window.location;
-    const index: number = location.href.indexOf('/' + UrlService.OVERBAARD_FRAGMENT + '/');
-
-    const overbaardPrefix: string = index >= 0 ? location.href.substr(0, index) + '/' : null;
-    if (!overbaardPrefix) {
-      console.error('Could not determine the overbård prefix');
-      console.log(`Location: ${location}`);
-      console.log(`Index of /'${UrlService.OVERBAARD_FRAGMENT}'/ : ${index}`);
-    }
-    const localDebug: boolean = location.hostname === 'localhost' && location.port === '4200';
-
+    let demo = false;
     let jiraUrl: string = null;
+    let overbaardPrefix: string = null;
+    const localDebug = location.hostname === 'localhost' && location.port === '4200';
+
+    if (environment.demo) {
+      demo = true;
+      const index: number = location.href.indexOf(UrlService.DEMO_FRAGMENT);
+      overbaardPrefix = index >= 0 ? location.href.substring(0, index + UrlService.DEMO_FRAGMENT.length) : null;
+    } else {
+      const index: number = location.href.indexOf('/' + UrlService.OVERBAARD_FRAGMENT + '/');
+      overbaardPrefix = index >= 0 ? location.href.substr(0, index) + '/' : null;
+    }
+
     if (overbaardPrefix) {
       jiraUrl = overbaardPrefix;
     } else if (localDebug) {
       // Return the locally running Jira instance since this is still where the icons etc are loaded from
       jiraUrl =  'http://localhost:2990/jira/';
     }
-    console.log(`Overbård prefix ${overbaardPrefix}`);
-    console.log(`Jira url ${jiraUrl}`);
-    console.log(`localDebug ${localDebug}`);
+
+    console.log('Environment:');
+    console.log(environment);
+    console.log('Url Service State:');
+    console.log(this._urlServiceState);
 
     this._urlServiceState = STATE_FACTORY({
       overbaardPrefix: overbaardPrefix,
       localDebug: localDebug,
-      jiraUrl: jiraUrl
+      jiraUrl: jiraUrl,
+      demo: demo
     });
   }
 
-  set jiraUrl(url: string) {
-    // TODO remove this when https://github.com/overbaard/overbaard/issues/32 is verified to work
-    console.error(new Error('Attempt was made to set jiraUrl'));
-  }
-
   get jiraUrl(): string {
-    const url = this._urlServiceState.jiraUrl;
-    if (url.indexOf('null') >= 0) {
-      // TODO remove this when https://github.com/overbaard/overbaard/issues/32 is verified to work
-      console.error(new Error('url contains "null": ' + url));
-    }
-    return url;
+    return this._urlServiceState.jiraUrl;
   }
 
 
@@ -72,13 +69,18 @@ export class UrlService {
   localImageUrl(imageName: string): string {
     if (this._urlServiceState.localDebug) {
       return '/assets/images/' + imageName;
+    } else if (this._urlServiceState.demo) {
+      return this._urlServiceState.overbaardPrefix + '/assets/images/' + imageName;
     } else {
       return this._urlServiceState.overbaardPrefix + 'overbaard/assets/images/' + imageName;
     }
   }
 
   caclulateRestUrl(path: string): string {
-    if (this._urlServiceState.localDebug) {
+    if (this._urlServiceState.localDebug || this._urlServiceState.demo) {
+      if (this._urlServiceState.demo) {
+        path = path.replace('rest/', 'demo/');
+      }
       // For the local debugging of the UI, which does not seem to like loading json without a .json suffix
       const index = path.indexOf('?');
       if (index > 0) {
@@ -94,6 +96,7 @@ interface UrlServiceState {
   overbaardPrefix: string;
   localDebug: boolean;
   jiraUrl: string;
+  demo: boolean;
 }
 
 interface UrlServiceStateRecord extends TypedRecord<UrlServiceStateRecord>, UrlServiceState {
@@ -102,5 +105,6 @@ interface UrlServiceStateRecord extends TypedRecord<UrlServiceStateRecord>, UrlS
 const STATE_FACTORY = makeTypedFactory<UrlServiceState, UrlServiceStateRecord>({
   overbaardPrefix: '',
   localDebug: false,
-  jiraUrl: ''
+  jiraUrl: '',
+  demo: false
 });

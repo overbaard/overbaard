@@ -6,7 +6,8 @@ import {Progress, ProgressLogService} from './progress-log.service';
 import {catchError, map, tap, timeout} from 'rxjs/operators';
 
 @Injectable()
-export class BoardsService {
+export class
+BoardsService {
   private _timeout = 30000;
 
   constructor(private _restUrlService: UrlService, private _httpClient: HttpClient, private _progressLog: ProgressLogService) {

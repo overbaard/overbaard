@@ -1,0 +1,100 @@
+{
+  "id": 1,
+  "code": "DEMO",
+  "name": "Demo Board",
+  "edit": true,
+  "config": {
+    "name": "Demo Board",
+    "code": "DEMO",
+    "rank-custom-field-id": 10009,
+    "states": [
+      {
+        "name": "Backlog",
+        "backlog": true,
+        "help": "Unordered issues."
+      },
+      {
+        "name": "Kickoff",
+        "header": "Development",
+        "help": "Planning and information gathering."
+      },
+      {
+        "name": "Dev In Progress",
+        "header": "Development",
+        "wip": 16,
+        "help": "Development is happening."
+      },
+      {
+        "name": "Review",
+        "header": "Development",
+        "help": "A pull request has been opened, and is undergoing review."
+      },
+      {
+        "name": "QA TODO",
+        "header": "QA",
+        "help": "The issue is part of a build ready for testing."
+      },
+      {
+        "name": "QA In Progress",
+        "header": "QA",
+        "help": "The issue is being tested."
+      },
+      {
+        "name": "Verified",
+        "help": "The feature has been verified. All is good!"
+      }
+    ],
+    "priorities" : [
+      {
+        "name" : "Blocker",
+        "colour" : "red"
+      },
+      {
+        "name" : "Major",
+        "colour" : "orange"
+      },
+      {
+        "name" : "Minor",
+        "colour" : "green"
+      },
+      {
+        "name" : "Trivial",
+        "colour" : "grey"
+      }
+    ],
+    "issue-types" : [
+      {
+        "name" : "Feature",
+        "colour" : "#1d689c"
+      },
+      {
+        "name" : "Bug",
+        "colour" : "red"
+      },
+      {
+        "name" : "Task",
+        "colour" : "green"
+      },
+      {
+        "name" : "Story",
+        "colour" : "yellowgreen"
+      }
+    ],
+    "projects": [
+      {
+        "code": "DEMO",
+        "colour": "#1d689c",
+        "rank": true,
+        "state-links": {
+          "Backlog" : "Backlog",
+          "Kickoff" : "Kickoff",
+          "Dev In Progress" : "Dev In Progress",
+          "Review" : "Review",
+          "QA TODO" : "QA TODO",
+          "State Number 6" : "QA In Progress",
+          "Verified" : "Verified"
+        }
+      }
+    ]
+  }
+}
