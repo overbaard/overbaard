@@ -1,6 +1,6 @@
 {
   "view" : 1,
-  "current-user" : "kabir",
+  "current-user" : "anon",
   "rank-custom-field-id" : 11111,
   "states" : [
     {"name" : "Backlog"},
@@ -18,31 +18,31 @@
     {
       "key" : "anon",
       "email" : "anon@example.com",
-      "avatar" : "https://kabir.github.io/ob-demo/demo/avatars/avatar1.svg",
+      "avatar" : "https://overbaard.github.io/ob-demo/demo/avatars/avatar1.svg",
       "name" : "Albert Anonymous"
     },
     {
       "key" : "brill",
       "email" : "brill@example.com",
-      "avatar" : "https://kabir.github.io/ob-demo/demo/avatars/avatar2.svg",
+      "avatar" : "https://overbaard.github.io/ob-demo/demo/avatars/avatar2.svg",
       "name" : "Benjamin Brilliant"
     },
     {
       "key" : "ken",
       "email" : "kenny@example.com",
-      "avatar" : "https://kabir.github.io/ob-demo/demo/avatars/avatar3.svg",
+      "avatar" : "https://overbaard.github.io/ob-demo/demo/avatars/avatar3.svg",
       "name" : "Kenny Ken"
     },
     {
       "key" : "rob",
       "email" : "rob@example.com",
-      "avatar" : "https://kabir.github.io/ob-demo/demo/avatars/avatar4.svg",
+      "avatar" : "https://overbaard.github.io/ob-demo/demo/avatars/avatar4.svg",
       "name" : "Robbie Robber"
     },
     {
       "key" : "ass 5",
       "email" : "ass5@example.com",
-      "avatar" : "https://kabir.github.io/ob-demo/demo/avatars/avatar5.svg",
+      "avatar" : "https://overbaard.github.io/ob-demo/demo/avatars/avatar5.svg",
       "name" : "Steven Surfer"
     }
   ],
