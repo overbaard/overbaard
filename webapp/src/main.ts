@@ -10,26 +10,36 @@ console.log('Calculated webpack public path: ' + __webpack_public_path__);
 
 
 function calculatePublicPath(): string {
-  const searchElement = '/overbaard/';
+
+  console.log('webpack');
+  console.log(environment);
+
   const location: Location = window.location;
   const href: string = location.href;
-  const index: number = href.indexOf(searchElement);
-  if (index < 0) {
-    // We are running in a test server setup
-    let url: string = location.protocol + '//';
-    url += location.hostname;
-    if (location.port) {
-      url += ':' + location.port;
-    }
-    url += '/';
-    return url;
+  if (environment.demo) {
+    const fragment = 'github.io/ob-demo/';
+    const index: number = location.href.indexOf('github.io/ob-demo/');
+    return location.href.substring(0, index + fragment.length);
   } else {
-    // We are running in the plugin
-    return href.substr(0, index) + '/';
+    const searchElement = '/overbaard/';
+    const index: number = href.indexOf(searchElement);
+    if (index < 0) {
+      // We are running in a test server setup
+      let url: string = location.protocol + '//';
+      url += location.hostname;
+      if (location.port) {
+        url += ':' + location.port;
+      }
+      url += '/';
+      return url;
+    } else {
+      // We are running in the plugin
+      return href.substr(0, index) + '/';
+    }
   }
 }
 
-if (environment.production) {
+if (environment.production || environment['demo']) {
   enableProdMode();
 }
 

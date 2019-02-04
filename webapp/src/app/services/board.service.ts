@@ -10,6 +10,7 @@ import {showBacklogSelector} from '../model/board/user/user-setting.reducer';
 import {BoardIssueView} from '../view-model/board/board-issue-view';
 import {HeaderActions} from '../model/board/data/header/header.reducer';
 import {catchError, take, tap, timeout, map} from 'rxjs/operators';
+import {environment} from '../../environments/environment';
 
 @Injectable()
 export class BoardService {
@@ -73,6 +74,9 @@ export class BoardService {
 
   setParallelTaskOption(boardCode: string, backlog: boolean, issueKey: string, taskName: string,
                         groupIndex: number, taskIndex: number, selectedOptionName: string, selectedOptionIndex: number) {
+    if (!this.checkDemoAndLogMessage()) {
+      return;
+    }
 
     // Cancel any background polling
     // Cancel any background polling
@@ -108,12 +112,17 @@ export class BoardService {
   }
 
   saveIssueComment(boardCode: string, backlog: boolean, issue: BoardIssueView, comment: string, success: () => void) {
+    if (!this.checkDemoAndLogMessage()) {
+      success(); // Although not really 'success' this is a callback to close the dialog initiating this call
+      return;
+    }
+
     // Cancel any background polling
     this.stopPolling();
 
     const progress: Progress = this._progressLog.startUserAction(`Commented on issue ${issue.key}`);
 
-    const path: string = this._restUrlService.jiraUrl + 'rest/api/2/issue/' + issue.key + '/comment';
+    const path: string = this._restUrlService.caclulateRestUrl('rest/api/2/issue/' + issue.key + '/comment');
 
     const payload: any = {body: comment};
 
@@ -136,6 +145,11 @@ export class BoardService {
   }
 
   rankIssue(rankCustomFieldId: number, boardCode: string, issue: BoardIssueView, beforeKey: string, afterKey: string, success: () => void) {
+    if (!this.checkDemoAndLogMessage()) {
+      success(); // Although not really 'success' this is a callback to close the dialog initiating this call
+      return;
+    }
+
     // Cancel any background polling
     this.stopPolling();
 
@@ -146,7 +160,7 @@ export class BoardService {
       msg += 'to the end';
     }
     const progress: Progress = this._progressLog.startUserAction(msg);
-    const path: string = this._restUrlService.jiraUrl + 'rest/greenhopper/1.0/rank';
+    const path: string = this._restUrlService.caclulateRestUrl('rest/greenhopper/1.0/rank');
     console.log('Ranking issue ' + path);
 
     const payload: any = {
@@ -180,13 +194,18 @@ export class BoardService {
   }
 
   moveIssue(boardCode: string, showBacklog: boolean, issue: BoardIssueView, boardState: string, ownState: string, success: () => void) {
+    if (!this.checkDemoAndLogMessage()) {
+      success(); // Although not really 'success' this is a callback to close the dialog initiating this call
+      return;
+    }
+
     // Cancel any background polling
     this.stopPolling();
 
     const progress: Progress = this._progressLog.startUserAction(`Moved ${issue.key} to the ${boardState} column`);
 
     // First get the transitions
-    const path = this._restUrlService.jiraUrl + 'rest/api/2/issue/' + issue.key + '/transitions';
+    const path = this._restUrlService.caclulateRestUrl('rest/api/2/issue/' + issue.key + '/transitions');
     console.log('Getting transitions for issue ' + path);
     // Don't use executeRequest here to keep the progress open until we actually do the transition
     this._http.get(path)
@@ -228,7 +247,7 @@ export class BoardService {
       return;
     }
 
-    const path = this._restUrlService.jiraUrl + 'rest/api/2/issue/' + issue.key + '/transitions';
+    const path = this._restUrlService.caclulateRestUrl('rest/api/2/issue/' + issue.key + '/transitions');
     const payload: any = {transition: {id: transitionId}};
     console.log('Moving issue ' + path);
 
@@ -271,6 +290,10 @@ export class BoardService {
   }
 
   private recreateChangePollerAndStartPolling(boardCode: string, backlog: boolean, progressOnFirst: boolean, initialWait?: number) {
+    if (environment.demo) {
+      return;
+    }
+
     if (this._changePoller) {
       this._changePoller.destroy();
       this._changePoller = name;
@@ -285,6 +308,13 @@ export class BoardService {
       .append('Content-Type', 'application/json');
   }
 
+  private checkDemoAndLogMessage(): boolean {
+    if (environment.demo) {
+      this._progressLog.startUserAction().logWarning('This is a read-only demo instance. The selected functionality is not available');
+      return false;
+    }
+    return true;
+  }
 }
 
 class ChangePoller {

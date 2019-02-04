@@ -8,6 +8,8 @@ import {map, take} from 'rxjs/operators';
 import {IssueQlUtil} from '../../common/parsers/issue-ql/issue-ql.util';
 import * as issueQlParser from '../../common/parsers/issue-ql/pegjs/issue-ql.generated';
 import {UrlService} from '../../services/url.service';
+import {environment} from '../../../environments/environment';
+import {ProgressLogService} from '../../services/progress-log.service';
 
 @Component({
   selector: 'app-configuration',
@@ -44,7 +46,8 @@ export class ConfigurationComponent implements OnInit {
 
   constructor(private _boardsService: BoardsService,
               appHeaderService: AppHeaderService,
-              private _urlService: UrlService) {
+              private _urlService: UrlService,
+              private _progressLog: ProgressLogService) {
     appHeaderService.setTitle('Configuration');
   }
 
@@ -104,7 +107,11 @@ export class ConfigurationComponent implements OnInit {
     const id = this.selected;
 
     console.log('Deleting board');
-    // TODO progress and errors
+
+    if (!this.checkDemoAndLogMessage()) {
+      return;
+    }
+
     this._boardsService.deleteBoard(id)
       .pipe(
         map(data => this.toConfigBoardView(data)),
@@ -132,7 +139,11 @@ export class ConfigurationComponent implements OnInit {
       this.createError = issueQlError;
       return;
     }
-    // TODO progress and errors
+
+    if (!this.checkDemoAndLogMessage()) {
+      return;
+    }
+
     this._boardsService.createBoard(json)
       .pipe(
         map<any, ConfigBoardsView>(data => {
@@ -167,7 +178,10 @@ export class ConfigurationComponent implements OnInit {
       return;
     }
 
-    // TODO progress and errors
+    if (!this.checkDemoAndLogMessage()) {
+      return;
+    }
+
     this._boardsService.saveBoard(this.selected, boardJson)
       .pipe(
         map<any, ConfigBoardsView>(data => this.toConfigBoardView(data)),
@@ -180,7 +194,10 @@ export class ConfigurationComponent implements OnInit {
   }
 
   onSaveCustomFieldId() {
-    // TODO handle progress and errors
+    if (!this.checkDemoAndLogMessage()) {
+      return;
+    }
+
     this._boardsService.saveCustomFieldsIds(
       this.customFieldsForm.value['rankCustomFieldId'],
       this.customFieldsForm.value['epicLinkCustomFieldId'],
@@ -254,6 +271,15 @@ export class ConfigurationComponent implements OnInit {
       }
     }
   }
+
+  private checkDemoAndLogMessage(): boolean {
+    if (environment.demo) {
+      this._progressLog.startUserAction().logWarning('This is a read-only demo instance. The selected functionality is not available');
+      return false;
+    }
+    return true;
+  }
+
 }
 
 interface ConfigBoardsView {

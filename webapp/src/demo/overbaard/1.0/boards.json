@@ -1,0 +1,17 @@
+{
+  "configs": [
+    {
+      "id": 1,
+      "code": "DEMO",
+      "name": "Demo board",
+      "edit": true,
+      "config": {
+        "_comment": "This config doesn't actually match the setup for the DEMO.json file. It is only here for illustrative purposes, and to see this board in the boards list."
+      }
+    }
+  ],
+  "can-edit-custom-fields": true,
+  "rank-custom-field-id": 10005,
+  "epic-link-custom-field-id": 10000,
+  "epic-name-custom-field-id": 10001
+}

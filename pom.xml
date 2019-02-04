@@ -486,7 +486,7 @@
                                     <goal>yarn</goal>
                                 </goals>
                                 <configuration>
-                                    <arguments>run build --output-hashing=all --prod --aot</arguments>
+                                    <arguments>run build --output-hashing=all --prod --aot --configuration=production</arguments>
                                 </configuration>
                             </execution>
                         </executions>

@@ -67,5 +67,5 @@
   "can-edit-custom-fields": true,
   "rank-custom-field-id": 10005,
   "epic-link-custom-field-id": 10000,
-  "epic-summary-custom-field-id": 10001
+  "epic-name-custom-field-id": 10001
 }
