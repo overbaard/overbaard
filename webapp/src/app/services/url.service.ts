@@ -5,7 +5,7 @@ import {environment} from '../../environments/environment';
 @Injectable()
 export class UrlService {
 
-  private static DEMO_FRAGMENT = 'github.io/ob-demo/';
+  private static DEMO_FRAGMENT = 'github.io/demo/';
   private static OVERBAARD_FRAGMENT = 'overbaard';
   static readonly OVERBAARD_REST_PREFIX = 'rest/' + UrlService.OVERBAARD_FRAGMENT + '/1.0';
 
