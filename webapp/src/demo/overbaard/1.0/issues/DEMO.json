@@ -117,6 +117,26 @@
       "colour" : "yellowgreen"
     }
   ],
+  "custom": {
+    "Tester": [
+      {
+        "key": "danny",
+        "value": "Danny Destroyer"
+      },
+      {
+        "key": "quincy",
+        "value": "Quincy Von QA"
+      },
+      {
+        "key": "sigmund",
+        "value": "Sigmund Smasher"
+      },
+      {
+        "key": "timothy",
+        "value": "Tamarah Tester"
+      }
+    ]
+  },
   "projects" : {"main" : [{
     "code" : "DEMO",
     "colour" : "#1d689c",
@@ -261,7 +281,8 @@
       "fix-versions" : [0],
       "assignee" : 0,
       "priority" : 0,
-      "type" : 0
+      "type" : 0,
+      "custom": {"Tester": 0}
     },
     "DEMO-2" : {
       "key" : "DEMO-2",
@@ -271,7 +292,8 @@
       "fix-versions" : [1],
       "assignee" : 1,
       "priority" : 1,
-      "type" : 1
+      "type" : 1,
+      "custom": {"Tester": 0}
     },
     "DEMO-3" : {
       "key" : "DEMO-3",
@@ -282,7 +304,8 @@
       "fix-versions" : [2],
       "assignee" : 2,
       "priority" : 2,
-      "type" : 2
+      "type" : 2,
+      "custom": {"Tester": 1}
     },
     "DEMO-4" : {
       "key" : "DEMO-4",
@@ -292,7 +315,8 @@
       "fix-versions" : [0],
       "assignee" : 3,
       "priority" : 2,
-      "type" : 3
+      "type" : 3,
+      "custom": {"Tester": 2}
     },
     "DEMO-5" : {
       "key" : "DEMO-5",
@@ -303,7 +327,8 @@
       "fix-versions" : [1],
       "assignee" : 4,
       "priority" : 0,
-      "type" : 0
+      "type" : 0,
+      "custom": {"Tester": 0}
     },
     "DEMO-6" : {
       "key" : "DEMO-6",
@@ -313,7 +338,8 @@
       "fix-versions" : [2],
       "assignee" : 0,
       "priority" : 1,
-      "type" : 1
+      "type" : 1,
+      "custom": {"Tester": 3}
     },
     "DEMO-7" : {
       "key" : "DEMO-7",
@@ -323,7 +349,8 @@
       "fix-versions" : [0],
       "assignee" : 1,
       "priority" : 2,
-      "type" : 2
+      "type" : 2,
+      "custom": {"Tester": 0}
     },
     "DEMO-8" : {
       "key" : "DEMO-8",
@@ -334,7 +361,8 @@
       "fix-versions" : [1],
       "assignee" : 2,
       "priority" : 2,
-      "type" : 3
+      "type" : 3,
+      "custom": {"Tester": 3}
     },
     "DEMO-9" : {
       "key" : "DEMO-9",
@@ -345,7 +373,8 @@
       "fix-versions" : [2],
       "assignee" : 3,
       "priority" : 0,
-      "type" : 0
+      "type" : 0,
+      "custom": {"Tester": 2}
     },
     "DEMO-10" : {
       "key" : "DEMO-10",
@@ -355,7 +384,8 @@
       "fix-versions" : [0],
       "assignee" : 4,
       "priority" : 1,
-      "type" : 1
+      "type" : 1,
+      "custom": {"Tester": 1}
     },
     "DEMO-11" : {
       "key" : "DEMO-11",
@@ -364,7 +394,8 @@
       "fix-versions" : [1],
       "assignee" : 0,
       "priority" : 2,
-      "type" : 2
+      "type" : 2,
+      "custom": {"Tester": 1}
     },
     "DEMO-12" : {
       "key" : "DEMO-12",
@@ -373,7 +404,8 @@
       "fix-versions" : [2],
       "assignee" : 1,
       "priority" : 2,
-      "type" : 3
+      "type" : 3,
+      "custom": {"Tester": 3}
     },
     "DEMO-13" : {
       "key" : "DEMO-13",
@@ -384,7 +416,8 @@
       "fix-versions" : [0],
       "assignee" : 2,
       "priority" : 0,
-      "type" : 0
+      "type" : 0,
+      "custom": {"Tester": 3}
     },
     "DEMO-14" : {
       "key" : "DEMO-14",
@@ -395,7 +428,8 @@
       "fix-versions" : [1],
       "assignee" : 3,
       "priority" : 1,
-      "type" : 1
+      "type" : 1,
+      "custom": {"Tester": 2}
     },
     "DEMO-15" : {
       "key" : "DEMO-15",
@@ -405,7 +439,8 @@
       "fix-versions" : [2],
       "assignee" : 4,
       "priority" : 2,
-      "type" : 2
+      "type" : 2,
+      "custom": {"Tester": 1}
     },
     "DEMO-16" : {
       "key" : "DEMO-16",
@@ -415,7 +450,8 @@
       "fix-versions" : [0],
       "assignee" : 0,
       "priority" : 2,
-      "type" : 3
+      "type" : 3,
+      "custom": {"Tester": 0}
     },
     "DEMO-17" : {
       "key" : "DEMO-17",
@@ -424,7 +460,8 @@
       "fix-versions" : [1],
       "assignee" : 1,
       "priority" : 0,
-      "type" : 0
+      "type" : 0,
+      "custom": {"Tester": 3}
     },
     "DEMO-18" : {
       "key" : "DEMO-18",
@@ -435,7 +472,8 @@
       "fix-versions" : [2],
       "assignee" : 2,
       "priority" : 1,
-      "type" : 1
+      "type" : 1,
+      "custom": {"Tester": 3}
     },
     "DEMO-19" : {
       "key" : "DEMO-19",
@@ -445,7 +483,8 @@
       "fix-versions" : [0],
       "assignee" : 3,
       "priority" : 2,
-      "type" : 2
+      "type" : 2,
+      "custom": {"Tester": 0}
     },
     "DEMO-20" : {
       "key" : "DEMO-20",
@@ -455,7 +494,8 @@
       "fix-versions" : [1],
       "assignee" : 4,
       "priority" : 2,
-      "type" : 3
+      "type" : 3,
+      "custom": {"Tester": 2}
     },
     "DEMO-21" : {
       "key" : "DEMO-21",

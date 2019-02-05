@@ -80,6 +80,13 @@
         "colour" : "yellowgreen"
       }
     ],
+    "custom": [
+      {
+        "name": "Tester",
+        "type": "user",
+        "field-id": 1231008
+      }
+    ],
     "projects": [
       {
         "code": "DEMO",
