@@ -13,7 +13,7 @@
   ],
   "backlog" : 1,
   "done" : 0,
-  "headers" : ["Development", "QA"],
+  "headers" : ["Development", "Final Verification"],
   "assignees" : [
     {
       "key" : "anon",

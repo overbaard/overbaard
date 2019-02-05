@@ -31,12 +31,12 @@
       },
       {
         "name": "QA TODO",
-        "header": "QA",
+        "header": "Final Verification",
         "help": "The issue is part of a build ready for testing."
       },
       {
         "name": "QA In Progress",
-        "header": "QA",
+        "header": "Final Verification",
         "help": "The issue is being tested."
       },
       {
