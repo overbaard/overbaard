@@ -232,7 +232,26 @@
       "DEMO-99",
       "DEMO-100"
     ]
-  }]},
+  },
+    {
+      "code" : "DEMO2",
+      "colour" : "#55a4d1",
+      "rank" : true,
+      "state-links" : {
+        "Backlog" : "TODO",
+        "Dev In Progress" : "In Progress",
+        "Review" : "PR Sent",
+        "Verified" : "Done"
+      },
+      "ranked" : [
+        "DEMO2-1",
+        "DEMO2-2",
+        "DEMO2-3",
+        "DEMO2-4",
+        "DEMO2-5",
+        "DEMO2-6"
+      ]
+    }]},
   "issues" : {
     "DEMO-1" : {
       "key" : "DEMO-1",
@@ -1191,6 +1210,67 @@
       "labels" : [19],
       "priority" : 2,
       "type" : 3
+    },
+    "DEMO2-1" : {
+      "key" : "DEMO2-1",
+      "state" : 3,
+      "summary" : "Completely conceptualize performance based catalysts for change",
+      "components" : [0],
+      "fix-versions" : [0],
+      "labels" : [1, 2, 3, 9],
+      "assignee" : 0,
+      "priority" : 2,
+      "type" : 3
+    },
+    "DEMO2-2" : {
+      "key" : "DEMO2-2",
+      "state" : 3,
+      "summary" : "Authoritatively generate extensive e-services",
+      "components" : [0, 4],
+      "labels" : [3, 12, 16, 18],
+      "fix-versions" : [0],
+      "assignee" : 2,
+      "priority" : 0,
+      "type" : 3
+    },
+    "DEMO2-3" : {
+      "key" : "DEMO2-3",
+      "state" : 2,
+      "summary" : "Efficiently pursue enterprise-wide testing procedures",
+      "components" : [1, 2],
+      "fix-versions" : [0],
+      "assignee" : 4,
+      "priority" : 3,
+      "type" : 1
+    },
+    "DEMO2-4" : {
+      "key" : "DEMO2-4",
+      "state" : 1,
+      "summary" : "Intrinsically conceptualize standards compliant \"outside the box\" thinking",
+      "components" : [1],
+      "labels" : [8, 10, 12],
+      "fix-versions" : [0],
+      "assignee" : 2,
+      "priority" : 2,
+      "type" : 0
+    },
+    "DEMO2-5" : {
+      "key" : "DEMO2-5",
+      "state" : 0,
+      "summary" : "Dramatically utilize web-enabled customer service",
+      "components" : [2],
+      "fix-versions" : [0],
+      "priority" : 3,
+      "type" : 2
+    },
+    "DEMO2-6" : {
+      "key" : "DEMO2-6",
+      "state" : 0,
+      "summary" : "Objectively build economically sound platforms",
+      "components" : [0],
+      "fix-versions" : [0],
+      "priority" : 2,
+      "type" : 2
     }
   }
 }

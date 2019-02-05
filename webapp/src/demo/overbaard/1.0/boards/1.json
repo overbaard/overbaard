@@ -94,6 +94,17 @@
           "State Number 6" : "QA In Progress",
           "Verified" : "Verified"
         }
+      },
+      {
+        "code": "DEMO2",
+        "colour": "#55a4d1",
+        "rank": true,
+        "state-links": {
+          "TODO" : "Backlog",
+          "In Progress" : "Dev In Progress",
+          "PR Sent" : "Review",
+          "Done" : "Verified"
+        }
       }
     ]
   }
