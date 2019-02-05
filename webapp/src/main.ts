@@ -17,8 +17,8 @@ function calculatePublicPath(): string {
   const location: Location = window.location;
   const href: string = location.href;
   if (environment.demo) {
-    const fragment = 'github.io/ob-demo/';
-    const index: number = location.href.indexOf('github.io/ob-demo/');
+    const fragment = 'github.io/demo/';
+    const index: number = location.href.indexOf('github.io/demo/');
     return location.href.substring(0, index + fragment.length);
   } else {
     const searchElement = '/overbaard/';
