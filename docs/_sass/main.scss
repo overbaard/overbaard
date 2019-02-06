@@ -61,7 +61,7 @@ a:not(.mdl-navigation__link) {
   padding-left: 20px;
   padding-right: 20px;
   padding-top: 10px;
-  width: 600px;
+  max-width: 600px;
 }
 .highlight {
   color: $primary-colour;
