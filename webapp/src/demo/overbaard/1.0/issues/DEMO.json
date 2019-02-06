@@ -137,12 +137,31 @@
       }
     ]
   },
+  "epics" : {"DEMO" : [
+    {
+      "key" : "DEMO-1010",
+      "name" : "The First Epic Of All"
+    },
+    {
+      "key" : "DEMO-1011",
+      "name" : "Third-party Integrations"
+    },
+    {
+      "key" : "DEMO-1012",
+      "name" : "Customer Engagement"
+    },
+    {
+      "key" : "DEMO-1013",
+      "name" : "Lowest Ranked Epic"
+    }
+  ]},
   "projects" : {
     "main" : [
       {
         "code" : "DEMO",
         "colour" : "#1d689c",
         "rank" : true,
+        "enable-epics": true,
         "state-links" : {
           "Backlog" : "Backlog",
           "Kickoff" : "Kickoff",
@@ -329,6 +348,7 @@
       "assignee" : 0,
       "priority" : 0,
       "type" : 0,
+      "epic" : 0,
       "custom": {"Tester": 0},
       "parallel-tasks": [[3, 3], [3]],
       "parallel-tasks": [[3, 3], [3]]
@@ -378,6 +398,7 @@
       "assignee" : 4,
       "priority" : 0,
       "type" : 0,
+      "epic" : 1,
       "custom": {"Tester": 0},
       "parallel-tasks": [[3, 3], [3]],
       "parallel-tasks": [[3, 3], [3]]
@@ -427,6 +448,7 @@
       "assignee" : 3,
       "priority" : 0,
       "type" : 0,
+      "epic" : 2,
       "custom": {"Tester": 2},
       "parallel-tasks": [[3, 3], [3]],
       "parallel-tasks": [[3, 3], [3]]
@@ -474,6 +496,7 @@
       "assignee" : 2,
       "priority" : 0,
       "type" : 0,
+      "epic" : 1,
       "custom": {"Tester": 3},
       "parallel-tasks": [[3, 3], [3]]
     },
@@ -521,6 +544,7 @@
       "assignee" : 1,
       "priority" : 0,
       "type" : 0,
+      "epic" : 3,
       "custom": {"Tester": 3},
       "parallel-tasks": [[3, 3], [3]]
     },
@@ -610,6 +634,7 @@
       "assignee" : 4,
       "priority" : 0,
       "type" : 0,
+      "epic" : 1,
       "parallel-tasks": [[3, 3], [3]]
     },
     "DEMO-26" : {
@@ -653,6 +678,7 @@
       "assignee" : 3,
       "priority" : 0,
       "type" : 0,
+      "epic" : 1,
       "parallel-tasks": [[3, 3], [3]]
     },
     "DEMO-30" : {
@@ -699,6 +725,7 @@
       "assignee" : 2,
       "priority" : 0,
       "type" : 0,
+      "epic" : 2,
       "parallel-tasks": [[3, 3], [3]]
     },
     "DEMO-34" : {
@@ -741,6 +768,7 @@
       "assignee" : 1,
       "priority" : 0,
       "type" : 0,
+      "epic" : 0,
       "parallel-tasks": [[3, 3], [3]]
     },
     "DEMO-38" : {
@@ -779,6 +807,7 @@
       "assignee" : 0,
       "priority" : 0,
       "type" : 0,
+      "epic" : 2,
       "parallel-tasks": [[3, 3], [3]]
     },
     "DEMO-42" : {
@@ -817,6 +846,7 @@
       "assignee" : 4,
       "priority" : 0,
       "type" : 0,
+      "epic" : 3,
       "parallel-tasks": [[2, 1], [1]]
     },
     "DEMO-46" : {
@@ -896,6 +926,7 @@
       "assignee" : 2,
       "priority" : 0,
       "type" : 0,
+      "epic" : 1,
       "parallel-tasks": [[1, 2], [2]]
     },
     "DEMO-54" : {
@@ -937,6 +968,7 @@
       "assignee" : 1,
       "priority" : 0,
       "type" : 0,
+      "epic" : 0,
       "parallel-tasks": [[1, 1], [3]]
     },
     "DEMO-58" : {
@@ -1018,6 +1050,7 @@
       "assignee" : 4,
       "priority" : 0,
       "type" : 0,
+      "epic" : 2,
       "parallel-tasks": [[1, 0], [0]]
     },
     "DEMO-66" : {
@@ -1095,6 +1128,7 @@
       "labels" : [12],
       "priority" : 0,
       "type" : 0,
+      "epic" : 2,
       "parallel-tasks": [[0, 0], [0]]
     },
     "DEMO-74" : {
@@ -1133,6 +1167,7 @@
       "labels" : [16],
       "priority" : 0,
       "type" : 0,
+      "epic" : 2,
       "parallel-tasks": [[0, 0], [0]]
     },
     "DEMO-78" : {
@@ -1170,6 +1205,7 @@
       "labels" : [0],
       "priority" : 0,
       "type" : 0,
+      "epic" : 3,
       "parallel-tasks": [[0, 0], [0]]
     },
     "DEMO-82" : {
@@ -1206,6 +1242,7 @@
       "labels" : [4],
       "priority" : 0,
       "type" : 0,
+      "epic" : 1,
       "parallel-tasks": [[0, 0], [0]]
     },
     "DEMO-86" : {
@@ -1243,6 +1280,7 @@
       "labels" : [8],
       "priority" : 0,
       "type" : 0,
+      "epic" : 0,
       "parallel-tasks": [[0, 0], [0]]
     },
     "DEMO-90" : {
@@ -1281,6 +1319,7 @@
       "labels" : [12],
       "priority" : 0,
       "type" : 0,
+      "epic" : 2,
       "parallel-tasks": [[0, 0], [0]]
     },
     "DEMO-94" : {
@@ -1316,6 +1355,7 @@
       "labels" : [16],
       "priority" : 0,
       "type" : 0,
+      "epic" : 2,
       "parallel-tasks": [[0, 0], [0]]
     },
     "DEMO-98" : {
