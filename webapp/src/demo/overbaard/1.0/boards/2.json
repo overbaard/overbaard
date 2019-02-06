@@ -1,0 +1,184 @@
+{
+  "id": 1,
+  "code": "DEMO",
+  "name": "Demo Board",
+  "edit": true,
+  "config": {
+    "name": "Demo Board",
+    "code": "DEMO",
+    "rank-custom-field-id": 10009,
+    "states": [
+      {
+        "name": "Backlog",
+        "backlog": true,
+        "help": "Unordered issues."
+      },
+      {
+        "name": "Kickoff",
+        "header": "Development",
+        "help": "Planning and information gathering."
+      },
+      {
+        "name": "Dev In Progress",
+        "header": "Development",
+        "wip": 16,
+        "help": "Development is happening."
+      },
+      {
+        "name": "Review",
+        "header": "Development",
+        "help": "A pull request has been opened, and is undergoing review."
+      },
+      {
+        "name": "QA TODO",
+        "header": "Final Verification",
+        "help": "The issue is part of a build ready for testing."
+      },
+      {
+        "name": "QA In Progress",
+        "header": "Final Verification",
+        "help": "The issue is being tested."
+      },
+      {
+        "name": "Verified",
+        "help": "The feature has been verified. All is good!"
+      }
+    ],
+    "priorities" : [
+      {
+        "name" : "Blocker",
+        "colour" : "red"
+      },
+      {
+        "name" : "Major",
+        "colour" : "orange"
+      },
+      {
+        "name" : "Minor",
+        "colour" : "green"
+      },
+      {
+        "name" : "Trivial",
+        "colour" : "grey"
+      }
+    ],
+    "issue-types" : [
+      {
+        "name" : "Feature",
+        "colour" : "#1d689c"
+      },
+      {
+        "name" : "Bug",
+        "colour" : "red"
+      },
+      {
+        "name" : "Task",
+        "colour" : "green"
+      },
+      {
+        "name" : "Story",
+        "colour" : "yellowgreen"
+      }
+    ],
+    "custom": [
+      {
+        "name": "Tester",
+        "type": "user",
+        "field-id": 1231008
+      }
+    ],
+    "parallel-tasks": {
+      "fields": [
+        {
+          "name": "User Stories",
+          "type": "parallel-task-progress",
+          "field-id": 121212121212,
+          "display": "US"
+        },
+        {
+          "name": "Documentation Draft",
+          "type": "parallel-task-progress",
+          "field-id": 121212121213,
+          "display": "DD"
+        },
+        {
+          "name": "Test Design",
+          "type": "parallel-task-progress",
+          "field-id": 121212121214,
+          "display": "TD"
+        }
+      ]
+    },
+    "manual-swimlanes": [
+      {
+        "name": "Customised",
+        "entries" : [
+          {
+            "name": "Blocker issues",
+            "issue-ql": "priority = 'Blocker'"
+          },
+          {
+            "name": "Extra-QA or Extra-design Label",
+            "issue-ql": "labels IN ('Extra-QA', 'Extra-design')"
+          },
+          {
+            "name": "Front-end bugs",
+            "issue-ql": "component = 'Front-End' AND type = 'Bug'"
+          }
+        ]
+      }
+    ],
+    "projects": [
+      {
+        "code": "DEMO",
+        "colour": "#1d689c",
+        "rank": true,
+        "state-links": {
+          "Backlog" : "Backlog",
+          "Kickoff" : "Kickoff",
+          "Dev In Progress" : "Dev In Progress",
+          "Review" : "Review",
+          "QA TODO" : "QA TODO",
+          "State Number 6" : "QA In Progress",
+          "Verified" : "Verified"
+        },
+        "linked-issues": [
+          {
+            "projects": [
+              "FIRST"
+            ],
+            "filter": {}
+          }
+        ],
+        "parallel-tasks": [
+          ["User Stories", "Documentation Draft"],
+          ["Test Design"]],
+        "overrides": {
+          "parallel-tasks": [
+            {
+              "issue-types": ["Bug", "Task", "Story"],
+              "override": null
+            }
+          ]
+        }
+
+      },
+      {
+        "code": "DEMO2",
+        "colour": "#55a4d1",
+        "rank": true,
+        "state-links": {
+          "TODO" : "Backlog",
+          "In Progress" : "Dev In Progress",
+          "PR Sent" : "Review",
+          "Done" : "Verified"
+        }
+      }
+    ],
+    "linked-projects" : {
+      "CUST" : {
+        "states" : ["Backlog", "In Progress", "Done"]
+      }
+    }
+  }
+}
