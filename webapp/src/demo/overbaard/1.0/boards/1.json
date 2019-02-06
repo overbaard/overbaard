@@ -109,6 +109,25 @@
         }
       ]
     },
+    "manual-swimlanes": [
+      {
+        "name": "Customised",
+        "entries" : [
+          {
+            "name": "Blocker issues",
+            "issue-ql": "priority = 'Blocker'"
+          },
+          {
+            "name": "Extra-QA or Extra-design Label",
+            "issue-ql": "labels IN ('Extra-QA', 'Extra-design')"
+          },
+          {
+            "name": "Front-end bugs",
+            "issue-ql": "component = 'Front-End' AND type = 'Bug'"
+          }
+        ]
+      }
+    ],
     "projects": [
       {
         "code": "DEMO",
