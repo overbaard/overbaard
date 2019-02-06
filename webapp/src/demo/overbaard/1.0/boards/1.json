@@ -87,6 +87,28 @@
         "field-id": 1231008
       }
     ],
+    "parallel-tasks": {
+      "fields": [
+        {
+          "name": "User Stories",
+          "type": "parallel-task-progress",
+          "field-id": 121212121212,
+          "display": "US"
+        },
+        {
+          "name": "Documentation Draft",
+          "type": "parallel-task-progress",
+          "field-id": 121212121213,
+          "display": "DD"
+        },
+        {
+          "name": "Test Design",
+          "type": "parallel-task-progress",
+          "field-id": 121212121214,
+          "display": "TD"
+        }
+      ]
+    },
     "projects": [
       {
         "code": "DEMO",
@@ -108,7 +130,19 @@
             ],
             "filter": {}
           }
-        ]
+        ],
+        "parallel-tasks": [
+          ["User Stories", "Documentation Draft"],
+          ["Test Design"]],
+        "overrides": {
+          "parallel-tasks": [
+            {
+              "issue-types": ["Bug", "Task", "Story"],
+              "override": null
+            }
+          ]
+        }
+
       },
       {
         "code": "DEMO2",
