@@ -100,7 +100,15 @@
           "QA TODO" : "QA TODO",
           "State Number 6" : "QA In Progress",
           "Verified" : "Verified"
-        }
+        },
+        "linked-issues": [
+          {
+            "projects": [
+              "FIRST"
+            ],
+            "filter": {}
+          }
+        ]
       },
       {
         "code": "DEMO2",
@@ -113,6 +121,11 @@
           "Done" : "Verified"
         }
       }
-    ]
+    ],
+    "linked-projects" : {
+      "CUST" : {
+        "states" : ["Backlog", "In Progress", "Done"]
+      }
+    }
   }
 }

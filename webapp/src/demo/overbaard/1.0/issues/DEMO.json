@@ -137,141 +137,150 @@
       }
     ]
   },
-  "projects" : {"main" : [{
-    "code" : "DEMO",
-    "colour" : "#1d689c",
-    "rank" : true,
-    "state-links" : {
-      "Backlog" : "Backlog",
-      "Kickoff" : "Kickoff",
-      "Dev In Progress" : "Dev In Progress",
-      "Review" : "Review",
-      "QA TODO" : "QA TODO",
-      "QA In Progress" : "QA In Progress",
-      "Verified" : "Verified"
-    },
-    "ranked" : [
-      "DEMO-1",
-      "DEMO-2",
-      "DEMO-3",
-      "DEMO-4",
-      "DEMO-5",
-      "DEMO-6",
-      "DEMO-7",
-      "DEMO-8",
-      "DEMO-9",
-      "DEMO-10",
-      "DEMO-11",
-      "DEMO-12",
-      "DEMO-13",
-      "DEMO-14",
-      "DEMO-15",
-      "DEMO-16",
-      "DEMO-17",
-      "DEMO-18",
-      "DEMO-19",
-      "DEMO-20",
-      "DEMO-21",
-      "DEMO-22",
-      "DEMO-23",
-      "DEMO-24",
-      "DEMO-25",
-      "DEMO-26",
-      "DEMO-27",
-      "DEMO-28",
-      "DEMO-29",
-      "DEMO-30",
-      "DEMO-31",
-      "DEMO-32",
-      "DEMO-33",
-      "DEMO-34",
-      "DEMO-35",
-      "DEMO-36",
-      "DEMO-37",
-      "DEMO-38",
-      "DEMO-39",
-      "DEMO-40",
-      "DEMO-41",
-      "DEMO-42",
-      "DEMO-43",
-      "DEMO-44",
-      "DEMO-45",
-      "DEMO-46",
-      "DEMO-47",
-      "DEMO-48",
-      "DEMO-49",
-      "DEMO-50",
-      "DEMO-51",
-      "DEMO-52",
-      "DEMO-53",
-      "DEMO-54",
-      "DEMO-55",
-      "DEMO-56",
-      "DEMO-57",
-      "DEMO-58",
-      "DEMO-59",
-      "DEMO-60",
-      "DEMO-61",
-      "DEMO-62",
-      "DEMO-63",
-      "DEMO-64",
-      "DEMO-65",
-      "DEMO-66",
-      "DEMO-67",
-      "DEMO-68",
-      "DEMO-69",
-      "DEMO-70",
-      "DEMO-71",
-      "DEMO-72",
-      "DEMO-73",
-      "DEMO-74",
-      "DEMO-75",
-      "DEMO-76",
-      "DEMO-77",
-      "DEMO-78",
-      "DEMO-79",
-      "DEMO-80",
-      "DEMO-81",
-      "DEMO-82",
-      "DEMO-83",
-      "DEMO-84",
-      "DEMO-85",
-      "DEMO-86",
-      "DEMO-87",
-      "DEMO-88",
-      "DEMO-89",
-      "DEMO-90",
-      "DEMO-91",
-      "DEMO-92",
-      "DEMO-93",
-      "DEMO-94",
-      "DEMO-95",
-      "DEMO-96",
-      "DEMO-97",
-      "DEMO-98",
-      "DEMO-99",
-      "DEMO-100"
-    ]
-  },
-    {
-      "code" : "DEMO2",
-      "colour" : "#55a4d1",
-      "rank" : true,
-      "state-links" : {
-        "Backlog" : "TODO",
-        "Dev In Progress" : "In Progress",
-        "Review" : "PR Sent",
-        "Verified" : "Done"
+  "projects" : {
+    "main" : [
+      {
+        "code" : "DEMO",
+        "colour" : "#1d689c",
+        "rank" : true,
+        "state-links" : {
+          "Backlog" : "Backlog",
+          "Kickoff" : "Kickoff",
+          "Dev In Progress" : "Dev In Progress",
+          "Review" : "Review",
+          "QA TODO" : "QA TODO",
+          "QA In Progress" : "QA In Progress",
+          "Verified" : "Verified"
+        },
+        "ranked" : [
+          "DEMO-1",
+          "DEMO-2",
+          "DEMO-3",
+          "DEMO-4",
+          "DEMO-5",
+          "DEMO-6",
+          "DEMO-7",
+          "DEMO-8",
+          "DEMO-9",
+          "DEMO-10",
+          "DEMO-11",
+          "DEMO-12",
+          "DEMO-13",
+          "DEMO-14",
+          "DEMO-15",
+          "DEMO-16",
+          "DEMO-17",
+          "DEMO-18",
+          "DEMO-19",
+          "DEMO-20",
+          "DEMO-21",
+          "DEMO-22",
+          "DEMO-23",
+          "DEMO-24",
+          "DEMO-25",
+          "DEMO-26",
+          "DEMO-27",
+          "DEMO-28",
+          "DEMO-29",
+          "DEMO-30",
+          "DEMO-31",
+          "DEMO-32",
+          "DEMO-33",
+          "DEMO-34",
+          "DEMO-35",
+          "DEMO-36",
+          "DEMO-37",
+          "DEMO-38",
+          "DEMO-39",
+          "DEMO-40",
+          "DEMO-41",
+          "DEMO-42",
+          "DEMO-43",
+          "DEMO-44",
+          "DEMO-45",
+          "DEMO-46",
+          "DEMO-47",
+          "DEMO-48",
+          "DEMO-49",
+          "DEMO-50",
+          "DEMO-51",
+          "DEMO-52",
+          "DEMO-53",
+          "DEMO-54",
+          "DEMO-55",
+          "DEMO-56",
+          "DEMO-57",
+          "DEMO-58",
+          "DEMO-59",
+          "DEMO-60",
+          "DEMO-61",
+          "DEMO-62",
+          "DEMO-63",
+          "DEMO-64",
+          "DEMO-65",
+          "DEMO-66",
+          "DEMO-67",
+          "DEMO-68",
+          "DEMO-69",
+          "DEMO-70",
+          "DEMO-71",
+          "DEMO-72",
+          "DEMO-73",
+          "DEMO-74",
+          "DEMO-75",
+          "DEMO-76",
+          "DEMO-77",
+          "DEMO-78",
+          "DEMO-79",
+          "DEMO-80",
+          "DEMO-81",
+          "DEMO-82",
+          "DEMO-83",
+          "DEMO-84",
+          "DEMO-85",
+          "DEMO-86",
+          "DEMO-87",
+          "DEMO-88",
+          "DEMO-89",
+          "DEMO-90",
+          "DEMO-91",
+          "DEMO-92",
+          "DEMO-93",
+          "DEMO-94",
+          "DEMO-95",
+          "DEMO-96",
+          "DEMO-97",
+          "DEMO-98",
+          "DEMO-99",
+          "DEMO-100"
+        ]
       },
-      "ranked" : [
-        "DEMO2-1",
-        "DEMO2-2",
-        "DEMO2-3",
-        "DEMO2-4",
-        "DEMO2-5",
-        "DEMO2-6"
-      ]
-    }]},
+      {
+        "code" : "DEMO2",
+        "colour" : "#55a4d1",
+        "rank" : true,
+        "state-links" : {
+          "Backlog" : "TODO",
+          "Dev In Progress" : "In Progress",
+          "Review" : "PR Sent",
+          "Verified" : "Done"
+        },
+        "ranked" : [
+          "DEMO2-1",
+          "DEMO2-2",
+          "DEMO2-3",
+          "DEMO2-4",
+          "DEMO2-5",
+          "DEMO2-6"
+        ]
+      }
+    ],
+    "linked" : {
+      "CUST" : {
+        "states" : ["Backlog", "In Progress", "Review", "Done"]
+      }
+    }
+  },
   "issues" : {
     "DEMO-1" : {
       "key" : "DEMO-1",
@@ -293,7 +302,8 @@
       "assignee" : 1,
       "priority" : 1,
       "type" : 1,
-      "custom": {"Tester": 0}
+      "custom": {"Tester": 0},
+      "linked-issues" : [{"key" : "CUST-11", "state" : 3, "summary" : "Linked customer case 11"}]
     },
     "DEMO-3" : {
       "key" : "DEMO-3",
@@ -339,7 +349,8 @@
       "assignee" : 0,
       "priority" : 1,
       "type" : 1,
-      "custom": {"Tester": 3}
+      "custom": {"Tester": 3},
+      "linked-issues" : [{"key" : "CUST-112", "state" : 3, "summary" : "Linked customer case 112"}]
     },
     "DEMO-7" : {
       "key" : "DEMO-7",
@@ -385,7 +396,8 @@
       "assignee" : 4,
       "priority" : 1,
       "type" : 1,
-      "custom": {"Tester": 1}
+      "custom": {"Tester": 1},
+      "linked-issues" : [{"key" : "CUST-213", "state" : 3, "summary" : "Linked customer case 213"}]
     },
     "DEMO-11" : {
       "key" : "DEMO-11",
@@ -395,7 +407,8 @@
       "assignee" : 0,
       "priority" : 2,
       "type" : 2,
-      "custom": {"Tester": 1}
+      "custom": {"Tester": 1},
+      "linked-issues" : [{"key" : "CUST-43", "state" : 2, "summary" : "Linked customer case 43"}, {"key" : "CUST-35", "state" : 2, "summary" : "Linked customer case 35"}]
     },
     "DEMO-12" : {
       "key" : "DEMO-12",
@@ -429,7 +442,9 @@
       "assignee" : 3,
       "priority" : 1,
       "type" : 1,
-      "custom": {"Tester": 2}
+      "custom": {"Tester": 2},
+      "linked-issues" : [{"key" : "CUST-57", "state" : 2, "summary" : "Linked customer case 57"}]
+
     },
     "DEMO-15" : {
       "key" : "DEMO-15",
@@ -515,7 +530,8 @@
       "fix-versions" : [0],
       "assignee" : 1,
       "priority" : 1,
-      "type" : 1
+      "type" : 1,
+      "linked-issues" : [{"key" : "CUST-76", "state" : 2, "summary" : "Linked customer case 76"}]
     },
     "DEMO-23" : {
       "key" : "DEMO-23",
@@ -599,7 +615,8 @@
       "fix-versions" : [2],
       "assignee" : 4,
       "priority" : 1,
-      "type" : 1
+      "type" : 1,
+      "linked-issues" : [{"key" : "CUST-117", "state" : 2, "summary" : "Linked customer case 117"}]
     },
     "DEMO-31" : {
       "key" : "DEMO-31",
@@ -683,7 +700,8 @@
       "fix-versions" : [1],
       "assignee" : 2,
       "priority" : 1,
-      "type" : 1
+      "type" : 1,
+      "linked-issues" : [{"key" : "CUST-817", "state" : 2, "summary" : "Linked customer case 817"}]
     },
     "DEMO-39" : {
       "key" : "DEMO-39",
@@ -755,7 +773,8 @@
       "components" : [3, 2],
       "assignee" : 0,
       "priority" : 1,
-      "type" : 1
+      "type" : 1,
+      "linked-issues" : [{"key" : "CUST-31", "state" : 1, "summary" : "Linked customer case 31"}]
     },
     "DEMO-47" : {
       "key" : "DEMO-47",
@@ -832,7 +851,8 @@
       "labels" : [13, 9, 12],
       "assignee" : 3,
       "priority" : 1,
-      "type" : 1
+      "type" : 1,
+      "linked-issues" : [{"key" : "CUST-69", "state" : 1, "summary" : "Linked customer case 69"}]
     },
     "DEMO-55" : {
       "key" : "DEMO-55",
@@ -871,7 +891,8 @@
       "labels" : [17, 4, 18],
       "assignee" : 2,
       "priority" : 1,
-      "type" : 1
+      "type" : 1,
+      "linked-issues" : [{"key" : "CUST-321", "state" : 1, "summary" : "Linked customer case 321"}]
     },
     "DEMO-59" : {
       "key" : "DEMO-59",
@@ -909,7 +930,8 @@
       "components" : [1],
       "assignee" : 1,
       "priority" : 1,
-      "type" : 1
+      "type" : 1,
+      "linked-issues" : [{"key" : "CUST-47", "state" : 1, "summary" : "Linked customer case 47"}]
     },
     "DEMO-63" : {
       "key" : "DEMO-63",
@@ -947,7 +969,8 @@
       "components" : [5],
       "assignee" : 0,
       "priority" : 1,
-      "type" : 1
+      "type" : 1,
+      "linked-issues" : [{"key" : "CUST-76", "state" : 1, "summary" : "Linked customer case 76"}]
     },
     "DEMO-67" : {
       "key" : "DEMO-67",
@@ -984,7 +1007,8 @@
       "components" : [3],
       "labels" : [9],
       "priority" : 1,
-      "type" : 1
+      "type" : 1,
+      "linked-issues" : [{"key" : "CUST-423", "state" : 0, "summary" : "Linked customer case 423"}]
     },
     "DEMO-71" : {
       "key" : "DEMO-71",
@@ -1020,7 +1044,8 @@
       "components" : [1],
       "labels" : [13],
       "priority" : 1,
-      "type" : 1
+      "type" : 1,
+      "linked-issues" : [{"key" : "CUST-21", "state" : 0, "summary" : "Linked customer case 21"}]
     },
     "DEMO-75" : {
       "key" : "DEMO-75",
@@ -1055,7 +1080,8 @@
       "summary" : "Proactively initiate intuitive intellectual capital",
       "components" : [5, 2, 3],
       "priority" : 1,
-      "type" : 1
+      "type" : 1,
+      "linked-issues" : [{"key" : "CUST-42", "state" : 0, "summary" : "Linked customer case 42"}]
     },
     "DEMO-79" : {
       "key" : "DEMO-79",
@@ -1126,7 +1152,8 @@
       "components" : [1],
       "labels" : [5],
       "priority" : 1,
-      "type" : 1
+      "type" : 1,
+      "linked-issues" : [{"key" : "CUST-676", "state" : 0, "summary" : "Linked customer case 676"}]
     },
     "DEMO-87" : {
       "key" : "DEMO-87",
@@ -1161,7 +1188,8 @@
       "components" : [5, 0],
       "labels" : [9],
       "priority" : 1,
-      "type" : 1
+      "type" : 1,
+      "linked-issues" : [{"key" : "CUST-39", "state" : 0, "summary" : "Linked customer case 39"}]
     },
     "DEMO-91" : {
       "key" : "DEMO-91",
@@ -1231,7 +1259,8 @@
       "components" : [1],
       "labels" : [17],
       "priority" : 1,
-      "type" : 1
+      "type" : 1,
+      "linked-issues" : [{"key" : "CUST-555", "state" : 0, "summary" : "Linked customer case 555"}]
     },
     "DEMO-99" : {
       "key" : "DEMO-99",
