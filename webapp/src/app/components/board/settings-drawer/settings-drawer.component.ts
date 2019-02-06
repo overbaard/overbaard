@@ -244,14 +244,19 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
       )
       .subscribe(
         boardProjects => {
-          this.filterList.push(PARALLEL_TASK_ATTRIBUTES);
           const filterFormEntryDictionary: Dictionary<FilterFormEntry> = {};
           const filterFormEntries: FilterFormEntry[] = [];
           const parallelTasksGroup: FormGroup = new FormGroup({});
 
           const flattenedTasks: List<ParallelTask> = new ParallelTaskFlattener(boardProjects).flattenParallelTasks();
 
+          let hasParallelTasks = false;
+
           flattenedTasks.forEach((parallelTask: ParallelTask) => {
+            if (!hasParallelTasks) {
+              this.filterList.push(PARALLEL_TASK_ATTRIBUTES);
+              hasParallelTasks = true;
+            }
 
             const options: FilterFormEntry[] = new Array<FilterFormEntry>(parallelTask.options.size);
             const taskGroup: FormGroup = new FormGroup({});
@@ -268,9 +273,11 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
             parallelTasksGroup.addControl(parallelTask.display, taskGroup);
           });
 
-          this.filterEntryDictionary[PARALLEL_TASK_ATTRIBUTES.key] = filterFormEntryDictionary;
-          this.filterEntries[PARALLEL_TASK_ATTRIBUTES.key] = filterFormEntries;
-          this.filterForm.addControl(PARALLEL_TASK_ATTRIBUTES.key, parallelTasksGroup);
+          if (hasParallelTasks) {
+            this.filterEntryDictionary[PARALLEL_TASK_ATTRIBUTES.key] = filterFormEntryDictionary;
+            this.filterEntries[PARALLEL_TASK_ATTRIBUTES.key] = filterFormEntries;
+            this.filterForm.addControl(PARALLEL_TASK_ATTRIBUTES.key, parallelTasksGroup);
+          }
         }
       );
   }
