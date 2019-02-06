@@ -150,7 +150,6 @@
         },
         "parallel-tasks" : [
           [
-
             {
               "name" : "Analysis Document",
               "display" : "AD",

@@ -15,28 +15,22 @@
       },
       {
         "name": "Kickoff",
-        "header": "Development",
         "help": "Planning and information gathering."
       },
       {
         "name": "Dev In Progress",
-        "header": "Development",
-        "wip": 16,
         "help": "Development is happening."
       },
       {
         "name": "Review",
-        "header": "Development",
         "help": "A pull request has been opened, and is undergoing review."
       },
       {
         "name": "QA TODO",
-        "header": "Final Verification",
         "help": "The issue is part of a build ready for testing."
       },
       {
         "name": "QA In Progress",
-        "header": "Final Verification",
         "help": "The issue is being tested."
       },
       {
@@ -80,13 +74,6 @@
         "colour" : "yellowgreen"
       }
     ],
-    "custom": [
-      {
-        "name": "Tester",
-        "type": "user",
-        "field-id": 1231008
-      }
-    ],
     "projects": [
       {
         "code": "DEMO",
@@ -100,17 +87,6 @@
           "QA TODO" : "QA TODO",
           "State Number 6" : "QA In Progress",
           "Verified" : "Verified"
-        }
-      },
-      {
-        "code": "DEMO2",
-        "colour": "#55a4d1",
-        "rank": true,
-        "state-links": {
-          "TODO" : "Backlog",
-          "In Progress" : "Dev In Progress",
-          "PR Sent" : "Review",
-          "Done" : "Verified"
         }
       }
     ]
