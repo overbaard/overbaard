@@ -1,15 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  Output,
-  SimpleChange,
-  SimpleChanges
-} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {FilterAttributes, PARALLEL_TASK_ATTRIBUTES} from '../../../model/board/user/board-filter/board-filter.constants';
 import {List, Set} from 'immutable';
 import {Dictionary} from '../../../common/dictionary';
@@ -20,8 +9,6 @@ import {FilterEntryEvent} from './filter-entry.event';
 import {Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 import {getNonParallelTaskSet} from './settings-drawer.util';
-import {IssueState} from '../../../model/board/data/issue/issue.model';
-import {BoardIssue} from '../../../model/board/data/issue/board-issue';
 
 
 @Component({
@@ -116,12 +103,17 @@ export class FilterEntryComponent implements OnInit, OnDestroy {
       let first = true;
       let tooltip = '';
       set.forEach(key => {
-        if (first) {
-          first = false;
-        } else {
-          tooltip += '\n';
+        // There might be strange state in the redux store from the querystring (say if an assignee no longer exists on the board).
+        // Check these entries are there before attempting to use the tooltip
+        const entry: FilterFormEntry = lookup[key];
+        if (entry !== null && entry !== undefined) {
+          if (first) {
+            first = false;
+          } else {
+            tooltip += '\n';
+          }
+          tooltip += entry.display;
         }
-        tooltip += lookup[key].display;
       });
       return tooltip;
     }
@@ -138,9 +130,12 @@ export class FilterEntryComponent implements OnInit, OnDestroy {
             tooltip += '\n\n';
           }
           tooltip += taskEntry.display + ':';
+          const childKeys: Set<string> = Set<string>(taskEntry.children.map(c => c.key));
           taskSet.forEach(key => {
-            // For parallel tasks the key and the display value is the same so there is no need to look up
-            tooltip += '\n' + key;
+            // Only display actual existing children (in case of stale links)
+            if (childKeys.contains(key)) {
+              tooltip += '\n' + key;
+            }
           });
 
         }

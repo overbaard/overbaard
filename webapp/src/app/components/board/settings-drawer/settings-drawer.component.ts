@@ -45,6 +45,8 @@ import {IssueState} from '../../../model/board/data/issue/issue.model';
 import {BoardSearchFilterActions} from '../../../model/board/user/board-filter/board-search-filter.reducer';
 import {ManualSwimlane, manualSwimlanesSelector} from '../../../model/board/data/manual-swimlane/manual-swimlane.model';
 import {Epic, epicsByProjectSelector} from '../../../model/board/data/epic/epic.model';
+import {promise} from 'selenium-webdriver';
+import controlFlow = promise.controlFlow;
 
 @Component({
   selector: 'app-board-settings-drawer',
@@ -348,13 +350,23 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
     const set: Set<string> = getNonParallelTaskSet(this.userSettings.filters, filterAttributes);
     const group: FormGroup = <FormGroup>this.filterForm.controls[filterAttributes.key];
     if (set) {
-      set.forEach(k => group.controls[k].setValue(false));
+      set.forEach(k => {
+        const control: AbstractControl = group.controls[k];
+        if (control) {
+          group.controls[k].setValue(false);
+        }
+      });
     }
 
     if (filterAttributes === PARALLEL_TASK_ATTRIBUTES) {
       this.userSettings.filters.parallelTask.forEach((ptSet, key) => {
         const taskGroup: FormGroup = <FormGroup>group.controls[key];
-        ptSet.forEach(k => taskGroup.controls[k].setValue(false));
+        ptSet.forEach(k => {
+          const control: AbstractControl = taskGroup.controls[k];
+          if (control) {
+            control.setValue(false);
+          }
+        });
       });
     }
   }
