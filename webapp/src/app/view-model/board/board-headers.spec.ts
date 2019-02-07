@@ -1262,10 +1262,10 @@ describe('Board headers tests', () => {
       util
         .easySubscribeHeaders(headers => {
           check(headers.headersList,
-            new HeaderChecker('Backlog').stateIndices(0, 1).counts(2, 2).backlog().invisible()
+            new HeaderChecker('Backlog').stateIndices(0, 1).counts(2, 2).backlog()
               .states(
-                new HeaderChecker('B1').stateIndices(0).counts(1, 1).backlog().invisible(),
-                new HeaderChecker('B2').stateIndices(1).counts(1, 1).backlog().invisible()),
+                new HeaderChecker('B1').stateIndices(0).counts(1, 1).backlog(),
+                new HeaderChecker('B2').stateIndices(1).counts(1, 1).backlog()),
             new HeaderChecker('H1').stateIndices(2, 3).counts(2, 2)
               .states(
                 new HeaderChecker('S1').stateIndices(2).counts(1, 1),
@@ -1296,10 +1296,10 @@ describe('Board headers tests', () => {
       util.getBoardStateUpdater().setHelpTexts(help).emit()
         .easySubscribeHeaders(headers => {
           checkAndCompare(headers.headersList, original,
-            new HeaderChecker('Backlog').stateIndices(0, 1).counts(2, 2).backlog().invisible()
+            new HeaderChecker('Backlog').stateIndices(0, 1).counts(2, 2).backlog()
               .states(
-                new HeaderChecker('B1').stateIndices(0).counts(1, 1).backlog().invisible().same(),
-                new HeaderChecker('B2').stateIndices(1).counts(1, 1).help('B-One').backlog().invisible()),
+                new HeaderChecker('B1').stateIndices(0).counts(1, 1).backlog().same(),
+                new HeaderChecker('B2').stateIndices(1).counts(1, 1).help('B-One').backlog()),
             new HeaderChecker('H1').stateIndices(2, 3).counts(2, 2)
               .states(
                 new HeaderChecker('S1').stateIndices(2).counts(1, 1).same(),
@@ -1324,7 +1324,7 @@ describe('Board headers tests', () => {
         {name: 'S5', header: 1},
         {name: 'S6'}], ['H1', 'H2'], 2);
 
-      return new BoardViewObservableUtil({hidden: '4,5'})
+      return new BoardViewObservableUtil({hidden: '4,5', bl: 'true'})
         .updateBoardState(
           new BoardStateInitializer()
             .headerStateFactory(headerStateFactory)

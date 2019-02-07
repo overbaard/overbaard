@@ -271,6 +271,16 @@ export class IssueTableBuilder {
       const issue: BoardIssueView = issues.get(key);
       // find the index and add the issue
       const boardIndex: number = ownToBoardIndex.getBoardIndex(issue);
+
+      if (!this._currentUserSettingState.showBacklog && boardIndex < this._currentBoardState.headers.backlog) {
+        // When loading the board normally (ie. in the Jira plugin), we don't get the backlog issues when the backlog is collapsed.
+        // However, when using the sample data for UI development, and the demo site we have these issues. In turn, they
+        // skew the height calculations.
+        // So don't add these issues to the issue table
+        return;
+      }
+
+
       totalIssues[boardIndex] += 1;
       if (issue.visible) {
         tableBuilder.push(boardIndex, issue);
