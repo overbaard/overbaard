@@ -1548,8 +1548,8 @@ public class BoardManagerTest extends AbstractBoardTest {
         checkIssue(allIssues, "TDP-4", IssueType.TASK, Priority.HIGH, "Four", 3, new AssigneeChecker(0));
         checkIssue(allIssues, "TBG-2", IssueType.TASK, Priority.HIGH, "Two", 1, new AssigneeChecker(0));
 
-        checkProjectRankedIssues(boardNode, "TDP", 3, 4);
-        checkProjectRankedIssues(boardNode, "TBG", 2);
+        checkProjectRankedIssues(boardNode, "TDP", 1, 2, 3, 4);
+        checkProjectRankedIssues(boardNode, "TBG", 1, 2);
 
 
         //Now check with the backlog

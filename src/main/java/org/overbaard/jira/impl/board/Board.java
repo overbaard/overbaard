@@ -237,15 +237,6 @@ public class Board {
         return issue.convertToCreateIssueChange(registry, getConfig());
     }
 
-    public boolean isBacklogIssue(BoardProjectConfig projectConfig, String issueKey) {
-        Issue issue = allIssues.get(issueKey);
-        int boardIndex = projectConfig.getProjectStatesLinks(issue.getIssueTypeName()).mapOwnStateOntoBoardStateIndex(issue.getState());
-        if (boardConfig.isBacklogState(boardIndex)) {
-            return true;
-        }
-        return false;
-    }
-
     abstract static class Accessor {
         protected final JiraInjectables jiraInjectables;
         protected final BoardConfig boardConfig;
