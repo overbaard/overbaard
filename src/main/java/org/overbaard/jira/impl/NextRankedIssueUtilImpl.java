@@ -56,6 +56,7 @@ public class NextRankedIssueUtilImpl implements NextRankedIssueUtil {
 
     @Override
     public String findNextRankedIssue(BoardProjectConfig projectConfig, ApplicationUser boardOwner, String issueKey) throws SearchException {
+        System.out.println("Finding next ranked issue");
         long rankCustomFieldId = boardConfigurationManager.getRankCustomFieldId();
         CustomFieldManager customFieldManager = jiraInjectables.getCustomFieldManager();
         CustomField customField = customFieldManager.getCustomFieldObject(rankCustomFieldId);
@@ -75,6 +76,7 @@ public class NextRankedIssueUtilImpl implements NextRankedIssueUtil {
         SearchResults searchResults =
                 searchService.search(boardOwner, query, PagerFilter.newPageAlignedFilter(0, 1));
         List<Issue> issueList = searchResults.getIssues();
+        System.out.println("Next for " + issueKey + ": " + issueList);
         if (issueList.size() > 0) {
             return issueList.get(0).getKey();
         }
