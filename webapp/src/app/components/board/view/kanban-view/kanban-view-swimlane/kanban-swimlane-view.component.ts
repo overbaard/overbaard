@@ -16,7 +16,7 @@ import {SwimlaneInfo} from '../../../../../view-model/board/swimlane-info';
 import {UpdateParallelTaskEvent} from '../../../../../events/update-parallel-task.event';
 import {IssueDetailState} from '../../../../../model/board/user/issue-detail/issue-detail.model';
 import {Observable, Subject} from 'rxjs';
-import {List} from 'immutable';
+import {List, Map} from 'immutable';
 import {ScrollHeightSplitter, StartAndHeight} from '../../../../../common/scroll-height-splitter';
 import {BoardHeaders} from '../../../../../view-model/board/board-headers';
 import {takeUntil} from 'rxjs/operators';
@@ -47,6 +47,9 @@ export class KanbanSwimlaneViewComponent implements OnInit, OnChanges {
    */
   @Input()
   scrollPositionObserver$: Observable<ScrollPositionAndHeight>;
+
+  @Input()
+  rankOrdersByProject: Map<string, Map<string, number>>;
 
   @Output()
   scrollTableBodyX: EventEmitter<number> = new EventEmitter<number>();

@@ -15,6 +15,7 @@
   <app-kanban-normal-view
     *ngIf="!board.issueTable.swimlaneInfo"
     [board]="board"
+    [rankOrdersByProject]="board.issueTable.issueRanksByProject"
     (updateParallelTask)="onUpdateParallelTask($event)"
     [scrollPositionObserver$]="scrollPositionObserver$"
   ></app-kanban-normal-view>
@@ -27,5 +28,6 @@
     (toggleCollapsedSwimlane)="onToggleCollapsedSwimlane($event)"
     (updateParallelTask)="onUpdateParallelTask($event)"
     [scrollPositionObserver$]="scrollPositionObserver$"
+    [rankOrdersByProject]="board.issueTable.issueRanksByProject"
   ></app-kanban-swimlane-view>
 </div>

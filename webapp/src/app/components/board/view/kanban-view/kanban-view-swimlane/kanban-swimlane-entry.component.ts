@@ -19,6 +19,7 @@ import {StartAndHeight} from '../../../../../common/scroll-height-splitter';
 import {Observable, Subject, BehaviorSubject} from 'rxjs';
 import {ScrollPositionAndHeight} from '../../../../../common/scroll-position-height';
 import {takeUntil} from 'rxjs/operators';
+import {Map} from 'immutable';
 
 @Component({
   selector: 'app-kanban-swimlane-entry',
@@ -45,6 +46,10 @@ export class KanbanSwimlaneEntryComponent implements OnInit, OnChanges, OnDestro
 
   @Input()
   startAndHeight: StartAndHeight;
+
+  @Input()
+  rankOrdersByProject: Map<string, Map<string, number>>;
+
 
   /**
    * Values emitted here come from the ScrollListenerDirective and are OUTSIDE the angular zone.
