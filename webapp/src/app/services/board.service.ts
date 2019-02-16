@@ -25,6 +25,11 @@ export class BoardService {
               private readonly _store: Store<AppState>) {
   }
 
+  getBoardName(boardCode: string): Observable<any> {
+    const url = UrlService.OVERBAARD_REST_PREFIX + '/issues/' + boardCode + '/name';
+    const path: string = this._restUrlService.caclulateRestUrl(url);
+    return this._http.get(path).pipe(timeout(BoardService._bigTimeout));
+  }
 
   loadBoardData(boardCode: string, backlog: boolean, firstLoad: boolean) {
     // Cancel any background polling

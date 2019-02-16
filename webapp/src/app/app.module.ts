@@ -52,6 +52,8 @@ import {ResetProgressGuard} from './services/router/reset-progress.guard';
 import {FilterEntryComponent} from './components/board/settings-drawer/filter-entry.component';
 import {SearchFilterComponent} from './components/board/settings-drawer/search-filter.component';
 import {IssueQlDialogComponent} from './components/board/settings-drawer/issue-ql-dialog.component';
+import {ToolbarTitleService} from './services/toolbar-title.service';
+import {ResetToolbarTitleGuard} from './services/router/reset-toolbar-title-guard';
 
 const appState: AppState = initialAppState;
 export function getInitialAppState(): AppState {
@@ -119,9 +121,11 @@ export function getInitialAppState(): AppState {
     {provide: APP_BASE_HREF, useValue: '/'},
     {provide: LocationStrategy, useClass: HashLocationStrategy},
     AppHeaderService,
+    ToolbarTitleService,
     FontSizeTableService,
     ProgressLogService,
     ResetProgressGuard,
+    ResetToolbarTitleGuard,
     UrlService,
     VersionService
   ],

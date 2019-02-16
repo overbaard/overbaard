@@ -9,37 +9,37 @@ import {AccessLogViewComponent} from './components/access-log/access-log.compone
 import {FontMeasureComponent} from './components/font-measure/font-measure.component';
 import {FontMeasureTableComponent} from './components/font-measure/font-measure-table.component';
 import {ResetProgressGuard} from './services/router/reset-progress.guard';
+import {ResetToolbarTitleGuard} from './services/router/reset-toolbar-title-guard';
 
-/**
- * canActivate: [ResetProgress] is to reset the progress spinner when e.g. pressing the back button
- */
+const standardGuards: any[] = [ResetProgressGuard, ResetToolbarTitleGuard];
+
 const routes: Routes = [
   {
     path: '', redirectTo: '/boards', pathMatch: 'full'
   },
   {
-    path: 'boards', component: BoardsComponent, canActivate: [ResetProgressGuard]
+    path: 'boards', component: BoardsComponent, canActivate: standardGuards
   },
   {
-    path: 'board', component: BoardComponent, canActivate: [ResetProgressGuard]
+    path: 'board', component: BoardComponent, canActivate: standardGuards
   },
   {
-    path: 'config', component: ConfigurationComponent, canActivate: [ResetProgressGuard]
+    path: 'config', component: ConfigurationComponent, canActivate: standardGuards
   },
   {
-    path: 'login', component: LoginComponent, canActivate: [ResetProgressGuard]
+    path: 'login', component: LoginComponent, canActivate: standardGuards
   },
   {
-    path: 'db-explorer', component: DbExplorerComponent, canActivate: [ResetProgressGuard]
+    path: 'db-explorer', component: DbExplorerComponent, canActivate: standardGuards
   },
   {
-    path: 'access-log', component: AccessLogViewComponent, canActivate: [ResetProgressGuard]
+    path: 'access-log', component: AccessLogViewComponent, canActivate: standardGuards
   },
   {
-    path: 'font-measure', component: FontMeasureComponent, canActivate: [ResetProgressGuard]
+    path: 'font-measure', component: FontMeasureComponent, canActivate: standardGuards
   },
   {
-    path: 'font-measure-table', component: FontMeasureTableComponent, canActivate: [ResetProgressGuard]
+    path: 'font-measure-table', component: FontMeasureTableComponent, canActivate: standardGuards
   }
 ];
 

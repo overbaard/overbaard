@@ -48,12 +48,13 @@
       </div>
     </mat-sidenav>
     <mat-toolbar color="primary" class="mat-elevation-z10"  [ngStyle]="{'min-height': toolbarHeight, 'max-height': toolbarHeight}">
-    <span>
-      <button mat-icon-button (click)="navigation.open('mouse')">
-        <mat-icon>menu</mat-icon>
-      </button>
-    </span>
+      <span>
+        <button mat-icon-button (click)="navigation.open('mouse')">
+          <mat-icon>menu</mat-icon>
+        </button>
+      </span>
       <span class="side-drawer-logo-container"><img src="{{localImageUrl('overbard_logotype_white_100px.svg')}}" height="32px"></span>
+      <span *ngIf="toolbarTitleService.title" style="padding-left: 10px;">{{toolbarTitleService.title}}</span>
     </mat-toolbar>
     <div class="inner-sidenav-content">
       <app-font-measure style="min-width: 0px; max-width: 0px ; overflow: hidden ; position: absolute ; top: 0px; left: 0px; z-index: -10"></app-font-measure>

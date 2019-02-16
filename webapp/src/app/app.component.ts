@@ -16,6 +16,7 @@ import {UrlService} from './services/url.service';
 import {LogEntry} from './model/global/progress-log/log-entry';
 import {Router} from '@angular/router';
 import {filter, take, takeUntil} from 'rxjs/operators';
+import {ToolbarTitleService} from './services/toolbar-title.service';
 
 @Component({
   selector: 'app-root',
@@ -40,6 +41,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   constructor(
     private _router: Router,
+    public toolbarTitleService: ToolbarTitleService,
     private _store: Store<AppState>, private _versionService: VersionService,
     private _urlService: UrlService, private _snackBar: MatSnackBar) {
   }

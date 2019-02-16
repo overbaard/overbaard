@@ -21,6 +21,7 @@ import {BlacklistDialogComponent} from './blacklist/blacklist-dialog.component';
 import {filter, take, takeUntil} from 'rxjs/operators';
 import {IssueState} from '../../model/board/data/issue/issue.model';
 import {issueStateSelector} from '../../model/board/data/issue/issue.reducer';
+import {ToolbarTitleService} from '../../services/toolbar-title.service';
 
 
 @Component({
@@ -59,6 +60,7 @@ export class BoardComponent implements OnInit, OnDestroy {
     private _route: ActivatedRoute,
     private _boardService: BoardService,
     private _appHeaderService: AppHeaderService,
+    private _toolbarTitleService: ToolbarTitleService,
     private _store: Store<AppState>,
     private boardViewService: BoardViewModelService,
     private _queryParamsService: BoardQueryParamsService,
@@ -82,6 +84,17 @@ export class BoardComponent implements OnInit, OnDestroy {
             title += ' (rank)';
           }
           this._appHeaderService.setTitle(title);
+
+          this._boardService.getBoardName(userSettingsValue.boardCode)
+            .pipe(
+              take(1)
+            )
+            .subscribe(nameObject => {
+              this._toolbarTitleService.title = nameObject['name'];
+            });
+
+
+
           this.viewMode = userSettingsValue.viewMode;
           userSettings = userSettingsValue;
           // TODO progress and error handling
@@ -90,6 +103,7 @@ export class BoardComponent implements OnInit, OnDestroy {
           this._blacklistMsg = 'There are problems in the configuration of board \'' + userSettingsValue.boardCode +
             '\'. Click the red warning icon for details, and let your administrator know.';
         });
+
 
 
     this.board$ = this.boardViewService.getBoardViewModel();

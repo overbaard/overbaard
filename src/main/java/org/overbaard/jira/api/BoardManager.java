@@ -40,6 +40,14 @@ public interface BoardManager {
     String getBoardJson(ApplicationUser user, boolean backlog, String code) throws SearchException;
 
     /**
+     * Get the name of a board from its code
+     * @param user the user
+     * @param boardCode the board code
+     * @return json containing the name of the board
+     */
+    String getBoardName(ApplicationUser user, String boardCode) throws SearchException;
+
+    /**
      * Deletes a board
      * @param user the logged in user
      * @param code the id of the board to delete
