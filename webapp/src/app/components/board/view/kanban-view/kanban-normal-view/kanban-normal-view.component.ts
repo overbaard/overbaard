@@ -2,6 +2,7 @@ import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output}
 import {BoardViewModel} from '../../../../../view-model/board/board-view';
 import {UpdateParallelTaskEvent} from '../../../../../events/update-parallel-task.event';
 import {Observable} from 'rxjs';
+import {Map} from 'immutable';
 
 @Component({
   selector: 'app-kanban-normal-view',
@@ -21,6 +22,10 @@ export class KanbanNormalViewComponent implements OnInit {
    */
   @Input()
   scrollPositionObserver$: Observable<number>;
+
+
+  @Input()
+  rankOrdersByProject: Map<string, Map<string, number>>;
 
   @Output()
   scrollTableBodyX: EventEmitter<number> = new EventEmitter<number>();

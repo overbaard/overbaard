@@ -9,7 +9,7 @@ import {
   SimpleChange,
   SimpleChanges
 } from '@angular/core';
-import {List} from 'immutable';
+import {List, Map} from 'immutable';
 import {BoardIssueView} from '../../../../../view-model/board/board-issue-view';
 import {BoardHeader} from '../../../../../view-model/board/board-header';
 import {UpdateParallelTaskEvent} from '../../../../../events/update-parallel-task.event';
@@ -37,6 +37,9 @@ export class KanbanViewColumnGroupComponent implements OnInit, OnChanges {
   // If a swimlane is collapsed, we still need to display empty columns so the header has the correct width
   @Input()
   displayIssues = true;
+
+  @Input()
+  rankOrdersByProject: Map<string, Map<string, number>>;
 
   /**
    * Values emitted here come from the ScrollListenerDirective and are OUTSIDE the angular zone.

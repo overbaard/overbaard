@@ -22,6 +22,12 @@ export class RankViewEntryComponent implements OnInit {
   @Input()
   issueDetailState: IssueDetailState;
 
+  @Input()
+  rankOrder: number;
+
+  @Input()
+  totalProjectIssues: number;
+
 
   @Output()
   updateParallelTask: EventEmitter<UpdateParallelTaskEvent> = new EventEmitter<UpdateParallelTaskEvent>();

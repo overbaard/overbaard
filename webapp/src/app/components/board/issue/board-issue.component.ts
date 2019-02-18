@@ -47,6 +47,12 @@ export class BoardIssueComponent implements OnInit, OnChanges, AfterViewInit {
   @Input()
   viewMode: BoardViewMode = BoardViewMode.KANBAN;
 
+  @Input()
+  rankOrder: number;
+
+  @Input()
+  totalProjectIssues: number;
+
 
   cardTooltip: string;
 

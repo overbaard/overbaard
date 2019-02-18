@@ -23,6 +23,7 @@ const SWITCH_BOARD_VIEW = 'SWITCH_BOARD_VIEW';
 const UPDATE_ISSUE_DETAIL_LEVEL = 'UPDATE_ISSUE_DETAIL_LEVEL';
 const UPDATE_SHOW_PARALLEL_TASKS = 'UPDATE_SHOW_PARALLEL_TASKS';
 const UPDATE_SHOW_LINKED_ISSUES = 'UPDATE_SHOW_LINKED_ISSUES';
+const UPDATE_SHOW_RANKING_ORDER = 'UPDATE_SHOW_RANKING-ORDER';
 
 class ClearSettingsAction implements Action {
   readonly type = CLEAR_SETTINGS;
@@ -82,6 +83,12 @@ class UpdateShowLinkedIssuesAction {
   }
 }
 
+class UpdateShowRankingOrderAction {
+  readonly type = UPDATE_SHOW_RANKING_ORDER;
+  constructor(readonly payload: boolean) {
+  }
+}
+
 export class UserSettingActions {
   static createClearSettings(): Action {
     return new ClearSettingsAction();
@@ -126,6 +133,10 @@ export class UserSettingActions {
   static createUpdateShowLinkedIssues(show: boolean) {
     return new UpdateShowLinkedIssuesAction(show);
   }
+
+  static createUpdateShowRankingOrder(show: boolean) {
+    return new UpdateShowRankingOrderAction(show);
+  }
 }
 
 export function userSettingReducer(state: UserSettingState = initialUserSettingState, action: Action): UserSettingState {
@@ -151,6 +162,7 @@ export function userSettingReducer(state: UserSettingState = initialUserSettingS
             }
             issueDetail.parallelTasks = !(params['vpt'] === 'false');
             issueDetail.linkedIssues = !(params['vli'] === 'false');
+            issueDetail.rankingOrder = (params['vro'] === 'true');
           });
         mutable.swimlane = params['swimlane'];
         if (mutable.swimlane) {
@@ -252,6 +264,14 @@ export function userSettingReducer(state: UserSettingState = initialUserSettingS
       return UserSettingUtil.updateUserSettingState(state, settingState => {
         settingState.issueDetail = IssueDetailUtil.updateIssueDetailState(settingState.issueDetail, issueDetail => {
           issueDetail.linkedIssues = show;
+        });
+      });
+    }
+    case UPDATE_SHOW_RANKING_ORDER: {
+      const show: boolean = (<UpdateShowRankingOrderAction>action).payload;
+      return UserSettingUtil.updateUserSettingState(state, settingState => {
+        settingState.issueDetail = IssueDetailUtil.updateIssueDetailState(settingState.issueDetail, issueDetail => {
+          issueDetail.rankingOrder = show;
         });
       });
     }

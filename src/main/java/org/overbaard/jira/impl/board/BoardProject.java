@@ -118,11 +118,7 @@ public class BoardProject {
         ModelNode ranked = new ModelNode();
         ranked.setEmptyList();
         for (String key : rankedIssueKeys) {
-            if (backlog) {
-                ranked.add(key);
-            } else if (!board.isBacklogIssue(projectConfig, key)) {
-                ranked.add(key);
-            }
+            ranked.add(key);
         }
         parent.get(Constants.RANKED).set(ranked);
 

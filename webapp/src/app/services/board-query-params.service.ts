@@ -69,6 +69,9 @@ export class BoardQueryParamsHandler {
               if (!userSettingState.issueDetail.linkedIssues) {
                 params.push('vli=false');
               }
+              if (userSettingState.issueDetail.rankingOrder) {
+                params.push('vro=true');
+              }
               if (userSettingState.swimlane) {
                 params.push(`swimlane=${encodeURIComponent(userSettingState.swimlane)}`);
                 if (userSettingState.swimlaneShowEmpty) {

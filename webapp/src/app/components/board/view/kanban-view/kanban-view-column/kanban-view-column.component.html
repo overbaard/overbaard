@@ -6,6 +6,8 @@
       *ngFor="let issue of visibleIssues ; trackBy: issueTrackByFn "
       [issue]="issue"
       [issueDetailState]="issueDetailState"
+      [rankOrder]="getRankOrder(issue)"
+      [totalProjectIssues]="getTotalIssuesForProject(issue)"
       (updateParallelTask)="onUpdateParallelTask($event)"
     ></app-board-issue>
     <div [style.height.px]="afterPadding" [ngClass]="backgroundPaddingClass"></div>

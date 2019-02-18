@@ -464,6 +464,10 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
       this._store.dispatch(UserSettingActions.createUpdateShowLinkedIssues(event.checked));
   }
 
+  onChangeShowRankingOrder(event: MatCheckboxChange) {
+    this._store.dispatch(UserSettingActions.createUpdateShowRankingOrder(event.checked));
+  }
+
   onSelectedSearchIssueIds(event: Set<string>) {
     this._store.dispatch(BoardSearchFilterActions.createUpdateIssueIds(event));
   }

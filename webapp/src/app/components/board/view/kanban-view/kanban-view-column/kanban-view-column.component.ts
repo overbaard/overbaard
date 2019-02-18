@@ -11,7 +11,7 @@ import {
   SimpleChange,
   SimpleChanges
 } from '@angular/core';
-import {List} from 'immutable';
+import {List, Map} from 'immutable';
 import {BoardIssueView} from '../../../../../view-model/board/board-issue-view';
 import {BoardHeader} from '../../../../../view-model/board/board-header';
 import {UpdateParallelTaskEvent} from '../../../../../events/update-parallel-task.event';
@@ -20,6 +20,7 @@ import {Subject, Observable} from 'rxjs';
 import {ScrollHeightSplitter} from '../../../../../common/scroll-height-splitter';
 import {takeUntil} from 'rxjs/operators';
 import {ScrollPositionAndHeight} from '../../../../../common/scroll-position-height';
+import {RankViewEntry} from '../../../../../view-model/board/rank-view-entry';
 
 @Component({
   selector: 'app-kanban-view-column',
@@ -44,6 +45,9 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
   // If a swimlane is collapsed, we still need to display empty columns so the header has the correct width
   @Input()
   displayIssues = true;
+
+  @Input()
+  rankOrdersByProject: Map<string, Map<string, number>>;
 
   /**
    * Values emitted here come from the ScrollListenerDirective and are OUTSIDE the angular zone.
@@ -113,6 +117,23 @@ export class KanbanViewColumnComponent implements OnInit, OnChanges {
   onUpdateParallelTask(event: UpdateParallelTaskEvent) {
     this.updateParallelTask.emit(event);
   }
+
+  private getRankOrder(issue: BoardIssueView): number {
+    const ranks: Map<string, number> = this.rankOrdersByProject.get(issue.projectCode);
+    if (!ranks) {
+      return null;
+    }
+    return ranks.get(issue.key);
+  }
+
+  private getTotalIssuesForProject(issue: BoardIssueView): number {
+    const ranks: Map<string, number> = this.rankOrdersByProject.get(issue.projectCode);
+    if (!ranks) {
+      return null;
+    }
+    return ranks.size;
+  }
+
 
   private calculateVisibleEntries(forceUpdate: boolean = false) {
     this._splitter.updateVirtualScrollInfo(

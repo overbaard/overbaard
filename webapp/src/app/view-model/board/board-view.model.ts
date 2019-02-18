@@ -42,6 +42,7 @@ const DEFAULT_ISSUE_TABLE: IssueTable = {
   visibleIssues: List<number>(),
   rankView: List<RankViewEntry>(),
   table: List<List<BoardIssueView>>(),
+  issueRanksByProject: Map<string, Map<string, number>>(),
   swimlaneInfo: null
 };
 
@@ -155,6 +156,7 @@ export class BoardViewModelUtil {
     visibleIssues: List<number>,
     rankView: List<RankViewEntry>,
     tableList: List<List<BoardIssueView>>,
+    issueRanksByProject: Map<string, Map<string, number>>,
     swimlaneInfo: SwimlaneInfo): IssueTable {
 
     const state: IssueTable = {
@@ -163,6 +165,7 @@ export class BoardViewModelUtil {
       visibleIssues,
       rankView: rankView,
       table: tableList,
+      issueRanksByProject: issueRanksByProject,
       swimlaneInfo: swimlaneInfo
     };
     return ISSUE_TABLE_STATE_FACTORY(state);
