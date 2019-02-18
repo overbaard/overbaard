@@ -126,6 +126,14 @@ public class RestEndpoint {
     }
 
     @GET
+    @Path(Constants.ISSUES + "/{boardCode}/" + Constants.NAME)
+    public Response getBoardName(@PathParam("boardCode") String boardCode) throws SearchException {
+        //TODO figure out if a permission violation becomes a search exception
+        return createResponse(
+                jiraFacade.getBoardName(getUser(), boardCode));
+    }
+
+    @GET
     @Path(Constants.ISSUES + "/{boardCode}/" + Constants.UPDATES + "/{viewId}")
     public Response getBoard(@PathParam("boardCode") String boardCode,
                               @PathParam("viewId") int viewId,

@@ -109,6 +109,20 @@ public class OverbaardFacadeImpl implements JiraFacade, InitializingBean, Dispos
     }
 
     @Override
+    public String getBoardName(ApplicationUser user, String code) throws SearchException {
+        try {
+            return boardManager.getBoardName(user, code);
+        } catch (Exception e) {
+            //Last parameter is the exception (it does not match a {} entry)
+            OverbaardLogger.LOGGER.debug("BoardManagerImpl.handleEvent - Error loading board {}", code, e);
+            if (e instanceof SearchException || e instanceof RuntimeException) {
+                throw e;
+            }
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public String getBoardsForDisplay(ApplicationUser user) {
         return boardConfigurationManager.getBoardsJson(user, false);
     }

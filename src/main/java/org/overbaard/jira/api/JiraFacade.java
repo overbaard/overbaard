@@ -63,6 +63,15 @@ public interface JiraFacade {
     String getBoardJson(ApplicationUser user, boolean backlog, String code) throws SearchException;
 
     /**
+     * Get the name of a board from its code
+     * @param user the user
+     * @param boardCode the board code
+     * @return json containing the name of the board
+     */
+    String getBoardName(ApplicationUser user, String boardCode) throws SearchException;
+
+
+    /**
      * Gets the changes for a board. The client passes in their view id, and the delta is passed back to the client in
      * json format so they can apply it to their own model.
      *
@@ -132,4 +141,5 @@ public interface JiraFacade {
      * @param optionIndex the index of the option within the task
      */
     void updateParallelTaskForIssue(ApplicationUser user, String boardCode, String issueKey, int groupIndex, int taskIndex, int optionIndex) throws SearchException;
+
 }

@@ -224,6 +224,14 @@ public class BoardManagerImpl implements BoardManager, InitializingBean, Disposa
     }
 
     @Override
+    public String getBoardName(ApplicationUser user, String boardCode) throws SearchException {
+        Board board = getBoard(user, boardCode);
+        ModelNode nameNode = new ModelNode();
+        nameNode.get(Constants.NAME).set(board.getConfig().getName());
+        return nameNode.toJSONString(true);
+    }
+
+    @Override
     public void deleteBoard(ApplicationUser user, String code) {
         deleteBoard(code);
     }
