@@ -56,9 +56,7 @@ describe('Issue Table observer tests', () => {
             .updateBoardState(init)
             .easySubscribe(board => {
               const checker: BoardChecker = new BoardChecker([['ONE-1'], ['ONE-2'], ['ONE-5', 'ONE-3', 'ONE-6'], ['ONE-4']]);
-              if (rank) {
-                checker.rankOrder('ONE-5', 'ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-6');
-              }
+              checker.rankOrder(rank, 'ONE-5', 'ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-6');
               checker.checkBoard(board);
             });
         }
@@ -86,9 +84,7 @@ describe('Issue Table observer tests', () => {
             .updateBoardState(init)
             .easySubscribe(board => {
               const checker: BoardChecker = new BoardChecker([[], ['ONE-1', 'ONE-2'], ['ONE-5', 'ONE-3'], ['ONE-4']]);
-              if (rank) {
-                checker.rankOrder('ONE-5', 'ONE-1', 'ONE-2', 'ONE-3', 'ONE-4');
-              }
+              checker.rankOrder(rank, 'ONE-5', 'ONE-1', 'ONE-2', 'ONE-3', 'ONE-4');
               checker.checkBoard(board);
             });
         }
@@ -116,9 +112,7 @@ describe('Issue Table observer tests', () => {
             .updateBoardState(init)
             .easySubscribe(board => {
               const checker: BoardChecker = new BoardChecker([[], ['ONE-1', 'ONE-2'], ['ONE-5', 'ONE-3'], ['ONE-4']]);
-              if (rank) {
-                checker.rankOrder('ONE-5', 'ONE-1', 'ONE-2', 'ONE-3', 'ONE-4');
-              }
+              checker.rankOrder(rank, 'ONE-5', 'ONE-1', 'ONE-2', 'ONE-3', 'ONE-4');
               checker.checkBoard(board);
             });
         }
@@ -149,9 +143,7 @@ describe('Issue Table observer tests', () => {
             .updateBoardState(init)
             .easySubscribe(board => {
               const checker: BoardChecker = new BoardChecker([[], ['ONE-2', 'ONE-1'], [], ['ONE-4', 'ONE-3']]);
-              if (rank) {
-                checker.rankOrder('ONE-4', 'ONE-3', 'ONE-2', 'ONE-1');
-              }
+              checker.rankOrder(rank, 'ONE-4', 'ONE-3', 'ONE-2', 'ONE-1');
               checker.checkBoard(board);
             });
         }
@@ -186,9 +178,7 @@ describe('Issue Table observer tests', () => {
             .updateBoardState(init)
             .easySubscribe((board: BoardViewModel) => {
               const checker: BoardChecker = new BoardChecker([['ONE-1'], ['ONE-2'], ['ONE-5', 'ONE-3', 'ONE-6'], ['ONE-4']]);
-              if (rank) {
-                checker.rankOrder('ONE-5', 'ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-6');
-              }
+              checker.rankOrder(rank, 'ONE-5', 'ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-6');
               checker.checkBoard(board);
 
               // Do some extra checking here of the issues for epics and parents
@@ -259,10 +249,8 @@ describe('Issue Table observer tests', () => {
                 ['ONE-2', 'TWO-2'],
                 ['ONE-3', 'ONE-5', 'ONE-6', 'TWO-6', 'TWO-5', 'TWO-3'],
                 ['ONE-4', 'TWO-4']]);
-              if (rank) {
-                checker.rankOrder(
-                  'ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6', 'TWO-6', 'TWO-5', 'TWO-4', 'TWO-3', 'TWO-2', 'TWO-1');
-              }
+              checker.rankOrder(rank,
+                'ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6', 'TWO-6', 'TWO-5', 'TWO-4', 'TWO-3', 'TWO-2', 'TWO-1');
               checker.checkBoard(board);
             });
         }
@@ -303,10 +291,7 @@ describe('Issue Table observer tests', () => {
                 ['ONE-3', 'TWO-1'],
                 ['TWO-3', 'TWO-2'],
                 []]);
-              if (rank) {
-                checker.rankOrder(
-                  'ONE-3', 'ONE-2', 'ONE-1', 'TWO-3', 'TWO-2', 'TWO-1');
-              }
+              checker.rankOrder(rank, 'ONE-3', 'ONE-2', 'ONE-1', 'TWO-3', 'TWO-2', 'TWO-1');
               checker.checkBoard(board);
             });
         }
@@ -342,9 +327,7 @@ describe('Issue Table observer tests', () => {
         util
           .easySubscribe(board => {
             const checker: BoardChecker = new BoardChecker([['ONE-1'], ['ONE-2'], ['ONE-3', 'ONE-5', 'ONE-6'], ['ONE-4', 'ONE-7']]);
-            if (rank) {
-              checker.rankOrder('ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6', 'ONE-7');
-            }
+            checker.rankOrder(rank, 'ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6', 'ONE-7');
             original = board;
           });
       }
@@ -365,9 +348,7 @@ describe('Issue Table observer tests', () => {
             .emit()
             .easySubscribe(board => {
               const checker: BoardChecker = new BoardChecker([['ONE-1'], ['ONE-2'], ['ONE-3', 'ONE-5', 'ONE-6'], ['ONE-4', 'ONE-7']]);
-              if (rank) {
-                checker.rankOrder('ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6', 'ONE-7');
-              }
+              checker.rankOrder(rank, 'ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6', 'ONE-7');
               checker.checkBoard(board);
               expect(board.issueTable.table).not.toBe(original.issueTable.table);
               checkSameColumns(original, board, 0, 2, 3);
@@ -404,9 +385,7 @@ describe('Issue Table observer tests', () => {
             .emit()
             .easySubscribe(board => {
               const checker: BoardChecker = new BoardChecker([['ONE-1'], ['ONE-2', 'ONE-5'], ['ONE-3', 'ONE-6'], ['ONE-4', 'ONE-7']]);
-              if (rank) {
-                checker.rankOrder('ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6', 'ONE-7');
-              }
+              checker.rankOrder(rank, 'ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6', 'ONE-7');
               checker.checkBoard(board);
               original = board;
             });
@@ -417,9 +396,7 @@ describe('Issue Table observer tests', () => {
             .emit()
             .easySubscribe(board => {
               const checker: BoardChecker = new BoardChecker([[], ['ONE-1', 'ONE-2', 'ONE-5'], ['ONE-3', 'ONE-6'], ['ONE-4', 'ONE-7']]);
-              if (rank) {
-                checker.rankOrder('ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6', 'ONE-7');
-              }
+              checker.rankOrder(rank, 'ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6', 'ONE-7');
               checker.checkBoard(board);
               checkSameColumns(original, board, 2, 3);
               original = board;
@@ -431,9 +408,7 @@ describe('Issue Table observer tests', () => {
             .emit()
             .easySubscribe(board => {
               const checker: BoardChecker = new BoardChecker([['ONE-1'], ['ONE-2', 'ONE-5'], ['ONE-3', 'ONE-6'], ['ONE-4', 'ONE-7']]);
-              if (rank) {
-                checker.rankOrder('ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6', 'ONE-7');
-              }
+              checker.rankOrder(rank, 'ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6', 'ONE-7');
               checker.checkBoard(board);
               checkSameColumns(original, board, 2, 3);
             });
@@ -457,9 +432,7 @@ describe('Issue Table observer tests', () => {
             .easySubscribe(
               board => {
                 const checker: BoardChecker = new BoardChecker([['ONE-1'], ['ONE-2'], ['ONE-3', 'ONE-6'], ['ONE-4', 'ONE-7']]);
-                if (rank) {
-                  checker.rankOrder('ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-6', 'ONE-7');
-                }
+                checker.rankOrder(rank, 'ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-6', 'ONE-7');
                 checker.checkBoard(board);
                 checkSameColumns(original, board, 0, 1, 3);
                 original = board;
@@ -472,9 +445,7 @@ describe('Issue Table observer tests', () => {
             .easySubscribe(
               board => {
                 const checker: BoardChecker = new BoardChecker([[], ['ONE-2'], ['ONE-3', 'ONE-6'], ['ONE-4', 'ONE-7']]);
-                if (rank) {
-                  checker.rankOrder('ONE-2', 'ONE-3', 'ONE-4', 'ONE-6', 'ONE-7');
-                }
+                checker.rankOrder(rank, 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-6', 'ONE-7');
                 checker.checkBoard(board);
                 checkSameColumns(original, board, 1, 2, 3);
                 original = board;
@@ -502,9 +473,7 @@ describe('Issue Table observer tests', () => {
                 board => {
                   const checker: BoardChecker =
                     new BoardChecker([['ONE-1', 'ONE-8'], ['ONE-2'], ['ONE-3', 'ONE-5', 'ONE-6'], ['ONE-4', 'ONE-7']]);
-                  if (rank) {
-                    checker.rankOrder('ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6', 'ONE-7', 'ONE-8');
-                  }
+                  checker.rankOrder(rank, 'ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6', 'ONE-7', 'ONE-8');
                   checker.checkBoard(board);
                   checkSameColumns(original, board, 1, 2, 3);
                 });
@@ -551,9 +520,7 @@ describe('Issue Table observer tests', () => {
                 board => {
                   const checker: BoardChecker =
                     new BoardChecker([['ONE-1'], ['ONE-2'], ['ONE-3', 'ONE-5', 'ONE-6', 'TWO-1'], ['ONE-4', 'ONE-7', 'TWO-2']]);
-                  if (rank) {
-                    checker.rankOrder('ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6', 'ONE-7', 'TWO-1', 'TWO-2');
-                  }
+                  checker.rankOrder(rank, 'ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6', 'ONE-7', 'TWO-1', 'TWO-2');
                   checker.checkBoard(board);
                   original = board;
                 });
@@ -566,9 +533,7 @@ describe('Issue Table observer tests', () => {
                 board => {
                   const checker: BoardChecker =
                     new BoardChecker([['ONE-1'], ['ONE-2'], ['ONE-3', 'ONE-5', 'ONE-6', 'TWO-1', 'TWO-3'], ['ONE-4', 'ONE-7', 'TWO-2']]);
-                  if (rank) {
-                    checker.rankOrder('ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6', 'ONE-7', 'TWO-1', 'TWO-2', 'TWO-3');
-                  }
+                  checker.rankOrder(rank, 'ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6', 'ONE-7', 'TWO-1', 'TWO-2', 'TWO-3');
                   checker.checkBoard(board);
                   checkSameColumns(original, board, 0, 1, 3);
                 });
@@ -596,7 +561,7 @@ describe('Issue Table observer tests', () => {
                 if (rank) {
                   expect(board.issueTable.table).toBe(original.issueTable.table);
                   new BoardChecker([['ONE-1'], ['ONE-2'], ['ONE-3', 'ONE-5', 'ONE-6'], ['ONE-4', 'ONE-7']])
-                    .rankOrder('ONE-3', 'ONE-1', 'ONE-2', 'ONE-4', 'ONE-5', 'ONE-6', 'ONE-7')
+                    .rankOrder(rank, 'ONE-3', 'ONE-1', 'ONE-2', 'ONE-4', 'ONE-5', 'ONE-6', 'ONE-7')
                     .checkBoard(board);
                 } else {
                   expect(board.issueTable).toBe(original.issueTable);
@@ -624,9 +589,7 @@ describe('Issue Table observer tests', () => {
               board => {
                 const checker: BoardChecker =
                   new BoardChecker([['ONE-1'], ['ONE-2'], ['ONE-5', 'ONE-6', 'ONE-3'], ['ONE-4', 'ONE-7']]);
-                if (rank) {
-                  checker.rankOrder('ONE-1', 'ONE-2', 'ONE-4', 'ONE-5', 'ONE-6', 'ONE-7', 'ONE-3');
-                }
+                checker.rankOrder(rank, 'ONE-1', 'ONE-2', 'ONE-4', 'ONE-5', 'ONE-6', 'ONE-7', 'ONE-3');
                 checker.checkBoard(board);
                 checkSameColumns(original, board, 0, 1, 3);
               });
@@ -659,9 +622,7 @@ describe('Issue table filter tests', () => {
       const util: BoardViewObservableUtil = setupTable(rank ? {view: 'rv'} : null);
       util.easySubscribe(board => {
         const checker: BoardChecker = new BoardChecker(standardTable);
-        if (rank) {
-          checker.rankOrder(...standardRank);
-        }
+        checker.rankOrder(rank, ...standardRank);
         checker.checkBoard(board);
       });
 
@@ -669,9 +630,7 @@ describe('Issue table filter tests', () => {
       util.easySubscribe(board => {
         const checker: BoardChecker = new BoardChecker(standardTable)
           .invisibleIssues('ONE-1', 'ONE-3', 'ONE-5', 'ONE-7', 'ONE-9');
-        if (rank) {
-          checker.rankOrder(...standardRank);
-        }
+        checker.rankOrder(rank, ...standardRank);
         checker.checkBoard(board);
         // The visible issue counts are checked automatically in checkTable(), but do a sanity test here
         expect(board.headers.headersList.map(h => h.visibleIssues).toArray()).toEqual([1, 1, 2]);
@@ -681,9 +640,7 @@ describe('Issue table filter tests', () => {
       util.easySubscribe(board => {
         const checker: BoardChecker = new BoardChecker(standardTable)
           .invisibleIssues('ONE-2', 'ONE-4', 'ONE-6', 'ONE-8');
-        if (rank) {
-          checker.rankOrder(...standardRank);
-        }
+        checker.rankOrder(rank, ...standardRank);
         checker.checkBoard(board);
         // The visible issue counts are checked automatically in checkTable(), but do a sanity test here
         expect(board.headers.headersList.map(h => h.visibleIssues).toArray()).toEqual([1, 2, 2]);
@@ -703,9 +660,7 @@ describe('Issue table filter tests', () => {
       util.easySubscribe(board => {
         const checker: BoardChecker =
           new BoardChecker(standardTable);
-        if (rank) {
-          checker.rankOrder(...standardRank);
-        }
+        checker.rankOrder(rank, ...standardRank);
         checker.checkBoard(board);
       });
 
@@ -714,9 +669,7 @@ describe('Issue table filter tests', () => {
         const checker: BoardChecker =
           new BoardChecker(standardTable)
             .invisibleIssues('ONE-1', 'ONE-3', 'ONE-5', 'ONE-7', 'ONE-9');
-        if (rank) {
-          checker.rankOrder(...standardRank);
-        }
+        checker.rankOrder(rank, ...standardRank);
         checker.checkBoard(board);
         // The visible issue counts are checked automatically in checkTable(), but do a sanity test here
         expect(board.headers.headersList.map(h => h.visibleIssues).toArray()).toEqual([1, 1, 2]);
@@ -727,9 +680,7 @@ describe('Issue table filter tests', () => {
         const checker: BoardChecker =
           new BoardChecker(standardTable)
             .invisibleIssues('ONE-2', 'ONE-4', 'ONE-6', 'ONE-8');
-        if (rank) {
-          checker.rankOrder(...standardRank);
-        }
+        checker.rankOrder(rank, ...standardRank);
         checker.checkBoard(board);
         // The visible issue counts are checked automatically in checkTable(), but do a sanity test here
         expect(board.headers.headersList.map(h => h.visibleIssues).toArray()).toEqual([1, 2, 2]);
@@ -755,9 +706,7 @@ describe('Issue table filter tests', () => {
         const checker: BoardChecker =
           new BoardChecker(standardTable)
             .invisibleIssues('ONE-2', 'ONE-4', 'ONE-6', 'ONE-8');
-        if (rank) {
-          checker.rankOrder(...standardRank);
-        }
+        checker.rankOrder(rank, ...standardRank);
         checker.checkBoard(board);
       });
     }
@@ -787,10 +736,8 @@ describe('Issue table filter tests', () => {
               standardTable[0].push('ONE-10');
               const checker: BoardChecker = new BoardChecker(standardTable)
                 .invisibleIssues('ONE-2', 'ONE-4', 'ONE-6', 'ONE-8');
-              if (rank) {
-                standardRank.push('ONE-10');
-                checker.rankOrder(...standardRank);
-              }
+              standardRank.push('ONE-10');
+              checker.rankOrder(rank, ...standardRank);
               checker.checkBoard(board);
             });
         }
@@ -817,10 +764,8 @@ describe('Issue table filter tests', () => {
               standardTable[0].push('ONE-10');
               const checker: BoardChecker = new BoardChecker(standardTable)
                 .invisibleIssues('ONE-2', 'ONE-4', 'ONE-6', 'ONE-8', 'ONE-10');
-              if (rank) {
-                standardRank.push('ONE-10');
-                checker.rankOrder(...standardRank);
-              }
+              standardRank.push('ONE-10');
+              checker.rankOrder(rank, ...standardRank);
               checker.checkBoard(board);
             });
         }
@@ -846,9 +791,7 @@ describe('Issue table filter tests', () => {
               .easySubscribe(board => {
                 const checker: BoardChecker = new BoardChecker(standardTable)
                   .invisibleIssues('ONE-4', 'ONE-6', 'ONE-8');
-                if (rank) {
-                  checker.rankOrder(...standardRank);
-                }
+                checker.rankOrder(rank, ...standardRank);
                 checker.checkBoard(board);
               });
           }
@@ -873,9 +816,7 @@ describe('Issue table filter tests', () => {
               .easySubscribe(board => {
                 const checker: BoardChecker = new BoardChecker(standardTable)
                   .invisibleIssues('ONE-1', 'ONE-2', 'ONE-4', 'ONE-6', 'ONE-8');
-                if (rank) {
-                  checker.rankOrder(...standardRank);
-                }
+                checker.rankOrder(rank, ...standardRank);
                 checker.checkBoard(board);
               });
           }
@@ -902,9 +843,7 @@ describe('Issue table filter tests', () => {
         const checker: BoardChecker =
           new BoardChecker(standardTable)
             .invisibleIssues('ONE-2', 'ONE-4', 'ONE-6', 'ONE-8');
-        if (rank) {
-          checker.rankOrder(...standardRank);
-        }
+        checker.rankOrder(rank, ...standardRank);
         checker.checkBoard(board);
       });
 
@@ -920,9 +859,7 @@ describe('Issue table filter tests', () => {
               parallelTasks: true,
               rankingOrder: false
             });
-        if (rank) {
-          checker.rankOrder(...standardRank);
-        }
+        checker.rankOrder(rank, ...standardRank);
         checker.checkBoard(board);
       });
     }
@@ -978,18 +915,14 @@ describe ('Issue table search filter', () => {
         const util: BoardViewObservableUtil = setupTable(rank ? {view: 'rv'} : null);
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker.checkBoard(board);
 
         });
         util.getUserSettingUpdater().updateSearchIssueIds('ONE-2');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .nonMatchingIssues('ONE-1', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6')
             .checkBoard(board);
@@ -997,9 +930,7 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchIssueIds('ONE-2', 'ONE-4');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .nonMatchingIssues('ONE-1', 'ONE-3', 'ONE-5', 'ONE-6')
             .checkBoard(board);
@@ -1007,9 +938,7 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchIssueIds('ONE-4');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .nonMatchingIssues('ONE-1', 'ONE-2', 'ONE-3', 'ONE-5', 'ONE-6')
             .checkBoard(board);
@@ -1017,9 +946,7 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchIssueIds();
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .checkBoard(board);
         });
@@ -1038,27 +965,21 @@ describe ('Issue table search filter', () => {
         const util: BoardViewObservableUtil = setupTable(rank ? {view: 'rv'} : null);
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .checkBoard(board);
         });
         util.getUserSettingUpdater().updateSearchContainingText('IssUe ##');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .checkBoard(board);
         });
         util.getUserSettingUpdater().updateSearchContainingText('##1');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .nonMatchingIssues('ONE-2', 'ONE-4', 'ONE-6')
             .checkBoard(board);
@@ -1066,9 +987,7 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchContainingText('##12');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .nonMatchingIssues('ONE-1', 'ONE-2', 'ONE-4', 'ONE-5', 'ONE-6')
             .checkBoard(board);
@@ -1076,9 +995,7 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchContainingText('##1');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .nonMatchingIssues('ONE-2', 'ONE-4', 'ONE-6')
             .checkBoard(board);
@@ -1086,18 +1003,14 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchContainingText('##');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .checkBoard(board);
         });
         util.getUserSettingUpdater().updateSearchContainingText('##2');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .nonMatchingIssues('ONE-1', 'ONE-3', 'ONE-5')
             .checkBoard(board);
@@ -1118,9 +1031,7 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchIssueIds('ONE-1', 'ONE-2', 'ONE-3');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .nonMatchingIssues('ONE-4', 'ONE-5', 'ONE-6')
             .checkBoard(board);
@@ -1129,9 +1040,7 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchContainingText('##1');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .nonMatchingIssues('ONE-2', 'ONE-4', 'ONE-5', 'ONE-6')
             .checkBoard(board);
@@ -1139,9 +1048,7 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchContainingText('##12');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .nonMatchingIssues('ONE-1', 'ONE-2', 'ONE-4', 'ONE-5', 'ONE-6')
             .checkBoard(board);
@@ -1149,9 +1056,7 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchContainingText('##1');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .nonMatchingIssues('ONE-2', 'ONE-4', 'ONE-5', 'ONE-6')
             .checkBoard(board);
@@ -1159,9 +1064,7 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchIssueIds('ONE-2');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .nonMatchingIssues('ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6')
             .checkBoard(board);
@@ -1169,9 +1072,7 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchContainingText('##');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .nonMatchingIssues('ONE-1', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6')
             .checkBoard(board);
@@ -1179,9 +1080,7 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchIssueIds('ONE-2', 'ONE-6');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .nonMatchingIssues('ONE-1', 'ONE-3', 'ONE-4', 'ONE-5')
             .checkBoard(board);
@@ -1201,18 +1100,14 @@ describe ('Issue table search filter', () => {
         const util: BoardViewObservableUtil = setupTable(rank ? {view: 'rv'} : null);
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .checkBoard(board);
         });
         util.getUserSettingUpdater().updateSearchIssueQl('priority="Blocker"');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .nonMatchingIssues('ONE-1', 'ONE-3', 'ONE-5')
             .checkBoard(board);
@@ -1220,9 +1115,7 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchIssueQl('assignee IS EMPTY');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .checkBoard(board);
         });
@@ -1244,9 +1137,7 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchHideNonMatching(true);
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .checkBoard(board);
 
@@ -1254,9 +1145,7 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchIssueIds('ONE-2');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .invisibleIssues('ONE-1', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6')
             .checkBoard(board);
@@ -1264,9 +1153,7 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchIssueIds('ONE-2', 'ONE-4');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .invisibleIssues('ONE-1', 'ONE-3', 'ONE-5', 'ONE-6')
             .checkBoard(board);
@@ -1275,9 +1162,7 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchIssueIds('ONE-4');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .invisibleIssues('ONE-1', 'ONE-2', 'ONE-3', 'ONE-5', 'ONE-6')
             .checkBoard(board);
@@ -1286,9 +1171,7 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchIssueIds();
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .checkBoard(board);
         });
@@ -1308,27 +1191,21 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchHideNonMatching(true);
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .checkBoard(board);
         });
         util.getUserSettingUpdater().updateSearchContainingText('IssUe ##');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .checkBoard(board);
         });
         util.getUserSettingUpdater().updateSearchContainingText('##1');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .invisibleIssues('ONE-2', 'ONE-4', 'ONE-6')
             .checkBoard(board);
@@ -1336,9 +1213,7 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchContainingText('##12');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .invisibleIssues('ONE-1', 'ONE-2', 'ONE-4', 'ONE-5', 'ONE-6')
             .checkBoard(board);
@@ -1346,9 +1221,7 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchContainingText('##1');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .invisibleIssues('ONE-2', 'ONE-4', 'ONE-6')
             .checkBoard(board);
@@ -1356,18 +1229,14 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchContainingText('##');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .checkBoard(board);
         });
         util.getUserSettingUpdater().updateSearchContainingText('##2');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .invisibleIssues('ONE-1', 'ONE-3', 'ONE-5')
             .checkBoard(board);
@@ -1389,9 +1258,7 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchIssueIds('ONE-1', 'ONE-2', 'ONE-3');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .invisibleIssues('ONE-4', 'ONE-5', 'ONE-6')
             .checkBoard(board);
@@ -1399,9 +1266,7 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchContainingText('##1');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .invisibleIssues('ONE-2', 'ONE-4', 'ONE-5', 'ONE-6')
             .checkBoard(board);
@@ -1409,9 +1274,7 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchContainingText('##12');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .invisibleIssues('ONE-1', 'ONE-2', 'ONE-4', 'ONE-5', 'ONE-6')
             .checkBoard(board);
@@ -1419,9 +1282,7 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchContainingText('##1');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .invisibleIssues('ONE-2', 'ONE-4', 'ONE-5', 'ONE-6')
             .checkBoard(board);
@@ -1429,9 +1290,7 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchIssueIds('ONE-2');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .invisibleIssues('ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6')
             .checkBoard(board);
@@ -1439,9 +1298,7 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchContainingText('##');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .invisibleIssues('ONE-1', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6')
             .checkBoard(board);
@@ -1449,9 +1306,7 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchIssueIds('ONE-2', 'ONE-6');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .invisibleIssues('ONE-1', 'ONE-3', 'ONE-4', 'ONE-5')
             .checkBoard(board);
@@ -1472,18 +1327,14 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchHideNonMatching(true);
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .checkBoard(board);
         });
         util.getUserSettingUpdater().updateSearchIssueQl('priority="Blocker"');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .invisibleIssues('ONE-1', 'ONE-3', 'ONE-5')
             .checkBoard(board);
@@ -1491,9 +1342,7 @@ describe ('Issue table search filter', () => {
         util.getUserSettingUpdater().updateSearchIssueQl('assignee IS EMPTY');
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           checker
             .checkBoard(board);
         });
@@ -1557,9 +1406,7 @@ describe ('Issue table search filter', () => {
       function check(hidden: boolean, ...hiddenIds: string[]) {
         util.easySubscribe(board => {
           const checker: BoardChecker = new BoardChecker(standardTable);
-          if (rank) {
-            checker.rankOrder(...standardRank);
-          }
+          checker.rankOrder(rank, ...standardRank);
           if (hidden) {
             checker
               .invisibleIssues(...hiddenIds);
@@ -1598,6 +1445,12 @@ describe ('Issue table search filter', () => {
 });
 
 describe('Switch View Mode (effect on Backlog) Tests', () => {
+
+  let standardRanks: string[];
+  beforeEach(() => {
+    standardRanks = ['ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6'];
+  });
+
   // The key thing here is that when bringing in the backlog the BoardComponent makes another call to fetch the backlog
   // data from the server
   let util: BoardViewObservableUtil;
@@ -1609,6 +1462,7 @@ describe('Switch View Mode (effect on Backlog) Tests', () => {
         util = setupTable(false);
         util.easySubscribe(board => {
           new BoardChecker([[], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
+            .rankOrder(false, ...standardRanks)
             .checkBoard(board);
           last = board;
         });
@@ -1624,7 +1478,7 @@ describe('Switch View Mode (effect on Backlog) Tests', () => {
           .easySubscribe(board => {
             expect(board).not.toBe(last);
             new BoardChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
-              .rankOrder('ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6')
+              .rankOrder(true, ...standardRanks)
               .checkBoard(board);
             expect(board).not.toBe(last);
             checkSameColumns(last, board, 1, 2);
@@ -1642,6 +1496,7 @@ describe('Switch View Mode (effect on Backlog) Tests', () => {
           .easySubscribe(board => {
             expect(board).not.toBe(last);
             new BoardChecker([[], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
+              .rankOrder(false, ...standardRanks)
               .checkBoard(board);
             checkSameColumns(last, board, 1, 2);
             last = board;
@@ -1652,6 +1507,7 @@ describe('Switch View Mode (effect on Backlog) Tests', () => {
         util = setupTable(false);
         util.easySubscribe(board => {
           new BoardChecker([[], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
+            .rankOrder(false, ...standardRanks)
             .checkBoard(board);
           last = board;
         });
@@ -1667,6 +1523,7 @@ describe('Switch View Mode (effect on Backlog) Tests', () => {
           .easySubscribe(board => {
             expect(board).not.toBe(last);
             new BoardChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
+              .rankOrder(false, ...standardRanks)
               .checkBoard(board);
             expect(board).not.toBe(last);
             checkSameColumns(last, board, 1, 2);
@@ -1684,6 +1541,7 @@ describe('Switch View Mode (effect on Backlog) Tests', () => {
           .easySubscribe(board => {
             expect(board).not.toBe(last);
             new BoardChecker([[], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
+              .rankOrder(false, ...standardRanks)
               .checkBoard(board);
             checkSameColumns(last, board, 1, 2);
             last = board;
@@ -1697,6 +1555,7 @@ describe('Switch View Mode (effect on Backlog) Tests', () => {
         util = setupTable(true, {bl: 'true'});
         util.easySubscribe(board => {
           new BoardChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
+            .rankOrder(false, ...standardRanks)
             .checkBoard(board);
           last = board;
         });
@@ -1707,7 +1566,7 @@ describe('Switch View Mode (effect on Backlog) Tests', () => {
           .easySubscribe(board => {
             expect(board).not.toBe(last);
             new BoardChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
-              .rankOrder('ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6')
+              .rankOrder(true, ...standardRanks)
               .checkBoard(board);
             expect(board).not.toBe(last);
             expect(board.issueTable.table).toBe(last.issueTable.table);
@@ -1720,6 +1579,7 @@ describe('Switch View Mode (effect on Backlog) Tests', () => {
           .easySubscribe(board => {
             expect(board).not.toBe(last);
             new BoardChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
+              .rankOrder(false, ...standardRanks)
               .checkBoard(board);
             expect(board).not.toBe(last);
             expect(board.issueTable.table).toBe(last.issueTable.table);
@@ -1731,6 +1591,7 @@ describe('Switch View Mode (effect on Backlog) Tests', () => {
         util = setupTable(true, {bl: 'true'});
         util.easySubscribe(board => {
           new BoardChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
+            .rankOrder(false, ...standardRanks)
             .checkBoard(board);
           last = board;
         });
@@ -1746,6 +1607,7 @@ describe('Switch View Mode (effect on Backlog) Tests', () => {
           .easySubscribe(board => {
             expect(board).not.toBe(last);
             new BoardChecker([[], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
+              .rankOrder(false, ...standardRanks)
               .checkBoard(board);
             checkSameColumns(last, board, 1, 2);
             last = board;
@@ -1762,6 +1624,7 @@ describe('Switch View Mode (effect on Backlog) Tests', () => {
           .easySubscribe(board => {
             expect(board).not.toBe(last);
             new BoardChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
+              .rankOrder(false, ...standardRanks)
               .checkBoard(board);
             expect(board).not.toBe(last);
             checkSameColumns(last, board, 1, 2);
@@ -1776,7 +1639,7 @@ describe('Switch View Mode (effect on Backlog) Tests', () => {
     util = setupTable(true, {view: 'rv'});
     util.easySubscribe(board => {
       new BoardChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
-        .rankOrder('ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6')
+        .rankOrder(true, ...standardRanks)
         .checkBoard(board);
       last = board;
     });
@@ -1792,6 +1655,7 @@ describe('Switch View Mode (effect on Backlog) Tests', () => {
       .easySubscribe(board => {
         expect(board).not.toBe(last);
         new BoardChecker([[], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
+          .rankOrder(false, ...standardRanks)
           .checkBoard(board);
         checkSameColumns(last, board, 1, 2);
         last = board;
@@ -1808,7 +1672,7 @@ describe('Switch View Mode (effect on Backlog) Tests', () => {
       .easySubscribe(board => {
         expect(board).not.toBe(last);
         new BoardChecker([['ONE-1', 'ONE-2'], ['ONE-3', 'ONE-4'], ['ONE-5', 'ONE-6']])
-          .rankOrder('ONE-1', 'ONE-2', 'ONE-3', 'ONE-4', 'ONE-5', 'ONE-6')
+          .rankOrder(true, ...standardRanks)
           .checkBoard(board);
         checkSameColumns(last, board, 1, 2);
         last = board;
@@ -1823,11 +1687,7 @@ describe('Switch View Mode (effect on Backlog) Tests', () => {
         .mapState('ONE', 'S-1', '1-1')
         .mapState('ONE', 'S-2', '1-2')
         .mapState('ONE', 'S-3', '1-3');
-    if (loadBacklog) {
-      init.setRank('ONE', 1, 2, 3, 4, 5, 6);
-    } else {
-      init.setRank('ONE', 3, 4, 5, 6);
-    }
+    init.setRank('ONE', 1, 2, 3, 4, 5, 6);
     const issueFactory: SimpleIssueFactory = new SimpleIssueFactory();
     if (loadBacklog) {
       issueFactory
@@ -1904,6 +1764,8 @@ describe('Issue Table issue type overrides tests', () => {
           ['ONE-103', 'ONE-203'],
           ['ONE-204', 'ONE-302'],
           ['ONE-104', 'ONE-205']]);
+        checker.rankOrder(false,
+          'ONE-101', 'ONE-102', 'ONE-103', 'ONE-104', 'ONE-201', 'ONE-202', 'ONE-203', 'ONE-204', 'ONE-205', 'ONE-301', 'ONE-302');
         checker.checkBoard(board);
         checkIssueOwnState(board, 'ONE-101', 0, '1-1');
         checkIssueOwnState(board, 'ONE-102', 1, '1-2');
@@ -1963,6 +1825,11 @@ describe('Issue Table issue type overrides tests', () => {
             ['ONE-103', 'ONE-203', 'ONE-107', 'ONE-208'],
             ['ONE-204', 'ONE-302', 'ONE-209', 'ONE-304'],
             ['ONE-104', 'ONE-205', 'ONE-108', 'ONE-210']]);
+          checker.rankOrder(false,
+            'ONE-101', 'ONE-102', 'ONE-103', 'ONE-104', 'ONE-105', 'ONE-106', 'ONE-107', 'ONE-108',
+            'ONE-201', 'ONE-202', 'ONE-203', 'ONE-204', 'ONE-205', 'ONE-206', 'ONE-207', 'ONE-208', 'ONE-209', 'ONE-210',
+            'ONE-301', 'ONE-302', 'ONE-303', 'ONE-304');
+
           checker.checkBoard(board);
           checkIssueOwnState(board, 'ONE-101', 0, '1-1');
           checkIssueOwnState(board, 'ONE-102', 1, '1-2');
@@ -2013,6 +1880,8 @@ describe('Issue Table issue type overrides tests', () => {
           ['ONE-104', 'ONE-204'],
           ['ONE-205', 'ONE-301'],
           ['ONE-101', 'ONE-201']]);
+        checker.rankOrder(false,
+          'ONE-101', 'ONE-102', 'ONE-103', 'ONE-104', 'ONE-201', 'ONE-202', 'ONE-203', 'ONE-204', 'ONE-205', 'ONE-301', 'ONE-302');
         checker.checkBoard(board);
         checkIssueOwnState(board, 'ONE-101', 3, '1-4');
         checkIssueOwnState(board, 'ONE-102', 0, '1-1');
@@ -2174,6 +2043,7 @@ class BacklogStateFactory extends NumberedHeaderStateFactory {
 class BoardChecker {
   private _invisibleIssues: string[] = [];
   private _nonMatchingIssues: string[] = [];
+  private _rankView = false;
   private _rankOrder: string[] = null;
   private _issueDetailsState: IssueDetailState;
 
@@ -2196,7 +2066,8 @@ class BoardChecker {
   }
 
 
-  rankOrder(...rankOrder: string[]): BoardChecker {
+  rankOrder(rankView: boolean, ...rankOrder: string[]): BoardChecker {
+    this._rankView = rankView;
     this._rankOrder = rankOrder;
     return this;
   }
@@ -2251,7 +2122,7 @@ class BoardChecker {
     // Check header counts
     board.headers.headersList.forEach(header => this.checkHeader(header, totalIssueCounts, visibleIssueCounts));
 
-    if (!this._rankOrder) {
+    if (!this._rankView) {
       expect(issueTable.rankView.size).toBe(0);
     } else {
       const expectedVisibleRank: string[] = this._rankOrder.filter(k => !invisibleIssueSet.contains(k));
@@ -2263,6 +2134,22 @@ class BoardChecker {
       expect(issueTable.rankView.map(re => re.issue.key).toArray()).toEqual(expectedVisibleRank);
       issueTable.rankView.forEach(re => expect(re.boardIndex).toBe((issueDictionary[re.issue.key])));
     }
+
+    // Check the ranks by project in the issue table
+    const ranksForProjectDict: Dictionary<Dictionary<number>> = {};
+    for (const key of this._rankOrder) {
+      const projectCode: string = key.split('-')[0];
+      let ranksForProject: Dictionary<number> = ranksForProjectDict[projectCode];
+      if (!ranksForProject) {
+        ranksForProject = {};
+        ranksForProjectDict[projectCode] = ranksForProject;
+      }
+      ranksForProject[key] = Object.keys(ranksForProject).length + 1;
+    }
+    const actualRanksByProject: any = {};
+    issueTable.issueRanksByProject.forEach((value, key) => actualRanksByProject[key] = value.toObject());
+    expect(issueTable.issueRanksByProject.toObject()).toEqual(actualRanksByProject);
+
   }
 
   private checkHeader(header: BoardHeader, totalIssueCounts: number[], visibleIssueCounts: number[]) {
