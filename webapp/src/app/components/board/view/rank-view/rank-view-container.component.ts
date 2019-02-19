@@ -107,11 +107,19 @@ export class RankViewContainerComponent implements OnInit, OnChanges, OnDestroy 
 
   private getRankOrder(rankEntry: RankViewEntry): number {
     const issue: BoardIssueView = rankEntry.issue;
-    return this.rankOrdersByProject.get(issue.projectCode).get(issue.key);
+    const ranks: Map<string, number> = this.rankOrdersByProject.get(issue.projectCode);
+    if (!ranks) {
+      return null;
+    }
+    return ranks.get(issue.key);
   }
 
   private getTotalIssuesForProject(rankEntry: RankViewEntry): number {
-    return this.rankOrdersByProject.get(rankEntry.issue.projectCode).size;
+    const ranks: Map<string, number> = this.rankOrdersByProject.get(rankEntry.issue.projectCode);
+    if (!ranks) {
+      return null;
+    }
+    return ranks.size;
   }
 
   private calculateVisibleEntries(forceUpdate: boolean = false) {
