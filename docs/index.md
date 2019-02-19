@@ -31,7 +31,9 @@ Read the guides to see more of our innovative features such as:
  
 ## Guides
 
-These guides are listed in order of 'complexity'.
+These guides are listed in order of 'complexity'. We also have a read-only demo 
+[instance](https://overbaard.github.io/demo) that you can play with to get a feel for the UI 
+without needing to install it to your Jira instance.
 
 * [User Guide](user-guide.md) - for end users of Overbård.
 * [Admin Guide](admin-guide.md) - for administrators to configure new boards.

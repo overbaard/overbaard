@@ -6,6 +6,10 @@ This guide shows you how to use Overbård as an end user once boards have been s
 an [admin guide](admin-guide.md) showing how to set up new boards, and a
 [developer guide](developer-guide.md) if you are interested in contributing.
 
+Most of the screenshots for this guide are taken from our read-only 
+[demo instance](https://overbaard.github.io/demo) that you can play with to get a feel for the UI 
+without needing to install it to your Jira instance. Try it out and see for yourself!
+
 # 1 Finding Overbård
 
 To use Overbård, you need to be logged into your Jira instance. Then click on the
@@ -103,17 +107,18 @@ with regard to the ranking. For example in the following board (still using the 
 
 <img src="assets/images/user-guide/board-rankview-kanban-no-context.png" width="500px"/>
 
-We can see that `FEAT-1` is higher ranked than `FEAT-2` which in turn has a higher rank than `FEAT-5`. But we don't
-know how highly ranked `FEAT-3` or `FEAT-4` are compared to `FEAT-1`, `FEAT-2` or `FEAT-3`. To find this out, we can
-switch to the Rank view:
+We can see that `DEMO-36` is higher ranked than `DEMO-37` which in turn has a higher rank than `DEMO-38`. But we don't
+know how highly ranked these are compared to the issues in the other columns (for example is `DEMO-38` really 
+ranked higher than `DEMO-62` and `DEMO-44`). To find this out, we can switch to the Rank view:
 
 <img src="assets/images/user-guide/board-rankview.png" width="500px"/>
 
-Note that although we have not covered this yet, I have changed the 'Issue details' setting so that we see more issues.
+Note that although we have not covered this yet, I have changed the 'Issue details' setting so that we see more issues,
+and also used a filter to pick out the issues from the previous screenshot.
+
 This view shows all the issues in global rank order, along with how far each has moved through the workflow states.
-From this we can tell that the `FEAT-4` has a low rank, but has moved further through the process than the higher
-ranked issues. Also, `FEAT-5` is in a later state than the higher ranked `FEAT-3`. Heads will roll at the next
-standup meeting!
+From this we can tell that the `DEMO-36` really has a higher rank than both `DEMO-62` and `DEMO-44`,
+and as expected is further along in the process. All is good!
 
 #### 2.3.1.2 Swimlane view
 Back in the Kanban view, we can select to display the board using swimlanes. Here I have chosen to display it using
@@ -129,7 +134,7 @@ swimlanes by clicking on the swimlane header:
 
 <img src="assets/images/user-guide/board-swimlane-collapsed.png" width="500px"/>
 
-Here we have collapsed the `Major` swimlane and the `DT` state column.
+Here we have collapsed the `Major` swimlane and the `Dev In Progress` state column.
 
 ### 2.3.2 Issue details
 By default the issue cards are shown including all the available information. In some cases it can be nice to have
@@ -143,8 +148,14 @@ a more summarised view. In this section there is a slider to control the amount 
 In addition there are two checkboxes to disable showing the parallel tasks and linked issues sections on the bottom
 of each card. Note that these are only shown if the board is configured to show parallel tasks and linked issues.
 
+Then there is a checkbox to display the rank order and the total number of issues in the issue cards. As you 
+can see in the following image, when selected this information is shown next to the issue keys in the issue cards:
+
+<img src="assets/images/user-guide/board-control-panel-rank-order.png" width="500px"/>
+
+
 ### 2.3.3 Filters and search
-The final main section in the control panel are the setting of filters. Click on each of the accordion entries to get
+The final main section in the control panel is the setting of filters. Click on each of the accordion entries to get
 a wider view.
 
 On all boards in the Kanban view there will be an entry for `Search`, `Project`, `Issue Type`, `Priority`, `Assignee`, 
@@ -157,13 +168,13 @@ here:
 <img src="assets/images/user-guide/board-filters-issue-type.png" width="500px"/>
 
 Only issues that have issue type `Bug` OR `Story` will be shown. Across the filter types there is an AND relationship.
-So if you leave issue types `Bug` and `Story` selected and choose priority `Blocker`:
+So if you leave issue types `Bug` and `Story` selected and choose priority `Major`:
 
 <img src="assets/images/user-guide/board-filters-issue-type-priority.png" width="500px"/>
 
 we end up with less issues because the query behind the scenes becomes something along the lines of:
 ```
-(issueType = 'Bug' OR issueType = 'Story') AND priority = 'Blocker'
+(issueType = 'Bug' OR issueType = 'Story') AND priority = 'Major'
 ```
 
 In the previous image it is worth pointing out the icon next to `Issue Type` in the collapsed filter entry. This
@@ -197,8 +208,8 @@ the issues that do not match the search:
 
 <img src="assets/images/user-guide/board-search-no-hide.png" width="500px"/>
 
-As you can see we are looking for issues where the issue id is `FEAT-1` or `FEAT-5`, where the summary also
-contains the text `longi`. For the `Issue Ids` field suggestions for issue ids are presented as you type into the
+As you can see we are looking for issues where the issue id is `DEMO-36` or `DEMO-44`, where the summary also
+contains the text `robus`. For the `Issue Ids` field suggestions for issue ids are presented as you type into the
 field. The `Issue Text Search` box must contain at least three characters for it to have any effect.
 
 There is also an Issue QL field that you can use to enter more advanced queries, see the 
@@ -216,6 +227,10 @@ but only showing the minor issues. Since we are not showing any of the other pri
 are completely hidden on the board:
 
 <img src="assets/images/user-guide/board-swimlane-filters.png" width="500px"/>
+
+We can prove this really is the case by collapsing the `Minor` swimlane:
+
+<img src="assets/images/user-guide/board-swimlane-filters-collapsed.png" width="500px"/>
 
 ## 2.4 Issue cards
 
