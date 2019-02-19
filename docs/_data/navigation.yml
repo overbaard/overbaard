@@ -6,5 +6,7 @@
   link: ./admin-guide.html
 - name: Developer Guide
   link: ./developer-guide.html
+- name: Demo
+  link: https://overbaard.github.io/demo
 - name: Source Code
   link: https://github.com/overbaard/overbaard
