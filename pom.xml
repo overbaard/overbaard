@@ -401,7 +401,7 @@
                                 </goals>
                                 <configuration>
                                     <nodeVersion>v9.8.0</nodeVersion>
-                                    <yarnVersion>v1.9.2</yarnVersion>
+                                    <yarnVersion>v1.13.0</yarnVersion>
                                 </configuration>
                             </execution>
                             <execution>
