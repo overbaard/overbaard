@@ -29,6 +29,7 @@
     "@ngrx/store": "^6.0.1",
     "@ngrx/store-devtools": "^6.0.1",
     "@types/pegjs": "^0.10.1",
+    "@types/underscore": "^1.8.9",
     "core-js": "^2.5.4",
     "hammerjs": "^2.0.8",
     "immutable": "^3.8.2",
@@ -37,6 +38,7 @@
     "rxjs": "^6.0.0",
     "rxjs-tslint": "^0.1.5",
     "typed-immutable-record": "^0.0.6",
+    "underscore": "^1.9.1",
     "zone.js": "~0.8.26"
   },
   "devDependencies": {

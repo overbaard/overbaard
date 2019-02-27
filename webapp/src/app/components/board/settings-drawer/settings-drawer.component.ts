@@ -45,8 +45,8 @@ import {IssueState} from '../../../model/board/data/issue/issue.model';
 import {BoardSearchFilterActions} from '../../../model/board/user/board-filter/board-search-filter.reducer';
 import {ManualSwimlane, manualSwimlanesSelector} from '../../../model/board/data/manual-swimlane/manual-swimlane.model';
 import {Epic, epicsByProjectSelector} from '../../../model/board/data/epic/epic.model';
-import {promise} from 'selenium-webdriver';
-import controlFlow = promise.controlFlow;
+import * as _ from 'underscore';
+
 
 @Component({
   selector: 'app-board-settings-drawer',
@@ -90,6 +90,9 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
   bulkUpdateFilter: FilterAttributes;
 
   hasLinkedIssues: boolean;
+
+  private _lastForm: any;
+
 
   constructor(private _store: Store<AppState>) {
   }
@@ -413,8 +416,11 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
 
   processFormValueChanges(value: any) {
     // bulkUpdateFilter is set by the onXXXFilter()
+
+
     const filterAttributes: FilterAttributes = this.bulkUpdateFilter ? this.bulkUpdateFilter : this.filtersToDisplay;
-    if (filterAttributes) {
+    if (filterAttributes && !_.isEqual(value, this._lastForm)) {
+      this._lastForm = value;
       const obj: Object = value[filterAttributes.key];
       this._store.dispatch(BoardFilterActions.createUpdateFilter(filterAttributes, obj));
       this.filterForm.reset(value);
