@@ -647,46 +647,6 @@ describe('Issue table filter tests', () => {
       });
     }
   });
-  describe('Update filter for existing table', () => {
-    it('No rank', () => {
-      doTest(false);
-    });
-    it('Rank', () => {
-      doTest(true);
-    });
-
-    function doTest(rank: boolean) {
-      const util: BoardViewObservableUtil = setupTable(rank ? {view: 'rv'} : null);
-      util.easySubscribe(board => {
-        const checker: BoardChecker =
-          new BoardChecker(standardTable);
-        checker.rankOrder(rank, ...standardRank);
-        checker.checkBoard(board);
-      });
-
-      util.getUserSettingUpdater().updateFilters('priority', 'Blocker');
-      util.easySubscribe(board => {
-        const checker: BoardChecker =
-          new BoardChecker(standardTable)
-            .invisibleIssues('ONE-1', 'ONE-3', 'ONE-5', 'ONE-7', 'ONE-9');
-        checker.rankOrder(rank, ...standardRank);
-        checker.checkBoard(board);
-        // The visible issue counts are checked automatically in checkTable(), but do a sanity test here
-        expect(board.headers.headersList.map(h => h.visibleIssues).toArray()).toEqual([1, 1, 2]);
-      });
-
-      util.getUserSettingUpdater().updateFilters('priority', 'Major');
-      util.easySubscribe(board => {
-        const checker: BoardChecker =
-          new BoardChecker(standardTable)
-            .invisibleIssues('ONE-2', 'ONE-4', 'ONE-6', 'ONE-8');
-        checker.rankOrder(rank, ...standardRank);
-        checker.checkBoard(board);
-        // The visible issue counts are checked automatically in checkTable(), but do a sanity test here
-        expect(board.headers.headersList.map(h => h.visibleIssues).toArray()).toEqual([1, 2, 2]);
-      });
-    }
-  });
 
   describe('Filter exists when creating table', () => {
     it('No rank', () => {
