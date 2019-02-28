@@ -6,7 +6,6 @@ import {List} from 'immutable';
 import {BoardHeaders} from './board-headers';
 import {Dictionary} from '../../common/dictionary';
 import {BoardHeader} from './board-header';
-import {map, take} from 'rxjs/operators';
 
 describe('Board headers tests', () => {
   let util: BoardViewObservableUtil;
