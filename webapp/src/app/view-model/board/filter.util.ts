@@ -24,9 +24,7 @@ import {
   ProjectState,
   ProjectUtil
 } from '../../model/board/data/project/project.model';
-import {P} from '@angular/core/src/render3';
 import {BoardSearchFilterState, BoardSearchFilterUtil} from '../../model/board/user/board-filter/board-search-filter.model';
-import {IssueQlNode} from '../../common/parsers/issue-ql/ast/node.iql';
 import {IssueQlMatcher} from '../../common/parsers/issue-ql/issue-ql.matcher';
 import {IssueVisitor} from '../../common/parsers/issue-ql/issue.visitor';
 

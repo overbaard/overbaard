@@ -2,10 +2,7 @@ import {List, Map, OrderedMap} from 'immutable';
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {HeaderState} from '../header/header.state';
 import {ColourTable} from '../../../../common/colour-table';
-import {Dictionary} from '../../../../common/dictionary';
 import {BoardIssue} from '../issue/board-issue';
-import {cloneObject} from '../../../../common/object-util';
-import {t} from '@angular/core/src/render3';
 
 export interface ProjectState {
   boardProjects: OrderedMap<string, BoardProject>;
