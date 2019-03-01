@@ -400,7 +400,7 @@
                                     <goal>install-node-and-yarn</goal>
                                 </goals>
                                 <configuration>
-                                    <nodeVersion>v9.8.0</nodeVersion>
+                                    <nodeVersion>v11.10.0</nodeVersion>
                                     <yarnVersion>v1.13.0</yarnVersion>
                                 </configuration>
                             </execution>
