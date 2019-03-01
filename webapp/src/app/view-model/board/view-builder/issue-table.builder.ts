@@ -190,15 +190,72 @@ export class IssueTableBuilder {
   }
 
   private filterIssue(issue: BoardIssueView, filters: AllFilters): BoardIssueView {
+    let doFilter = true;
+    let doSearch = true;
+    if (this._changeType === ChangeType.APPLY_FILTERS) {
+      doFilter = true;
+    } else if (this._changeType === ChangeType.UPDATE_SEARCH) {
+      doSearch = true;
+    }
+
+    let visible: boolean = issue.visible;
+    let matchesSearch: boolean = issue.matchesSearch;
+    if (doFilter) {
+      visible = filters.filterVisible(issue);
+      if (!visible) {
+        // Reset this to the default
+        matchesSearch = true;
+      } else {
+        if (!issue.visible) {
+          // We increased visibility, so we need to force the search
+          doSearch = true;
+        }
+      }
+    }
+    if (visible && doSearch) {
+      const hideNonMatches: boolean = this._currentUserSettingState.searchFilters.hideNonMatches;
+
+      const temp = filters.filterMatchesSearch(issue);
+      if (hideNonMatches) {
+
+        visible = temp;
+
+        if (!visible) {
+          // Reset this to the default
+          matchesSearch = true;
+        }
+      } else {
+        matchesSearch = temp;
+      }
+    }
+
+    if (visible !== issue.visible || matchesSearch !== issue.matchesSearch) {
+      return BoardIssueViewUtil.updateVisibilityAndMatchesSearch(issue, visible, matchesSearch);
+    }
+    return issue;
+  }
+
+  /*private filterIssue(issue: BoardIssueView, filters: AllFilters): BoardIssueView {
+    const hideNonMatches: boolean = this._currentUserSettingState.searchFilters.hideNonMatches;
     const filterVisible = this._changeType !== ChangeType.UPDATE_SEARCH;
     const filterSearch = this._changeType !== ChangeType.APPLY_FILTERS;
 
     let visible: boolean = issue.visible;
-    let matchesSearch: boolean = issue.matchesSearch;
     if (filterVisible) {
       visible = filters.filterVisible(issue);
     }
-    const hideNonMatches: boolean = this._currentUserSettingState.searchFilters.hideNonMatches;
+
+    let matchesSearch: boolean = issue.matchesSearch;
+    if (visible) {
+      if (hideNonMatches) {
+        visible = filters.filterMatchesSearch(issue);
+        matchesSearch = true;
+      } else {
+        if (filterSearch) {
+          matchesSearch = filters.filterMatchesSearch(issue);
+        }
+      }
+    }
     if (visible || hideNonMatches) {
       if (filterSearch) {
         const tempMatchesSearch = filters.filterMatchesSearch(issue);
@@ -215,7 +272,7 @@ export class IssueTableBuilder {
       return BoardIssueViewUtil.updateVisibilityAndMatchesSearch(issue, visible, matchesSearch);
     }
     return issue;
-  }
+  }*/
 
   private createTableAndRankView(issues: Map<string, BoardIssueView>): Map<string, BoardIssueView> {
     switch (this._changeType) {
