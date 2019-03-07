@@ -16,7 +16,15 @@
       <mat-icon
         *ngIf="!swimlane.collapsed"
       >keyboard_arrow_down</mat-icon>
-      <span class="mat-h4">{{swimlane.display}}</span>
+      <span class="mat-h4">
+        {{swimlane.display}}
+        <span *ngIf="swimlane.linkName">
+          - <a href="{{swimlane.linkUrl}}"
+               (click)="onClickLink($event)"
+               [ngClass]="classObj"
+               target="_blank">{{swimlane.linkName}}</a>
+        </span>
+      </span>
     </span>
   </div>
   <div

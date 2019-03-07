@@ -3,8 +3,11 @@ import {UserSettingState} from '../../../model/board/user/user-setting';
 import {SwimlaneInfo} from '../swimlane-info';
 import {List, Map, OrderedMap, OrderedSet, Set} from 'immutable';
 import {
-  ASSIGNEE_ATTRIBUTES, COMPONENT_ATTRIBUTES, FIX_VERSION_ATTRIBUTES,
-  ISSUE_TYPE_ATTRIBUTES, LABEL_ATTRIBUTES,
+  ASSIGNEE_ATTRIBUTES,
+  COMPONENT_ATTRIBUTES,
+  FIX_VERSION_ATTRIBUTES,
+  ISSUE_TYPE_ATTRIBUTES,
+  LABEL_ATTRIBUTES,
   NONE_FILTER_KEY,
   PRIORITY_ATTRIBUTES,
   PROJECT_ATTRIBUTES
@@ -18,13 +21,14 @@ import {TableBuilder} from './table.builder';
 import {UserSettingUtil} from '../../../model/board/user/user-setting.model';
 import {BoardIssue} from '../../../model/board/data/issue/board-issue';
 import {ManualSwimlane, ManualSwimlaneEntry} from '../../../model/board/data/manual-swimlane/manual-swimlane.model';
-import {IssueQlUtil} from '../../../common/parsers/issue-ql/issue-ql.util';
 import {IssueQlMatcher} from '../../../common/parsers/issue-ql/issue-ql.matcher';
 import {IssueVisitor} from '../../../common/parsers/issue-ql/issue.visitor';
 
 export class SwimlaneInfoBuilder {
   static create(boardState: BoardState,
-                userSettingState: UserSettingState, existingInfo: SwimlaneInfo): SwimlaneInfoBuilder {
+                userSettingState: UserSettingState,
+                existingInfo: SwimlaneInfo,
+                jiraUrl: string): SwimlaneInfoBuilder {
     const states: number = boardState.headers.states.size;
     let builderMap: OrderedMap<string, SwimlaneDataBuilder> = OrderedMap<string, SwimlaneDataBuilder>().asMutable();
     let builderNone: SwimlaneDataBuilder =
@@ -96,8 +100,11 @@ export class SwimlaneInfoBuilder {
       case 'epic': {
         boardState.epics.epicsByProject.forEach(epicsForProject => {
           epicsForProject.forEach(epic => {
-            builderMap.set(epic.key,
-              new SwimlaneDataBuilder(epic.key, epic.name, states, collapsed(userSettingState, epic.key), userSettingState, existingInfo));
+            const db: SwimlaneDataBuilder =
+              new SwimlaneDataBuilder(epic.key, epic.name, states, collapsed(userSettingState, epic.key), userSettingState, existingInfo);
+            const epicIssueUrl = `${jiraUrl}browse/${epic.key}`;
+            db.setLink(epic.key, epicIssueUrl);
+            builderMap.set(epic.key, db);
           });
           issueMatcher = ((issue, dataBuilders) =>
               [dataBuilders.get(issue.epic ? issue.epic.key : NONE_FILTER_KEY)]);
@@ -320,6 +327,8 @@ class SwimlaneDataBuilder {
   filterVisible = true;
   private _table: List<List<BoardIssueView>>;
   private readonly _calculatedColumnHeights: number[];
+  private _linkName: string;
+  private _linkUrl: string;
 
 
   constructor(private readonly _key: string, private readonly _display: string,
@@ -330,6 +339,11 @@ class SwimlaneDataBuilder {
     for (let i = 0 ; i < states ; i++) {
       this._calculatedColumnHeights[i] = 0;
     }
+  }
+
+  setLink(name: string, url: string) {
+    this._linkName = name;
+    this._linkUrl = url;
   }
 
   addIssue(issue: BoardIssueView, boardIndex: number) {
@@ -391,6 +405,8 @@ class SwimlaneDataBuilder {
     return BoardViewModelUtil.createSwimlaneDataView(
       this._key,
       this._display,
+      this._linkName,
+      this._linkUrl,
       this._tableBuilder.build(),
       this._visibleIssuesCount,
       this._collapsed,
