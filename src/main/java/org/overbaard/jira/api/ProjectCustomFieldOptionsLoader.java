@@ -24,17 +24,26 @@ import org.overbaard.jira.impl.config.BoardProjectConfig;
  * Used to determine the parallel tasks for a project. Implemented as a bean to be able to mock it out for unit tests
  * @author Kabir Khan
  */
-public interface ProjectParallelTaskOptionsLoader {
+public interface ProjectCustomFieldOptionsLoader {
 
     /**
-     * Load the parallel task value lookup tables for a project. If there are none {@code null} is returned. Otherwise an
-     * ordered map is returned. The key is the custom field name, the entry is another ordered map, where the key is the
-     * option key, and the entry is the value.
+     * Load the parallel task value lookup tables for a project.
      *
      * @param jiraInjectables
      * @param boardConfig
      * @param projectConfig
-     * @return
+     * @return the options or {@code null}
      */
-    ParallelTaskOptions loadValues(JiraInjectables jiraInjectables, BoardConfig boardConfig, BoardProjectConfig projectConfig);
+    ParallelTaskOptions loadParallelTaskOptions(JiraInjectables jiraInjectables, BoardConfig boardConfig, BoardProjectConfig projectConfig);
+
+    /**
+     * Load the custom field value lookup tables for a project. Only custom fields which are of a type that have a known
+     * set of options will be part of the result.
+     *
+     * @param jiraInjectables
+     * @param boardConfig
+     * @param projectConfig
+     * @return the options or {@code null}
+     */
+    CustomFieldOptions loadCustomFieldOptions(JiraInjectables jiraInjectables, BoardConfig boardConfig, BoardProjectConfig projectConfig);
 }

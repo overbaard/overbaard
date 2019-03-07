@@ -35,7 +35,7 @@ import java.util.function.Supplier;
 import org.jboss.dmr.ModelNode;
 import org.overbaard.jira.OverbaardLogger;
 import org.overbaard.jira.api.NextRankedIssueUtil;
-import org.overbaard.jira.api.ProjectParallelTaskOptionsLoader;
+import org.overbaard.jira.api.ProjectCustomFieldOptionsLoader;
 import org.overbaard.jira.impl.Constants;
 import org.overbaard.jira.impl.JiraInjectables;
 import org.overbaard.jira.impl.OverbaardIssueEvent;
@@ -103,10 +103,10 @@ public class Board {
     }
 
     public static Builder builder(JiraInjectables jiraInjectables,
-                                  ProjectParallelTaskOptionsLoader projectParallelTaskOptionsLoader,
+                                  ProjectCustomFieldOptionsLoader projectCustomFieldOptionsLoader,
                                   BoardConfig boardConfig,
                                   ApplicationUser boardOwner) {
-        return new Builder(jiraInjectables, projectParallelTaskOptionsLoader, boardConfig, boardOwner);
+        return new Builder(jiraInjectables, projectCustomFieldOptionsLoader, boardConfig, boardOwner);
     }
 
     public Board handleEvent(JiraInjectables jiraInjectables, NextRankedIssueUtil nextRankedIssueUtil, ApplicationUser boardOwner, OverbaardIssueEvent event,
@@ -337,7 +337,7 @@ public class Board {
      * Used to create a new board
      */
     public static class Builder extends Accessor {
-        private final ProjectParallelTaskOptionsLoader projectParallelTaskOptionsLoader;
+        private final ProjectCustomFieldOptionsLoader projectCustomFieldOptionsLoader;
         private final Map<String, Assignee> assignees = new HashMap<>();
         private final Map<String, Component> components = new HashMap<>();
         private final Map<String, Label> labels = new HashMap<>();
@@ -348,16 +348,16 @@ public class Board {
         private final Map<Long, SortedCustomFieldValues.Builder> customFieldBuilders = new HashMap();
 
         public Builder(JiraInjectables jiraInjectables,
-                       ProjectParallelTaskOptionsLoader projectParallelTaskOptionsLoader,
+                       ProjectCustomFieldOptionsLoader projectCustomFieldOptionsLoader,
                        BoardConfig boardConfig, ApplicationUser boardOwner) {
             super(jiraInjectables, boardConfig, boardOwner);
-            this.projectParallelTaskOptionsLoader = projectParallelTaskOptionsLoader;
+            this.projectCustomFieldOptionsLoader = projectCustomFieldOptionsLoader;
         }
 
         public Builder load() throws SearchException {
             for (BoardProjectConfig boardProjectConfig : boardConfig.getBoardProjects()) {
                 BoardProjectConfig project = boardConfig.getBoardProject(boardProjectConfig.getCode());
-                BoardProject.Builder projectBuilder = BoardProject.builder(jiraInjectables, projectParallelTaskOptionsLoader, this, project, boardOwner);
+                BoardProject.Builder projectBuilder = BoardProject.builder(jiraInjectables, projectCustomFieldOptionsLoader, this, project, boardOwner);
                 projectBuilder.load();
                 projects.put(projectBuilder.getCode(), projectBuilder);
             }

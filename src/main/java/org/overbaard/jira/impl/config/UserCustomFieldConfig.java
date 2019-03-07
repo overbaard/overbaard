@@ -22,7 +22,7 @@ import com.atlassian.jira.issue.fields.CustomField;
  * @author Kabir Khan
  */
 class UserCustomFieldConfig extends CustomFieldConfigImpl {
-    UserCustomFieldConfig(String name, Type type, CustomField customField) {
-        super(name, type, customField);
+    UserCustomFieldConfig(String name, CustomField customField) {
+        super(name, Type.USER, customField);
     }
 }

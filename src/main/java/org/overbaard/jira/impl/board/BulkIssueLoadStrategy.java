@@ -205,7 +205,7 @@ class BulkIssueLoadStrategy implements IssueLoadStrategy {
         } else if (parallelTaskFieldConfig != null) {
 
             ParallelTaskOptions parallelTaskOptions = project.getParallelTaskOptions();
-            SortedParallelTaskFieldOptions options =
+            SortedFieldOptions.ParallelTasks options =
                     parallelTaskOptions.getOptions(issueType).get(parallelTaskFieldConfig.getName());
             ProjectParallelTaskGroupsConfig parallelTaskGroupsConfig = project.getConfig().getParallelTaskGroupsConfig(issueType);
             if (parallelTaskGroupsConfig == null || options == null) {

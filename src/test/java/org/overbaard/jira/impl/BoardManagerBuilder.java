@@ -18,7 +18,7 @@ package org.overbaard.jira.impl;
 import org.overbaard.jira.api.BoardConfigurationManager;
 import org.overbaard.jira.api.BoardManager;
 import org.overbaard.jira.api.NextRankedIssueUtil;
-import org.overbaard.jira.api.ProjectParallelTaskOptionsLoader;
+import org.overbaard.jira.api.ProjectCustomFieldOptionsLoader;
 import org.overbaard.jira.impl.board.ProjectParallelTaskOptionsLoaderBuilder;
 
 import com.atlassian.jira.avatar.AvatarService;
@@ -48,7 +48,7 @@ public class BoardManagerBuilder {
     private UserManager userManager;
     private PermissionManager permissionManager;
     private NextRankedIssueUtil nextRankedIssueUtil;
-    private ProjectParallelTaskOptionsLoader projectParallelTaskOptionsLoader = new ProjectParallelTaskOptionsLoaderBuilder().build();
+    private ProjectCustomFieldOptionsLoader projectCustomFieldOptionsLoader = new ProjectParallelTaskOptionsLoaderBuilder().build();
 
     public BoardManagerBuilder(BoardConfigurationManager boardConfigurationManager, ConfigurationManagerInjectables configurationManagerInjectables) {
         this.boardConfigurationManager = boardConfigurationManager;
@@ -86,8 +86,8 @@ public class BoardManagerBuilder {
         return this;
     }
 
-    public BoardManagerBuilder setProjectParallelTaskOptionsLoader(ProjectParallelTaskOptionsLoader projectParallelTaskOptionsLoader) {
-        this.projectParallelTaskOptionsLoader = projectParallelTaskOptionsLoader;
+    public BoardManagerBuilder setProjectCustomFieldOptionsLoader(ProjectCustomFieldOptionsLoader projectCustomFieldOptionsLoader) {
+        this.projectCustomFieldOptionsLoader = projectCustomFieldOptionsLoader;
         return this;
     }
 
@@ -118,6 +118,6 @@ public class BoardManagerBuilder {
                 userService,
                 versionManager);
 
-        return new BoardManagerImpl(jiraInjectables, boardConfigurationManager, projectParallelTaskOptionsLoader);
+        return new BoardManagerImpl(jiraInjectables, boardConfigurationManager, projectCustomFieldOptionsLoader);
     }
 }

@@ -332,9 +332,19 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
 
     @Test
     public void testCreateIssuesCustomFields() throws Exception {
-        setupInitialBoard("config/board-custom.json");
         final Long testerId = 121212121212L;
         final Long documenterId = 121212121213L;
+        final Long testedById = 121212121214L;
+        setupInitialBoard("config/board-custom.json", new AbstractAdditionalSetup() {
+            @Override
+            public void initialise(BoardManagerBuilder boardManagerBuilder) {
+                ProjectParallelTaskOptionsLoaderBuilder loader = new ProjectParallelTaskOptionsLoaderBuilder();
+                loader
+                        .addCustomFieldOption("TDP", testedById, "QE", "QE")
+                        .addCustomFieldOption("TDP", testedById, "Engineering", "Engineering");
+                boardManagerBuilder.setProjectCustomFieldOptionsLoader(loader.build());
+            }
+        });
 
         //Create an issue which does not bring in custom fields
         OverbaardIssueEvent create = createEventBuilder("TDP-8", IssueType.BUG, Priority.HIGH, "Eight")
@@ -350,6 +360,7 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
         //Create an issue which brings in a custom field
         Map<Long, String> customFieldValues = new HashMap<>();
         customFieldValues.put(testerId, "jason");
+        customFieldValues.put(testedById, "QE");
         create = createEventBuilder("TDP-9", IssueType.BUG, Priority.HIGH, "Nine")
                 .assignee("kabir")
                 .state("TDP-D")
@@ -362,20 +373,21 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
         checkDeletes(changes);
         checkUpdates(changes);
         checkAdds(changes,
-                new AddIssueData("TDP-8", IssueType.BUG, Priority.HIGH, "Eight", "TDP-D", "kabir").checkers(TesterChecker.NONE, DocumenterChecker.NONE),
-                new AddIssueData("TDP-9", IssueType.BUG, Priority.HIGH, "Nine", "TDP-D", "kabir").checkers(new TesterChecker("jason"), DocumenterChecker.NONE));
+                new AddIssueData("TDP-8", IssueType.BUG, Priority.HIGH, "Eight", "TDP-D", "kabir").checkers(TesterChecker.NONE, DocumenterChecker.NONE, TestedByChecker.NONE),
+                new AddIssueData("TDP-9", IssueType.BUG, Priority.HIGH, "Nine", "TDP-D", "kabir").checkers(new TesterChecker("jason"), DocumenterChecker.NONE, new TestedByChecker("QE")));
         //1 -> 2
         changes = getChangesJson(1, 2, new NewCustomFieldChecker().testers("jason"),
                 new NewRankChecker().rank(8, "TDP-9"));
         checkDeletes(changes);
         checkUpdates(changes);
         checkAdds(changes,
-                new AddIssueData("TDP-9", IssueType.BUG, Priority.HIGH, "Nine", "TDP-D", "kabir").checkers(new TesterChecker("jason"), DocumenterChecker.NONE));
+                new AddIssueData("TDP-9", IssueType.BUG, Priority.HIGH, "Nine", "TDP-D", "kabir").checkers(new TesterChecker("jason"), DocumenterChecker.NONE, new TestedByChecker("QE")));
 
         //Create an issue which brings in a custom field and reuses one of the existing ones
         customFieldValues = new HashMap<>();
         customFieldValues.put(testerId, "jason");
         customFieldValues.put(documenterId, "kabir");
+        customFieldValues.put(testedById, "Engineering");
         create = createEventBuilder("TDP-10", IssueType.BUG, Priority.HIGH, "Ten")
                 .assignee("kabir")
                 .state("TDP-D")
@@ -389,22 +401,22 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
         checkUpdates(changes);
         checkAdds(changes,
                 new AddIssueData("TDP-8", IssueType.BUG, Priority.HIGH, "Eight", "TDP-D", "kabir").checkers(TesterChecker.NONE, DocumenterChecker.NONE),
-                new AddIssueData("TDP-9", IssueType.BUG, Priority.HIGH, "Nine", "TDP-D", "kabir").checkers(new TesterChecker("jason"), DocumenterChecker.NONE),
-                new AddIssueData("TDP-10", IssueType.BUG, Priority.HIGH, "Ten", "TDP-D", "kabir").checkers(new TesterChecker("jason"), new DocumenterChecker("kabir")));
+                new AddIssueData("TDP-9", IssueType.BUG, Priority.HIGH, "Nine", "TDP-D", "kabir").checkers(new TesterChecker("jason"), DocumenterChecker.NONE, new TestedByChecker("QE")),
+                new AddIssueData("TDP-10", IssueType.BUG, Priority.HIGH, "Ten", "TDP-D", "kabir").checkers(new TesterChecker("jason"), new DocumenterChecker("kabir"), new TestedByChecker("Engineering")));
         //1 -> 3
         changes = getChangesJson(1, 3, new NewCustomFieldChecker().testers("jason").documenters("kabir"),
                 new NewRankChecker().rank(8, "TDP-9").rank(9, "TDP-10"));
         checkDeletes(changes);
         checkUpdates(changes);
         checkAdds(changes,
-                new AddIssueData("TDP-9", IssueType.BUG, Priority.HIGH, "Nine", "TDP-D", "kabir").checkers(new TesterChecker("jason"), DocumenterChecker.NONE),
-                new AddIssueData("TDP-10", IssueType.BUG, Priority.HIGH, "Ten", "TDP-D", "kabir").checkers(new TesterChecker("jason"), new DocumenterChecker("kabir")));
+                new AddIssueData("TDP-9", IssueType.BUG, Priority.HIGH, "Nine", "TDP-D", "kabir").checkers(new TesterChecker("jason"), DocumenterChecker.NONE, new TestedByChecker("QE")),
+                new AddIssueData("TDP-10", IssueType.BUG, Priority.HIGH, "Ten", "TDP-D", "kabir").checkers(new TesterChecker("jason"), new DocumenterChecker("kabir"), new TestedByChecker("Engineering")));
         //2 -> 3
         changes = getChangesJson(2, 3, new NewCustomFieldChecker().documenters("kabir"), new NewRankChecker().rank(9, "TDP-10"));
         checkDeletes(changes);
         checkUpdates(changes);
         checkAdds(changes,
-                new AddIssueData("TDP-10", IssueType.BUG, Priority.HIGH, "Ten", "TDP-D", "kabir").checkers(new TesterChecker("jason"), new DocumenterChecker("kabir")));
+                new AddIssueData("TDP-10", IssueType.BUG, Priority.HIGH, "Ten", "TDP-D", "kabir").checkers(new TesterChecker("jason"), new DocumenterChecker("kabir"), new TestedByChecker("Engineering")));
 
         //Create an issue which brings in no custom fields
         create = createEventBuilder("TDP-11", IssueType.BUG, Priority.HIGH, "Eleven")
@@ -418,19 +430,19 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
         checkDeletes(changes);
         checkUpdates(changes);
         checkAdds(changes,
-                new AddIssueData("TDP-8", IssueType.BUG, Priority.HIGH, "Eight", "TDP-D", "kabir").checkers(TesterChecker.NONE, DocumenterChecker.NONE),
-                new AddIssueData("TDP-9", IssueType.BUG, Priority.HIGH, "Nine", "TDP-D", "kabir").checkers(new TesterChecker("jason"), DocumenterChecker.NONE),
-                new AddIssueData("TDP-10", IssueType.BUG, Priority.HIGH, "Ten", "TDP-D", "kabir").checkers(new TesterChecker("jason"), new DocumenterChecker("kabir")),
-                new AddIssueData("TDP-11", IssueType.BUG, Priority.HIGH, "Eleven", "TDP-D", "kabir").checkers(TesterChecker.NONE, DocumenterChecker.NONE));
+                new AddIssueData("TDP-8", IssueType.BUG, Priority.HIGH, "Eight", "TDP-D", "kabir").checkers(TesterChecker.NONE, DocumenterChecker.NONE, TestedByChecker.NONE),
+                new AddIssueData("TDP-9", IssueType.BUG, Priority.HIGH, "Nine", "TDP-D", "kabir").checkers(new TesterChecker("jason"), DocumenterChecker.NONE, new TestedByChecker("QE")),
+                new AddIssueData("TDP-10", IssueType.BUG, Priority.HIGH, "Ten", "TDP-D", "kabir").checkers(new TesterChecker("jason"), new DocumenterChecker("kabir"), new TestedByChecker("Engineering")),
+                new AddIssueData("TDP-11", IssueType.BUG, Priority.HIGH, "Eleven", "TDP-D", "kabir").checkers(TesterChecker.NONE, DocumenterChecker.NONE, TestedByChecker.NONE));
         //1 -> 4
         changes = getChangesJson(1, 4, new NewCustomFieldChecker().testers("jason").documenters("kabir"),
                 new NewRankChecker().rank(8, "TDP-9").rank(9, "TDP-10").rank(10, "TDP-11"));
         checkDeletes(changes);
         checkUpdates(changes);
         checkAdds(changes,
-                new AddIssueData("TDP-9", IssueType.BUG, Priority.HIGH, "Nine", "TDP-D", "kabir").checkers(new TesterChecker("jason"), DocumenterChecker.NONE),
-                new AddIssueData("TDP-10", IssueType.BUG, Priority.HIGH, "Ten", "TDP-D", "kabir").checkers(new TesterChecker("jason"), new DocumenterChecker("kabir")),
-                new AddIssueData("TDP-11", IssueType.BUG, Priority.HIGH, "Eleven", "TDP-D", "kabir").checkers(TesterChecker.NONE, DocumenterChecker.NONE));
+                new AddIssueData("TDP-9", IssueType.BUG, Priority.HIGH, "Nine", "TDP-D", "kabir").checkers(new TesterChecker("jason"), DocumenterChecker.NONE, new TestedByChecker("QE")),
+                new AddIssueData("TDP-10", IssueType.BUG, Priority.HIGH, "Ten", "TDP-D", "kabir").checkers(new TesterChecker("jason"), new DocumenterChecker("kabir"), new TestedByChecker("Engineering")),
+                new AddIssueData("TDP-11", IssueType.BUG, Priority.HIGH, "Eleven", "TDP-D", "kabir").checkers(TesterChecker.NONE, DocumenterChecker.NONE, TestedByChecker.NONE));
 
         //2 -> 4
         changes = getChangesJson(2, 4, new NewCustomFieldChecker().documenters("kabir"),
@@ -438,14 +450,14 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
         checkDeletes(changes);
         checkUpdates(changes);
         checkAdds(changes,
-                new AddIssueData("TDP-10", IssueType.BUG, Priority.HIGH, "Ten", "TDP-D", "kabir").checkers(new TesterChecker("jason"), new DocumenterChecker("kabir")),
-                new AddIssueData("TDP-11", IssueType.BUG, Priority.HIGH, "Eleven", "TDP-D", "kabir").checkers(TesterChecker.NONE, DocumenterChecker.NONE));
+                new AddIssueData("TDP-10", IssueType.BUG, Priority.HIGH, "Ten", "TDP-D", "kabir").checkers(new TesterChecker("jason"), new DocumenterChecker("kabir"), new TestedByChecker("Engineering")),
+                new AddIssueData("TDP-11", IssueType.BUG, Priority.HIGH, "Eleven", "TDP-D", "kabir").checkers(TesterChecker.NONE, DocumenterChecker.NONE, TestedByChecker.NONE));
         //3 -> 4
         changes = getChangesJson(3, 4, new NewRankChecker().rank(10, "TDP-11"));
         checkDeletes(changes);
         checkUpdates(changes);
         checkAdds(changes,
-                new AddIssueData("TDP-11", IssueType.BUG, Priority.HIGH, "Eleven", "TDP-D", "kabir").checkers(TesterChecker.NONE, DocumenterChecker.NONE));
+                new AddIssueData("TDP-11", IssueType.BUG, Priority.HIGH, "Eleven", "TDP-D", "kabir").checkers(TesterChecker.NONE, DocumenterChecker.NONE, TestedByChecker.NONE));
     }
 
     @Test
@@ -613,14 +625,15 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
     public void testUpdateSameIssueCustomFields() throws Exception {
         final Long testerId = 121212121212L;
         final Long documenterId = 121212121213L;
-        setupInitialBoard("config/board-custom.json", new AdditionalSetup() {
+        final Long testedById = 121212121214L;
+        setupInitialBoard("config/board-custom.json", new AbstractAdditionalSetup() {
             @Override
             public void initialise(BoardManagerBuilder boardManagerBuilder) {
-            }
-
-            @Override
-            public boolean skipStandardIssues() {
-                return false;
+                ProjectParallelTaskOptionsLoaderBuilder loader = new ProjectParallelTaskOptionsLoaderBuilder();
+                loader
+                        .addCustomFieldOption("TDP", testedById, "QE", "QE")
+                        .addCustomFieldOption("TDP", testedById, "Engineering", "Engineering");
+                boardManagerBuilder.setProjectCustomFieldOptionsLoader(loader.build());
             }
 
             @Override
@@ -628,17 +641,19 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
                 //Make sure that 'kabir' is in the list of custom fields
                 issueRegistry.setCustomField("TDP-1", testerId, userManager.getUserByKey("brian"));
                 issueRegistry.setCustomField("TDP-1", documenterId, userManager.getUserByKey("stuart"));
+                issueRegistry.setCustomField("TDP-1", testedById, userManager.getUserByKey("Engineering"));
             }
         });
 
-        //Do an update not bringing in any new data
+        //Do an update not bringing in any new data (for 'tested by' we always have the full list)
         Map<Long, String> customFieldValues = new HashMap<>();
         customFieldValues.put(testerId, "brian");
         customFieldValues.put(documenterId, "stuart");
+        customFieldValues.put(testedById, "QE");
         OverbaardIssueEvent update = updateEventBuilder("TDP-7").customFieldValues(customFieldValues).buildAndRegister();
         boardManager.handleEvent(update, nextRankedIssueUtil);
         ModelNode changes = getChangesJson(0, 1);
-        checkUpdates(changes, new UpdateIssueData("TDP-7").checkers(new TesterChecker("brian"), new DocumenterChecker("stuart")));
+        checkUpdates(changes, new UpdateIssueData("TDP-7").checkers(new TesterChecker("brian"), new DocumenterChecker("stuart"), new TestedByChecker("QE")));
 
         //Clear one of the custom fields
         customFieldValues = new HashMap<>();
@@ -646,36 +661,38 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
         update = updateEventBuilder("TDP-7").customFieldValues(customFieldValues).buildAndRegister();
         boardManager.handleEvent(update, nextRankedIssueUtil);
         changes = getChangesJson(0, 2);
-        checkUpdates(changes, new UpdateIssueData("TDP-7").checkers(TesterChecker.UNDEFINED, new DocumenterChecker("stuart")));
+        checkUpdates(changes, new UpdateIssueData("TDP-7").checkers(TesterChecker.UNDEFINED, new DocumenterChecker("stuart"), new TestedByChecker("QE")));
         changes = getChangesJson(1, 2);
-        checkUpdates(changes, new UpdateIssueData("TDP-7").checkers(TesterChecker.UNDEFINED));
+        checkUpdates(changes, new UpdateIssueData("TDP-7").checkers(TesterChecker.UNDEFINED, DocumenterChecker.NONE, TestedByChecker.NONE));
 
-        //Clear the other custom field
+        //Clear the other custom fields
         customFieldValues = new HashMap<>();
         customFieldValues.put(documenterId, "");
+        customFieldValues.put(testedById, "");
         update = updateEventBuilder("TDP-7").customFieldValues(customFieldValues).buildAndRegister();
         boardManager.handleEvent(update, nextRankedIssueUtil);
         changes = getChangesJson(0, 3);
-        checkUpdates(changes, new UpdateIssueData("TDP-7").checkers(TesterChecker.UNDEFINED, DocumenterChecker.UNDEFINED));
+        checkUpdates(changes, new UpdateIssueData("TDP-7").checkers(TesterChecker.UNDEFINED, DocumenterChecker.UNDEFINED, TestedByChecker.UNDEFINED));
         changes = getChangesJson(1, 3);
-        checkUpdates(changes, new UpdateIssueData("TDP-7").checkers(TesterChecker.UNDEFINED, DocumenterChecker.UNDEFINED));
+        checkUpdates(changes, new UpdateIssueData("TDP-7").checkers(TesterChecker.UNDEFINED, DocumenterChecker.UNDEFINED, TestedByChecker.UNDEFINED));
         changes = getChangesJson(2, 3);
-        checkUpdates(changes, new UpdateIssueData("TDP-7").checkers(DocumenterChecker.UNDEFINED));
+        checkUpdates(changes, new UpdateIssueData("TDP-7").checkers(TesterChecker.NONE, DocumenterChecker.UNDEFINED, TestedByChecker.UNDEFINED));
 
         //Now add custom fields bringing in new data
         customFieldValues = new HashMap<>();
         customFieldValues.put(testerId, "james");
         customFieldValues.put(documenterId, "jason");
+        customFieldValues.put(testedById, "QE"); // Note that for this lookup field, we already have the full list so there is no new data
         update = updateEventBuilder("TDP-7").customFieldValues(customFieldValues).buildAndRegister();
         boardManager.handleEvent(update, nextRankedIssueUtil);
         changes = getChangesJson(0, 4, new NewCustomFieldChecker().testers("james").documenters("jason"));
-        checkUpdates(changes, new UpdateIssueData("TDP-7").checkers(new TesterChecker("james"), new DocumenterChecker("jason")));
+        checkUpdates(changes, new UpdateIssueData("TDP-7").checkers(new TesterChecker("james"), new DocumenterChecker("jason"), new TestedByChecker("QE")));
         changes = getChangesJson(1, 4, new NewCustomFieldChecker().testers("james").documenters("jason"));
-        checkUpdates(changes, new UpdateIssueData("TDP-7").checkers(new TesterChecker("james"), new DocumenterChecker("jason")));
+        checkUpdates(changes, new UpdateIssueData("TDP-7").checkers(new TesterChecker("james"), new DocumenterChecker("jason"), new TestedByChecker("QE")));
         changes = getChangesJson(2, 4, new NewCustomFieldChecker().testers("james").documenters("jason"));
-        checkUpdates(changes, new UpdateIssueData("TDP-7").checkers(new TesterChecker("james"), new DocumenterChecker("jason")));
+        checkUpdates(changes, new UpdateIssueData("TDP-7").checkers(new TesterChecker("james"), new DocumenterChecker("jason"), new TestedByChecker("QE")));
         changes = getChangesJson(3, 4, new NewCustomFieldChecker().testers("james").documenters("jason"));
-        checkUpdates(changes, new UpdateIssueData("TDP-7").checkers(new TesterChecker("james"), new DocumenterChecker("jason")));
+        checkUpdates(changes, new UpdateIssueData("TDP-7").checkers(new TesterChecker("james"), new DocumenterChecker("jason"), new TestedByChecker("QE")));
 
         //Update other custom fields bringing in new data
         customFieldValues = new HashMap<>();
@@ -950,9 +967,21 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
 
     @Test
     public void testCreateAndDeleteIssueWithNewData() throws Exception {
-        setupInitialBoard("config/board-custom.json");
         final Long testerId = 121212121212L;
         final Long documenterId = 121212121213L;
+        final Long testedById = 121212121214L;
+        setupInitialBoard("config/board-custom.json", new AbstractAdditionalSetup() {
+            @Override
+            public void initialise(BoardManagerBuilder boardManagerBuilder) {
+                // Just initialise the lookups here since they are needed for the board configuration use. But we
+                // don't need to test anything for the testedBy field here (it won't bring in new data)
+                ProjectParallelTaskOptionsLoaderBuilder loader = new ProjectParallelTaskOptionsLoaderBuilder();
+                loader
+                        .addCustomFieldOption("TDP", testedById, "QE", "QE")
+                        .addCustomFieldOption("TDP", testedById, "Engineering", "Engineering");
+                boardManagerBuilder.setProjectCustomFieldOptionsLoader(loader.build());
+            }
+        });
         Map<Long, String> customFieldValues = new HashMap<>();
         customFieldValues.put(testerId, "brian");
         customFieldValues.put(documenterId, "stuart");
@@ -2794,6 +2823,23 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
         }
     }
 
+    static class TestedByChecker extends CustomFieldChecker {
+        /** Use to check that there is no tested by defined */
+        static final TestedByChecker NONE = new TestedByChecker(null);
+        /** Use to check that there is a tested by field but it is undefined (used when sending update events clearing the tester) */
+        static final TestedByChecker UNDEFINED = new TestedByChecker(true);
+
+        public TestedByChecker(String key) {
+            super("Tested By", key, false);
+        }
+
+        private TestedByChecker(boolean undefined) {
+            super("Tested By", null, undefined);
+        }
+    }
+
+
+
     static class ParallelTaskGroupsValueChecker implements IssueChecker {
         static final ParallelTaskGroupsValueChecker NONE = new ParallelTaskGroupsValueChecker(true, null);
 
@@ -2855,6 +2901,24 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
         boolean skipStandardIssues();
         void setupIssues();
     }
+
+    private abstract static class AbstractAdditionalSetup implements AdditionalSetup {
+        @Override
+        public boolean skipStandardIssues() {
+            return false;
+        }
+
+        @Override
+        public void setupIssues() {
+
+        }
+
+        @Override
+        public void initialise(BoardManagerBuilder boardManagerBuilder) {
+
+        }
+    }
+
 
     private static class RankChange {
         final int index;
@@ -3163,35 +3227,35 @@ public class BoardChangeRegistryTest extends AbstractBoardTest {
         public void initialise(BoardManagerBuilder boardManagerBuilder) {
             ProjectParallelTaskOptionsLoaderBuilder loader = new ProjectParallelTaskOptionsLoaderBuilder();
             loader
-                    .addCustomFieldOption("TDP", upstreamId, "NS", "Not Started")
-                    .addCustomFieldOption("TDP", upstreamId, "IP", "In Progress")
-                    .addCustomFieldOption("TDP", upstreamId, "M", "Merged")
-                    .addCustomFieldOption("TDP", downstreamId, "TD", "TODO")
-                    .addCustomFieldOption("TDP", downstreamId, "IP", "In Progress")
-                    .addCustomFieldOption("TDP", downstreamId, "D", "Done")
-                    .addCustomFieldOption("TDP", documentationId, "TD", "TODO")
-                    .addCustomFieldOption("TDP", documentationId, "W", "Writing")
-                    .addCustomFieldOption("TDP", documentationId, "P", "Published");
+                    .addParallelTaskOption("TDP", upstreamId, "NS", "Not Started")
+                    .addParallelTaskOption("TDP", upstreamId, "IP", "In Progress")
+                    .addParallelTaskOption("TDP", upstreamId, "M", "Merged")
+                    .addParallelTaskOption("TDP", downstreamId, "TD", "TODO")
+                    .addParallelTaskOption("TDP", downstreamId, "IP", "In Progress")
+                    .addParallelTaskOption("TDP", downstreamId, "D", "Done")
+                    .addParallelTaskOption("TDP", documentationId, "TD", "TODO")
+                    .addParallelTaskOption("TDP", documentationId, "W", "Writing")
+                    .addParallelTaskOption("TDP", documentationId, "P", "Published");
             if (overrides) {
                 addOverrides(loader, "bug");
                 addOverrides(loader, "task");
             }
 
-            boardManagerBuilder.setProjectParallelTaskOptionsLoader(loader.build());
+            boardManagerBuilder.setProjectCustomFieldOptionsLoader(loader.build());
         }
 
         private void addOverrides(ProjectParallelTaskOptionsLoaderBuilder loader, String issueType) {
             String suffix = issueType.substring(0, 1).toLowerCase();
             loader
-                    .addCustomFieldOption("TDP", issueType, upstreamId, "NS" + suffix, "Not Started - " + issueType)
-                    .addCustomFieldOption("TDP", issueType, upstreamId, "IP" + suffix, "In Progress - " + issueType)
-                    .addCustomFieldOption("TDP", issueType, upstreamId, "M" + suffix, "Merged - " + issueType)
-                    .addCustomFieldOption("TDP", issueType, downstreamId, "TD" + suffix, "TODO - " + issueType)
-                    .addCustomFieldOption("TDP", issueType, downstreamId, "IP" + suffix, "In Progress - " + issueType)
-                    .addCustomFieldOption("TDP", issueType, downstreamId, "D" + suffix, "Done - " + issueType)
-                    .addCustomFieldOption("TDP", issueType, documentationId, "TD" + suffix, "TODO - " + issueType)
-                    .addCustomFieldOption("TDP", issueType, documentationId, "W" + suffix, "Writing - " + issueType)
-                    .addCustomFieldOption("TDP", issueType, documentationId, "P" + suffix, "Published - " + issueType);
+                    .addParallelTaskOption("TDP", issueType, upstreamId, "NS" + suffix, "Not Started - " + issueType)
+                    .addParallelTaskOption("TDP", issueType, upstreamId, "IP" + suffix, "In Progress - " + issueType)
+                    .addParallelTaskOption("TDP", issueType, upstreamId, "M" + suffix, "Merged - " + issueType)
+                    .addParallelTaskOption("TDP", issueType, downstreamId, "TD" + suffix, "TODO - " + issueType)
+                    .addParallelTaskOption("TDP", issueType, downstreamId, "IP" + suffix, "In Progress - " + issueType)
+                    .addParallelTaskOption("TDP", issueType, downstreamId, "D" + suffix, "Done - " + issueType)
+                    .addParallelTaskOption("TDP", issueType, documentationId, "TD" + suffix, "TODO - " + issueType)
+                    .addParallelTaskOption("TDP", issueType, documentationId, "W" + suffix, "Writing - " + issueType)
+                    .addParallelTaskOption("TDP", issueType, documentationId, "P" + suffix, "Published - " + issueType);
         }
     }
 }
