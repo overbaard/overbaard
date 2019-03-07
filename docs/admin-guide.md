@@ -190,6 +190,32 @@ The `linked-projects` are not needed, but are left here empty. They will be disc
 }
 ```
 
+<a name="enabling-epics"></a>
+## 4.2.1 Enabling Epics
+By default we don't enable tracking of issues via epics. To turn this on for a project, add 
+`"enable-epics":true` to the projects you want to enable epics for. [epics.json](assets/examples/epics.json)
+is a copy of `simple.json` that we have been using so far, and does this for the `PROJ` project (apart from that the 
+contents of the two files are the same):
+```
+  "projects": [
+    {
+      "code": "PROJ",
+      "query-filter": null,
+      "colour": "#4667CA",
+      "enable-epics": true,
+```
+Epics will now be turned on for the project. When epics are turned on you are able to select `Epics` as one of the 
+swimlane choices. 
+
+```      
+      "state-links": {
+        "Backlog" : "My Backlog",
+        "Selected for Development" : "My Selected for Development",
+        "In Progress" : "My In Progress",
+        "Done" : "My Done"
+      }
+```
+
 # 5 Board with several projects
 
 The previous section shows a simple board with just one project. We can also add several projects to our board.

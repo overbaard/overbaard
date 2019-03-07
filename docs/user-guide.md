@@ -21,7 +21,7 @@ You will then be presented with a list of Overbård boards configured on your Ji
 
 <img src="assets/images/common/boards.png" width="500px"/>
 
-To go to a board click on the name of a board, and you will get taken to it. See the [board](#2-board) section
+To go to a board click on the name of a board, and you will get taken to it. See the [board](#board) section
 for how to work with a board.
 
 ## 1.1 Left menu
@@ -37,6 +37,7 @@ and is out of scope for this user guide.
 you can track the progress of the project, create issues in case you find a bug etc.
 
 
+<a name="board"></a>
 # 2 Board
 
 Having clicked on a board in the boards list, you will be presented with a view of the board:
@@ -98,7 +99,9 @@ This section controls the view of the board. It has two settings:
 * `Swimlane` - the default is no swimlanes. When the Rank view is shown, this setting is not displayed.
 On all boards in the Kanban view you can select swimlanes for `Project`, `Issue Type`, `Priority`, `Assignee`, 
 `Component`, `Label` and `Fix Version`. Also, if the board administrator has configured certain custom fields to 
-be available in the board they will be part of the swimlane options too.
+be available in the board they will be part of the swimlane options too. Finally, if the administrator has 
+[enabled epics](admin-guide.md#enabling-epics), `Epics` will show up as one of the choices for swimlanes (The epic
+swimlanes will be displayed in the order of ranking of the epic issues). 
 
 #### 2.3.1.1 Rank view
 While the Kanban view is well known, and the standard way of displaying a Kanban board, for huge projects once you have
@@ -315,3 +318,29 @@ green (complete). If you hover over one of the colours a tooltip is displayed gi
 <img src="assets/images/user-guide/board-pt-change.png" width="250px"/>
 
 To change the value, click on the entry you wish to change the parallel task to.
+
+<a name="board-updates"></a>
+# 3.0.0 Board updates
+When you first load the board a full refresh of the board happens. Meaning the full contents of the server-side cache
+of the board get serialised to the client in a format the client needs to display the board. This cache is shared 
+among all clients and lives in the server part of the Jira pluging. The Jira plugin also installs a Jira SDK event 
+listener that is used to handle the events that are exposed by Jira to update the cache as issues are moved, and have
+their data changed etc. The client then pings the server every few seconds asking for the changes, which it then
+applies to update the view.
+
+Despite our best efforts to handle as many events as possible, in some cases Jira does not expose the changes as
+events that can be handled via the SDK. And in a handful of other cases, we have left out trying to handle
+events for data that is rarely changed. However, the server-side cache is thrown away every 10 minutes, meaning a full
+reload happens when a client asks for the changes. After this full reload, all the data (including the things we don't
+handle via the event listeners) will be up to date. So in summary most changes are reflected immediately 
+on the client, while for some parts there can be a few minutes delay.
+
+The list of 'delayed' data is:
+* Epic link/name changes
+* Links to parent issues
+* Links to linked issues
+* When an issue is changed in such a way that it was not part of the results used to load the cache, and it now 
+would have become part of the cache (say if you have a query filter to load all issues with `Fix Version`=`1.0.1`, 
+issue `TST-123` has `Fix Version`=`1.2.0`, and you change `TST-123` to have `Fix Version`=`1.2.0`. In this case you 
+will have to wait until the periodic full refresh of the server side cache to happen until you see 
+`TST-123` on the board in question).
