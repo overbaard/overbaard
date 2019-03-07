@@ -20,6 +20,12 @@
 .swimlane-content {
   display: flex;
 }
+a {
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
 .mat-h4 {
   margin: 0px;
   white-space: nowrap;

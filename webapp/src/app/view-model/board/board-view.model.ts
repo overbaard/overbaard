@@ -57,6 +57,8 @@ const SWIMLANE_HEADER_HEIGHT = 36; /* header height: 30; header bottom border: 1
 const DEFAULT_SWIMLANE_DATA: SwimlaneData = {
   key: null,
   display: null,
+  linkName: null,
+  linkUrl: null,
   table: List<List<BoardIssueView>>(),
   visibleIssues: 0,
   collapsed: false,
@@ -174,6 +176,8 @@ export class BoardViewModelUtil {
   static createSwimlaneDataView(
     key: string,
     display: string,
+    linkName: string,
+    linkUrl: string,
     table: List<List<BoardIssueView>>,
     visibleIssues: number,
     collapsed: boolean,
@@ -181,6 +185,8 @@ export class BoardViewModelUtil {
     const state: SwimlaneData = {
       key: key,
       display: display,
+      linkName: linkName,
+      linkUrl: linkUrl,
       table: table,
       visibleIssues: visibleIssues,
       collapsed: collapsed,

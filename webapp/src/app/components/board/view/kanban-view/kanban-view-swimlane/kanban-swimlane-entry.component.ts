@@ -168,4 +168,7 @@ export class KanbanSwimlaneEntryComponent implements OnInit, OnChanges, OnDestro
     this.updateParallelTask.emit(event);
   }
 
+  onClickLink(event: MouseEvent) {
+    event.stopImmediatePropagation();
+  }
 }

@@ -384,7 +384,8 @@ export class IssueTableBuilder {
       case ChangeType.LOAD_BOARD:
       case ChangeType.CHANGE_SWIMLANE:
       case ChangeType.UPDATE_ISSUE_DETAIL:
-        swimlaneBuilder = SwimlaneInfoBuilder.create(this._currentBoardState, this._currentUserSettingState, null);
+        swimlaneBuilder = SwimlaneInfoBuilder.create(
+          this._currentBoardState, this._currentUserSettingState, null, this._jiraUrl);
         break;
       case ChangeType.APPLY_FILTERS:
       case ChangeType.UPDATE_SEARCH:
@@ -392,7 +393,8 @@ export class IssueTableBuilder {
       case ChangeType.UPDATE_BOARD_AFTER_BACKLOG_TOGGLE:
       case ChangeType.UPDATE_BOARD: {
         const oldSwimlane = this._oldIssueTableState.swimlaneInfo;
-        swimlaneBuilder = SwimlaneInfoBuilder.create(this._currentBoardState, this._currentUserSettingState, oldSwimlane);
+        swimlaneBuilder = SwimlaneInfoBuilder.create(
+          this._currentBoardState, this._currentUserSettingState, oldSwimlane, this._jiraUrl);
         break;
       }
       case ChangeType.TOGGLE_SWIMLANE_SHOW_EMPTY: {
@@ -401,7 +403,8 @@ export class IssueTableBuilder {
       }
       case ChangeType.TOGGLE_SWIMLANE_COLLAPSED: {
         const oldSwimlane = this._oldIssueTableState.swimlaneInfo;
-        swimlaneBuilder = SwimlaneInfoBuilder.create(this._currentBoardState, this._currentUserSettingState, oldSwimlane);
+        swimlaneBuilder = SwimlaneInfoBuilder.create(
+          this._currentBoardState, this._currentUserSettingState, oldSwimlane, this._jiraUrl);
         // The builder does the updating for us
         return swimlaneBuilder.updateCollapsed();
       }

@@ -144,8 +144,10 @@ describe('Swimlane observer tests', () => {
             board => {
               new BoardChecker([['ONE-1', 'ONE-2', 'ONE-3'], ['ONE-4', 'ONE-5'], []])
                 .swimlanes([
-                  {key: 'ONE-1000', name: 'Some Epic', issues: ['ONE-1', 'ONE-3']},
-                  {key: 'ONE-2000', name: 'Another Epic', issues: ['ONE-2', 'ONE-4']},
+                  {key: 'ONE-1000', name: 'Some Epic', issues: ['ONE-1', 'ONE-3'],
+                    linkUrl: 'http://jira.example.com/browse/ONE-1000', linkName: 'ONE-1000'},
+                  {key: 'ONE-2000', name: 'Another Epic', issues: ['ONE-2', 'ONE-4'],
+                    linkUrl: 'http://jira.example.com/browse/ONE-2000', linkName: 'ONE-2000'},
                   {key: NONE_FILTER_KEY, name: 'None', issues: ['ONE-5']}])
                 .checkBoard(board);
             });
@@ -2270,6 +2272,14 @@ class BoardChecker {
       } else {
         expect(sl.collapsed).toBe(false);
       }
+
+      if (!check.linkName) {
+        expect(sl.linkName).toBeFalsy();
+        expect(sl.linkUrl).toBeFalsy();
+      } else {
+        expect(sl.linkName).toBe(check.linkName);
+        expect(sl.linkUrl).toBe(check.linkUrl);
+      }
     }
 
     // Now check the visible swimlanes
@@ -2311,6 +2321,8 @@ interface SwimlaneCheck {
   issues: string[];
   /* If not set true is assumed */
   visibleFilter?: boolean;
+  linkName?: string;
+  linkUrl?: string;
 }
 
 class EqualityChecker {
