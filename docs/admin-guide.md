@@ -62,6 +62,10 @@ so the id of the `Rank` custom field is `10005`.
 
 Enter the value you found into the `Rank custom field id` field on the bottom of the configuration page.
 
+Then do the same looking for the `Epic Link` and `Epic Name` custom fields. These are important if you want to
+<a href="#enabling-epics">enable epics</a>. On my local instance the `Epic Link` id is `10000` and `Epic Name` is 
+`10001`. 
+
 # 4 Setting up a simple board
 The following example discusses how to set up a very basic board, using a project with the standard states
 when you create a project in Jira with the `Kanban software development` workflow. Don't worry if you have an existing
