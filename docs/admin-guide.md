@@ -64,7 +64,7 @@ Enter the value you found into the `Rank custom field id` field on the bottom of
 
 Then do the same looking for the `Epic Link` and `Epic Name` custom fields. These are important if you want to
 <a href="#enabling-epics">enable epics</a>. On my local instance the `Epic Link` id is `10000` and `Epic Name` is 
-`10001`. 
+`10002`. 
 
 # 4 Setting up a simple board
 The following example discusses how to set up a very basic board, using a project with the standard states
