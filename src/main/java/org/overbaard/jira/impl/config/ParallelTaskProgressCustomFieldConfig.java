@@ -23,8 +23,8 @@ import com.atlassian.jira.issue.fields.CustomField;
  */
 class ParallelTaskProgressCustomFieldConfig extends CustomFieldConfigImpl implements ParallelTaskCustomFieldConfig {
     private final String code;
-    ParallelTaskProgressCustomFieldConfig(String name, Type type, String code, CustomField customField) {
-        super(name, type, customField);
+    ParallelTaskProgressCustomFieldConfig(String name, String code, CustomField customField) {
+        super(name, Type.PARALLEL_TASK_PROGRESS, customField);
         this.code = code;
     }
 

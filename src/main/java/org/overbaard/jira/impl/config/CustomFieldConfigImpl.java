@@ -57,10 +57,13 @@ abstract class CustomFieldConfigImpl implements CustomFieldConfig {
 
         switch (type) {
             case USER: {
-                return new UserCustomFieldConfig(name, type, customField);
+                return new UserCustomFieldConfig(name, customField);
             }
             case VERSION: {
-                return new VersionCustomFieldConfig(name, type, customField);
+                return new VersionCustomFieldConfig(name, customField);
+            }
+            case SINGLE_SELECT_DROPDOWN: {
+                return new SingleSelectDropDownCustomFieldConfig(name, customField);
             }
             default:
                 throw new OverbaardValidationException("Invalid type for 'custom' field config: " + type);
@@ -86,7 +89,7 @@ abstract class CustomFieldConfigImpl implements CustomFieldConfig {
 
         switch (type) {
             case PARALLEL_TASK_PROGRESS: {
-                return new ParallelTaskProgressCustomFieldConfig(name, type, parallelTaskCode, customField);
+                return new ParallelTaskProgressCustomFieldConfig(name, parallelTaskCode, customField);
             }
             default:
                 throw new OverbaardValidationException("Invalid type for 'custom' field config: " + type);

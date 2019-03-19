@@ -29,9 +29,10 @@ import java.util.Set;
 
 import org.jboss.dmr.ModelNode;
 import org.overbaard.jira.OverbaardLogger;
+import org.overbaard.jira.api.CustomFieldOptions;
 import org.overbaard.jira.api.NextRankedIssueUtil;
 import org.overbaard.jira.api.ParallelTaskOptions;
-import org.overbaard.jira.api.ProjectParallelTaskOptionsLoader;
+import org.overbaard.jira.api.ProjectCustomFieldOptionsLoader;
 import org.overbaard.jira.impl.Constants;
 import org.overbaard.jira.impl.JiraInjectables;
 import org.overbaard.jira.impl.config.BoardProjectConfig;
@@ -127,7 +128,7 @@ public class BoardProject {
             for (ProjectParallelTaskConfig group : this.projectConfig.getInternalAdvanced().getParallelTaskGroupsConfig().getGroups()) {
                 ModelNode groupNode = new ModelNode().setEmptyList();
                 for (ParallelTaskCustomFieldConfig cfg : group.getConfigs().values()) {
-                    SortedParallelTaskFieldOptions options = parallelTaskOptions.getInternalAdvanced().getOptionsForProject().get(cfg.getName());
+                    SortedFieldOptions.ParallelTasks options = parallelTaskOptions.getInternalAdvanced().getOptionsForProject().get(cfg.getName());
                     options.serialize(groupNode);
                 }
                 parallelTasks.add(groupNode);
@@ -157,10 +158,14 @@ public class BoardProject {
         return null;
     }
 
-    static Builder builder(JiraInjectables jiraInjectables, ProjectParallelTaskOptionsLoader projectParallelTaskOptionsLoader, Board.Builder builder, BoardProjectConfig projectConfig,
+    static Builder builder(JiraInjectables jiraInjectables, ProjectCustomFieldOptionsLoader projectCustomFieldOptionsLoader, Board.Builder builder, BoardProjectConfig projectConfig,
                            ApplicationUser boardOwner) {
-        ParallelTaskOptions parallelTaskOptions = projectParallelTaskOptionsLoader.loadValues(jiraInjectables, builder.getConfig(), projectConfig);
-        return new Builder(jiraInjectables, builder, projectConfig, boardOwner, parallelTaskOptions);
+        ParallelTaskOptions parallelTaskOptions =
+                projectCustomFieldOptionsLoader.loadParallelTaskOptions(jiraInjectables, builder.getConfig(), projectConfig);
+        CustomFieldOptions customFieldOptions =
+                projectCustomFieldOptionsLoader.loadCustomFieldOptions(jiraInjectables, builder.getConfig(), projectConfig);
+
+        return new Builder(jiraInjectables, builder, projectConfig, boardOwner, parallelTaskOptions, customFieldOptions);
     }
 
     static LinkedProjectContext linkedProjectContext(Board.Accessor board, LinkedProjectConfig linkedProjectConfig) {
@@ -408,13 +413,15 @@ public class BoardProject {
         private final List<String> rankedIssueKeys = new ArrayList<>();
         private final Map<String, List<String>> issueKeysByState = new HashMap<>();
         private final ParallelTaskOptions parallelTaskOptions;
+        private final CustomFieldOptions customFieldOptions;
         private IndexedMap<String, Epic> orderedEpics;
 
 
         private Builder(JiraInjectables jiraInjectables, Board.Accessor board, BoardProjectConfig projectConfig,
-                        ApplicationUser boardOwner, ParallelTaskOptions parallelTaskOptions) {
+                        ApplicationUser boardOwner, ParallelTaskOptions parallelTaskOptions, CustomFieldOptions customFieldOptions) {
             super(jiraInjectables, board, projectConfig, boardOwner);
             this.parallelTaskOptions = parallelTaskOptions;
+            this.customFieldOptions = customFieldOptions;
         }
 
         Builder addIssue(String state, Issue issue) {
@@ -459,6 +466,10 @@ public class BoardProject {
             return parallelTaskOptions;
         }
 
+        public CustomFieldOptions getCustomFieldOptions() {
+            return customFieldOptions;
+        }
+
         void load() throws SearchException {
             final SearchService searchService = jiraInjectables.getSearchService();
             final Query query = initialiseQuery(projectConfig, boardOwner, searchService, null);
@@ -466,10 +477,9 @@ public class BoardProject {
             SearchResults searchResults =
                         searchService.search(boardOwner, query, PagerFilter.getUnlimitedFilter());
 
-            /*// TODO Use the bulk one again
-            System.out.println("Hardcoding lazy load - REMOVE THIS");
-            IssueLoadStrategy issueLoadStrategy = new Issue.LazyLoadStrategy(this);
-            */
+
+            /*System.out.println("Hardcoding lazy load - REMOVE THIS");
+            IssueLoadStrategy issueLoadStrategy = new Issue.LazyLoadStrategy(this);*/
             final IssueLoadStrategy issueLoadStrategy = IssueLoadStrategy.Factory.create(this);
 
             List<Issue.Builder> issueBuilders = new ArrayList<>();
@@ -489,6 +499,14 @@ public class BoardProject {
         }
 
         BoardProject build() {
+            //Add all the pre-determined custom field options to the list in the board
+            for (SortedFieldOptions.CustomFields fieldOptions : customFieldOptions.getCustomFieldsOptions().values()) {
+                for (CustomFieldValue value : fieldOptions.sortedFields.values()) {
+                    board.addBulkLoadedCustomFieldValue(fieldOptions.getConfig(), value);
+
+                }
+            }
+
             return new BoardProject(
                     projectConfig,
                     orderedEpics, Collections.unmodifiableList(rankedIssueKeys),

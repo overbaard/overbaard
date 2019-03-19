@@ -65,7 +65,7 @@ public class BoardProjectIssueTypeOverrideSerializer {
                     for (ProjectParallelTaskConfig group : config.getGroups()) {
                         ModelNode groupNode = new ModelNode().setEmptyList();
                         for (ParallelTaskCustomFieldConfig cfg : group.getConfigs().values()) {
-                            SortedParallelTaskFieldOptions options = parallelTaskOptions.getInternalAdvanced().getOptionsForIssueType(type).get(cfg.getName());
+                            SortedFieldOptions.ParallelTasks options = parallelTaskOptions.getInternalAdvanced().getOptionsForIssueType(type).get(cfg.getName());
                             options.serialize(groupNode);
                         }
                         tasks.add(groupNode);

@@ -22,7 +22,7 @@ import com.atlassian.jira.issue.fields.CustomField;
  * @author Kabir Khan
  */
 class VersionCustomFieldConfig extends CustomFieldConfigImpl {
-    VersionCustomFieldConfig(String name, Type type, CustomField customField) {
-        super(name, type, customField);
+    VersionCustomFieldConfig(String name, CustomField customField) {
+        super(name, Type.VERSION, customField);
     }
 }

@@ -59,6 +59,8 @@ public abstract class CustomFieldUtil {
                 return USER;
             case VERSION:
                 return VERSION;
+            case SINGLE_SELECT_DROPDOWN:
+                return SINGLE_SELECT_DROPDOWN;
             default:
                 throw new IllegalStateException("No util class for type " + config.getType());
         }
@@ -143,6 +145,53 @@ public abstract class CustomFieldUtil {
                 @Override
                 CustomFieldValue loadCustomFieldValue(Long id) {
                     return VersionCustomFieldValue.load(project.getJiraInjectables(), customFieldConfig, id);
+                }
+            };
+        }
+    };
+
+    public static final CustomFieldUtil SINGLE_SELECT_DROPDOWN = new CustomFieldUtil() {
+        @Override
+        public CustomFieldValue loadCustomField(CustomFieldConfig customFieldConfig, Object customFieldValue) {
+            return SingleSelectDropDownCustomFieldValue.load(customFieldConfig, customFieldValue);
+        }
+
+        @Override
+        public String getKey(Object fieldValue) {
+            return SingleSelectDropDownCustomFieldValue.getKeyForValue(fieldValue);
+        }
+
+        @Override
+        public String getCreateEventValue(Object fieldValue) {
+            return SingleSelectDropDownCustomFieldValue.getChangeValue(fieldValue);
+        }
+
+        @Override
+        public CustomFieldValue loadCustomFieldFromKey(JiraInjectables jiraInjectables, CustomFieldConfig customFieldConfig, String key) {
+            return SingleSelectDropDownCustomFieldValue.load(customFieldConfig, key);
+        }
+
+        @Override
+        public String getUpdateEventValue(String changeKey, String changeValue) {
+            return changeValue;
+        }
+
+        @Override
+        BulkLoadContext<?> createBulkLoadContext(BoardProject.Builder project, CustomFieldConfig customFieldConfig) {
+            return new BulkLoadContext<String>(customFieldConfig) {
+                @Override
+                String getCacheKey(String stringValue, Long numericValue) {
+                    return stringValue;
+                }
+
+                @Override
+                CustomFieldValue loadCustomFieldValue(String cfValueId) {
+                    return
+                            SingleSelectDropDownCustomFieldValue.load(
+                                    project.getJiraInjectables(),
+                                    customFieldConfig,
+                                    project.getCustomFieldOptions(),
+                                    Long.valueOf(cfValueId));
                 }
             };
         }

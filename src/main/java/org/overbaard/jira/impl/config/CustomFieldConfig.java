@@ -66,6 +66,9 @@ public interface CustomFieldConfig {
         USER("user"),
         //A Jira custom field of type 'Version'
         VERSION("version"),
+        //A Jira custom field of type 'Select List (single choice)'
+        SINGLE_SELECT_DROPDOWN("single-select"),
+
         //A Jira custom field of type 'Select List (single choice)'. Make sure that the field configuration
         //scheme for projects using this field for use as a parallel task in Overbård is set up to be Required
         //(otherwise you get an additional 'None' entry)

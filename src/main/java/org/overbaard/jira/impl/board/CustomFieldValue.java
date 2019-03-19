@@ -80,7 +80,7 @@ public class CustomFieldValue {
         }
 
         ParallelTaskOptions parallelTaskOptions = project.getParallelTaskOptions();
-        for (Map.Entry<String, SortedParallelTaskFieldOptions> fieldEntry : parallelTaskOptions.getOptions(issueType).entrySet()) {
+        for (Map.Entry<String, SortedFieldOptions.ParallelTasks> fieldEntry : parallelTaskOptions.getOptions(issueType).entrySet()) {
             CustomFieldConfig customFieldConfig = parallelTaskGroupsConfig.getConfigs().getForOverbaardName(fieldEntry.getKey());
             String value = getParallelTaskCustomFieldValue(issue, customFieldConfig.getJiraCustomField(), fieldEntry.getKey());
             if (value == null) {
@@ -171,7 +171,7 @@ public class CustomFieldValue {
 
                 if (value != null) {
                     int taskIndex = parallelTaskConfig.getIndex(customFieldConfig.getName());
-                    SortedParallelTaskFieldOptions options = project.getParallelTaskOptions().getOptions(issueType).get(customFieldConfig.getName());
+                    SortedFieldOptions.ParallelTasks options = project.getParallelTaskOptions().getOptions(issueType).get(customFieldConfig.getName());
                     int optionIndex = options.getIndex(value);
                     parallelTaskValues.put(new ParallelTaskGroupPosition(groupIndex, taskIndex), optionIndex);
                 } else if (overwriteAllFields) {

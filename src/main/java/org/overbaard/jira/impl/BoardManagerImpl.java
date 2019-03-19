@@ -37,12 +37,12 @@ import org.overbaard.jira.OverbaardValidationException;
 import org.overbaard.jira.api.BoardConfigurationManager;
 import org.overbaard.jira.api.BoardManager;
 import org.overbaard.jira.api.NextRankedIssueUtil;
-import org.overbaard.jira.api.ProjectParallelTaskOptionsLoader;
+import org.overbaard.jira.api.ProjectCustomFieldOptionsLoader;
 import org.overbaard.jira.impl.board.Board;
 import org.overbaard.jira.impl.board.BoardChangeRegistry;
 import org.overbaard.jira.impl.board.BoardProject;
 import org.overbaard.jira.impl.board.CustomFieldValue;
-import org.overbaard.jira.impl.board.SortedParallelTaskFieldOptions;
+import org.overbaard.jira.impl.board.SortedFieldOptions;
 import org.overbaard.jira.impl.config.BoardConfig;
 import org.overbaard.jira.impl.config.BoardProjectConfig;
 import org.overbaard.jira.impl.config.CustomFieldConfig;
@@ -79,7 +79,7 @@ public class BoardManagerImpl implements BoardManager, InitializingBean, Disposa
 
     private final BoardConfigurationManager boardConfigurationManager;
 
-    private final ProjectParallelTaskOptionsLoader projectParallelTaskOptionsLoader;
+    private final ProjectCustomFieldOptionsLoader projectCustomFieldOptionsLoader;
 
     private final ExecutorService boardRefreshExecutor = Executors.newSingleThreadExecutor();
 
@@ -91,10 +91,10 @@ public class BoardManagerImpl implements BoardManager, InitializingBean, Disposa
     @Inject
     public BoardManagerImpl(JiraInjectables jiraInjectables,
                             BoardConfigurationManager boardConfigurationManager,
-                            ProjectParallelTaskOptionsLoader projectParallelTaskOptionsLoader) {
+                            ProjectCustomFieldOptionsLoader projectCustomFieldOptionsLoader) {
         this.jiraInjectables = jiraInjectables;
         this.boardConfigurationManager = boardConfigurationManager;
-        this.projectParallelTaskOptionsLoader = projectParallelTaskOptionsLoader;
+        this.projectCustomFieldOptionsLoader = projectCustomFieldOptionsLoader;
     }
 
     @Override
@@ -120,7 +120,7 @@ public class BoardManagerImpl implements BoardManager, InitializingBean, Disposa
         final CustomField customField = taskFieldConfig.getJiraCustomField();
 
         final BoardProject boardProject = board.getBoardProject(projectCode);
-        final SortedParallelTaskFieldOptions sortedParallelTaskFieldOptions =
+        final SortedFieldOptions.ParallelTasks sortedParallelTaskFieldOptions =
                 boardProject.getParallelTaskOptions().getOptions(issueType).get(taskFieldConfig.getName());
         final CustomFieldValue value = sortedParallelTaskFieldOptions.forIndex(optionIndex);
 
@@ -154,7 +154,7 @@ public class BoardManagerImpl implements BoardManager, InitializingBean, Disposa
                     if (parallelTaskField != null) {
                         //Since the field is not set, guess the default value (i.e. the first one in the list)
                         //Later if this is not satisfactory, we can use the Jira SDK to figure
-                        final SortedParallelTaskFieldOptions currentParallelTaskFieldOptions =
+                        final SortedFieldOptions.ParallelTasks currentParallelTaskFieldOptions =
                                 boardProject.getParallelTaskOptions().getInternalAdvanced().getOptionsForProject().get(parallelTaskField.getName());
                         CustomFieldValue defaultValue = currentParallelTaskFieldOptions.forIndex(0);
 
@@ -210,7 +210,7 @@ public class BoardManagerImpl implements BoardManager, InitializingBean, Disposa
                     */
 
                     final ApplicationUser boardOwner = jiraInjectables.getJiraUserManager().getUserByKey(boardConfig.getOwningUserKey());
-                    board = Board.builder(jiraInjectables, projectParallelTaskOptionsLoader, boardConfig, boardOwner).load().build();
+                    board = Board.builder(jiraInjectables, projectCustomFieldOptionsLoader, boardConfig, boardOwner).load().build();
                     OverbaardLogger.LOGGER.debug("Full refresh of board {}", code);
                     boards.put(code, board);
                     boardChangeRegistries.put(code, new BoardChangeRegistry(this, board));

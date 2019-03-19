@@ -28,6 +28,11 @@
       "name": "Documenter",
       "type": "user",
       "field-id": 121212121213
+    },
+    {
+      "name": "Tested By",
+      "type": "single-select",
+      "field-id": 121212121214
     }
   ],
   "projects": [
@@ -35,7 +40,7 @@
       "code": "TDP",
       "query-filter": null,
       "colour": "#4667CA",
-      "custom": ["Tester", "Documenter"],
+      "custom": ["Tester", "Documenter", "Tested By"],
       "state-links": {
         "TDP-A" : "S-A",
         "TDP-B" : "S-B",
