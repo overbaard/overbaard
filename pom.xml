@@ -57,8 +57,8 @@
         <version.resources-plugin>3.0.2</version.resources-plugin>
         <version.clean-plugin>3.0.0</version.clean-plugin>
         <version.checkstyle.plugin>3.0.0</version.checkstyle.plugin>
-        <!-- use older version of checkstyle as otherwise lots of checks fail -->
-        <version.checkstyle>8.5</version.checkstyle>
+
+        <version.checkstyle>8.18</version.checkstyle>
 
 
         <!-- This key is used to keep the consistency between the key in atlassian-plugin.xml and the key to generate bundle. -->
