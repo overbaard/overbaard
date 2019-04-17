@@ -172,6 +172,15 @@ public class OverbaardFacadeImpl implements JiraFacade, InitializingBean, Dispos
         }
     }
 
+    public String getBoardConfigurationHistory(ApplicationUser user, String restRootUrl, Integer cfgId, Integer fromId) {
+        return boardConfigurationManager.getBoardConfigurationHistoryJson(user, restRootUrl, cfgId, fromId);
+    }
+
+    @Override
+    public String getBoardConfigurationHistoryEntry(ApplicationUser user, Integer historyEntryId) {
+        return boardConfigurationManager.getBoardConfigurationHistoryEntry(user, historyEntryId);
+    }
+
     @Override
     public void afterPropertiesSet() throws Exception {
 

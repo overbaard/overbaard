@@ -15,18 +15,27 @@
  */
 package org.overbaard.jira.impl;
 
+import static org.overbaard.jira.impl.Constants.BOARD_ID;
 import static org.overbaard.jira.impl.Constants.CAN_EDIT_CUSTOM_FIELDS;
+import static org.overbaard.jira.impl.Constants.CHANGE_TYPE;
+import static org.overbaard.jira.impl.Constants.CHANGED_BY;
 import static org.overbaard.jira.impl.Constants.CODE;
+import static org.overbaard.jira.impl.Constants.CONFIG;
 import static org.overbaard.jira.impl.Constants.CONFIGS;
 import static org.overbaard.jira.impl.Constants.EDIT;
+import static org.overbaard.jira.impl.Constants.ENTRIES;
 import static org.overbaard.jira.impl.Constants.EPIC_LINK_CUSTOM_FIELD_ID;
 import static org.overbaard.jira.impl.Constants.EPIC_NAME_CUSTOM_FIELD_ID;
 import static org.overbaard.jira.impl.Constants.ID;
 import static org.overbaard.jira.impl.Constants.NAME;
+import static org.overbaard.jira.impl.Constants.OWNER;
 import static org.overbaard.jira.impl.Constants.PROJECTS;
 import static org.overbaard.jira.impl.Constants.RANK_CUSTOM_FIELD_ID;
+import static org.overbaard.jira.impl.Constants.TIME;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,6 +50,7 @@ import org.overbaard.jira.OverbaardPermissionException;
 import org.overbaard.jira.OverbaardValidationException;
 import org.overbaard.jira.api.BoardConfigurationManager;
 import org.overbaard.jira.impl.activeobjects.BoardCfg;
+import org.overbaard.jira.impl.activeobjects.BoardCfgHistory;
 import org.overbaard.jira.impl.activeobjects.Setting;
 import org.overbaard.jira.impl.config.BoardConfig;
 import org.overbaard.jira.impl.config.BoardProjectConfig;
@@ -64,6 +74,8 @@ import net.java.ao.Query;
  */
 @Named("overbaardBoardConfigurationManager")
 public class BoardConfigurationManagerImpl implements BoardConfigurationManager {
+
+    private static final int HISTORY_LIMIT = 50;
 
     private volatile Map<String, BoardConfig> boardConfigs = new ConcurrentHashMap<>();
 
@@ -202,15 +214,18 @@ public class BoardConfigurationManagerImpl implements BoardConfigurationManager 
                     }
                 }
 
+                final String historyAction;
+                final BoardCfg cfg;
                 if (id >= 0) {
-                    final BoardCfg cfg = activeObjects.get(BoardCfg.class, id);
+                    cfg = activeObjects.get(BoardCfg.class, id);
                     cfg.setCode(code);
                     cfg.setName(name);
                     cfg.setOwningUserKey(user.getKey());
                     cfg.setConfigJson(validConfig.toJSONString(true));
                     cfg.save();
+                    historyAction = "U";
                 } else {
-                    final BoardCfg cfg = activeObjects.create(
+                    cfg = activeObjects.create(
                             BoardCfg.class,
                             new DBParam("CODE", code),
                             new DBParam("NAME", name),
@@ -218,7 +233,27 @@ public class BoardConfigurationManagerImpl implements BoardConfigurationManager 
                             //Compact the json before saving it
                             new DBParam("CONFIG_JSON", validConfig.toJSONString(true)));
                     cfg.save();
+                    historyAction = "C";
                 }
+
+                // Add a history entry
+                try {
+                    BoardCfgHistory history = activeObjects.create(
+                            BoardCfgHistory.class,
+                            new DBParam("CODE", code),
+                            new DBParam("NAME", name),
+                            new DBParam("OWNING_USER", user.getKey()),
+                            new DBParam("CHANGING_USER", user.getKey()),
+                            new DBParam("CONFIG_JSON", validConfig.toJSONString(true)),
+                            new DBParam("BOARD_CFG_ID", cfg.getID()),
+                            new DBParam("MODIFIED", new Date()),
+                            new DBParam("ACTION", historyAction)
+                    );
+                    history.save();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
                 if (id >= 0) {
                     boardConfigs.remove(code);
                 }
@@ -246,6 +281,22 @@ public class BoardConfigurationManagerImpl implements BoardConfigurationManager 
                             boardConfig.get(NAME) + "' (" + id + ")");
                 }
                 activeObjects.delete(cfg);
+
+                // Add a history entry
+                BoardCfgHistory history = activeObjects.create(
+                        BoardCfgHistory.class,
+                        new DBParam("CODE", code),
+                        new DBParam("NAME", cfg.getName()),
+                        new DBParam("OWNING_USER", cfg.getOwningUser()),
+                        new DBParam("CHANGING_USER", user.getKey()),
+                        new DBParam("CONFIG_JSON", cfg.getConfigJson()),
+                        new DBParam("BOARD_CFG_ID", cfg.getID()),
+                        new DBParam("MODIFIED", new Date()),
+                        new DBParam("ACTION", "D")
+                );
+                history.save();
+
+
                 return code;
             }
         });
@@ -395,7 +446,112 @@ public class BoardConfigurationManagerImpl implements BoardConfigurationManager 
         return -1;
     }
 
+    @Override
+    public String getBoardConfigurationHistoryJson(ApplicationUser user, String restRootUrl, Integer cfgId, Integer fromId) {
+        final ActiveObjects activeObjects = jiraInjectables.getActiveObjects();
+        // Unfortunately select distinct doesn't work, so just do a paged thing
+        Query query = Query.select()
+                .order("MODIFIED DESC");
 
+        StringBuilder whereClause = new StringBuilder();
+        List<Object> whereParams = new ArrayList<>();
+        if (fromId != null && fromId > 0) {
+            whereClause.append("ID < ?");
+            whereParams.add(fromId);
+        }
+        if (cfgId != null) {
+            if (whereClause.length() > 0) {
+                whereClause.append(" AND ");
+            }
+            whereClause.append("BOARD_CFG_ID = ?");
+            whereParams.add(cfgId);
+        }
+        if (whereClause.length() > 0) {
+            query.where(whereClause.toString(), whereParams.toArray());
+        }
+        query = query.limit(HISTORY_LIMIT);
+        final Query theQuery = query;
+
+
+        BoardCfgHistory[] history = activeObjects.executeInTransaction(new TransactionCallback<BoardCfgHistory[]>() {
+            @Override
+            public BoardCfgHistory[] doInTransaction() {
+                return activeObjects.find(BoardCfgHistory.class, theQuery);
+            }
+        });
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd\'T\'HH:mmZ");
+        ModelNode historyList = new ModelNode().setEmptyList();
+        int startId = fromId == null ? 0 : fromId + 1;
+        int endId = 0;
+        for (BoardCfgHistory h : history) {
+            if (startId == 0) {
+                startId = h.getID();
+            }
+            endId = h.getID();
+
+            ModelNode entry = new ModelNode();
+            entry.get(ID).set(h.getID());
+            entry.get(CODE).set(h.getCode());
+            entry.get(BOARD_ID).set(h.getBoardCfgId());
+            entry.get(CHANGED_BY).set(h.getChangingUser());
+            entry.get(CHANGE_TYPE).set(formatChangeType(h));
+            entry.get(TIME).set(formatDate(h.getModified()));
+            entry.get("url").set(restRootUrl + "/" + h.getID());
+            historyList.add(entry);
+        }
+
+        ModelNode result = new ModelNode();
+        if (history.length == HISTORY_LIMIT) {
+            String nextPath = "?from=" + endId;
+            if (cfgId != null) {
+                nextPath += "&" + BOARD_ID +"=" + cfgId;
+            }
+            result.get("next").set(restRootUrl + nextPath);
+        }
+        result.get(ENTRIES).set(historyList);
+
+        return result.toJSONString(false);
+    }
+
+    @Override
+    public String getBoardConfigurationHistoryEntry(ApplicationUser user, Integer historyEntryId) {
+        final ActiveObjects activeObjects = jiraInjectables.getActiveObjects();
+        BoardCfgHistory history = activeObjects.executeInTransaction(new TransactionCallback<BoardCfgHistory[]>() {
+            @Override
+            public BoardCfgHistory[] doInTransaction() {
+                return activeObjects.find(BoardCfgHistory.class, Query.select().where("ID = ?", historyEntryId));
+            }
+        })[0];
+
+        ModelNode historyNode = new ModelNode();
+        historyNode.get(ID).set(history.getID());
+        historyNode.get(NAME).set(history.getName());
+        historyNode.get(CODE).set(history.getCode());
+        historyNode.get(OWNER).set(history.getOwningUser());
+        historyNode.get(BOARD_ID).set(history.getBoardCfgId());
+        historyNode.get(CHANGED_BY).set(history.getChangingUser());
+        historyNode.get(CHANGE_TYPE).set(formatChangeType(history));
+        historyNode.get(TIME).set(formatDate(history.getModified()));
+        historyNode.get(CONFIG).set(ModelNode.fromJSONString(history.getConfigJson()));
+
+        return historyNode.toJSONString(false);
+    }
+
+    private String formatDate(Date date) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd\'T\'HH:mmZ");
+        return format.format(date);
+    }
+
+    private String formatChangeType(BoardCfgHistory h) {
+        String changeType = "Updated";
+        if (h.getAction().equals("D")) {
+            changeType = "Deleted";
+        } else if (h.getAction().equals("C")){
+            changeType = "Created";
+        }
+        return changeType;
+    }
 
     //Permission methods
     private boolean canEditBoard(ApplicationUser user, ModelNode boardConfig) {

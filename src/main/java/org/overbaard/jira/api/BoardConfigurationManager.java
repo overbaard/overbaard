@@ -102,5 +102,9 @@ public interface BoardConfigurationManager {
     String getStateHelpTextsJson(ApplicationUser user, String boardCode);
 
     long getRankCustomFieldId();
+
+    String getBoardConfigurationHistoryJson(ApplicationUser user, String restRootUrl, Integer cfgId, Integer fromId);
+
+    String getBoardConfigurationHistoryEntry(ApplicationUser user, Integer historyEntryId);
 }
 

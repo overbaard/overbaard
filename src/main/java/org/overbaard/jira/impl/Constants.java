@@ -25,10 +25,13 @@ public class Constants {
     public static final String AVATAR = "avatar";
     public static final String BLACKLIST = "blacklist";
     public static final String BACKLOG = "backlog";
+    public static final String BOARD_ID = "board_id";
     public static final String BOARDS = "boards";
     public static final String CAN_EDIT_CUSTOM_FIELDS = "can-edit-custom-fields";
     public static final String CODE = "code";
+    public static final String CHANGE_TYPE = "change_type";
     public static final String CHANGES = "changes";
+    public static final String CHANGED_BY = "changed_by";
     public static final String CLEAR_COMPONENTS = "clear-components";
     public static final String CLEAR_FIX_VERSIONS = "clear-fix-versions";
     public static final String CLEAR_LABELS = "clear-labels";
@@ -55,6 +58,7 @@ public class Constants {
     public static final String FIELD_ID = "field-id";
     public static final String FILTER = "filter";
     public static final String FIX_VERSIONS = "fix-versions";
+    public static final String FROM = "from";
     public static final String HEADER = "header";
     public static final String HEADERS = "headers";
     public static final String HELP = "help";
@@ -93,6 +97,7 @@ public class Constants {
     public static final String STATE_LINKS = "state-links";
     public static final String STATES = "states";
     public static final String SUMMARY = "summary";
+    public static final String TIME = "time";
     public static final String TYPE = "type";
     public static final String TYPE_STATES = "type-states";
     public static final String UPDATE = "update";
