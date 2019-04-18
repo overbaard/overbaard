@@ -69,6 +69,7 @@
   <ao name="Overbaard Active Objects" key="ao-module">
     <description>The module configuring the Active Objects service used by this plugin</description>
     <entity>org.overbaard.jira.impl.activeobjects.BoardCfg</entity>
+    <entity>org.overbaard.jira.impl.activeobjects.BoardCfgHistory</entity>
     <entity>org.overbaard.jira.impl.activeobjects.Setting</entity>
     <entity>org.overbaard.jira.impl.activeobjects.UserAccess</entity>
   </ao>

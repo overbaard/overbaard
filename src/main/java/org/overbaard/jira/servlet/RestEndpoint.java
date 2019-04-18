@@ -15,6 +15,9 @@
  */
 package org.overbaard.jira.servlet;
 
+import static org.overbaard.jira.impl.Constants.BOARD_ID;
+import static org.overbaard.jira.impl.Constants.FROM;
+
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -258,6 +261,21 @@ public class RestEndpoint {
     public Response getUserAccesses() {
         ApplicationUser user = getUser();
         return createResponse(jiraFacade.getUserAccessJson(user));
+    }
+
+    @GET
+    @Path("board-config-history")
+    public Response getBoardConfigHistory(@Context HttpServletRequest req, @QueryParam(FROM) Integer fromId, @QueryParam(BOARD_ID) Integer boardCfgId){
+        ApplicationUser user = getUser();
+        String restRootUrl = Util.getDeployedUrl(req) + "/rest/overbaard/1.0/board-config-history";
+        return createResponse(jiraFacade.getBoardConfigurationHistory(user, restRootUrl, boardCfgId, fromId));
+    }
+
+    @GET
+    @Path("board-config-history/{historyId}")
+    public Response getBoardConfigHistoryEntry(@PathParam("historyId") Integer historyEntryId) {
+        ApplicationUser user = getUser();
+        return createResponse(jiraFacade.getBoardConfigurationHistoryEntry(user, historyEntryId));
     }
 
     private Response createResponse(ModelNode modelNode) {

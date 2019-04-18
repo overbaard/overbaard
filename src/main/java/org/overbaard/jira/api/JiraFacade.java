@@ -142,4 +142,14 @@ public interface JiraFacade {
      */
     void updateParallelTaskForIssue(ApplicationUser user, String boardCode, String issueKey, int groupIndex, int taskIndex, int optionIndex) throws SearchException;
 
+    /**
+     * Get configuration history. This returns a full list
+     *
+     * @param user the user
+     * @param restRootUrl
+     * @return JSON containing the config history
+     */
+    String getBoardConfigurationHistory(ApplicationUser user, String restRootUrl, Integer cfgId, Integer fromId);
+
+    String getBoardConfigurationHistoryEntry(ApplicationUser user, Integer historyEntryId);
 }
