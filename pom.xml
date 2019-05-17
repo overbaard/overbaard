@@ -22,12 +22,20 @@
     <artifactId>overbaard</artifactId>
     <version>1.0.0.Beta6-SNAPSHOT</version>
     <organization>
-        <name>Red Hat Inc.</name>
         <url>https://github.com/overbaard/overbaard</url>
     </organization>
     <name>Overbård</name>
     <description>Nicer views on the Jira Agile boards</description>
     <packaging>atlassian-plugin</packaging>
+
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
 
     <properties>
         <!-- versions -->
