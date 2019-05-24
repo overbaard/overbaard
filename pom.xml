@@ -39,7 +39,7 @@
 
     <properties>
         <!-- versions -->
-        <version.amps>6.2.11</version.amps>
+        <version.amps>8.0.2</version.amps>
         <version.atlassions.greenhopper>7.5.0-DAILY20170902071651</version.atlassions.greenhopper>
         <version.atlassian.spring.scanner>1.2.13</version.atlassian.spring.scanner>
         <version.atlassian.templaterenderer>1.5.6</version.atlassian.templaterenderer>
@@ -226,7 +226,7 @@
         <plugins>
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
-                <artifactId>maven-jira-plugin</artifactId>
+                <artifactId>jira-maven-plugin</artifactId>
                 <version>${version.amps}</version>
                 <extensions>true</extensions>
                 <configuration>
@@ -243,7 +243,6 @@
 					</pluginArtifacts>
 					-->
                     <enableQuickReload>true</enableQuickReload>
-                    <enableFastdev>false</enableFastdev>
                     <instructions>
                         <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
                         <!-- Add package to export here -->
@@ -256,7 +255,7 @@
 
                     <!-- TODO Get rid of this (compression causes some problems I don't want to look at now) -->
                     <compressResources>false</compressResources>
-
+                    <jvmArgs>-Xms1g -Xmx2g -XX:MaxPermSize=1g -XX:-UseGCOverheadLimit -server</jvmArgs>
                 </configuration>
             </plugin>
             <plugin>
