@@ -32,7 +32,7 @@ import org.overbaard.jira.impl.config.ProjectParallelTaskConfig;
 import org.overbaard.jira.impl.config.ProjectParallelTaskGroupsConfig;
 
 import com.atlassian.jira.issue.Issue;
-import com.atlassian.jira.issue.customfields.option.LazyLoadedOption;
+import com.atlassian.jira.issue.customfields.option.Option;
 import com.atlassian.jira.issue.fields.CustomField;
 
 /**
@@ -100,8 +100,8 @@ public class CustomFieldValue {
         //The type of this varies across instances?
         if (customFieldValue instanceof String) {
             return  (String)customFieldValue;
-        } else if (customFieldValue instanceof LazyLoadedOption) {
-            LazyLoadedOption option = (LazyLoadedOption)customFieldValue;
+        } else if (customFieldValue instanceof Option) {
+            Option option = (Option)customFieldValue;
             return String.valueOf(option.getOptionId());
         } else {
             OverbaardLogger.LOGGER.warn("Unhandled field type " + customFieldValue.getClass());
