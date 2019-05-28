@@ -275,7 +275,7 @@ public class BoardConfigurationManagerTest {
         Files.deleteIfExists(configExamples);
         Assert.assertFalse(Files.exists(configExamples));
 
-        Path sourceRoot = configDir.getParent().getParent().getParent();
+        Path sourceRoot = configDir.getParent().getParent().getParent().getParent().getParent();
         Path examplesRelative = Paths.get("docs", "assets", "examples");
         Path examplesSource = sourceRoot.resolve(examplesRelative);
         Assert.assertTrue(Files.isDirectory(examplesSource));
