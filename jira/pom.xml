@@ -24,17 +24,18 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>overbaard-jira-plugin-parent</artifactId>
     <parent>
         <groupId>org.overbaard</groupId>
         <artifactId>overbaard-parent</artifactId>
         <version>1.0.0.Beta6-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
+    <artifactId>overbaard-jira-plugin-parent</artifactId>
+    <name>Overbård Jira Parent</name>
     <packaging>pom</packaging>
     <description>Parent for the Jira plugins</description>
 
     <modules>
-        <module>core-plugin</module>
+        <module>plugin-core</module>
     </modules>
 </project>

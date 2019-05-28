@@ -16,7 +16,8 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.overbaard</groupId>
     <artifactId>overbaard-parent</artifactId>
@@ -25,7 +26,7 @@
     <organization>
         <url>https://github.com/overbaard/overbaard</url>
     </organization>
-    <name>Overbård</name>
+    <name>Overbård Parent</name>
     <description>Nicer views on the Jira Agile boards</description>
 
     <licenses>
@@ -60,13 +61,16 @@
         <!-- TestKit version 6.x for JIRA 6.x -->
         <version.testkit>6.3.11</version.testkit>
 
+        <!-- My plugin versions -->
         <version.frontend-maven-plugin>1.6</version.frontend-maven-plugin>
-
         <version.resources-plugin>3.0.2</version.resources-plugin>
         <version.clean-plugin>3.0.0</version.clean-plugin>
         <version.checkstyle.plugin>3.0.0</version.checkstyle.plugin>
-
         <version.checkstyle>8.18</version.checkstyle>
+
+        <!-- Node and Yarn versions -->
+        <version.yarn>v1.13.0</version.yarn>
+        <version.node>v11.10.0</version.node>
 
 
         <!-- This key is used to keep the consistency between the key in atlassian-plugin.xml and the key to generate bundle. -->
@@ -223,6 +227,148 @@
 
     </dependencies>
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>com.atlassian.maven.plugins</groupId>
+                    <artifactId>jira-maven-plugin</artifactId>
+                    <version>${version.amps}</version>
+                    <extensions>true</extensions>
+                    <configuration>
+                        <productVersion>${version.jira}</productVersion>
+                        <productDataVersion>${version.jira}</productDataVersion>
+                        <!-- Uncomment to install TestKit backdoor in JIRA. -->
+                        <!--
+                        <pluginArtifacts>
+                            <pluginArtifact>
+                                <groupId>com.atlassian.jira.tests</groupId>
+                                <artifactId>jira-testkit-plugin</artifactId>
+                                <version>${testkit.version}</version>
+                            </pluginArtifact>
+                        </pluginArtifacts>
+                        -->
+                        <enableQuickReload>true</enableQuickReload>
+                        <instructions>
+                            <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
+                            <!-- Add package to export here -->
+                            <Export-Package>org.overbaard.jira.api,</Export-Package>
+                            <!-- Add package import here -->
+                            <Import-Package>org.springframework.osgi.*;resolution:="optional",
+                                org.eclipse.gemini.blueprint.*;resolution:="optional", *
+                            </Import-Package>
+                            <!-- Ensure plugin is spring powered - see https://extranet.atlassian.com/x/xBS9hQ  -->
+                            <Spring-Context>*</Spring-Context>
+                        </instructions>
+
+                        <!-- TODO Get rid of this (compression causes some problems I don't want to look at now) -->
+                        <compressResources>false</compressResources>
+                        <jvmArgs>-Xms1g -Xmx2g -XX:MaxPermSize=1g -XX:-UseGCOverheadLimit -server</jvmArgs>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>com.atlassian.plugin</groupId>
+                    <artifactId>atlassian-spring-scanner-maven-plugin</artifactId>
+                    <version>${version.atlassian.spring.scanner}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>atlassian-spring-scanner</goal>
+                            </goals>
+                            <phase>process-classes</phase>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <scannedDependencies>
+                            <dependency>
+                                <groupId>com.atlassian.plugin</groupId>
+                                <artifactId>atlassian-spring-scanner-external-jar</artifactId>
+                            </dependency>
+                        </scannedDependencies>
+                        <verbose>false</verbose>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>${version.checkstyle.plugin}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>${version.checkstyle}</version>
+                            <exclusions>
+                                <exclusion>
+                                    <groupId>com.sun</groupId>
+                                    <artifactId>tools</artifactId>
+                                </exclusion>
+                            </exclusions>
+                        </dependency>
+                    </dependencies>
+                    <executions>
+                        <execution>
+                            <id>check-style</id>
+                            <phase>compile</phase>
+                            <goals>
+                                <goal>checkstyle</goal>
+                            </goals>
+                            <configuration>
+                                <configLocation>${project.build.outputDirectory}/checkstyle.xml</configLocation>
+                                <consoleOutput>true</consoleOutput>
+                                <failsOnError>true</failsOnError>
+                                <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                                <useFile></useFile>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <!-- Used to bundle the front-end build -->
+                <plugin>
+                    <groupId>com.github.eirslett</groupId>
+                    <artifactId>frontend-maven-plugin</artifactId>
+                    <!-- Use the latest released version:
+                    https://repo1.maven.org/maven2/com/github/eirslett/frontend-maven-plugin/ -->
+                    <version>${version.frontend-maven-plugin}</version>
+<!--
+                    <configuration>
+                        <workingDirectory>webapp</workingDirectory>
+                    </configuration>
+-->
+                </plugin>
+                <plugin>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>${version.clean-plugin}</version>
+                    <!--
+                    <executions>
+                        <execution>
+                            <id>copy-resources</id>
+                            &lt;!&ndash; here the phase you need &ndash;&gt;
+                            <phase>process-resources</phase>
+                            <goals>
+                                <goal>clean</goal>
+                            </goals>
+                            <configuration>
+                                <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                                <filesets>
+                                    <fileset>
+                                        <directory>${basedir}/target/classes/webapp</directory>
+                                        <includes>
+                                            <include>*.js</include>
+                                            <include>*.js.map</include>
+                                            <include>*.html</include>
+                                            <include>*.ico</include>
+                                        </includes>
+                                    </fileset>
+                                </filesets>
+                            </configuration>
+                        </execution>
+                    </executions>-->
+                </plugin>
+                <plugin>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${version.resources-plugin}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
@@ -248,7 +394,9 @@
                         <!-- Add package to export here -->
                         <Export-Package>org.overbaard.jira.api,</Export-Package>
                         <!-- Add package import here -->
-                        <Import-Package>org.springframework.osgi.*;resolution:="optional", org.eclipse.gemini.blueprint.*;resolution:="optional", *</Import-Package>
+                        <Import-Package>org.springframework.osgi.*;resolution:="optional",
+                            org.eclipse.gemini.blueprint.*;resolution:="optional", *
+                        </Import-Package>
                         <!-- Ensure plugin is spring powered - see https://extranet.atlassian.com/x/xBS9hQ  -->
                         <Spring-Context>*</Spring-Context>
                     </instructions>
@@ -314,24 +462,20 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- Used to run the webpack build -->
             <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
                 <!-- Use the latest released version:
                 https://repo1.maven.org/maven2/com/github/eirslett/frontend-maven-plugin/ -->
                 <version>${version.frontend-maven-plugin}</version>
-                <configuration>
-                    <workingDirectory>webapp</workingDirectory>
-                </configuration>
             </plugin>
-            <plugin>
+<!--            <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
                 <version>${version.clean-plugin}</version>
                 <executions>
                     <execution>
                         <id>copy-resources</id>
-                        <!-- here the phase you need -->
+                        &lt;!&ndash; here the phase you need &ndash;&gt;
                         <phase>process-resources</phase>
                         <goals>
                             <goal>clean</goal>
@@ -352,14 +496,14 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
+            </plugin>-->
+<!--            <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>${version.resources-plugin}</version>
                 <executions>
                     <execution>
                         <id>copy-resources</id>
-                        <!-- here the phase you need -->
+                        &lt;!&ndash; here the phase you need &ndash;&gt;
                         <phase>process-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
@@ -369,215 +513,19 @@
                             <resources>
                                 <resource>
                                     <directory>webapp/dist</directory>
-                                    <!-- TODO exclude the rest/ directory -->
+                                    &lt;!&ndash; TODO exclude the rest/ directory &ndash;&gt;
                                     <filtering>false</filtering>
                                 </resource>
                             </resources>
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
         </plugins>
     </build>
-    <profiles>
-        <profile>
-            <!--
-                Installs node and yarn in the webapp/node and webapp/node_modules folders respectively.
-                Run 'atlas-package -Dob.ui.deps':
-                    * the first time you have checked out the source.
-                    * whenever the dependencies have been changed in package.json (delete the webapp/node_modules
-                      folder first!)
-            -->
-            <id>Install node and yarn</id>
-            <activation>
-                <property><name>ob.ui.deps</name></property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.eirslett</groupId>
-                        <artifactId>frontend-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <!--
-                                    Install node and yarn for the plugin to have a copy.
-                                -->
-                                <id>install node and yarn</id>
-                                <goals>
-                                    <goal>install-node-and-yarn</goal>
-                                </goals>
-                                <configuration>
-                                    <nodeVersion>v11.10.0</nodeVersion>
-                                    <yarnVersion>v1.13.0</yarnVersion>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <!--
-                                    Run yarn install when having updated dependencies
-                                -->
-                                <id>yarn install</id>
-                                <goals>
-                                    <goal>yarn</goal>
-                                </goals>
-                                <!-- Optional configuration which provides for running any yarn command -->
-                                <configuration>
-                                    <arguments>install</arguments>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <!--
-                Since building the ui is slightly time-consuming, and not all changes necessarily affect the ui, turn on
-		building the ui explicitly by running 'atlas-package -Dob.ui.dev'.
-
-                This is faster than the production build as it does not perform all optimisations at build time.
-            -->
-            <id>Build the UI</id>
-            <activation>
-                <property>
-                    <name>ob.ui.dev</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.eirslett</groupId>
-                        <artifactId>frontend-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <!--
-                                    Uses webpack to bundle the application as set up in package.json
-                                -->
-                                <id>yarn run build</id>
-                                <goals>
-                                    <goal>yarn</goal>
-                                </goals>
-                                <configuration>
-                                    <arguments>run build --output-hashing=all</arguments>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <!--
-                !!!! USE THIS FOR PRODUCTION BUILDS - IT RESULTS IN A MUCH SMALLER SIZE!!!!
-
-                Since building the ui this way is very time-consuming, and not all changes necessarily affect the ui, turn on
-                building the ui explicitly by running 'atlas-package -Dob.ui'
-            -->
-            <id>Build the UI with AOT</id>
-            <activation>
-                <property>
-                    <name>ob.ui</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.eirslett</groupId>
-                        <artifactId>frontend-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <!--
-                                    Uses webpack to bundle the application as set up in package.json
-                                -->
-                                <id>yarn run build</id>
-                                <goals>
-                                    <goal>yarn</goal>
-                                </goals>
-                                <configuration>
-                                    <arguments>run build --output-hashing=all --prod --aot --configuration=production</arguments>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>Test the UI</id>
-            <activation>
-                <property>
-                    <name>ob.ui.tests</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.eirslett</groupId>
-                        <artifactId>frontend-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <!--
-                                    Run the linter
-                                -->
-                                <id>yarn run lint</id>
-                                <goals>
-                                    <goal>yarn</goal>
-                                </goals>
-                                <configuration>
-                                    <arguments>run lint</arguments>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <!--
-                                    Run the tests
-                                -->
-                                <id>yarn run test:travis-headless</id>
-                                <goals>
-                                    <goal>yarn</goal>
-                                </goals>
-                                <configuration>
-                                    <arguments>run test:travis-headless</arguments>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
-    <!-- After upgrading IntelliJ IDEA to 2016.3.2, this is suddenly needed -->
-    <repositories>
-        <repository>
-            <releases>
-                <enabled>true</enabled>
-                <checksumPolicy>warn</checksumPolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-                <checksumPolicy>warn</checksumPolicy>
-            </snapshots>
-            <id>atlassian-public</id>
-            <url>https://maven.atlassian.com/repository/public</url>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <releases>
-                <enabled>true</enabled>
-                <checksumPolicy>warn</checksumPolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-                <checksumPolicy>warn</checksumPolicy>
-            </snapshots>
-            <id>atlassian-public</id>
-            <url>https://maven.atlassian.com/repository/public</url>
-        </pluginRepository>
-    </pluginRepositories>
 
     <modules>
+        <module>webapp</module>
         <module>jira</module>
     </modules>
 </project>

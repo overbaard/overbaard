@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ JBoss, Home of Professional Open Source.
+  ~ Copyright 2019, Red Hat, Inc., and individual contributors
+  ~ as indicated by the @author tags. See the copyright.txt file in the
+  ~ distribution for a full listing of individual contributors.
+  ~
+  ~ This is free software; you can redistribute it and/or modify it
+  ~ under the terms of the GNU Lesser General Public License as
+  ~ published by the Free Software Foundation; either version 2.1 of
+  ~ the License, or (at your option) any later version.
+  ~
+  ~ This software is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  ~ Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public
+  ~ License along with this software; if not, write to the Free
+  ~ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>overbaard-webapp</artifactId>
+  <parent>
+    <groupId>org.overbaard</groupId>
+    <artifactId>overbaard-parent</artifactId>
+    <version>1.0.0.Beta6-SNAPSHOT</version>
+    <relativePath>..</relativePath>
+  </parent>
+  <name>Overbård Web Application</name>
+  <packaging>jar</packaging>
+  <description>The Overbård web application</description>
+
+  <profiles>
+    <profile>
+      <!--
+          Installs node and yarn in the node and node_modules folders respectively.
+          Run 'atlas-package -Dob.ui.deps':
+              * the first time you have checked out the source.
+              * whenever the dependencies have been changed in package.json (delete the node_modules
+                folder first!)
+      -->
+      <id>Install node and yarn</id>
+      <activation>
+        <property>
+          <name>ob.ui.deps</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.github.eirslett</groupId>
+            <artifactId>frontend-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <!--
+                    Install node and yarn for the plugin to have a copy.
+                -->
+                <id>install node and yarn</id>
+                <goals>
+                  <goal>install-node-and-yarn</goal>
+                </goals>
+                <configuration>
+                  <nodeVersion>${version.node}</nodeVersion>
+                  <yarnVersion>${version.yarn}</yarnVersion>
+                </configuration>
+              </execution>
+              <execution>
+                <!--
+                    Run yarn install when having updated dependencies
+                -->
+                <id>yarn install</id>
+                <goals>
+                  <goal>yarn</goal>
+                </goals>
+                <!-- Optional configuration which provides for running any yarn command -->
+                <configuration>
+                  <arguments>install</arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <!--
+          Since building the ui is slightly time-consuming, and not all changes necessarily affect the ui, turn on
+  building the ui explicitly by running 'atlas-package -Dob.ui.dev'.
+
+          This is faster than the production build as it does not perform all optimisations at build time.
+      -->
+      <id>Build the UI</id>
+      <activation>
+        <property>
+          <name>ob.ui.dev</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.github.eirslett</groupId>
+            <artifactId>frontend-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <!--
+                    Uses webpack to bundle the application as set up in package.json
+                -->
+                <id>yarn run build</id>
+                <goals>
+                  <goal>yarn</goal>
+                </goals>
+                <configuration>
+                  <arguments>run build --output-hashing=all</arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <!--
+          !!!! USE THIS FOR PRODUCTION BUILDS - IT RESULTS IN A MUCH SMALLER SIZE!!!!
+
+          Since building the ui this way is very time-consuming, and not all changes necessarily affect the ui, turn on
+          building the ui explicitly by running 'atlas-package -Dob.ui'
+      -->
+      <id>Build the UI with AOT</id>
+      <activation>
+        <property>
+          <name>ob.ui</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.github.eirslett</groupId>
+            <artifactId>frontend-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <!--
+                    Uses webpack to bundle the application as set up in package.json
+                -->
+                <id>yarn run build</id>
+                <goals>
+                  <goal>yarn</goal>
+                </goals>
+                <configuration>
+                  <arguments>run build --output-hashing=all --prod --aot --configuration=production</arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>Test the UI</id>
+      <activation>
+        <property>
+          <name>ob.ui.tests</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.github.eirslett</groupId>
+            <artifactId>frontend-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <!--
+                    Run the linter
+                -->
+                <id>yarn run lint</id>
+                <goals>
+                  <goal>yarn</goal>
+                </goals>
+                <configuration>
+                  <arguments>run lint</arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <!--
+                    Run the tests
+                -->
+                <id>yarn run test:travis-headless</id>
+                <goals>
+                  <goal>yarn</goal>
+                </goals>
+                <configuration>
+                  <arguments>run test:travis-headless</arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>
