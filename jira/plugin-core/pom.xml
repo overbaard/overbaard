@@ -35,17 +35,9 @@
     <packaging>atlassian-plugin</packaging>
     <description>Nicer views on the Jira Agile boards</description>
 
-    <organization>
-        <url>https://github.com/overbaard/overbaard</url>
-    </organization>
-
-    <licenses>
-        <license>
-            <name>Apache License 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
+    <properties>
+        <location.checkstyle.xml>${project.basedir}/../../checkstyle/checkstyle.xml</location.checkstyle.xml>
+    </properties>
 
     <dependencies>
         <dependency>

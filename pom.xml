@@ -82,6 +82,9 @@
         <!-- Source encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- Override this property in each module for the proper checkstyle.xml location -->
+        <location.checkstyle.xml>config/checkstyle.xml</location.checkstyle.xml>
     </properties>
 
     <modules>
@@ -458,7 +461,7 @@
                             <goal>checkstyle</goal>
                         </goals>
                         <configuration>
-                            <configLocation>${project.build.outputDirectory}/checkstyle.xml</configLocation>
+                            <configLocation>${location.checkstyle.xml}</configLocation>
                             <consoleOutput>true</consoleOutput>
                             <failsOnError>true</failsOnError>
                             <includeTestSourceDirectory>true</includeTestSourceDirectory>
