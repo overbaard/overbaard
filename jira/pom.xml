@@ -28,7 +28,7 @@
         <groupId>org.overbaard</groupId>
         <artifactId>overbaard-parent</artifactId>
         <version>1.0.0.Beta6-SNAPSHOT</version>
-        <relativePath>..</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>overbaard-jira-plugin-parent</artifactId>
     <name>Overbård Jira Parent</name>
