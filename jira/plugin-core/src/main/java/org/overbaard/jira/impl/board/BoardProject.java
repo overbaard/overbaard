@@ -33,6 +33,8 @@ import org.overbaard.jira.api.CustomFieldOptions;
 import org.overbaard.jira.api.NextRankedIssueUtil;
 import org.overbaard.jira.api.ParallelTaskOptions;
 import org.overbaard.jira.api.ProjectCustomFieldOptionsLoader;
+import org.overbaard.jira.api.adapter.JiraApiAdapterFactory;
+import org.overbaard.jira.api.adapter.spi.SearchResultsAdapter;
 import org.overbaard.jira.impl.Constants;
 import org.overbaard.jira.impl.JiraInjectables;
 import org.overbaard.jira.impl.config.BoardProjectConfig;
@@ -301,6 +303,7 @@ public class BoardProject {
         protected final Board.Accessor board;
         protected final BoardProjectConfig projectConfig;
         protected final ApplicationUser boardOwner;
+        protected static final SearchResultsAdapter SEARCH_RESULTS_ADAPTER = JiraApiAdapterFactory.getAdapter().getSearchResultsAdapter();
 
 
         public Accessor(JiraInjectables jiraInjectables, Board.Accessor board, BoardProjectConfig projectConfig, ApplicationUser boardOwner) {
@@ -483,7 +486,7 @@ public class BoardProject {
             final IssueLoadStrategy issueLoadStrategy = IssueLoadStrategy.Factory.create(this);
 
             List<Issue.Builder> issueBuilders = new ArrayList<>();
-            for (com.atlassian.jira.issue.Issue jiraIssue : searchResults.getIssues()) {
+            for (com.atlassian.jira.issue.Issue jiraIssue : SEARCH_RESULTS_ADAPTER.getIssueResults(searchResults)) {
                 Issue.Builder issueBuilder = Issue.builder(this, issueLoadStrategy);
                 issueBuilder.load(jiraIssue);
                 issueBuilders.add(issueBuilder);
@@ -671,7 +674,7 @@ public class BoardProject {
             SearchResults searchResults =
                     searchService.search(boardOwner, queryBuilder.buildQuery(), PagerFilter.getUnlimitedFilter());
 
-            List<com.atlassian.jira.issue.Issue> issues = searchResults.getIssues();
+            List<com.atlassian.jira.issue.Issue> issues = SEARCH_RESULTS_ADAPTER.getIssueResults(searchResults);
             if (issues.size() == 0) {
                 OverbaardLogger.LOGGER.debug("BoardProject.Updater.loadSingleIssue - no issue found");
                 return null;
