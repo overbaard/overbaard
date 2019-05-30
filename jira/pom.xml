@@ -37,5 +37,6 @@
 
     <modules>
         <module>plugin-core</module>
+        <module>api-adapter</module>
     </modules>
 </project>

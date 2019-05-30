@@ -94,6 +94,25 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- Internal project dependencies -->
+            <dependency>
+                <groupId>org.overbaard</groupId>
+                <artifactId>overbaard-jira-api-adapter</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.overbaard</groupId>
+                <artifactId>overbaard-jira-api-adapter-spi</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.overbaard</groupId>
+                <artifactId>overbaard-jira-api-adapter-jira7</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+
+            <!-- Other dependencies -->
             <dependency>
                 <groupId>com.atlassian.jira</groupId>
                 <artifactId>jira-api</artifactId>
