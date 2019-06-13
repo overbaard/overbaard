@@ -16,6 +16,18 @@
         <location.checkstyle.xml>${project.basedir}/../../../checkstyle/checkstyle.xml</location.checkstyle.xml>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.overbaard</groupId>
+                <artifactId>overbaard-bom-jira7</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.overbaard</groupId>

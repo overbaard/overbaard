@@ -36,8 +36,24 @@
     <description>Nicer views on the Jira Agile boards</description>
 
     <properties>
+        <version.amps>8.0.2</version.amps>
+        <version.atlassian.spring.scanner>${version.internal.atlassian.spring.scanner}</version.atlassian.spring.scanner>
+        <version.jira>${version.internal.jira7}</version.jira>
+
         <location.checkstyle.xml>${project.basedir}/../../checkstyle/checkstyle.xml</location.checkstyle.xml>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.overbaard</groupId>
+                <artifactId>overbaard-bom-jira7</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -88,20 +104,7 @@
         <dependency>
             <groupId>com.atlassian.jira.plugins</groupId>
             <artifactId>jira-greenhopper-plugin</artifactId>
-            <version>${version.atlassian.greenhopper}</version>
         </dependency>
-
-
-        <!-- Add dependency on jira-core if you want access to JIRA implementation classes as well as the sanctioned API. -->
-        <!-- This is not normally recommended, but may be required eg when migrating a plugin originally developed against JIRA 4.x -->
-        <!--
-        <dependency>
-            <groupId>com.atlassian.jira</groupId>
-            <artifactId>jira-core</artifactId>
-            <version>${jira.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
