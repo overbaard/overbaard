@@ -257,42 +257,6 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>com.atlassian.maven.plugins</groupId>
-                    <artifactId>jira-maven-plugin</artifactId>
-                    <version>${version.amps}</version>
-                    <extensions>true</extensions>
-                    <configuration>
-                        <productVersion>${version.jira}</productVersion>
-                        <productDataVersion>${version.jira}</productDataVersion>
-                        <!-- Uncomment to install TestKit backdoor in JIRA. -->
-                        <!--
-                        <pluginArtifacts>
-                            <pluginArtifact>
-                                <groupId>com.atlassian.jira.tests</groupId>
-                                <artifactId>jira-testkit-plugin</artifactId>
-                                <version>${testkit.version}</version>
-                            </pluginArtifact>
-                        </pluginArtifacts>
-                        -->
-                        <enableQuickReload>true</enableQuickReload>
-                        <instructions>
-                            <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
-                            <!-- Add package to export here -->
-                            <Export-Package>org.overbaard.jira.api,</Export-Package>
-                            <!-- Add package import here -->
-                            <Import-Package>org.springframework.osgi.*;resolution:="optional",
-                                org.eclipse.gemini.blueprint.*;resolution:="optional", *
-                            </Import-Package>
-                            <!-- Ensure plugin is spring powered - see https://extranet.atlassian.com/x/xBS9hQ  -->
-                            <Spring-Context>*</Spring-Context>
-                        </instructions>
-
-                        <!-- TODO Get rid of this (compression causes some problems I don't want to look at now) -->
-                        <compressResources>false</compressResources>
-                        <jvmArgs>-Xms1g -Xmx2g -XX:MaxPermSize=1g -XX:-UseGCOverheadLimit -server</jvmArgs>
-                    </configuration>
-                </plugin>
-                <plugin>
                     <groupId>com.atlassian.plugin</groupId>
                     <artifactId>atlassian-spring-scanner-maven-plugin</artifactId>
                     <version>${version.atlassian.spring.scanner}</version>
@@ -353,42 +317,13 @@
                     <groupId>com.github.eirslett</groupId>
                     <artifactId>frontend-maven-plugin</artifactId>
                     <!-- Use the latest released version:
-                    https://repo1.maven.org/maven2/com/github/eirslett/frontend-maven-plugin/ -->
+                        https://repo1.maven.org/maven2/com/github/eirslett/frontend-maven-plugin/
+                    -->
                     <version>${version.frontend-maven-plugin}</version>
-<!--
-                    <configuration>
-                        <workingDirectory>webapp</workingDirectory>
-                    </configuration>
--->
                 </plugin>
                 <plugin>
                     <artifactId>maven-clean-plugin</artifactId>
                     <version>${version.clean-plugin}</version>
-                    <!--
-                    <executions>
-                        <execution>
-                            <id>copy-resources</id>
-                            &lt;!&ndash; here the phase you need &ndash;&gt;
-                            <phase>process-resources</phase>
-                            <goals>
-                                <goal>clean</goal>
-                            </goals>
-                            <configuration>
-                                <excludeDefaultDirectories>true</excludeDefaultDirectories>
-                                <filesets>
-                                    <fileset>
-                                        <directory>${basedir}/target/classes/webapp</directory>
-                                        <includes>
-                                            <include>*.js</include>
-                                            <include>*.js.map</include>
-                                            <include>*.html</include>
-                                            <include>*.ico</include>
-                                        </includes>
-                                    </fileset>
-                                </filesets>
-                            </configuration>
-                        </execution>
-                    </executions>-->
                 </plugin>
                 <plugin>
                     <artifactId>maven-resources-plugin</artifactId>
@@ -397,64 +332,6 @@
             </plugins>
         </pluginManagement>
         <plugins>
-            <plugin>
-                <groupId>com.atlassian.maven.plugins</groupId>
-                <artifactId>jira-maven-plugin</artifactId>
-                <version>${version.amps}</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <productVersion>${version.jira}</productVersion>
-                    <productDataVersion>${version.jira}</productDataVersion>
-                    <!-- Uncomment to install TestKit backdoor in JIRA. -->
-                    <!--
-					<pluginArtifacts>
-						<pluginArtifact>
-							<groupId>com.atlassian.jira.tests</groupId>
-							<artifactId>jira-testkit-plugin</artifactId>
-							<version>${testkit.version}</version>
-						</pluginArtifact>
-					</pluginArtifacts>
-					-->
-                    <enableQuickReload>true</enableQuickReload>
-                    <instructions>
-                        <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
-                        <!-- Add package to export here -->
-                        <Export-Package>org.overbaard.jira.api,</Export-Package>
-                        <!-- Add package import here -->
-                        <Import-Package>org.springframework.osgi.*;resolution:="optional",
-                            org.eclipse.gemini.blueprint.*;resolution:="optional", *
-                        </Import-Package>
-                        <!-- Ensure plugin is spring powered - see https://extranet.atlassian.com/x/xBS9hQ  -->
-                        <Spring-Context>*</Spring-Context>
-                    </instructions>
-
-                    <!-- TODO Get rid of this (compression causes some problems I don't want to look at now) -->
-                    <compressResources>false</compressResources>
-                    <jvmArgs>-Xms1g -Xmx2g -XX:MaxPermSize=1g -XX:-UseGCOverheadLimit -server</jvmArgs>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>com.atlassian.plugin</groupId>
-                <artifactId>atlassian-spring-scanner-maven-plugin</artifactId>
-                <version>${version.atlassian.spring.scanner}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>atlassian-spring-scanner</goal>
-                        </goals>
-                        <phase>process-classes</phase>
-                    </execution>
-                </executions>
-                <configuration>
-                    <scannedDependencies>
-                        <dependency>
-                            <groupId>com.atlassian.plugin</groupId>
-                            <artifactId>atlassian-spring-scanner-external-jar</artifactId>
-                        </dependency>
-                    </scannedDependencies>
-                    <verbose>false</verbose>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
@@ -480,6 +357,10 @@
                             <goal>checkstyle</goal>
                         </goals>
                         <configuration>
+                            <!--
+                                Sub modules will need to override this. If they don't an error will happen.
+                                This is good since it forces the modules to do this so we get the checks.
+                            -->
                             <configLocation>${location.checkstyle.xml}</configLocation>
                             <consoleOutput>true</consoleOutput>
                             <failsOnError>true</failsOnError>
@@ -496,58 +377,6 @@
                 https://repo1.maven.org/maven2/com/github/eirslett/frontend-maven-plugin/ -->
                 <version>${version.frontend-maven-plugin}</version>
             </plugin>
-<!--            <plugin>
-                <artifactId>maven-clean-plugin</artifactId>
-                <version>${version.clean-plugin}</version>
-                <executions>
-                    <execution>
-                        <id>copy-resources</id>
-                        &lt;!&ndash; here the phase you need &ndash;&gt;
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>clean</goal>
-                        </goals>
-                        <configuration>
-                            <excludeDefaultDirectories>true</excludeDefaultDirectories>
-                            <filesets>
-                                <fileset>
-                                    <directory>${basedir}/target/classes/webapp</directory>
-                                    <includes>
-                                        <include>*.js</include>
-                                        <include>*.js.map</include>
-                                        <include>*.html</include>
-                                        <include>*.ico</include>
-                                    </includes>
-                                </fileset>
-                            </filesets>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>-->
-<!--            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>${version.resources-plugin}</version>
-                <executions>
-                    <execution>
-                        <id>copy-resources</id>
-                        &lt;!&ndash; here the phase you need &ndash;&gt;
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${basedir}/target/classes/webapp</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>webapp/dist</directory>
-                                    &lt;!&ndash; TODO exclude the rest/ directory &ndash;&gt;
-                                    <filtering>false</filtering>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>-->
         </plugins>
     </build>
 

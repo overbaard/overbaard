@@ -38,5 +38,6 @@
     <modules>
         <module>plugin-core</module>
         <module>api-adapter</module>
+        <module>bom</module>
     </modules>
 </project>
