@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>overbaard-jira-api-adapter-spi</artifactId>
-    <name>Overbård Api Adapter Jira SPI</name>
+    <name>Jira Api Adapter SPI</name>
 
     <properties>
         <location.checkstyle.xml>${project.basedir}/../../../checkstyle/checkstyle.xml</location.checkstyle.xml>

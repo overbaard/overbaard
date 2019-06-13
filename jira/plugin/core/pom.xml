@@ -28,10 +28,9 @@
         <groupId>org.overbaard</groupId>
         <artifactId>overbaard-jira-plugin-parent</artifactId>
         <version>1.0.0.Beta6-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>overbaard-jira-plugin-core</artifactId>
-    <name>Overbård Jira Plugin Core</name>
+    <name>Jira Plugin Core</name>
     <packaging>atlassian-plugin</packaging>
     <description>Nicer views on the Jira Agile boards</description>
 
@@ -40,7 +39,7 @@
         <version.atlassian.spring.scanner>${version.internal.atlassian.spring.scanner}</version.atlassian.spring.scanner>
         <version.jira>${version.internal.jira7}</version.jira>
 
-        <location.checkstyle.xml>${project.basedir}/../../checkstyle/checkstyle.xml</location.checkstyle.xml>
+        <location.checkstyle.xml>${project.basedir}/../../../checkstyle/checkstyle.xml</location.checkstyle.xml>
     </properties>
 
     <dependencyManagement>
@@ -266,7 +265,7 @@
                             <outputDirectory>${basedir}/target/classes/webapp</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>../../webapp/target</directory>
+                                    <directory>../../../webapp/target</directory>
                                     <!-- TODO exclude the rest/ directory -->
                                     <filtering>false</filtering>
                                 </resource>

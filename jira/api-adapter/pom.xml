@@ -3,18 +3,18 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>overbaard-jira-plugin-parent</artifactId>
         <groupId>org.overbaard</groupId>
+        <artifactId>overbaard-jira-parent</artifactId>
         <version>1.0.0.Beta6-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>overbaard-jira-api-adapter</artifactId>
-    <name>Overbård Api Adapter Parent</name>
+    <packaging>pom</packaging>
+    <name>Api Adapter Parent</name>
     <modules>
         <module>jira7</module>
         <module>spi</module>
     </modules>
-    <packaging>pom</packaging>
 
 </project>
