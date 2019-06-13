@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>overbaard-bom-parent</artifactId>
+    <artifactId>overbaard-jira-bom-parent</artifactId>
     <name>BOM Parent</name>
     <packaging>pom</packaging>
     <modules>
