@@ -11,7 +11,7 @@
 
     <artifactId>overbaard-jira-api-adapter</artifactId>
     <packaging>pom</packaging>
-    <name>Api Adapter Parent</name>
+    <name>Jira Api Adapter Parent</name>
     <modules>
         <module>jira7</module>
         <module>spi</module>

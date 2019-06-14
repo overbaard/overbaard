@@ -62,8 +62,12 @@
         <version.node>v11.10.0</version.node>
 
 
-        <!-- This key is used to keep the consistency between the key in atlassian-plugin.xml and the key to generate bundle. -->
-        <atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
+        <!--
+            This key is used to keep the consistency between the key in atlassian-plugin.xml and the key to generate bundle.
+            The original value was ${project.groupId}.${project.artifactId}. But keep it 'constant' so we don't have to
+            do strange things in PrettyUrlFilter for the different plugin versions.
+        -->
+        <atlassian.plugin.key>org.overbaard.overbaard</atlassian.plugin.key>
 
         <!-- JDK version -->
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -97,6 +101,11 @@
             <dependency>
                 <groupId>org.overbaard</groupId>
                 <artifactId>overbaard-jira-api-adapter-jira7</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.overbaard</groupId>
+                <artifactId>overbaard-jira-plugin-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

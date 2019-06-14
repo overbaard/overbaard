@@ -38,7 +38,7 @@ import org.overbaard.jira.OverbaardLogger;
 public class PrettyUrlFilter implements Filter {
 
     private static final String OVERBAARD = "/overbaard";
-    private static final String OVERBAARD_RESOURCES = "/download/resources/org.overbaard.overbaard-jira-plugin-core/webapp";
+    private static final String OVERBAARD_RESOURCES = "/download/resources/org.overbaard.overbaard/webapp";
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
 

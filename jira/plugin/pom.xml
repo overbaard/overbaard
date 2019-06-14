@@ -35,5 +35,6 @@
 
     <modules>
         <module>core</module>
+        <module>jira7</module>
     </modules>
 </project>
