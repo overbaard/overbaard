@@ -24,7 +24,7 @@ import java.util.function.Function;
 import org.jboss.dmr.ModelNode;
 import org.ofbiz.core.entity.jdbc.SQLProcessor;
 import org.overbaard.jira.OverbaardValidationException;
-import org.overbaard.jira.api.adapter.JiraApiAdapterFactory;
+import org.overbaard.jira.api.adapter.spi.JiraApiAdapter;
 
 /**
  * @author Kabir Khan
@@ -39,7 +39,7 @@ public class RawSqlLoader {
 
     public static RawSqlLoader create(String dataSourceName) {
         final ClassLoader cl = RawSqlLoader.class.getClassLoader();
-        if (JiraApiAdapterFactory.getAdapter().getJiraEnvironmentAdapter().isRunningInJira()) {
+        if (JiraApiAdapter.Factory.get().getJiraEnvironmentAdapter().isRunningInJira()) {
             return new RawSqlLoader(dataSourceName);
         }
         return null;

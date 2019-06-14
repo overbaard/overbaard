@@ -24,7 +24,7 @@ import javax.inject.Named;
 
 import org.overbaard.jira.api.BoardConfigurationManager;
 import org.overbaard.jira.api.NextRankedIssueUtil;
-import org.overbaard.jira.api.adapter.JiraApiAdapterFactory;
+import org.overbaard.jira.api.adapter.spi.JiraApiAdapter;
 import org.overbaard.jira.api.adapter.spi.SearchResultsAdapter;
 import org.overbaard.jira.impl.board.BoardProject;
 import org.overbaard.jira.impl.config.BoardProjectConfig;
@@ -56,7 +56,7 @@ public class NextRankedIssueUtilImpl implements NextRankedIssueUtil {
     NextRankedIssueUtilImpl(JiraInjectables jiraInjectables, BoardConfigurationManager boardConfigurationManager) {
         this.jiraInjectables = jiraInjectables;
         this.boardConfigurationManager = boardConfigurationManager;
-        this.searchResultsAdapter = JiraApiAdapterFactory.getAdapter().getSearchResultsAdapter();
+        this.searchResultsAdapter = JiraApiAdapter.Factory.get().getSearchResultsAdapter();
     }
 
     @Override

@@ -24,7 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.overbaard.jira.api.adapter.JiraApiAdapterFactory;
+import org.overbaard.jira.api.adapter.spi.JiraApiAdapter;
 import org.overbaard.jira.api.adapter.spi.SearchResultsAdapter;
 import org.overbaard.jira.impl.util.IndexedMap;
 
@@ -78,7 +78,7 @@ interface IssueLoadStrategy {
         }
 
         final ClassLoader cl = RawSqlLoader.class.getClassLoader();
-        if (!JiraApiAdapterFactory.getAdapter().getJiraEnvironmentAdapter().isRunningInJira()) {
+        if (!JiraApiAdapter.Factory.get().getJiraEnvironmentAdapter().isRunningInJira()) {
             // For unit tests
             List<Epic> epics = new ArrayList<>(unsortedEpics.values());
             epics.sort(new Comparator<Epic>() {
@@ -108,7 +108,7 @@ interface IssueLoadStrategy {
         Query query = queryBuilder.buildQuery();
 
         try {
-            final SearchResultsAdapter searchResultsAdapter = JiraApiAdapterFactory.getAdapter().getSearchResultsAdapter();
+            final SearchResultsAdapter searchResultsAdapter = JiraApiAdapter.Factory.get().getSearchResultsAdapter();
             final SearchResults searchResults =
                     searchService.search(owner, query, PagerFilter.getUnlimitedFilter());
             final Map<String, Epic> result = new LinkedHashMap<>();
@@ -127,7 +127,7 @@ interface IssueLoadStrategy {
         static IssueLoadStrategy create(BoardProject.Builder project) {
             final boolean customFieldsOrParallelTasks =
                     project.getConfig().getCustomFieldNames().size() > 0 || project.getConfig().getInternalAdvanced().getParallelTaskGroupsConfig() != null;
-            if (JiraApiAdapterFactory.getAdapter().getJiraEnvironmentAdapter().isRunningInJira()) {
+            if (JiraApiAdapter.Factory.get().getJiraEnvironmentAdapter().isRunningInJira()) {
                 return new BulkIssueLoadStrategy(project, customFieldsOrParallelTasks);
             }
             //We are running in a unit test, so we don't use this strategy (see class javadoc)

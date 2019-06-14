@@ -33,7 +33,7 @@ import org.overbaard.jira.api.CustomFieldOptions;
 import org.overbaard.jira.api.NextRankedIssueUtil;
 import org.overbaard.jira.api.ParallelTaskOptions;
 import org.overbaard.jira.api.ProjectCustomFieldOptionsLoader;
-import org.overbaard.jira.api.adapter.JiraApiAdapterFactory;
+import org.overbaard.jira.api.adapter.spi.JiraApiAdapter;
 import org.overbaard.jira.api.adapter.spi.SearchResultsAdapter;
 import org.overbaard.jira.impl.Constants;
 import org.overbaard.jira.impl.JiraInjectables;
@@ -303,7 +303,7 @@ public class BoardProject {
         protected final Board.Accessor board;
         protected final BoardProjectConfig projectConfig;
         protected final ApplicationUser boardOwner;
-        protected static final SearchResultsAdapter SEARCH_RESULTS_ADAPTER = JiraApiAdapterFactory.getAdapter().getSearchResultsAdapter();
+        protected static final SearchResultsAdapter SEARCH_RESULTS_ADAPTER = JiraApiAdapter.Factory.get().getSearchResultsAdapter();
 
 
         public Accessor(JiraInjectables jiraInjectables, Board.Accessor board, BoardProjectConfig projectConfig, ApplicationUser boardOwner) {

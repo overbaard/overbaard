@@ -30,7 +30,6 @@ import org.ofbiz.core.entity.GenericValue;
 import org.overbaard.jira.OverbaardLogger;
 import org.overbaard.jira.api.BoardManager;
 import org.overbaard.jira.api.NextRankedIssueUtil;
-import org.overbaard.jira.api.adapter.JiraApiAdapterFactory;
 import org.overbaard.jira.api.adapter.spi.JiraApiAdapter;
 import org.overbaard.jira.impl.board.CustomFieldUtil;
 import org.overbaard.jira.impl.board.CustomFieldValue;
@@ -138,7 +137,7 @@ public class OverbaardIssueEventListener implements InitializingBean, Disposable
         this.boardManager = boardManager;
         this.nextRankedIssueUtil = nextRankedIssueUtil;
 
-        JiraApiAdapter jiraApiAdapter = JiraApiAdapterFactory.getAdapter();
+        JiraApiAdapter jiraApiAdapter = JiraApiAdapter.Factory.get();
     }
 
     /**

@@ -18,6 +18,7 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- Just use the Jira 7 BOM here. The adapters should abstract out the changes for other versions -->
             <dependency>
                 <groupId>org.overbaard</groupId>
                 <artifactId>overbaard-jira7-bom</artifactId>

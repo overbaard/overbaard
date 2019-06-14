@@ -1,4 +1,4 @@
-package org.overbaard.jira.api.adapter;
+package org.overbaard.jira.api.adapter.jira7;
 
 import java.util.List;
 

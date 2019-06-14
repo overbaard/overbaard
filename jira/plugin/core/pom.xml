@@ -44,6 +44,7 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- Just use the Jira 7 BOM here. The adapters should abstract out the changes for other versions -->
             <dependency>
                 <groupId>org.overbaard</groupId>
                 <artifactId>overbaard-jira7-bom</artifactId>
@@ -58,10 +59,6 @@
         <dependency>
             <groupId>org.overbaard</groupId>
             <artifactId>overbaard-jira-api-adapter-spi</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.overbaard</groupId>
-            <artifactId>overbaard-jira-api-adapter-jira7</artifactId>
         </dependency>
         <dependency>
             <groupId>com.atlassian.jira</groupId>
@@ -160,6 +157,16 @@
             <artifactId>mockito-all</artifactId>
             <scope>test</scope>
         </dependency>
+        <!--
+            This should ONLY be on the test classpath.
+            The plugins are responsible for pulling in the correct adapter version for runtime
+        -->
+        <dependency>
+            <groupId>org.overbaard</groupId>
+            <artifactId>overbaard-jira-api-adapter-jira7</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>

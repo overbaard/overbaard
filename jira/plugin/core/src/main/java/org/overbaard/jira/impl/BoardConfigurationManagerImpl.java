@@ -17,8 +17,8 @@ package org.overbaard.jira.impl;
 
 import static org.overbaard.jira.impl.Constants.BOARD_ID;
 import static org.overbaard.jira.impl.Constants.CAN_EDIT_CUSTOM_FIELDS;
-import static org.overbaard.jira.impl.Constants.CHANGE_TYPE;
 import static org.overbaard.jira.impl.Constants.CHANGED_BY;
+import static org.overbaard.jira.impl.Constants.CHANGE_TYPE;
 import static org.overbaard.jira.impl.Constants.CODE;
 import static org.overbaard.jira.impl.Constants.CONFIG;
 import static org.overbaard.jira.impl.Constants.CONFIGS;
