@@ -14,5 +14,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>jira7</module>
+        <module>jira8</module>
     </modules>
 </project>

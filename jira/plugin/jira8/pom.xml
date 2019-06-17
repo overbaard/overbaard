@@ -29,25 +29,24 @@
         <artifactId>overbaard-jira-plugin-parent</artifactId>
         <version>1.0.0.Beta6-SNAPSHOT</version>
     </parent>
-    <artifactId>overbaard-jira-plugin-core</artifactId>
-    <name>Jira Plugin Core</name>
-    <packaging>jar</packaging>
+    <artifactId>overbaard-jira-plugin-8</artifactId>
+    <name>Overbård Plugin for Jira 8.x</name>
+    <packaging>atlassian-plugin</packaging>
     <description>Nicer views on the Jira Agile boards</description>
 
     <properties>
         <version.amps>8.0.2</version.amps>
         <version.atlassian.spring.scanner>${version.internal.atlassian.spring.scanner}</version.atlassian.spring.scanner>
-        <version.jira>${version.internal.jira7}</version.jira>
+        <version.jira>${version.internal.jira8}</version.jira>
 
         <location.checkstyle.xml>${project.basedir}/../../../checkstyle/checkstyle.xml</location.checkstyle.xml>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-            <!-- Just use the Jira 7 BOM here. The adapters should abstract out the changes for other versions -->
             <dependency>
                 <groupId>org.overbaard</groupId>
-                <artifactId>overbaard-jira7-bom</artifactId>
+                <artifactId>overbaard-jira8-bom</artifactId>
                 <version>${project.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
@@ -62,7 +61,11 @@
         </dependency>
         <dependency>
             <groupId>org.overbaard</groupId>
-            <artifactId>overbaard-webapp</artifactId>
+            <artifactId>overbaard-jira-api-adapter-jira8</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.overbaard</groupId>
+            <artifactId>overbaard-jira-plugin-core</artifactId>
         </dependency>
         <dependency>
             <groupId>com.atlassian.jira</groupId>
@@ -161,20 +164,68 @@
             <artifactId>mockito-all</artifactId>
             <scope>test</scope>
         </dependency>
-        <!--
-            This should ONLY be on the test classpath.
-            The plugins are responsible for pulling in the correct adapter version for runtime
-        -->
-        <dependency>
-            <groupId>org.overbaard</groupId>
-            <artifactId>overbaard-jira-api-adapter-jira7</artifactId>
-            <scope>test</scope>
-        </dependency>
-
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>com.atlassian.maven.plugins</groupId>
+                <artifactId>jira-maven-plugin</artifactId>
+                <version>${version.amps}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <productVersion>${version.jira}</productVersion>
+                    <productDataVersion>${version.jira}</productDataVersion>
+                    <!-- Uncomment to install TestKit backdoor in JIRA. -->
+                    <!--
+                    <pluginArtifacts>
+                        <pluginArtifact>
+                            <groupId>com.atlassian.jira.tests</groupId>
+                            <artifactId>jira-testkit-plugin</artifactId>
+                            <version>${testkit.version}</version>
+                        </pluginArtifact>
+                    </pluginArtifacts>
+                    -->
+                    <enableQuickReload>true</enableQuickReload>
+                    <instructions>
+                        <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
+                        <!-- Add package to export here -->
+                        <Export-Package>org.overbaard.jira.api,</Export-Package>
+                        <!-- Add package import here -->
+                        <Import-Package>org.springframework.osgi.*;resolution:="optional",
+                            org.eclipse.gemini.blueprint.*;resolution:="optional", *
+                        </Import-Package>
+                        <!-- Ensure plugin is spring powered - see https://extranet.atlassian.com/x/xBS9hQ  -->
+                        <Spring-Context>*</Spring-Context>
+                    </instructions>
+
+                    <!-- TODO Get rid of this (compression causes some problems I don't want to look at now) -->
+                    <compressResources>false</compressResources>
+                    <jvmArgs>-Xms1g -Xmx2g -XX:MaxPermSize=1g -XX:-UseGCOverheadLimit -server</jvmArgs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.atlassian.plugin</groupId>
+                <artifactId>atlassian-spring-scanner-maven-plugin</artifactId>
+                <version>${version.atlassian.spring.scanner}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>atlassian-spring-scanner</goal>
+                        </goals>
+                        <phase>process-classes</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <scannedDependencies>
+                        <dependency>
+                            <groupId>com.atlassian.plugin</groupId>
+                            <artifactId>atlassian-spring-scanner-external-jar</artifactId>
+                        </dependency>
+                    </scannedDependencies>
+                    <verbose>false</verbose>
+                </configuration>
+            </plugin>
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
                 <version>${version.clean-plugin}</version>
@@ -208,19 +259,18 @@
                 <version>${version.resources-plugin}</version>
                 <executions>
                     <execution>
-                        <id>copy-resources</id>
+                        <id>copy-plugin-configuration-resources</id>
                         <!-- here the phase you need -->
                         <phase>process-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/classes/webapp</outputDirectory>
+                            <outputDirectory>${basedir}/target/classes</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>../../../webapp/target</directory>
-                                    <!-- TODO exclude the rest/ directory -->
-                                    <filtering>false</filtering>
+                                    <directory>../core/src/main/resources</directory>
+                                    <filtering>true</filtering>
                                 </resource>
                             </resources>
                         </configuration>

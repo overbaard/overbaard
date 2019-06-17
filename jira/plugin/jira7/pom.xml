@@ -30,7 +30,7 @@
         <version>1.0.0.Beta6-SNAPSHOT</version>
     </parent>
     <artifactId>overbaard-jira-plugin-7</artifactId>
-    <name>Jira Plugin 7</name>
+    <name>Overbård Plugin for Jira 7.x</name>
     <packaging>atlassian-plugin</packaging>
     <description>Nicer views on the Jira Agile boards</description>
 

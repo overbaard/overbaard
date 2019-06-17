@@ -48,6 +48,7 @@
             and plugins (which are needed directly by the Jira plugin
         -->
         <version.internal.jira7>7.5.0</version.internal.jira7>
+        <version.internal.jira8>8.0.2</version.internal.jira8>
         <version.internal.atlassian.spring.scanner>1.2.13</version.internal.atlassian.spring.scanner>
 
         <!-- My plugin versions -->
@@ -60,6 +61,10 @@
         <!-- Node and Yarn versions -->
         <version.yarn>v1.13.0</version.yarn>
         <version.node>v11.10.0</version.node>
+
+
+        <!-- Other stuff needed for atlassian-plugin.xml -->
+        <project.organization.name>Red Hat Inc.</project.organization.name>
 
 
         <!--
@@ -90,11 +95,6 @@
             <!-- Internal project dependencies -->
             <dependency>
                 <groupId>org.overbaard</groupId>
-                <artifactId>overbaard-jira-api-adapter</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.overbaard</groupId>
                 <artifactId>overbaard-jira-api-adapter-spi</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -105,7 +105,27 @@
             </dependency>
             <dependency>
                 <groupId>org.overbaard</groupId>
+                <artifactId>overbaard-jira-api-adapter-jira8</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.overbaard</groupId>
+                <artifactId>overbaard-jira7-bom</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.overbaard</groupId>
+                <artifactId>overbaard-jira8-bom</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.overbaard</groupId>
                 <artifactId>overbaard-jira-plugin-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.overbaard</groupId>
+                <artifactId>overbaard-webapp</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

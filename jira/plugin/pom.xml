@@ -36,5 +36,6 @@
     <modules>
         <module>core</module>
         <module>jira7</module>
+        <module>jira8</module>
     </modules>
 </project>
