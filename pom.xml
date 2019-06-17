@@ -48,7 +48,7 @@
             and plugins (which are needed directly by the Jira plugin
         -->
         <version.internal.jira7>7.5.0</version.internal.jira7>
-        <version.internal.jira8>8.0.2</version.internal.jira8>
+        <version.internal.jira8>8.2.0</version.internal.jira8>
         <version.internal.atlassian.spring.scanner>1.2.13</version.internal.atlassian.spring.scanner>
 
         <!-- My plugin versions -->
