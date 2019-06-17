@@ -35,7 +35,30 @@
 
     <modules>
         <module>core</module>
-        <module>jira7</module>
-        <module>jira8</module>
     </modules>
+
+    <profiles>
+        <profile>
+            <id>jira7</id>
+            <activation>
+                <property>
+                    <name>ob.jira7</name>
+                </property>
+            </activation>
+            <modules>
+                <module>jira7</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>jira8</id>
+            <activation>
+                <property>
+                    <name>ob.jira8</name>
+                </property>
+            </activation>
+            <modules>
+                <module>jira8</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>
