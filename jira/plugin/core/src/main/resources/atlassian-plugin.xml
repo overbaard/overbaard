@@ -66,7 +66,8 @@
   <resource type="download" name="webapp/" location="/webapp/"/>
 
   <!-- Active Objects configuration for configuration storage -->
-  <ao name="Overbaard Active Objects" key="ao-module">
+	<!-- Set the namespace key here, to preserve the same table prefix as was used in previous versions -->
+  <ao name="Overbaard Active Objects" key="ao-module" namespace="org.overbaard">
     <description>The module configuring the Active Objects service used by this plugin</description>
     <entity>org.overbaard.jira.impl.activeobjects.BoardCfg</entity>
     <entity>org.overbaard.jira.impl.activeobjects.BoardCfgHistory</entity>
