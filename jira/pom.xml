@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>org.overbaard</groupId>
+        <artifactId>overbaard-parent</artifactId>
+        <version>1.0.0.Beta6-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>overbaard-jira-parent</artifactId>
+    <packaging>pom</packaging>
+    <name>Jira Parent</name>
+    <modules>
+        <module>api-adapter</module>
+        <module>bom</module>
+        <module>plugin</module>
+    </modules>
+
+</project>

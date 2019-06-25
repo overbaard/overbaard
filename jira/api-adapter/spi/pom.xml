@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>overbaard-jira-api-adapter</artifactId>
+        <groupId>org.overbaard</groupId>
+        <version>1.0.0.Beta6-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>overbaard-jira-api-adapter-spi</artifactId>
+    <name>Jira Api Adapter SPI</name>
+
+    <properties>
+        <location.checkstyle.xml>${project.basedir}/../../../checkstyle/checkstyle.xml</location.checkstyle.xml>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Just use the Jira 7 BOM here. The adapters should abstract out the changes for other versions -->
+            <dependency>
+                <groupId>org.overbaard</groupId>
+                <artifactId>overbaard-jira7-bom</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.atlassian.jira</groupId>
+            <artifactId>jira-api</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

@@ -16,17 +16,18 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.overbaard</groupId>
-    <artifactId>overbaard</artifactId>
+    <artifactId>overbaard-parent</artifactId>
     <version>1.0.0.Beta6-SNAPSHOT</version>
+    <packaging>pom</packaging>
     <organization>
         <url>https://github.com/overbaard/overbaard</url>
     </organization>
-    <name>Overbård</name>
+    <name>Overbård Parent</name>
     <description>Nicer views on the Jira Agile boards</description>
-    <packaging>atlassian-plugin</packaging>
 
     <licenses>
         <license>
@@ -38,39 +39,45 @@
 
 
     <properties>
-        <!-- versions -->
-        <version.amps>8.0.2</version.amps>
-        <version.atlassions.greenhopper>7.5.0-DAILY20170902071651</version.atlassions.greenhopper>
-        <version.atlassian.spring.scanner>1.2.13</version.atlassian.spring.scanner>
-        <version.atlassian.templaterenderer>1.5.6</version.atlassian.templaterenderer>
-        <version.atlassian.activeobjects>0.28.7</version.atlassian.activeobjects>
-        <version.atlassian.sal-api>2.11.6</version.atlassian.sal-api>
-        <version.gson>2.2.2-atlassian-1</version.gson>
-        <version.httpcomponents>4.5.2</version.httpcomponents>
-        <version.javax.inject>1</version.javax.inject>
-        <version.javax.jsr311-api>1.1.1</version.javax.jsr311-api>
-        <version.javax.servlet-api>2.4</version.javax.servlet-api>
+        <!-- Non Jira dependency versions -->
         <version.jboss-dmr>1.3.0.Final</version.jboss-dmr>
-        <version.jira>7.5.0</version.jira>
         <version.junit>4.10</version.junit>
-        <version.mockito>1.10.19</version.mockito>
-        <version.plugin.testrunner>1.2.3</version.plugin.testrunner>
-        <version.slf4j>1.6.6</version.slf4j>
-        <version.spring>2.5.4</version.spring>
-        <!-- TestKit version 6.x for JIRA 6.x -->
-        <version.testkit>6.3.11</version.testkit>
 
-        <version.frontend-maven-plugin>1.6</version.frontend-maven-plugin>
+        <!--
+            Jira 7 and Jira8 versions of versions that are used both by dependencies (bom)
+            and plugins (which are needed directly by the Jira plugin
+        -->
+        <version.internal.jira7>7.5.0</version.internal.jira7>
+				<!-- 
+						 Use Jira 8.1 because with 8.2 when installing Jira Software, the names of the issue types
+						 and the Rank custom field are all cryptic. This confuses the set-up instructions in the 
+						 developer guide. Check if better in 8.3 if/when that comes.
+			  -->
+        <version.internal.jira8>8.1.0</version.internal.jira8>
+        <version.internal.atlassian.spring.scanner>1.2.13</version.internal.atlassian.spring.scanner>
 
-        <version.resources-plugin>3.0.2</version.resources-plugin>
-        <version.clean-plugin>3.0.0</version.clean-plugin>
-        <version.checkstyle.plugin>3.0.0</version.checkstyle.plugin>
-
+        <!-- My plugin versions -->
         <version.checkstyle>8.18</version.checkstyle>
+        <version.checkstyle.plugin>3.0.0</version.checkstyle.plugin>
+        <version.clean-plugin>3.0.0</version.clean-plugin>
+        <version.frontend-maven-plugin>1.6</version.frontend-maven-plugin>
+        <version.resources-plugin>3.0.2</version.resources-plugin>
+
+        <!-- Node and Yarn versions -->
+        <version.yarn>v1.13.0</version.yarn>
+        <version.node>v11.10.0</version.node>
 
 
-        <!-- This key is used to keep the consistency between the key in atlassian-plugin.xml and the key to generate bundle. -->
-        <atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
+        <!-- Other stuff needed for atlassian-plugin.xml -->
+        <project.organization.name>Red Hat Inc.</project.organization.name>
+
+
+        <!--
+            This key is used to keep the consistency between the key in atlassian-plugin.xml and the key to generate bundle.
+            The original value was ${project.groupId}.${project.artifactId}. But keep it 'constant' so we don't have to
+            do strange things in PrettyUrlFilter for the different plugin versions.
+        -->
+        <atlassian.plugin.key>org.overbaard.overbaard</atlassian.plugin.key>
 
         <!-- JDK version -->
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -78,208 +85,151 @@
         <!-- Source encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- Override this property in each module for the proper checkstyle.xml location -->
+        <location.checkstyle.xml>config/checkstyle.xml</location.checkstyle.xml>
     </properties>
 
+    <modules>
+        <module>webapp</module>
+        <module>jira</module>
+    </modules>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.atlassian.jira</groupId>
-            <artifactId>jira-api</artifactId>
-            <version>${version.jira}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring</artifactId>
-            <version>${version.spring}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.atlassian.plugin</groupId>
-            <artifactId>atlassian-spring-scanner-annotation</artifactId>
-            <version>${version.atlassian.spring.scanner}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.atlassian.plugin</groupId>
-            <artifactId>atlassian-spring-scanner-runtime</artifactId>
-            <version>${version.atlassian.spring.scanner}</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
-            <version>${version.javax.inject}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.atlassian.templaterenderer</groupId>
-            <artifactId>atlassian-template-renderer-api</artifactId>
-            <version>${version.atlassian.templaterenderer}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.atlassian.activeobjects</groupId>
-            <artifactId>activeobjects-plugin</artifactId>
-            <version>${version.atlassian.activeobjects}</version>
-            <scope>provided</scope>
-        </dependency>
-        <!-- SAL, the Active Objects plugin uses SAL's API for transactions -->
-        <dependency>
-            <groupId>com.atlassian.sal</groupId>
-            <artifactId>sal-api</artifactId>
-            <version>${version.atlassian.sal-api}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss</groupId>
-            <artifactId>jboss-dmr</artifactId>
-            <version>${version.jboss-dmr}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.atlassian.jira.plugins</groupId>
-            <artifactId>jira-greenhopper-plugin</artifactId>
-            <version>${version.atlassions.greenhopper}</version>
-            <scope>provided</scope>
-        </dependency>
+    <dependencyManagement>
+        <dependencies>
+            <!-- Internal project dependencies -->
+            <dependency>
+                <groupId>org.overbaard</groupId>
+                <artifactId>overbaard-jira-api-adapter-spi</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.overbaard</groupId>
+                <artifactId>overbaard-jira-api-adapter-jira7</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.overbaard</groupId>
+                <artifactId>overbaard-jira-api-adapter-jira8</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.overbaard</groupId>
+                <artifactId>overbaard-jira7-bom</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.overbaard</groupId>
+                <artifactId>overbaard-jira8-bom</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.overbaard</groupId>
+                <artifactId>overbaard-jira-plugin-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.overbaard</groupId>
+                <artifactId>overbaard-webapp</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
 
-        <!-- Add dependency on jira-core if you want access to JIRA implementation classes as well as the sanctioned API. -->
-        <!-- This is not normally recommended, but may be required eg when migrating a plugin originally developed against JIRA 4.x -->
-        <!--
-        <dependency>
-            <groupId>com.atlassian.jira</groupId>
-            <artifactId>jira-core</artifactId>
-            <version>${jira.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${version.junit}</version>
-            <scope>test</scope>
-        </dependency>
+            <!-- Other dependencies -->
 
-        <!-- WIRED TEST RUNNER DEPENDENCIES -->
-        <dependency>
-            <groupId>com.atlassian.plugins</groupId>
-            <artifactId>atlassian-plugins-osgi-testrunner</artifactId>
-            <version>${version.plugin.testrunner}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>jsr311-api</artifactId>
-            <version>${version.javax.jsr311-api}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>${version.gson}</version>
-        </dependency>
-        <!-- Uncomment to use TestKit in your project. Details at https://bitbucket.org/atlassian/jira-testkit -->
-        <!-- You can read more about TestKit at https://developer.atlassian.com/display/JIRADEV/Plugin+Tutorial+-+Smarter+integration+testing+with+TestKit -->
-        <!--
-		<dependency>
-			<groupId>com.atlassian.jira.tests</groupId>
-			<artifactId>jira-testkit-client</artifactId>
-			<version>${testkit.version}</version>
-			<scope>test</scope>
-		</dependency>
-		-->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>${version.javax.servlet-api}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${version.slf4j}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>${version.httpcomponents}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.atlassian.jira</groupId>
-            <artifactId>jira-tests</artifactId>
-            <version>${version.jira}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>${version.mockito}</version>
-            <scope>test</scope>
-        </dependency>
+            <dependency>
+                <groupId>org.jboss</groupId>
+                <artifactId>jboss-dmr</artifactId>
+                <version>${version.jboss-dmr}</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${version.junit}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
-
-    </dependencies>
     <build>
-        <plugins>
-            <plugin>
-                <groupId>com.atlassian.maven.plugins</groupId>
-                <artifactId>jira-maven-plugin</artifactId>
-                <version>${version.amps}</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <productVersion>${version.jira}</productVersion>
-                    <productDataVersion>${version.jira}</productDataVersion>
-                    <!-- Uncomment to install TestKit backdoor in JIRA. -->
-                    <!--
-					<pluginArtifacts>
-						<pluginArtifact>
-							<groupId>com.atlassian.jira.tests</groupId>
-							<artifactId>jira-testkit-plugin</artifactId>
-							<version>${testkit.version}</version>
-						</pluginArtifact>
-					</pluginArtifacts>
-					-->
-                    <enableQuickReload>true</enableQuickReload>
-                    <instructions>
-                        <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
-                        <!-- Add package to export here -->
-                        <Export-Package>org.overbaard.jira.api,</Export-Package>
-                        <!-- Add package import here -->
-                        <Import-Package>org.springframework.osgi.*;resolution:="optional", org.eclipse.gemini.blueprint.*;resolution:="optional", *</Import-Package>
-                        <!-- Ensure plugin is spring powered - see https://extranet.atlassian.com/x/xBS9hQ  -->
-                        <Spring-Context>*</Spring-Context>
-                    </instructions>
-
-                    <!-- TODO Get rid of this (compression causes some problems I don't want to look at now) -->
-                    <compressResources>false</compressResources>
-                    <jvmArgs>-Xms1g -Xmx2g -XX:MaxPermSize=1g -XX:-UseGCOverheadLimit -server</jvmArgs>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>com.atlassian.plugin</groupId>
-                <artifactId>atlassian-spring-scanner-maven-plugin</artifactId>
-                <version>${version.atlassian.spring.scanner}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>atlassian-spring-scanner</goal>
-                        </goals>
-                        <phase>process-classes</phase>
-                    </execution>
-                </executions>
-                <configuration>
-                    <scannedDependencies>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>com.atlassian.plugin</groupId>
+                    <artifactId>atlassian-spring-scanner-maven-plugin</artifactId>
+                    <version>${version.atlassian.spring.scanner}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>atlassian-spring-scanner</goal>
+                            </goals>
+                            <phase>process-classes</phase>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <scannedDependencies>
+                            <dependency>
+                                <groupId>com.atlassian.plugin</groupId>
+                                <artifactId>atlassian-spring-scanner-external-jar</artifactId>
+                            </dependency>
+                        </scannedDependencies>
+                        <verbose>false</verbose>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>${version.checkstyle.plugin}</version>
+                    <dependencies>
                         <dependency>
-                            <groupId>com.atlassian.plugin</groupId>
-                            <artifactId>atlassian-spring-scanner-external-jar</artifactId>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>${version.checkstyle}</version>
+                            <exclusions>
+                                <exclusion>
+                                    <groupId>com.sun</groupId>
+                                    <artifactId>tools</artifactId>
+                                </exclusion>
+                            </exclusions>
                         </dependency>
-                    </scannedDependencies>
-                    <verbose>false</verbose>
-                </configuration>
-            </plugin>
+                    </dependencies>
+                    <executions>
+                        <execution>
+                            <id>check-style</id>
+                            <phase>compile</phase>
+                            <goals>
+                                <goal>checkstyle</goal>
+                            </goals>
+                            <configuration>
+                                <configLocation>${project.build.outputDirectory}/checkstyle.xml</configLocation>
+                                <consoleOutput>true</consoleOutput>
+                                <failsOnError>true</failsOnError>
+                                <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                                <useFile></useFile>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <!-- Used to bundle the front-end build -->
+                <plugin>
+                    <groupId>com.github.eirslett</groupId>
+                    <artifactId>frontend-maven-plugin</artifactId>
+                    <!-- Use the latest released version:
+                        https://repo1.maven.org/maven2/com/github/eirslett/frontend-maven-plugin/
+                    -->
+                    <version>${version.frontend-maven-plugin}</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>${version.clean-plugin}</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${version.resources-plugin}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
@@ -305,7 +255,11 @@
                             <goal>checkstyle</goal>
                         </goals>
                         <configuration>
-                            <configLocation>${project.build.outputDirectory}/checkstyle.xml</configLocation>
+                            <!--
+                                Sub modules will need to override this. If they don't an error will happen.
+                                This is good since it forces the modules to do this so we get the checks.
+                            -->
+                            <configLocation>${location.checkstyle.xml}</configLocation>
                             <consoleOutput>true</consoleOutput>
                             <failsOnError>true</failsOnError>
                             <includeTestSourceDirectory>true</includeTestSourceDirectory>
@@ -314,236 +268,15 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- Used to run the webpack build -->
             <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
                 <!-- Use the latest released version:
                 https://repo1.maven.org/maven2/com/github/eirslett/frontend-maven-plugin/ -->
                 <version>${version.frontend-maven-plugin}</version>
-                <configuration>
-                    <workingDirectory>webapp</workingDirectory>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-clean-plugin</artifactId>
-                <version>${version.clean-plugin}</version>
-                <executions>
-                    <execution>
-                        <id>copy-resources</id>
-                        <!-- here the phase you need -->
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>clean</goal>
-                        </goals>
-                        <configuration>
-                            <excludeDefaultDirectories>true</excludeDefaultDirectories>
-                            <filesets>
-                                <fileset>
-                                    <directory>${basedir}/target/classes/webapp</directory>
-                                    <includes>
-                                        <include>*.js</include>
-                                        <include>*.js.map</include>
-                                        <include>*.html</include>
-                                        <include>*.ico</include>
-                                    </includes>
-                                </fileset>
-                            </filesets>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>${version.resources-plugin}</version>
-                <executions>
-                    <execution>
-                        <id>copy-resources</id>
-                        <!-- here the phase you need -->
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${basedir}/target/classes/webapp</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>webapp/dist</directory>
-                                    <!-- TODO exclude the rest/ directory -->
-                                    <filtering>false</filtering>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
-    <profiles>
-        <profile>
-            <!--
-                Installs node and yarn in the webapp/node and webapp/node_modules folders respectively.
-                Run 'atlas-package -Dob.ui.deps':
-                    * the first time you have checked out the source.
-                    * whenever the dependencies have been changed in package.json (delete the webapp/node_modules
-                      folder first!)
-            -->
-            <id>Install node and yarn</id>
-            <activation>
-                <property><name>ob.ui.deps</name></property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.eirslett</groupId>
-                        <artifactId>frontend-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <!--
-                                    Install node and yarn for the plugin to have a copy.
-                                -->
-                                <id>install node and yarn</id>
-                                <goals>
-                                    <goal>install-node-and-yarn</goal>
-                                </goals>
-                                <configuration>
-                                    <nodeVersion>v11.10.0</nodeVersion>
-                                    <yarnVersion>v1.13.0</yarnVersion>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <!--
-                                    Run yarn install when having updated dependencies
-                                -->
-                                <id>yarn install</id>
-                                <goals>
-                                    <goal>yarn</goal>
-                                </goals>
-                                <!-- Optional configuration which provides for running any yarn command -->
-                                <configuration>
-                                    <arguments>install</arguments>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <!--
-                Since building the ui is slightly time-consuming, and not all changes necessarily affect the ui, turn on
-		building the ui explicitly by running 'atlas-package -Dob.ui.dev'.
-
-                This is faster than the production build as it does not perform all optimisations at build time.
-            -->
-            <id>Build the UI</id>
-            <activation>
-                <property>
-                    <name>ob.ui.dev</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.eirslett</groupId>
-                        <artifactId>frontend-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <!--
-                                    Uses webpack to bundle the application as set up in package.json
-                                -->
-                                <id>yarn run build</id>
-                                <goals>
-                                    <goal>yarn</goal>
-                                </goals>
-                                <configuration>
-                                    <arguments>run build --output-hashing=all</arguments>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <!--
-                !!!! USE THIS FOR PRODUCTION BUILDS - IT RESULTS IN A MUCH SMALLER SIZE!!!!
-
-                Since building the ui this way is very time-consuming, and not all changes necessarily affect the ui, turn on
-                building the ui explicitly by running 'atlas-package -Dob.ui'
-            -->
-            <id>Build the UI with AOT</id>
-            <activation>
-                <property>
-                    <name>ob.ui</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.eirslett</groupId>
-                        <artifactId>frontend-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <!--
-                                    Uses webpack to bundle the application as set up in package.json
-                                -->
-                                <id>yarn run build</id>
-                                <goals>
-                                    <goal>yarn</goal>
-                                </goals>
-                                <configuration>
-                                    <arguments>run build --output-hashing=all --prod --aot --configuration=production</arguments>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>Test the UI</id>
-            <activation>
-                <property>
-                    <name>ob.ui.tests</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.eirslett</groupId>
-                        <artifactId>frontend-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <!--
-                                    Run the linter
-                                -->
-                                <id>yarn run lint</id>
-                                <goals>
-                                    <goal>yarn</goal>
-                                </goals>
-                                <configuration>
-                                    <arguments>run lint</arguments>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <!--
-                                    Run the tests
-                                -->
-                                <id>yarn run test:travis-headless</id>
-                                <goals>
-                                    <goal>yarn</goal>
-                                </goals>
-                                <configuration>
-                                    <arguments>run test:travis-headless</arguments>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 
     <!-- After upgrading IntelliJ IDEA to 2016.3.2, this is suddenly needed -->
     <repositories>

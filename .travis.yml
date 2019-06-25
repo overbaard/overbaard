@@ -25,7 +25,7 @@ before_script:
   - echo In Before Script
 
 script:
-  - atlas-package -Dob.ui.deps -Dob.ui -Dob.ui.tests
+  - atlas-package -Dob.ui.deps -Dob.ui -Dob.ui.tests -Dob.jira7 -Dob.jira8
 
 cache:
   directories:
