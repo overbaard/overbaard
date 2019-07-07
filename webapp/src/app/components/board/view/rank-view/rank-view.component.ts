@@ -16,6 +16,10 @@ import {FixedHeaderView} from '../fixed-header-view';
 import {BoardViewMode} from '../../../../model/board/user/board-view-mode';
 import {UpdateParallelTaskEvent} from '../../../../events/update-parallel-task.event';
 import {Subject, BehaviorSubject} from 'rxjs';
+import {BoardHeader} from '../../../../view-model/board/board-header';
+import {List} from 'immutable';
+import {BoardViewModel} from '../../../../view-model/board/board-view';
+import {BoardHeaders} from '../../../../view-model/board/board-headers';
 
 @Component({
   selector: 'app-rank-view',
@@ -30,13 +34,12 @@ export class RankViewComponent extends FixedHeaderView implements OnInit, OnChan
   @Output()
   updateParallelTask: EventEmitter<UpdateParallelTaskEvent> = new EventEmitter<UpdateParallelTaskEvent>();
 
-  // Just an array here to be able to do 'for s of states; let i = index' in the template
-  statesDummyArray: number[];
-
   private destroy$: Subject<void> = new Subject<void>();
 
   // Passed in to the ScrollListenerDirective. Values here are emitted OUTSIDE the angular zone
   scrollTopObserver$: Subject<number> = new BehaviorSubject<number>(0);
+
+  flattenedHeaders: List<BoardHeader>;
 
   constructor(
               changeDetector: ChangeDetectorRef,
@@ -46,32 +49,45 @@ export class RankViewComponent extends FixedHeaderView implements OnInit, OnChan
   }
 
   ngOnInit() {
-    this.createEmptyStatesDummyArray();
+    this.flattenHeaders();
     super.observeLeftScroll(this.destroy$);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     super.ngOnChanges(changes);
-    if (changes['board']) {
-      const change: SimpleChange = changes['board'];
-      if (change) {
-        this.createEmptyStatesDummyArray();
+    const boardChange: SimpleChange = changes['board'];
+    if (boardChange) {
+      const currentHeaders: BoardHeaders = this.getChangeHeaders(boardChange.currentValue);
+      const oldHeaders: BoardHeaders = this.getChangeHeaders(boardChange.previousValue);
+      if (currentHeaders !== oldHeaders) {
+        this.flattenHeaders();
       }
     }
+  }
+
+  private getChangeHeaders(board: BoardViewModel): BoardHeaders {
+    return board ? board.headers : null;
   }
 
   ngOnDestroy(): void {
     this.destroy$.next(null);
   }
 
-  private createEmptyStatesDummyArray() {
-    const numberStates =
-      this.board.headers.headersList.reduce((sum, header) => sum += header.stateIndices.size, 0);
-    this.statesDummyArray = new Array<number>(numberStates);
+  private flattenHeaders() {
+    this.flattenedHeaders = List<BoardHeader>().withMutations(mutable => {
+      this.board.headers.headersList.forEach(hdr => {
+        if (!hdr.category) {
+          mutable.push(hdr);
+        } else {
+          hdr.states.forEach(child => {
+            mutable.push(child);
+          });
+        }
+      });
+    });
   }
 
   onUpdateParallelTask(event: UpdateParallelTaskEvent) {
     this.updateParallelTask.emit(event);
   }
-
 }

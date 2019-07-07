@@ -3,7 +3,7 @@
   *ngFor="let rankEntry of visibleEntries"
   [rankEntry]="rankEntry"
   [issueDetailState]="issueDetailState"
-  [statesDummyArray]="statesDummyArray"
+  [flattenedHeaders]="flattenedHeaders"
   [rankOrder]="getRankOrder(rankEntry)"
   [totalProjectIssues]="getTotalIssuesForProject(rankEntry)"
   (updateParallelTask)="onUpdateParallelTask($event)"

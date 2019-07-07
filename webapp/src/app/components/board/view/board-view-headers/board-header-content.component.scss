@@ -45,6 +45,10 @@
   min-width: $invisible-header-width;
   max-width: $invisible-header-width;
 }
+.rank-invisible {
+  border-bottom-color: $rank-invisible-state-colour;
+  color: $rank-invisible-state-colour;
+}
 .exceeded-wip {
   color: red;
 }

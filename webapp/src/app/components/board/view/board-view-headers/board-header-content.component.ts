@@ -70,6 +70,11 @@ export class BoardHeaderContentComponent implements OnInit, OnChanges {
       }
     }
 
+    if (this.viewMode === BoardViewMode.RANK && !this.header.visible) {
+      this.classObj['rank-invisible'] = true;
+    }
+
+
     if (this.leftBorder) {
       this.classObj['left-border'] = true;
     }

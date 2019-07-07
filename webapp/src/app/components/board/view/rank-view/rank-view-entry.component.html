@@ -9,8 +9,8 @@
       (updateParallelTask)="onUpdateParallelTask($event)"
     ></app-board-issue>
   </div>
-  <div *ngFor="let unused of statesDummyArray ; let i = index" class="cell">
-    <div [class]="rankEntry.issue.matchesSearch ? 'inner-cell' : 'inner-cell-grey'">
+  <div *ngFor="let header of flattenedHeaders ; let i = index" class="cell">
+    <div [class]="matchesSearchAndVisibleState(header) ? 'inner-cell' : 'inner-cell-grey'">
       <div *ngIf="rankEntry.boardIndex === i"  [class]="rankEntry.issue.matchesSearch ? 'selected-cell' : 'selected-cell-grey'"></div>
     </div>
   </div>
