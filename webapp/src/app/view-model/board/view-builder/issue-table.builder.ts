@@ -23,7 +23,6 @@ import {IssueHeightCalculator} from './issue-height-calculator';
 export class IssueTableBuilder {
   // Initialised in createTableAndRankView
   private _rankView: List<RankViewEntry>;
-  private _old_style_table: List<List<string>>;
   private _table: List<List<BoardIssueView>>;
   private _issueRanksByProject: Map<string, Map<string, number>>;
 
@@ -281,7 +280,9 @@ export class IssueTableBuilder {
       case ChangeType.TOGGLE_SWIMLANE_COLLAPSED:
         this._totalIssueCounts = this._oldIssueTableState.totalIssues;
         this._visibleIssueCounts = this._oldIssueTableState.visibleIssues;
-        return;
+        if (this._changeType === ChangeType.CHANGE_COLUMN_VISIBILITY && this._currentUserSettingState.viewMode !== BoardViewMode.RANK) {
+          return;
+        }
     }
 
     const viewMode: BoardViewMode = this._currentUserSettingState.viewMode;
@@ -293,7 +294,8 @@ export class IssueTableBuilder {
     const tableBuilder: TableBuilder<BoardIssueView> =
       new TableBuilder<BoardIssueView>(statesSize, oldTable);
     // Only calculate the rank view if we have that viewMode
-    const rankViewBuilder: RankViewBuilder = viewMode === BoardViewMode.RANK ? new RankViewBuilder(oldRank) : null;
+    const rankViewBuilder: RankViewBuilder =
+      viewMode === BoardViewMode.RANK ? new RankViewBuilder(oldRank, this._currentUserSettingState) : null;
 
     const totalIssues: number[] = [];
     const visibleIssues: number[] = [];

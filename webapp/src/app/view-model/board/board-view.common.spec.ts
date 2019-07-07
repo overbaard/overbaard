@@ -426,6 +426,17 @@ export class UserSettingUpdater {
     return this._mainUtil;
   }
 
+  toggleStateVisibility(visible: boolean, ...stateIndices: number[]): BoardViewObservableUtil {
+    this._mainUtil.observer()
+      .pipe(
+        take(1)
+      )
+      .subscribe(boardView => {
+        return this.emitState(UserSettingActions.createToggleVisibility(visible, List<number>(stateIndices)));
+      });
+    return this._mainUtil;
+  }
+
   switchViewMode(): BoardViewObservableUtil {
     return this.emitState(UserSettingActions.createSwitchBoardViewAction());
   }
