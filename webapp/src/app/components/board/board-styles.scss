@@ -8,6 +8,7 @@ $header-colour-backlog: $accent-colour;
 $header-border-bottom: solid 2px $header-colour;
 $header-border-bottom-backlog: solid 2px $header-colour-backlog;
 $header-border-side: solid 1px white;
+$rank-invisible-state-colour: $disabled-issue-colour;
 
 $rank-issue-padding-left: 5px;
 $rank-issue-width: 195px;

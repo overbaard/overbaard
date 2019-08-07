@@ -1,8 +1,10 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output} from '@angular/core';
 import {RankViewEntry} from '../../../../view-model/board/rank-view-entry';
 import {UpdateParallelTaskEvent} from '../../../../events/update-parallel-task.event';
 import {BoardViewMode} from '../../../../model/board/user/board-view-mode';
 import {IssueDetailState} from '../../../../model/board/user/issue-detail/issue-detail.model';
+import {BoardHeader} from '../../../../view-model/board/board-header';
+import {List} from 'immutable';
 
 @Component({
   selector: 'app-rank-view-entry',
@@ -10,14 +12,10 @@ import {IssueDetailState} from '../../../../model/board/user/issue-detail/issue-
   styleUrls: ['./rank-view-entry.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RankViewEntryComponent implements OnInit {
+export class RankViewEntryComponent {
 
   @Input()
   rankEntry: RankViewEntry;
-
-  // Just an array here to be able to do 'for s of states; let i = index' in the template
-  @Input()
-  statesDummyArray: number[];
 
   @Input()
   issueDetailState: IssueDetailState;
@@ -28,6 +26,8 @@ export class RankViewEntryComponent implements OnInit {
   @Input()
   totalProjectIssues: number;
 
+  @Input()
+  flattenedHeaders: List<BoardHeader>;
 
   @Output()
   updateParallelTask: EventEmitter<UpdateParallelTaskEvent> = new EventEmitter<UpdateParallelTaskEvent>();
@@ -37,11 +37,13 @@ export class RankViewEntryComponent implements OnInit {
   constructor() {
   }
 
-  ngOnInit() {
-  }
+
 
   onUpdateParallelTask(event: UpdateParallelTaskEvent) {
     this.updateParallelTask.emit(event);
   }
 
+  matchesSearchAndVisibleState(header: BoardHeader): boolean {
+    return this.rankEntry.issue.matchesSearch && header.visible
+  }
 }

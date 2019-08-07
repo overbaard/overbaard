@@ -22,6 +22,8 @@ import {takeUntil} from 'rxjs/operators';
 import {ScrollHeightSplitter} from '../../../../common/scroll-height-splitter';
 import {Dictionary} from '../../../../common/dictionary';
 import {BoardIssueView} from '../../../../view-model/board/board-issue-view';
+import {BoardHeaders} from '../../../../view-model/board/board-headers';
+import {BoardHeader} from '../../../../view-model/board/board-header';
 
 @Component({
   selector: 'app-rank-view-container',
@@ -49,14 +51,13 @@ export class RankViewContainerComponent implements OnInit, OnChanges, OnDestroy 
   @Input()
   rankOrdersByProject: Map<string, Map<string, number>>;
 
+  @Input()
+  flattenedHeaders: List<BoardHeader>;
+
   @Output()
   updateParallelTask: EventEmitter<UpdateParallelTaskEvent> = new EventEmitter<UpdateParallelTaskEvent>();
 
   readonly viewMode = BoardViewMode.RANK;
-
-  // Just an array here to be able to do 'for s of states; let i = index' in the entry template
-  @Input()
-  statesDummyArray: number[];
 
   private _destroy$: Subject<void> = new Subject<void>();
 

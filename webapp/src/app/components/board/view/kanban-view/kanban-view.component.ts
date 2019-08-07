@@ -17,12 +17,6 @@ import {takeUntil} from 'rxjs/operators';
 export class KanbanViewComponent extends FixedHeaderView implements OnInit, OnDestroy {
 
   @Output()
-  toggleColumnVisibility: EventEmitter<BoardHeader> = new EventEmitter<BoardHeader>();
-
-  @Output()
-  toggleBacklog: EventEmitter<BoardHeader> = new EventEmitter<BoardHeader>();
-
-  @Output()
   toggleCollapsedSwimlane: EventEmitter<string> = new EventEmitter<string>();
 
   @Output()
@@ -71,14 +65,6 @@ export class KanbanViewComponent extends FixedHeaderView implements OnInit, OnDe
 
   ngOnDestroy(): void {
     this.destroy$.next(null);
-  }
-
-  onToggleVisibility(header: BoardHeader) {
-    this.toggleColumnVisibility.emit(header);
-  }
-
-  onToggleBacklog(header: BoardHeader) {
-    this.toggleBacklog.next(header);
   }
 
   onToggleCollapsedSwimlane(key: string) {

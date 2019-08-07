@@ -44,7 +44,7 @@ export class BoardHeaderGroupComponent implements OnInit {
   }
 
   onToggleVisibility(header: BoardHeader) {
-    if (!header.backlog) {
+    if (!header.backlog || this.viewMode === this.enumViewMode.RANK) {
       this.toggleColumnVisibility.next(header);
     } else {
       if (header.category) {
@@ -83,7 +83,7 @@ export class BoardHeaderGroupComponent implements OnInit {
   }
 
   onMouseEnter(event: MouseEvent) {
-    if (!this.showStates && this.viewMode === BoardViewMode.KANBAN) {
+    if (!this.showStates) {
       this.hovering = true;
     }
   }

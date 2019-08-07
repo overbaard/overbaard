@@ -30,6 +30,8 @@
           [board]="board$ | async"
           [windowWidth]="windowWidth"
           [windowHeight]="windowHeight"
+          (toggleColumnVisibility)="onToggleVisibility($event)"
+          (toggleBacklog)="onToggleBacklog($event)"
           (updateParallelTask)="onUpdateParallelTask($event)"
         >
         </app-rank-view>

@@ -2,6 +2,8 @@ import {List, Map} from 'immutable';
 import {RankViewEntry} from '../rank-view-entry';
 import {BoardIssueView} from '../board-issue-view';
 import {BoardViewModelUtil} from '../board-view.model';
+import {UserSettingUtil} from '../../../model/board/user/user-setting.model';
+import {UserSettingState} from '../../../model/board/user/user-setting';
 
 export class RankViewBuilder {
   private readonly _current: List<RankViewEntry> = List<RankViewEntry>().asMutable();
@@ -9,7 +11,9 @@ export class RankViewBuilder {
   private _currentIndex = 0;
   private _changed = false;
 
-  constructor(private readonly _existing: List<RankViewEntry>) {
+  constructor(
+    private readonly _existing: List<RankViewEntry>,
+    private readonly _userSettingState: UserSettingState) {
     if (!_existing) {
       this._changed = true;
       this._currentMap = Map<string, RankViewEntry>();
@@ -38,7 +42,9 @@ export class RankViewBuilder {
       }
     }
     if (entry.issue.visible) {
-      this._current.push(entry);
+      if (UserSettingUtil.calculateVisibility(this._userSettingState, boardIndex)) {
+        this._current.push(entry);
+      }
     }
     return this;
   }

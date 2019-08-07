@@ -2,6 +2,8 @@
   [headers]="board.headers"
   [viewMode]="viewMode"
   [boardLeftOffset]="boardLeftOffset"
+  (toggleColumnVisibility)="onToggleVisibility($event)"
+  (toggleBacklog)="onToggleBacklog($event)"
 >
 </app-board-headers-container>
 <div
@@ -16,7 +18,7 @@
     [rankEntries]="board.issueTable.rankView"
     [issueDetailState]="board.issueDetail"
     [topOffsetObserver$]="scrollTopObserver$"
-    [statesDummyArray]="statesDummyArray"
+    [flattenedHeaders]="flattenedHeaders"
     [boardBodyHeight]="boardBodyHeight"
     [rankOrdersByProject]="board.issueTable.issueRanksByProject"
     (updateParallelTask)="onUpdateParallelTask($event)"

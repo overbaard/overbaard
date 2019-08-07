@@ -1,12 +1,13 @@
 /**
  * Abstract base class for a board containing a fixed header.
  */
-import {ChangeDetectorRef, Input, NgZone, OnChanges, SimpleChange, SimpleChanges} from '@angular/core';
+import {ChangeDetectorRef, EventEmitter, Input, NgZone, OnChanges, Output, SimpleChange, SimpleChanges} from '@angular/core';
 import {BoardViewModel} from '../../../view-model/board/board-view';
 import {BOARD_HEADERS_HEIGHT, TOOLBAR_HEIGHT} from '../../../common/view-constants';
 import {IssueDetailState} from '../../../model/board/user/issue-detail/issue-detail.model';
 import {BehaviorSubject, Subject, Observable} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
+import {BoardHeader} from '../../../view-model/board/board-header';
 
 export class FixedHeaderView implements OnChanges {
 
@@ -21,6 +22,14 @@ export class FixedHeaderView implements OnChanges {
 
   @Input()
   issueDetailState: IssueDetailState;
+
+  @Output()
+  toggleColumnVisibility: EventEmitter<BoardHeader> = new EventEmitter<BoardHeader>();
+
+  @Output()
+  toggleBacklog: EventEmitter<BoardHeader> = new EventEmitter<BoardHeader>();
+
+
 
   boardLeftOffset = 0;
 
@@ -63,4 +72,14 @@ export class FixedHeaderView implements OnChanges {
 
   boardBodyHeightChanged() {
   }
+
+
+  onToggleVisibility(header: BoardHeader) {
+    this.toggleColumnVisibility.emit(header);
+  }
+
+  onToggleBacklog(header: BoardHeader) {
+    this.toggleBacklog.next(header);
+  }
+
 }
