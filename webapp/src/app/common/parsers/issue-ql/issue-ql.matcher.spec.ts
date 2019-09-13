@@ -1,6 +1,6 @@
 import {BoardIssueView} from '../../../view-model/board/board-issue-view';
 import {List, Map, OrderedSet} from 'immutable';
-import {CustomField} from '../../../model/board/data/custom-field/custom-field.model';
+import {CustomFieldValue} from '../../../model/board/data/custom-field/custom-field.model';
 import {LinkedIssue} from '../../../model/board/data/issue/linked-issue';
 import {IssueQlMatcher} from './issue-ql.matcher';
 import {IssueQlAstParser} from './ast/ast-parser.iql';
@@ -470,7 +470,7 @@ function populatedIssue(): BoardIssueView {
     components: OrderedSet<string>(['C1', 'C2']),
     labels: OrderedSet<string>(['L1', 'L2']),
     fixVersions: OrderedSet<string>(['F1', 'F2']),
-    customFields: Map<string, CustomField>(),
+    customFields: Map<string, CustomFieldValue>(),
     parallelTasks: null,
     selectedParallelTasks: null,
     linkedIssues: List<LinkedIssue>(),
@@ -499,7 +499,7 @@ function minimalIssue(): BoardIssueView {
     components: null,
     labels: null,
     fixVersions: null,
-    customFields: Map<string, CustomField>(),
+    customFields: Map<string, CustomFieldValue>(),
     parallelTasks: null,
     selectedParallelTasks: null,
     linkedIssues: List<LinkedIssue>(),

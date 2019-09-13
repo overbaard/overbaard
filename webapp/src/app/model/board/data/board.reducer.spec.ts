@@ -10,7 +10,7 @@ import {List, OrderedMap, Map} from 'immutable';
 import {Assignee, NO_ASSIGNEE} from './assignee/assignee.model';
 import {Priority} from './priority/priority.model';
 import {IssueType} from './issue-type/issue-type.model';
-import {CustomField} from './custom-field/custom-field.model';
+import {CustomFieldData, CustomFieldValue} from './custom-field/custom-field.model';
 import {BoardProject, ProjectState} from './project/project.model';
 import {BoardIssue} from './issue/board-issue';
 import {BlacklistState} from './blacklist/blacklist.model';
@@ -170,10 +170,12 @@ describe('Board reducer tests', () => {
       expect(epicsByProject.get('P2').get('P2-900').name).toBe('P2 First Epic');
       expect(epicsByProject.get('P2').get('P2-901').name).toBe('P2 Second Epic');
 
-      const customFields: OrderedMap<string, OrderedMap<string, CustomField>> = boardState.customFields.fields;
+      const customFields: OrderedMap<string, CustomFieldData> = boardState.customFields.fields;
       expect(customFields.size).toBe(2);
-      expect(customFields.get('Custom-1').size).toBe(3);
-      expect(customFields.get('Custom-2').size).toBe(2);
+      expect(customFields.get('Custom-1').type).toBe('version');
+      expect(customFields.get('Custom-1').fieldValues.size).toBe(3);
+      expect(customFields.get('Custom-2').type).toBe('user');
+      expect(customFields.get('Custom-2').fieldValues.size).toBe(2);
 
       const manualSwimlanes: OrderedMap<string, ManualSwimlane> = boardState.manualSwimlanes.swimlanes;
       expect(manualSwimlanes.size).toBe(1);
@@ -268,7 +270,7 @@ describe('Board reducer tests', () => {
       expect(issueTypes.get('bug').name).toEqual('bug');
       expect(issueTypes.get('feature').name).toEqual('feature');
 
-      const customFields: OrderedMap<string, OrderedMap<string, CustomField>> = boardState.customFields.fields;
+      const customFields: OrderedMap<string, CustomFieldData> = boardState.customFields.fields;
       expect(customFields.size).toBe(0);
 
       const manualSwimlanes: OrderedMap<string, ManualSwimlane> = boardState.manualSwimlanes.swimlanes;
@@ -386,10 +388,12 @@ describe('Board reducer tests', () => {
       const fixVersions: List<string> = newState.fixVersions.versions;
       expect(fixVersions.toArray()).toEqual(['F-05', 'F-10', 'F-20', 'F-30']);
 
-      const customFields: OrderedMap<string, OrderedMap<string, CustomField>> = newState.customFields.fields;
+      const customFields: OrderedMap<string, CustomFieldData> = newState.customFields.fields;
       expect(customFields.size).toBe(2);
-      expect(customFields.get('Custom-1').size).toBe(6);
-      expect(customFields.get('Custom-2').size).toBe(2);
+      expect(customFields.get('Custom-1').type).toBe('version');
+      expect(customFields.get('Custom-1').fieldValues.size).toBe(6);
+      expect(customFields.get('Custom-2').type).toBe('user');
+      expect(customFields.get('Custom-2').fieldValues.size).toBe(2);
 
       const rankState: RankState = newState.ranks;
       expect(rankState.rankedIssueKeys.size).toBe(1);

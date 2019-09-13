@@ -16,7 +16,7 @@ import {BoardFilterState} from '../../model/board/user/board-filter/board-filter
 import {BoardIssueView} from './board-issue-view';
 import {List, Map, Set} from 'immutable';
 import {NO_ASSIGNEE} from '../../model/board/data/assignee/assignee.model';
-import {CustomField} from '../../model/board/data/custom-field/custom-field.model';
+import {CustomFieldValue} from '../../model/board/data/custom-field/custom-field.model';
 import {
   ParallelTask,
   ParallelTaskOption,
@@ -147,7 +147,7 @@ export class AllFilters {
   private filterVisibleCustomFields(issue: BoardIssueView): boolean {
     let visible = true;
     this._customFieldFilters.forEach((f, k) => {
-      const cfv: CustomField = issue.customFields.get(k);
+      const cfv: CustomFieldValue = issue.customFields.get(k);
       if (!f.doFilter(cfv ? cfv.key : null)) {
         visible = false;
         return false;

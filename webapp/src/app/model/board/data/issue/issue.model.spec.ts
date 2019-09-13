@@ -6,7 +6,7 @@ import {List, Map, OrderedMap} from 'immutable';
 import {getTestComponentState} from '../component/component.reducer.spec';
 import {getTestLabelState} from '../label/label.reducer.spec';
 import {getTestFixVersionState} from '../fix-version/fix-version.reducer.spec';
-import {CustomField} from '../custom-field/custom-field.model';
+import {CustomFieldData, CustomFieldValue} from '../custom-field/custom-field.model';
 import {getTestCustomFieldState} from '../custom-field/custom-field.reducer.spec';
 import {Dictionary} from '../../../../common/dictionary';
 import {cloneObject} from '../../../../common/object-util';
@@ -34,7 +34,7 @@ describe('Issue unit tests', () => {
     const components: List<string> = getTestComponentState().components;
     const labels: List<string> = getTestLabelState().labels;
     const fixVersions: List<string> = getTestFixVersionState().versions;
-    const customFields: OrderedMap<string, OrderedMap<string, CustomField>> = getTestCustomFieldState().fields;
+    const customFields: OrderedMap<string, CustomFieldData> = getTestCustomFieldState().fields;
 
     const projectState: ProjectState =
       projectMetaReducer(
@@ -1235,7 +1235,7 @@ export class IssueChecker {
   private _components: string[];
   private _labels: string[];
   private _fixVersions: string[];
-  private _customFields: Dictionary<CustomField>;
+  private _customFields: Dictionary<CustomFieldValue>;
   private _parallelTasks: number[][];
   private _epic: Epic;
   private _parentKey: string;
@@ -1371,14 +1371,14 @@ export class IssueChecker {
       expect(expectedFieldNames).toEqual(issueFieldNames);
 
       for (const fieldName of issueFieldNames) {
-        const customField: CustomField = this._issue.customFields.get(fieldName);
-        const expectedField: CustomField = this._customFields[fieldName];
+        const customField: CustomFieldValue = this._issue.customFields.get(fieldName);
+        const expectedField: CustomFieldValue = this._customFields[fieldName];
         expect(customField).toEqual(jasmine.anything());
         expect(customField.key).toEqual(expectedField.key);
         expect(customField.value).toEqual(expectedField.value);
       }
     } else {
-      expect(this._issue.customFields).toEqual(Map<string, CustomField>());
+      expect(this._issue.customFields).toEqual(Map<string, CustomFieldValue>());
     }
 
     if (this._parallelTasks) {

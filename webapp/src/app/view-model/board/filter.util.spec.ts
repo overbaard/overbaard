@@ -5,7 +5,7 @@ import {Dictionary} from '../../common/dictionary';
 import {BoardIssueView} from './board-issue-view';
 import {Assignee, NO_ASSIGNEE} from '../../model/board/data/assignee/assignee.model';
 import {List, Map, OrderedMap, OrderedSet} from 'immutable';
-import {CustomField} from '../../model/board/data/custom-field/custom-field.model';
+import {CustomFieldValue} from '../../model/board/data/custom-field/custom-field.model';
 import {AllFilters} from './filter.util';
 import {CURRENT_USER_FILTER_KEY, NONE_FILTER_KEY} from '../../model/board/user/board-filter/board-filter.constants';
 import {
@@ -223,7 +223,7 @@ describe('Apply filter tests', () => {
     describe('Custom Fields', () => {
       it ('Matches one (out of one)', () => {
         const issue: BoardIssueView = emptyIssue();
-        issue.customFields = Map<string, CustomField>({1: {key: 'C1-1', value: 'One One'}});
+        issue.customFields = Map<string, CustomFieldValue>({1: {key: 'C1-1', value: 'One One'}});
         expect(filtersFromQs({'cf.1': 'C1-1'}).filterVisible(issue)).toBe(true);
       });
       it ('Matches one, none (out of one)', () => {
@@ -232,7 +232,7 @@ describe('Apply filter tests', () => {
       });
       it ('Matches two (out of two)', () => {
         const issue: BoardIssueView = emptyIssue();
-        issue.customFields = Map<string, CustomField>({1: {key: 'C1-1', value: 'One One'}, 2: {key: 'C2-2', value: 'Two Two'}});
+        issue.customFields = Map<string, CustomFieldValue>({1: {key: 'C1-1', value: 'One One'}, 2: {key: 'C2-2', value: 'Two Two'}});
         expect(filtersFromQs({'cf.1': 'C1-1', 'cf.2': 'C2-2'}).filterVisible(issue)).toBe(true);
       });
       it ('Matches two, none (out of two)', () => {
@@ -241,17 +241,17 @@ describe('Apply filter tests', () => {
       });
       it ('Matches two, one none (out of two)', () => {
         const issue: BoardIssueView = emptyIssue();
-        issue.customFields = Map<string, CustomField>({1: {key: 'C1-1', value: 'One One'}});
+        issue.customFields = Map<string, CustomFieldValue>({1: {key: 'C1-1', value: 'One One'}});
         expect(filtersFromQs({'cf.1': 'C1-1', 'cf.2': NONE_FILTER_KEY}).filterVisible(issue)).toBe(true);
       });
       it ('Non match, one out of two', () => {
         const issue: BoardIssueView = emptyIssue();
-        issue.customFields = Map<string, CustomField>({1: {key: 'C1-1', value: 'One One'}});
+        issue.customFields = Map<string, CustomFieldValue>({1: {key: 'C1-1', value: 'One One'}});
         expect(filtersFromQs({'cf.1': 'C1-1', 'cf.2': 'C2-2'}).filterVisible(issue)).toBe(false);
       });
       it ('Non match, zero out of one', () => {
         const issue: BoardIssueView = emptyIssue();
-        issue.customFields = Map<string, CustomField>({1: {key: 'C1-2', value: 'One Two'}});
+        issue.customFields = Map<string, CustomFieldValue>({1: {key: 'C1-2', value: 'One Two'}});
         expect(filtersFromQs({'cf.1': 'C1-1'}).filterVisible(issue)).toBe(false);
       });
       it ('Non match, no custom field in issue', () => {
@@ -260,7 +260,7 @@ describe('Apply filter tests', () => {
       });
       it ('Non match (none)', () => {
         const issue: BoardIssueView = emptyIssue();
-        issue.customFields = Map<string, CustomField>({1: {key: 'C1-1', value: 'One One'}});
+        issue.customFields = Map<string, CustomFieldValue>({1: {key: 'C1-1', value: 'One One'}});
         expect(filtersFromQs({'cf.1': NONE_FILTER_KEY}).filterVisible(issue)).toBe(false);
       });
     });
@@ -563,7 +563,7 @@ describe('Apply filter tests', () => {
       components: OrderedSet<string>(['C1', 'C2']),
       labels: OrderedSet<string>(['L1', 'L2']),
       fixVersions: OrderedSet<string>(['F1', 'F2']),
-      customFields: Map<string, CustomField>(),
+      customFields: Map<string, CustomFieldValue>(),
       parallelTasks: null,
       selectedParallelTasks: null,
       linkedIssues: List<LinkedIssue>(),
