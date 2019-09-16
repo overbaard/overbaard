@@ -44,6 +44,6 @@ export class RankViewEntryComponent {
   }
 
   matchesSearchAndVisibleState(header: BoardHeader): boolean {
-    return this.rankEntry.issue.matchesSearch && header.visible
+    return this.rankEntry.issue.matchesSearch && header.visible;
   }
 }

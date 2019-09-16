@@ -577,7 +577,6 @@ describe('Rank View observer tests', () => {
       it ('Toggle non-matching', () => {
         const util: BoardViewObservableUtil =
           new BoardViewObservableUtil({view: 'rv', 's.ids': 'ONE-1,ONE-3,ONE-5', hidden: '0', 's.hide': 'true'});
-        let last: BoardViewModel;
         util
           .updateBoardState(init)
           .easySubscribe(board => {
