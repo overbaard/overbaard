@@ -64,8 +64,8 @@
         <version.resources-plugin>3.0.2</version.resources-plugin>
 
         <!-- Node and Yarn versions -->
-        <version.yarn>v1.13.0</version.yarn>
-        <version.node>v11.10.0</version.node>
+        <version.yarn>v1.17.3</version.yarn>
+        <version.node>v12.10.0</version.node>
 
 
         <!-- Other stuff needed for atlassian-plugin.xml -->
