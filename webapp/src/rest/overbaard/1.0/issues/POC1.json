@@ -79,26 +79,32 @@
     }
   ],
   "custom": {
-    "User Custom Field": [
-      {
-        "key": "userA",
-        "value": "Another User"
-      },
-      {
-        "key": "userB",
-        "value": "Better User"
-      }
-    ],
-    "Version Custom Field": [
-      {
-        "key": "1.0.0.GA",
-        "value": "1.0.0.GA"
-      },
-      {
-        "key": "1.0.1.GA",
-        "value": "1.0.1.GA"
-      }
-    ]
+    "User Custom Field": {
+        "type": "user",
+        "values": [
+        {
+          "key": "userA",
+          "value": "Another User"
+        },
+        {
+          "key": "userB",
+          "value": "Better User"
+        }
+      ]
+    },
+    "Version Custom Field": {
+      "type": "version",
+      "values": [
+        {
+          "key": "1.0.0.GA",
+          "value": "1.0.0.GA"
+        },
+        {
+          "key": "1.0.1.GA",
+          "value": "1.0.1.GA"
+        }
+      ]
+    }
   },
   "epics": {
     "FEAT": [
