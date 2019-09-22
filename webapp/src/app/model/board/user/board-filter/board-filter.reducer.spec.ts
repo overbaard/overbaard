@@ -137,7 +137,7 @@ describe('BoardFilter reducer tests', () => {
     });
 
     it ('Update custom field', () => {
-      const customFieldAttributes: FilterAttributes = FilterAttributesUtil.createCustomFieldFilterAttributes('Custom2');
+      const customFieldAttributes: FilterAttributes = FilterAttributesUtil.createCustomFieldFilterAttributes('Custom2', null);
       state = boardFilterMetaReducer(
         state, BoardFilterActions.createUpdateFilter(customFieldAttributes, {CF21: false, CF22: true, CF23: true}));
       const checker: FilterChecker = new FilterChecker();

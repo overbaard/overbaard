@@ -54,6 +54,7 @@ import static org.overbaard.jira.impl.Constants.SUMMARY;
 import static org.overbaard.jira.impl.Constants.TYPE;
 import static org.overbaard.jira.impl.Constants.TYPE_STATES;
 import static org.overbaard.jira.impl.Constants.VALUE;
+import static org.overbaard.jira.impl.Constants.VALUES;
 import static org.overbaard.jira.impl.Constants.WIP;
 import static org.overbaard.jira.impl.board.CustomFieldValue.UNSET_VALUE;
 
@@ -76,6 +77,7 @@ import org.overbaard.jira.impl.BoardManagerBuilder;
 import org.overbaard.jira.impl.OverbaardIssueEvent;
 import org.overbaard.jira.impl.board.Epic;
 import org.overbaard.jira.impl.board.ProjectParallelTaskOptionsLoaderBuilder;
+import org.overbaard.jira.impl.config.CustomFieldConfig;
 
 import com.atlassian.jira.issue.search.SearchException;
 
@@ -3876,11 +3878,13 @@ public class BoardManagerTest extends AbstractBoardTest {
 
     private abstract static class BoardCustomFieldChecker implements BoardDataChecker {
         private final String customFieldName;
+        private final CustomFieldConfig.Type type;
         private final String[] keys;
         private final boolean keyEqualsValue;
 
-        public BoardCustomFieldChecker(String customFieldName, boolean keyEqualsValue, String[] keys) {
+        public BoardCustomFieldChecker(String customFieldName, CustomFieldConfig.Type type, boolean keyEqualsValue, String[] keys) {
             this.customFieldName = customFieldName;
+            this.type = type;
             this.keys = keys;
             this.keyEqualsValue = keyEqualsValue;
         }
@@ -3890,8 +3894,12 @@ public class BoardManagerTest extends AbstractBoardTest {
             if (keys.length == 0) {
                 Assert.assertFalse(board.hasDefined(CUSTOM, customFieldName));
             } else {
+                ModelNode customField = board.get(CUSTOM, customFieldName);
+                Assert.assertTrue(customField.isDefined());
 
-                List<ModelNode> fields = board.get(CUSTOM, customFieldName).asList();
+                Assert.assertEquals(type.getName(), customField.get(TYPE).asString());
+
+                List<ModelNode> fields = customField.get(VALUES).asList();
                 Assert.assertEquals(fields.size(), keys.length);
                 for (int i = 0 ; i < keys.length ; i++) {
                     ModelNode field = fields.get(i);
@@ -3916,7 +3924,7 @@ public class BoardManagerTest extends AbstractBoardTest {
         static final BoardTesterChecker NONE = new BoardTesterChecker();
 
         public BoardTesterChecker(String... keys) {
-            super("Tester", false, keys);
+            super("Tester", CustomFieldConfig.Type.USER, false, keys);
         }
     }
 
@@ -3924,7 +3932,7 @@ public class BoardManagerTest extends AbstractBoardTest {
         static final BoardDocumenterChecker NONE = new BoardDocumenterChecker();
 
         public BoardDocumenterChecker(String... keys) {
-            super("Documenter", false, keys);
+            super("Documenter", CustomFieldConfig.Type.USER, false, keys);
         }
     }
 
@@ -3932,7 +3940,7 @@ public class BoardManagerTest extends AbstractBoardTest {
         static final BoardTestedByChecker NONE = new BoardTestedByChecker();
 
         public BoardTestedByChecker(String... keys) {
-            super("Tested By", true, keys);
+            super("Tested By", CustomFieldConfig.Type.SINGLE_SELECT_DROPDOWN, true, keys);
         }
     }
 

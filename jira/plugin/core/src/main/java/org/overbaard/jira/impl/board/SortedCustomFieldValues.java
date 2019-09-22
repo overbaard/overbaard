@@ -25,6 +25,9 @@ import org.overbaard.jira.impl.JiraInjectables;
 import org.overbaard.jira.impl.config.CustomFieldConfig;
 import org.overbaard.jira.impl.util.IndexedMap;
 
+import static org.overbaard.jira.impl.Constants.TYPE;
+import static org.overbaard.jira.impl.Constants.VALUES;
+
 /**
  * Sorted values for a given custom field used as the 'registry' in the overall board data.
  * The sort order is according to the key or the value.
@@ -54,13 +57,20 @@ public class SortedCustomFieldValues {
     }
 
     public void serialize(ModelNode parentNode) {
-        ModelNode fieldList = new ModelNode();
+        ModelNode valueList = new ModelNode();
         for (CustomFieldValue customFieldValue : sortedFields.values()) {
-            customFieldValue.serializeRegistry(fieldList);
+            customFieldValue.serializeRegistry(valueList);
         }
-        if (fieldList.isDefined()) {
-            parentNode.get(config.getName()).set(fieldList);
+
+        ModelNode fieldNode = new ModelNode();
+        fieldNode.get(TYPE).set(config.getType().getName());
+        fieldNode.get(VALUES).set(valueList);
+
+
+        if (valueList.isDefined()) {
+            parentNode.get(config.getName()).set(fieldNode);
         }
+
     }
 
     abstract static class Accessor {

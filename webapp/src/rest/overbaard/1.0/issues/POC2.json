@@ -20,12 +20,6 @@
       "email" : "another@example.com",
       "avatar" : "https://static.jboss.org/developer/gravatar/ddb8426eafc8e3628d263af28aa13086?d=mm&s=32",
       "name" : "Another Programmer"
-    },
-    {
-      "key" : "kabir.khan",
-      "email" : "kabir.khan@example.com",
-      "avatar" : "https://static.jboss.org/developer/gravatar/00aa85cb5ea8fd5882bab9765f40655e?d=mm&s=32",
-      "name" : "Kabir Khan"
     }
   ],
   "components": ["Component One", "Component Two", "Component Three"],
@@ -68,26 +62,36 @@
     }
   ],
   "custom": {
-    "User Custom Field": [
-      {
-        "key": "userA",
-        "value": "Another User"
-      },
-      {
-        "key": "userB",
-        "value": "Better User"
-      }
-    ],
-    "Version Custom Field": [
-      {
-        "key": "1.0.0.GA",
-        "value": "1.0.0.GA"
-      },
-      {
-        "key": "1.0.1.GA",
-        "value": "1.0.1.GA"
-      }
-    ]
+    "User Custom Field": {
+      "type": "user",
+      "values": [
+        {
+          "key": "userA",
+          "value": "Another User"
+        },
+        {
+          "key": "userB",
+          "value": "Better User"
+        },
+        {
+          "key" : "kabir.khan",
+          "value" : "Kabir Khan"
+        }
+      ]
+    },
+    "Version Custom Field": {
+      "type": "version",
+      "values": [
+        {
+          "key": "1.0.0.GA",
+          "value": "1.0.0.GA"
+        },
+        {
+          "key": "1.0.1.GA",
+          "value": "1.0.1.GA"
+        }
+      ]
+    }
   },
   "projects" : {
     "main" : [

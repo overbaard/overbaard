@@ -3,7 +3,7 @@ import {Assignee, NO_ASSIGNEE} from '../assignee/assignee.model';
 import {Priority} from '../priority/priority.model';
 import {IssueType} from '../issue-type/issue-type.model';
 import {fromJS, List, Map, OrderedMap, OrderedSet} from 'immutable';
-import {CustomField} from '../custom-field/custom-field.model';
+import {CustomFieldData, CustomFieldValue} from '../custom-field/custom-field.model';
 import {BoardProject, LinkedProject, ParallelTask} from '../project/project.model';
 import {cloneObject} from '../../../../common/object-util';
 import {BoardIssue} from './board-issue';
@@ -43,7 +43,7 @@ const DEFAULT_ISSUE: BoardIssue = {
   components: null,
   labels: null,
   fixVersions: null,
-  customFields: Map<string, CustomField>(),
+  customFields: Map<string, CustomFieldValue>(),
   parallelTasks: null,
   selectedParallelTasks: null,
   linkedIssues: List<LinkedIssue>(),
@@ -103,8 +103,8 @@ export class DeserializeIssueLookupParams {
   private _components: List<string> = List<string>();
   private _labels: List<string> = List<string>();
   private _fixVersions: List<string> = List<string>();
-  private _customFields: OrderedMap<string, OrderedMap<string, CustomField>> = OrderedMap<string, OrderedMap<string, CustomField>>();
-  private _customFieldsListMap: OrderedMap<string, List<CustomField>>;
+  private _customFields: OrderedMap<string, CustomFieldData> = OrderedMap<string, CustomFieldData>();
+  private _customFieldsListMap: OrderedMap<string, List<CustomFieldValue>>;
   private _boardProjects: Map<string, BoardProject> = Map<string, BoardProject>();
   private _linkedProjects: Map<string, LinkedProject> = Map<string, LinkedProject>();
   private _boardStates: List<string>;
@@ -147,7 +147,7 @@ export class DeserializeIssueLookupParams {
     return this;
   }
 
-  setCustomFields(value: OrderedMap<string, OrderedMap<string, CustomField>>): DeserializeIssueLookupParams {
+  setCustomFields(value: OrderedMap<string, CustomFieldData>): DeserializeIssueLookupParams {
     this._customFields = value;
     return this;
   }
@@ -225,14 +225,14 @@ export class DeserializeIssueLookupParams {
     return this._fixVersions;
   }
 
-  get customFields(): OrderedMap<string, OrderedMap<string, CustomField>> {
+  get customFields(): OrderedMap<string, CustomFieldData> {
     return this._customFields;
   }
 
-  get customFieldsListMap(): OrderedMap<string, List<CustomField>> {
+  get customFieldsListMap(): OrderedMap<string, List<CustomFieldValue>> {
     if (!this._customFieldsListMap) {
-      this._customFieldsListMap = this._customFields.map(value => {
-        return value.toList();
+      this._customFieldsListMap = this._customFields.map(data => {
+        return data.fieldValues.toList();
       }).toOrderedMap();
     }
     return this._customFieldsListMap;
@@ -363,7 +363,7 @@ export class IssueUtil {
     }
     if (input['custom']) {
       const custom = input['custom'];
-      input['customFields'] = Map<string, CustomField>().withMutations(mutable => {
+      input['customFields'] = Map<string, CustomFieldValue>().withMutations(mutable => {
         for (const key of Object.keys(custom)) {
           const value = params.customFieldsListMap.get(key).get(custom[key]);
           if (value) {
@@ -373,7 +373,7 @@ export class IssueUtil {
       });
       delete input['custom'];
     } else {
-      input['customFields'] = Map<string, CustomField>();
+      input['customFields'] = Map<string, CustomFieldValue>();
     }
 
     if (input['parallel-tasks']) {
@@ -419,7 +419,7 @@ export class IssueUtil {
   }
 
   static issueChangeFromJs(input: any, currentIssues: Map<string, BoardIssue>, params: DeserializeIssueLookupParams): BoardIssue {
-    let customFields: Map<string, CustomField>;
+    let customFields: Map<string, CustomFieldValue>;
     const key: string = input['key'];
     const projectCode: string = IssueUtil.productCodeFromKey(input['key']);
 
@@ -432,14 +432,14 @@ export class IssueUtil {
 
     if (input['custom']) {
       const customInput: any = input['custom'];
-      customFields = Map<string, CustomField>().withMutations(mutable => {
+      customFields = Map<string, CustomFieldValue>().withMutations(mutable => {
         for (const fieldKey of Object.keys(customInput)) {
           const valueKey: string = customInput[fieldKey];
 
           if (!valueKey) {
             mutable.set(fieldKey, null);
           } else {
-            mutable.set(fieldKey, params.customFields.get(fieldKey).get(valueKey));
+            mutable.set(fieldKey, params.customFields.get(fieldKey).fieldValues.get(valueKey));
           }
         }
       });

@@ -104,6 +104,7 @@ public class Constants {
     public static final String UPDATES = "updates";
     public static final String UNASSIGNED = "unassigned";
     public static final String VALUE = "value";
+    public static final String VALUES = "values";
     public static final String VIEW = "view";
     public static final String VERSION = "version";
     public static final String WIP = "wip";

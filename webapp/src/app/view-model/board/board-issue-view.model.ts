@@ -3,7 +3,7 @@ import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
 import {BoardIssue} from '../../model/board/data/issue/board-issue';
 import {BoardIssueView} from './board-issue-view';
 import {NO_ASSIGNEE} from '../../model/board/data/assignee/assignee.model';
-import {CustomField} from '../../model/board/data/custom-field/custom-field.model';
+import {CustomFieldValue} from '../../model/board/data/custom-field/custom-field.model';
 import {LinkedIssue} from '../../model/board/data/issue/linked-issue';
 
 const DEFAULT_STATE: BoardIssueView = {
@@ -19,7 +19,7 @@ const DEFAULT_STATE: BoardIssueView = {
   components: null,
   labels: null,
   fixVersions: null,
-  customFields: Map<string, CustomField>(),
+  customFields: Map<string, CustomFieldValue>(),
   parallelTasks: null,
   selectedParallelTasks: null,
   linkedIssues: List<LinkedIssue>(),

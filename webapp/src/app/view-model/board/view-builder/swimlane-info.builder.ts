@@ -14,7 +14,7 @@ import {
 } from '../../../model/board/user/board-filter/board-filter.constants';
 import {BoardIssueView} from '../board-issue-view';
 import {NO_ASSIGNEE} from '../../../model/board/data/assignee/assignee.model';
-import {CustomField} from '../../../model/board/data/custom-field/custom-field.model';
+import {CustomFieldData, CustomFieldValue} from '../../../model/board/data/custom-field/custom-field.model';
 import {SwimlaneData} from '../swimlane-data';
 import {BoardViewModelUtil} from '../board-view.model';
 import {TableBuilder} from './table.builder';
@@ -112,16 +112,16 @@ export class SwimlaneInfoBuilder {
         break;
       }
       default: {
-        const customFields: OrderedMap<string, CustomField> = boardState.customFields.fields.get(userSettingState.swimlane);
-        if (customFields) {
+        const customFieldData: CustomFieldData = boardState.customFields.fields.get(userSettingState.swimlane);
+        if (customFieldData) {
           // See if it is a custom field
-          customFields.forEach(
+          customFieldData.fieldValues.forEach(
             f => {
               builderMap.set(f.key,
                 new SwimlaneDataBuilder(f.key, f.value, states, collapsed(userSettingState, f.key), userSettingState, existingInfo));
             });
           issueMatcher = ((issue, dataBuilders) => {
-            const issueField: CustomField = issue.customFields.get(userSettingState.swimlane);
+            const issueField: CustomFieldValue = issue.customFields.get(userSettingState.swimlane);
             return [dataBuilders.get(issueField ? issueField.key : NONE_FILTER_KEY)];
           });
         } else {
@@ -247,9 +247,9 @@ export class SwimlaneInfoBuilder {
         return this.applyFilterToSwimlaneKey(this._userSettingState.filters.fixVersion, swimlaneBuilder.key);
       }
       default: {
-        const customFields: OrderedMap<string, CustomField> =
+        const customFieldData: CustomFieldData =
           this._boardState.customFields.fields.get(this._userSettingState.swimlane);
-        if (customFields) {
+        if (customFieldData) {
           const filterSet: Set<string> = this._userSettingState.filters.customField.get(this._userSettingState.swimlane);
           if (filterSet) {
             return this.applyFilterToSwimlaneKey(filterSet, swimlaneBuilder.key);

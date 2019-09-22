@@ -148,6 +148,7 @@ export class IssueTableBuilder {
             this._currentUserSettingState.filters,
             this._currentUserSettingState.searchFilters,
             this._currentBoardState.projects,
+            this._currentBoardState.customFields,
             this._currentBoardState.currentUser);
         issues.forEach((issue, key) => {
           const updated: BoardIssueView = this.filterIssue(issue, filters);
@@ -165,6 +166,7 @@ export class IssueTableBuilder {
             this._currentUserSettingState.filters,
             this._currentUserSettingState.searchFilters,
             this._currentBoardState.projects,
+            this._currentBoardState.customFields,
             this._currentBoardState.currentUser);
         this._currentBoardState.issues.lastChanged.forEach((change, key) => {
           if (change.change === IssueChange.DELETE) {

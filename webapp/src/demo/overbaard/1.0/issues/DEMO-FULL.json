@@ -118,24 +118,27 @@
     }
   ],
   "custom": {
-    "Tester": [
-      {
-        "key": "danny",
-        "value": "Danny Destroyer"
-      },
-      {
-        "key": "quincy",
-        "value": "Quincy Von QA"
-      },
-      {
-        "key": "sigmund",
-        "value": "Sigmund Smasher"
-      },
-      {
-        "key": "timothy",
-        "value": "Tamarah Tester"
-      }
-    ]
+    "Tester": {
+      "type": "user",
+      "values": [
+        {
+          "key": "danny",
+          "value": "Danny Destroyer"
+        },
+        {
+          "key": "quincy",
+          "value": "Quincy Von QA"
+        },
+        {
+          "key": "sigmund",
+          "value": "Sigmund Smasher"
+        },
+        {
+          "key": "timothy",
+          "value": "Tamarah Tester"
+        }
+      ]
+    }
   },
   "epics" : {"DEMO" : [
     {

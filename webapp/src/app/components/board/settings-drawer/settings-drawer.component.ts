@@ -29,7 +29,7 @@ import {
 } from '../../../model/board/user/board-filter/board-filter.constants';
 import {BoardFilterActions} from '../../../model/board/user/board-filter/board-filter.reducer';
 import {customFieldsSelector} from '../../../model/board/data/custom-field/custom-field.reducer';
-import {CustomField} from '../../../model/board/data/custom-field/custom-field.model';
+import {CustomFieldData, CustomFieldValue} from '../../../model/board/data/custom-field/custom-field.model';
 import {BoardProject, ParallelTask} from '../../../model/board/data/project/project.model';
 import {UserSettingActions} from '../../../model/board/user/user-setting.reducer';
 import {UserSettingState} from '../../../model/board/user/user-setting';
@@ -224,17 +224,16 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
   }
 
   private createCustomFieldGroups(filterState: BoardFilterState,
-                                  observable: Observable<OrderedMap<string,
-                                    OrderedMap<string, CustomField>>>) {
+                                  observable: Observable<OrderedMap<string, CustomFieldData>>) {
     observable
       .pipe(
         take(1)
       )
       .subscribe(
         customFields => {
-          customFields.forEach((fields, key) => {
-            const filterFormEntries: FilterFormEntry[] = fields.map(c => FilterFormEntry(c.key, c.value)).toArray();
-            const cfFilterAttributes: FilterAttributes = FilterAttributesUtil.createCustomFieldFilterAttributes(key);
+          customFields.forEach((fieldData, key) => {
+            const filterFormEntries: FilterFormEntry[] = fieldData.fieldValues.map(c => FilterFormEntry(c.key, c.value)).toArray();
+            const cfFilterAttributes: FilterAttributes = FilterAttributesUtil.createCustomFieldFilterAttributes(key, fieldData);
             this.filterList.push(cfFilterAttributes);
             this.createGroup(filterFormEntries, cfFilterAttributes, () => filterState.customField.get(key));
           });
@@ -293,7 +292,7 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
     if (filterAttributes.hasNone) {
       filterFormEntries.unshift(FilterFormEntry(this.none, 'None'));
     }
-    if (filterAttributes === ASSIGNEE_ATTRIBUTES) {
+    if (filterAttributes.hasCurrentUser) {
       filterFormEntries.unshift(FilterFormEntry(this.currentUser, 'Current User'));
     }
     let set: Set<string> = setFilterGetter();

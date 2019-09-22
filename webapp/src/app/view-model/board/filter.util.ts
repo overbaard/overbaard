@@ -16,7 +16,7 @@ import {BoardFilterState} from '../../model/board/user/board-filter/board-filter
 import {BoardIssueView} from './board-issue-view';
 import {List, Map, Set} from 'immutable';
 import {NO_ASSIGNEE} from '../../model/board/data/assignee/assignee.model';
-import {CustomField} from '../../model/board/data/custom-field/custom-field.model';
+import {CustomFieldData, CustomFieldState, CustomFieldValue} from '../../model/board/data/custom-field/custom-field.model';
 import {
   ParallelTask,
   ParallelTaskOption,
@@ -44,17 +44,26 @@ export class AllFilters {
   private readonly _searchIssueIds: Set<string>;
   private readonly _searchIssueQlMatcher: IssueQlMatcher;
 
-  constructor(boardFilters: BoardFilterState, searchFilters: BoardSearchFilterState, projectState: ProjectState, currentUser: string) {
+  constructor(
+      boardFilters: BoardFilterState,
+      searchFilters: BoardSearchFilterState,
+      projectState: ProjectState,
+      customFieldState: CustomFieldState,
+      currentUser: string) {
     this._project = new SimpleFilter(PROJECT_ATTRIBUTES, boardFilters.project);
     this._priority = new SimpleFilter(PRIORITY_ATTRIBUTES, boardFilters.priority);
     this._issueType = new SimpleFilter(ISSUE_TYPE_ATTRIBUTES, boardFilters.issueType);
-    this._assignee = new AssigneeFilter(ASSIGNEE_ATTRIBUTES, boardFilters.assignee, currentUser);
+    this._assignee = new CurrentUserFilter(ASSIGNEE_ATTRIBUTES, boardFilters.assignee, currentUser);
     this._component = new MultiSelectFilter(COMPONENT_ATTRIBUTES, boardFilters.component);
     this._label = new MultiSelectFilter(LABEL_ATTRIBUTES, boardFilters.label);
     this._fixVersion = new MultiSelectFilter(FIX_VERSION_ATTRIBUTES, boardFilters.fixVersion);
     this._customFieldFilters = Map<string, SimpleFilter>().withMutations(mutable => {
       boardFilters.customField.forEach((f, k) => {
-        mutable.set(k, new SimpleFilter(FilterAttributesUtil.createCustomFieldFilterAttributes(k), f));
+        const cfd: CustomFieldData = customFieldState.fields.get(k);
+        const cfAttrs = FilterAttributesUtil.createCustomFieldFilterAttributes(k, cfd);
+        const cfFilter: SimpleFilter = cfAttrs.hasCurrentUser ?
+          new CurrentUserFilter(cfAttrs, f, currentUser) : new SimpleFilter(cfAttrs, f);
+        mutable.set(k, cfFilter);
       });
     });
     this._parallelTaskFilters = Map<string, SimpleFilter>().withMutations(mutable => {
@@ -147,7 +156,7 @@ export class AllFilters {
   private filterVisibleCustomFields(issue: BoardIssueView): boolean {
     let visible = true;
     this._customFieldFilters.forEach((f, k) => {
-      const cfv: CustomField = issue.customFields.get(k);
+      const cfv: CustomFieldValue = issue.customFields.get(k);
       if (!f.doFilter(cfv ? cfv.key : null)) {
         visible = false;
         return false;
@@ -234,7 +243,8 @@ class SimpleFilter {
   }
 }
 
-class AssigneeFilter extends SimpleFilter {
+// Used for assignees and custom fields of type user
+class CurrentUserFilter extends SimpleFilter {
   constructor(filterAttributes: FilterAttributes, filter: Set<string>, private readonly _currentUser: string) {
     super(filterAttributes, filter);
   }
