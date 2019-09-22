@@ -89,6 +89,10 @@
         {
           "key": "userB",
           "value": "Better User"
+        },
+        {
+          "key" : "kabir.khan",
+          "value" : "Kabir Khan"
         }
       ]
     },
@@ -306,6 +310,7 @@
       "type": 1,
       "epic": 2,
       "assignee": 1,
+      "custom": {"User Custom Field": 2},
       "parallel-tasks": [[3, 2], [1, 2]],
       "linked-issues": [
         {

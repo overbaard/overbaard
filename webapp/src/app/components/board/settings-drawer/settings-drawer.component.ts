@@ -231,9 +231,9 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
       )
       .subscribe(
         customFields => {
-          customFields.forEach((fieldDatas, key) => {
-            const filterFormEntries: FilterFormEntry[] = fieldDatas.fieldValues.map(c => FilterFormEntry(c.key, c.value)).toArray();
-            const cfFilterAttributes: FilterAttributes = FilterAttributesUtil.createCustomFieldFilterAttributes(key);
+          customFields.forEach((fieldData, key) => {
+            const filterFormEntries: FilterFormEntry[] = fieldData.fieldValues.map(c => FilterFormEntry(c.key, c.value)).toArray();
+            const cfFilterAttributes: FilterAttributes = FilterAttributesUtil.createCustomFieldFilterAttributes(key, fieldData);
             this.filterList.push(cfFilterAttributes);
             this.createGroup(filterFormEntries, cfFilterAttributes, () => filterState.customField.get(key));
           });
@@ -292,7 +292,7 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
     if (filterAttributes.hasNone) {
       filterFormEntries.unshift(FilterFormEntry(this.none, 'None'));
     }
-    if (filterAttributes === ASSIGNEE_ATTRIBUTES) {
+    if (filterAttributes.hasCurrentUser) {
       filterFormEntries.unshift(FilterFormEntry(this.currentUser, 'Current User'));
     }
     let set: Set<string> = setFilterGetter();

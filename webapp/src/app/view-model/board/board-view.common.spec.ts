@@ -389,7 +389,7 @@ export class UserSettingUpdater {
       case PARALLEL_TASK_ATTRIBUTES.key:
         // TODO implement another way if we need this
         throw new Error('Parallel Task filters cannot be changed using this method');
-      // atributes = PARALLEL_TASK_ATTRIBUTES;
+      // attributes = PARALLEL_TASK_ATTRIBUTES;
     }
     let values: object = null;
     if (atributes) {
@@ -399,7 +399,9 @@ export class UserSettingUpdater {
       }
     } else {
       if (this._mainUtil.boardState.customFields.fields.get(name)) {
-        atributes = FilterAttributesUtil.createCustomFieldFilterAttributes(name);
+        atributes = FilterAttributesUtil.createCustomFieldFilterAttributes(
+          name,
+          this._mainUtil.boardState.customFields.fields.get(name));
         values = {};
         for (const key of keys) {
           values[key] = true;

@@ -1,4 +1,5 @@
 import {makeTypedFactory, TypedRecord} from 'typed-immutable-record';
+import {CustomFieldData} from '../../data/custom-field/custom-field.model';
 
 export interface FilterAttributes {
   display: string;
@@ -94,10 +95,16 @@ export const PARALLEL_TASK_ATTRIBUTES =
     .build();
 
 export class FilterAttributesUtil {
-  static createCustomFieldFilterAttributes(customFieldName: string): FilterAttributes {
-    return new AttributesBuilder(customFieldName, customFieldName)
+  static createCustomFieldFilterAttributes(customFieldName: string, customFieldData: CustomFieldData): FilterAttributes {
+    const builder: AttributesBuilder = new AttributesBuilder(customFieldName, customFieldName)
       .hasNone()
-      .isCustomField()
-      .build();
+      .isCustomField();
+
+    if (customFieldData && customFieldData.type === 'user') {
+      // Currently not modifying all tests to pass in the CustomFieldMetadata
+      builder.hasCurrentUser();
+    }
+
+    return builder.build();
   }
 }
