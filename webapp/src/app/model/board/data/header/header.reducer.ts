@@ -1,7 +1,9 @@
 import {List, Map} from 'immutable';
 import {HeaderUtil, initialHeaderState} from './header.model';
-import {Action} from '@ngrx/store';
+import {Action, createSelector} from '@ngrx/store';
 import {HeaderState} from './header.state';
+import {AppState} from '../../../../app-store';
+import {CustomFieldState} from '../custom-field/custom-field.model';
 
 
 const DESERIALIZE_HEADERS = 'DESERIALIZE_HEADERS';
@@ -84,4 +86,9 @@ interface DeserializeHeadersPayload {
   backlog: number;
   done: number;
 }
+
+const getHeaderState = (state: AppState) => state.board.headers;
+const getBacklogStates = (state: HeaderState) => state.backlog;
+export const backlogStatesSelector = createSelector(getHeaderState, getBacklogStates);
+
 

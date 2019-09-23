@@ -115,7 +115,7 @@ export function getInitialAppState(): AppState {
     ReactiveFormsModule,
     AppRoutingModule,
     StoreModule.forRoot(reducers, {initialState: getInitialAppState, metaReducers: metaReducers}),
-    !environment.production ? StoreDevtoolsModule.instrument({ maxAge: 2 }) : []
+    !environment.production ? StoreDevtoolsModule.instrument({ maxAge: 10 }) : []
   ],
   providers: [
     {provide: APP_BASE_HREF, useValue: '/'},

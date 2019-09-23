@@ -22,6 +22,7 @@ import {filter, take, takeUntil} from 'rxjs/operators';
 import {IssueState} from '../../model/board/data/issue/issue.model';
 import {issueStateSelector} from '../../model/board/data/issue/issue.reducer';
 import {ToolbarTitleService} from '../../services/toolbar-title.service';
+import {backlogStatesSelector} from '../../model/board/data/header/header.reducer';
 
 
 @Component({
@@ -132,6 +133,13 @@ export class BoardComponent implements OnInit, OnDestroy {
           }
           this.blacklist = blacklist;
         });
+
+    this._store.select(backlogStatesSelector)
+      .pipe(take(1))
+      .subscribe(backlogStates => {
+        // The user settings need to know  the number of backlog states
+        this._store.dispatch(UserSettingActions.createSetBacklogStates(backlogStates));
+      });
   }
 
   ngOnDestroy(): void {

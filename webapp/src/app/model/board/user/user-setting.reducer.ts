@@ -24,6 +24,8 @@ const UPDATE_ISSUE_DETAIL_LEVEL = 'UPDATE_ISSUE_DETAIL_LEVEL';
 const UPDATE_SHOW_PARALLEL_TASKS = 'UPDATE_SHOW_PARALLEL_TASKS';
 const UPDATE_SHOW_LINKED_ISSUES = 'UPDATE_SHOW_LINKED_ISSUES';
 const UPDATE_SHOW_RANKING_ORDER = 'UPDATE_SHOW_RANKING-ORDER';
+const SET_BACKLOG_STATES = 'SET_BACKLOG_STATES';
+
 
 class ClearSettingsAction implements Action {
   readonly type = CLEAR_SETTINGS;
@@ -89,6 +91,12 @@ class UpdateShowRankingOrderAction {
   }
 }
 
+class SetBacklogStatesAction {
+  readonly type = SET_BACKLOG_STATES;
+  constructor(readonly payload: number) {
+  }
+}
+
 export class UserSettingActions {
   static createClearSettings(): Action {
     return new ClearSettingsAction();
@@ -136,6 +144,10 @@ export class UserSettingActions {
 
   static createUpdateShowRankingOrder(show: boolean) {
     return new UpdateShowRankingOrderAction(show);
+  }
+
+  static createSetBacklogStates(backlogStates: number) {
+    return new SetBacklogStatesAction(backlogStates);
   }
 }
 
@@ -193,7 +205,11 @@ export function userSettingReducer(state: UserSettingState = initialUserSettingS
         settingState.showBacklog = newValue;
         settingState.columnVisibilities = settingState.columnVisibilities.withMutations(visibilities => {
           backlogHeader.stateIndices.forEach(stateIndex => {
-            visibilities.set(stateIndex, newValue);
+            if (settingState.showBacklog) {
+              setVisibleState(visibilities, settingState.defaultColumnVisibility, stateIndex, true);
+            } else {
+              visibilities.remove(stateIndex);
+            }
           });
         });
       });
@@ -239,6 +255,11 @@ export function userSettingReducer(state: UserSettingState = initialUserSettingS
           if (settingState.forceBacklog) {
             settingState.showBacklog = false;
             settingState.forceBacklog = false;
+            settingState.columnVisibilities = settingState.columnVisibilities.withMutations(visibilities => {
+              for (let stateIndex = 0; stateIndex < settingState.backlogStates; stateIndex++) {
+                setVisibleState(visibilities, settingState.defaultColumnVisibility, stateIndex, false);
+              }
+            });
           }
         }
       });
@@ -275,12 +296,26 @@ export function userSettingReducer(state: UserSettingState = initialUserSettingS
         });
       });
     }
+    case SET_BACKLOG_STATES: {
+      const backlogStates: number = (<SetBacklogStatesAction>action).payload;
+      return UserSettingUtil.updateUserSettingState(state, settingState => {
+        settingState.backlogStates = backlogStates;
+      });
+    }
   }
   // Delegate other actions like updating the filters
   return UserSettingUtil.updateUserSettingState(state, mutable => {
     mutable.filters = boardFilterMetaReducer(state.filters, action);
     mutable.searchFilters = boardSearchFilterMetaReducer(state.searchFilters, action);
   });
+}
+
+function setVisibleState(mutableColumnVisibilities: Map<number, boolean>, defaultVisibility: boolean, stateIndex: number, value: boolean) {
+  if (value === defaultVisibility) {
+    mutableColumnVisibilities.remove(stateIndex);
+  } else {
+    mutableColumnVisibilities.set(stateIndex, value);
+  }
 }
 
 interface ToggleVisibilityPayload {

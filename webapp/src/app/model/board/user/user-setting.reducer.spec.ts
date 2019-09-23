@@ -575,12 +575,10 @@ describe('User setting reducer tests', () => {
 
           state = userSettingReducer(state, UserSettingActions.createToggleBacklog(getBacklogHeaderForToggle()));
           checker.showBacklog = true;
-          checker.visibleColumns = {0: true};
           checker.check(state);
 
           state = userSettingReducer(state, UserSettingActions.createToggleBacklog(getBacklogHeaderForToggle()));
           checker.showBacklog = false;
-          checker.visibleColumns = {0: false};
           checker.check(state);
         });
       });
@@ -623,13 +621,12 @@ describe('User setting reducer tests', () => {
 
           state = userSettingReducer(state, UserSettingActions.createToggleBacklog(getBacklogHeaderForToggle()));
           checker.showBacklog = false;
-          checker.visibleColumns = {0: false};
+          checker.visibleColumns = {};
           checker.check(state);
 
           state = userSettingReducer(state, UserSettingActions.createToggleBacklog(getBacklogHeaderForToggle()));
           checker.showBacklog = true;
-          checker.visibleColumns = {0: true
-          };
+          checker.visibleColumns = {};
           checker.check(state);
         });
       });
