@@ -5,6 +5,7 @@ import {IssueDetailState} from './issue-detail/issue-detail.model';
 import {BoardSearchFilterState} from './board-filter/board-search-filter.model';
 
 export interface UserSettingState {
+  backlogStates: number;
   boardCode: string;
   viewMode: BoardViewMode;
   forceBacklog: boolean;

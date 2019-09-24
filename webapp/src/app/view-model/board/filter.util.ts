@@ -131,6 +131,7 @@ export class AllFilters {
     if (!this._issueType.doFilter(issue.type.name)) {
       return false;
     }
+    console.log('----> ' + issue.key);
     if (!this._assignee.doFilter(issue.assignee !== NO_ASSIGNEE ? issue.assignee.key : null)) {
       return false;
     }

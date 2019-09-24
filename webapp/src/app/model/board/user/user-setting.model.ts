@@ -7,6 +7,7 @@ import {initialIssueDetailState} from './issue-detail/issue-detail.model';
 import {initialBoardSearchFilterState} from './board-filter/board-search-filter.model';
 
 const DEFAULT_STATE: UserSettingState = {
+  backlogStates: 0,
   boardCode: '',
   viewMode: BoardViewMode.KANBAN,
   forceBacklog: false,

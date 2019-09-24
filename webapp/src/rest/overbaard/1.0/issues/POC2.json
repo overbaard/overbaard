@@ -122,7 +122,7 @@
       "components": [0, 1],
       "fix-versions": [0,1],
       "labels": [0, 1],
-      "assignee": 1,
+      "assignee": 0,
       "custom": {"User Custom Field": 0, "Version Custom Field": 1}
     },
     "FEAT-2" : {

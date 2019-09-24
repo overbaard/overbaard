@@ -44,7 +44,7 @@ export class BoardHeaderGroupComponent implements OnInit {
   }
 
   onToggleVisibility(header: BoardHeader) {
-    if (!header.backlog || this.viewMode === this.enumViewMode.RANK) {
+    if (!header.backlog) {
       this.toggleColumnVisibility.next(header);
     } else {
       if (header.category) {
