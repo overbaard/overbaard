@@ -136,7 +136,7 @@ public class BoardConfigurationManagerImpl implements BoardConfigurationManager 
         BoardCfg[] cfgs = jiraInjectables.getActiveObjects().executeInTransaction(new TransactionCallback<BoardCfg[]>(){
             @Override
             public BoardCfg[] doInTransaction() {
-                return jiraInjectables.getActiveObjects().find(BoardCfg.class, Query.select().where("id = ?", boardId));
+                return jiraInjectables.getActiveObjects().find(BoardCfg.class, Query.select().where("ID = ?", boardId));
             }
         });
         ModelNode configJson = ModelNode.fromJSONString(cfgs[0].getConfigJson());
@@ -162,7 +162,7 @@ public class BoardConfigurationManagerImpl implements BoardConfigurationManager 
             BoardCfg[] cfgs = activeObjects.executeInTransaction(new TransactionCallback<BoardCfg[]>(){
                 @Override
                 public BoardCfg[] doInTransaction() {
-                    return activeObjects.find(BoardCfg.class, Query.select().where("code = ?", code));
+                    return activeObjects.find(BoardCfg.class, Query.select().where("CODE = ?", code));
                 }
             });
 
@@ -341,7 +341,7 @@ public class BoardConfigurationManagerImpl implements BoardConfigurationManager 
                 for (String customFieldKey : idsNode.keys()) {
                     String customFieldId = idsNode.get(customFieldKey).asString();
 
-                    Setting[] settings =  activeObjects.find(Setting.class, Query.select().where("name = ?", customFieldKey));
+                    Setting[] settings =  activeObjects.find(Setting.class, Query.select().where("NAME = ?", customFieldKey));
                     if (settings.length == 0) {
                         //Insert
                         final Setting setting = activeObjects.create(
@@ -437,7 +437,7 @@ public class BoardConfigurationManagerImpl implements BoardConfigurationManager 
         Setting[] settings = activeObjects.executeInTransaction(new TransactionCallback<Setting[]>() {
             @Override
             public Setting[] doInTransaction() {
-                return activeObjects.find(Setting.class, Query.select().where("name = ?", name));
+                return activeObjects.find(Setting.class, Query.select().where("NAME = ?", name));
             }
         });
         if (settings.length == 1) {

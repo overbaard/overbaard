@@ -110,11 +110,11 @@ class BulkIssueLoadStrategy implements IssueLoadStrategy {
 
     private void bulkLoadData(SQLProcessor sqlProcessor) {
         // Load up the ids of the link types, we'll need those for figuring out the sub-tasks and the epic links
-        String loadIdsSql = "select id, linkname " +
-                "from issuelinktype " +
-                "where linkname = 'jira_subtask_link' " +
-                "or linkname = 'Epic-Story Link' " +
-                "order by linkname";
+        String loadIdsSql = "SELECT ID, LINKNAME " +
+                "FROM ISSUELINKTYPE " +
+                "WHERE LINKNAME = 'jira_subtask_link' " +
+                "OR LINKNAME = 'Epic-Story Link' " +
+                "ORDER BY LINKNAME";
         long subtaskLinkId = -1;
         long epicLinkId = -1;
         try (ResultSet rs = sqlProcessor.executeQuery(loadIdsSql)){
@@ -226,13 +226,13 @@ class BulkIssueLoadStrategy implements IssueLoadStrategy {
 
     private String createLoadCustomFieldsSql(List<Long> idBatch) {
         StringBuilder sb = new StringBuilder()
-                .append("select j.id, cv.customfield, cv.stringvalue, cv.numbervalue, it.pname as type ")
-                .append("from project p, jiraissue j, customfieldvalue cv, issuetype it ")
-                .append("where ")
-                .append("p.id=j.project and j.id=cv.issue and ")
-                .append("j.issuetype=it.id and ")
-                .append("p.pkey='" + project.getCode() + "' and ")
-                .append("customfield in (");
+                .append("SELECT J.ID, CV.CUSTOMFIELD, CV.STRINGVALUE, CV.NUMBERVALUE, IT.PNAME AS TYPE ")
+                .append("FROM PROJECT P, JIRAISSUE J, CUSTOMFIELDVALUE CV, ISSUETYPE IT ")
+                .append("WHERE ")
+                .append("P.ID=J.PROJECT AND J.ID=CV.ISSUE AND ")
+                .append("J.ISSUETYPE=IT.ID AND ")
+                .append("P.PKEY='" + project.getCode() + "' AND ")
+                .append("CUSTOMFIELD IN (");
 
         boolean first = true;
         for (Long cfId : customFieldContexts.keySet()) {
@@ -253,8 +253,8 @@ class BulkIssueLoadStrategy implements IssueLoadStrategy {
                 sb.append(cfId.toString());
             }
         }
-        sb.append(") and ");
-        sb.append("j.id in " + createInIdsClause(idBatch));
+        sb.append(") AND ");
+        sb.append("J.ID IN " + createInIdsClause(idBatch));
 
         final String sql = sb.toString();
         OverbaardLogger.LOGGER.debug("SQL query: {}", sql);
@@ -264,15 +264,15 @@ class BulkIssueLoadStrategy implements IssueLoadStrategy {
     private void loadParentTasks(SQLProcessor sqlProcessor, List<Long> idBatch, long subTaskLinkId) {
         StringBuilder sb = new StringBuilder()
                 .append("SELECT ")
-                .append("child.issueNum as issueNum, parentProject.pkey as parentProjectCode, parent.issueNum as parentNum ")
+                .append("CHILD.ISSUENUM AS ISSUENUM, PARENTPROJECT.PKEY AS PARENTPROJECTCODE, PARENT.ISSUENUM AS PARENTNUM ")
                 .append("FROM ")
-                .append("JiraIssue child, JiraIssue parent, Project childProject, Project parentProject, IssueLink il ")
+                .append("JIRAISSUE CHILD, JIRAISSUE PARENT, PROJECT CHILDPROJECT, PROJECT PARENTPROJECT, ISSUELINK IL ")
                 .append("WHERE ")
-                .append("child.project = childProject.id and child.id = il.destination and ")
-                .append("parent.id = il.source and parent.project = parentProject.id and ")
-                .append("childProject.pkey = '" + project.getCode() + "' and ")
-                .append("il.linktype = " + subTaskLinkId + " and ")
-                .append("il.destination in " + createInIdsClause(idBatch));
+                .append("CHILD.PROJECT = CHILDPROJECT.ID AND CHILD.ID = IL.DESTINATION AND ")
+                .append("PARENT.ID = IL.SOURCE AND PARENT.PROJECT = PARENTPROJECT.ID AND ")
+                .append("CHILDPROJECT.PKEY = '" + project.getCode() + "' AND ")
+                .append("IL.LINKTYPE = " + subTaskLinkId + " AND ")
+                .append("IL.DESTINATION IN " + createInIdsClause(idBatch));
 
         try (ResultSet rs = sqlProcessor.executeQuery(sb.toString())){
             while (rs.next()) {
@@ -292,18 +292,18 @@ class BulkIssueLoadStrategy implements IssueLoadStrategy {
 
         StringBuilder sb = new StringBuilder()
                 .append("SELECT ")
-                .append("issue.issueNum as issueNum, epicProject.pkey as epicProjectCode, ")
-                .append("epic.issueNum as epicNum, cfv.stringvalue as summary ")
+                .append("ISSUE.ISSUENUM AS ISSUENUM, EPICPROJECT.PKEY AS EPICPROJECTCODE, ")
+                .append("EPIC.ISSUENUM AS EPICNUM, CFV.STRINGVALUE AS SUMMARY ")
                 .append("FROM ")
-                .append("JiraIssue issue, JiraIssue epic, Project issueProject, ")
-                .append("Project epicProject, IssueLink il, CustomFieldValue cfv ")
+                .append("JIRAISSUE ISSUE, JIRAISSUE EPIC, PROJECT ISSUEPROJECT, ")
+                .append("PROJECT EPICPROJECT, ISSUELINK IL, CUSTOMFIELDVALUE CFV ")
                 .append("WHERE ")
-                .append("issue.project = issueProject.id and issue.id = il.destination and ")
-                .append("epic.id = il.source and\tepic.project = epicProject.id and cfv.issue = epic.id and ")
-                .append("epicProject.pkey = '" + project.getCode() + "' and ")
-                .append("il.linkType = " + epicLinkId + " and ")
-                .append("cfv.customfield = " + project.getBoard().getConfig().getEpicSummaryCustomFieldId() + " and ")
-                .append("il.destination in " + createInIdsClause(idBatch));
+                .append("ISSUE.PROJECT = ISSUEPROJECT.ID AND ISSUE.ID = IL.DESTINATION AND ")
+                .append("EPIC.ID = IL.SOURCE AND\tEPIC.PROJECT = EPICPROJECT.ID AND CFV.ISSUE = EPIC.ID AND ")
+                .append("EPICPROJECT.PKEY = '" + project.getCode() + "' AND ")
+                .append("IL.LINKTYPE = " + epicLinkId + " AND ")
+                .append("CFV.CUSTOMFIELD = " + project.getBoard().getConfig().getEpicSummaryCustomFieldId() + " AND ")
+                .append("IL.DESTINATION IN " + createInIdsClause(idBatch));
 
         try (ResultSet rs = sqlProcessor.executeQuery(sb.toString())){
             while (rs.next()) {
