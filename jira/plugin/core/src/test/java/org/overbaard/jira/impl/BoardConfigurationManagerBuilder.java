@@ -173,7 +173,7 @@ public class BoardConfigurationManagerBuilder implements ConfigurationManagerInj
             Class<?> clazz = (Class<?>)args[0];
             if (clazz == BoardCfg.class) {
                 Query query = (Query) args[1];
-                if (query.getWhereClause().equals("code = ?") && query.getWhereParams().length == 1) {
+                if (query.getWhereClause().equals("CODE = ?") && query.getWhereParams().length == 1) {
                     ModelNode entry = activeObjectEntries.get(query.getWhereParams()[0]);
                     if (entry != null) {
                         return new BoardCfg[]{new MockBoardCfg("kabir", entry).boardCfg};
@@ -182,7 +182,7 @@ public class BoardConfigurationManagerBuilder implements ConfigurationManagerInj
                 return new BoardCfg[0];
             } else if (clazz == Setting.class) {
                 Query query = (Query) args[1];
-                if (query.getWhereClause().equals("name = ?") && query.getWhereParams().length == 1) {
+                if (query.getWhereClause().equals("NAME = ?") && query.getWhereParams().length == 1) {
                     ModelNode entry = activeObjectEntries.get(query.getWhereParams()[0]);
                     if (entry != null) {
                         return new Setting[]{new MockSetting(entry.get(NAME).asString(), entry.get(ID).asString()).setting};
