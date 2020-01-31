@@ -57,7 +57,7 @@
         <version.internal.atlassian.spring.scanner>1.2.13</version.internal.atlassian.spring.scanner>
 
         <!-- My plugin versions -->
-        <version.checkstyle>8.18</version.checkstyle>
+        <version.checkstyle>8.29</version.checkstyle>
         <version.checkstyle.plugin>3.0.0</version.checkstyle.plugin>
         <version.clean-plugin>3.0.0</version.clean-plugin>
         <version.frontend-maven-plugin>1.6</version.frontend-maven-plugin>
