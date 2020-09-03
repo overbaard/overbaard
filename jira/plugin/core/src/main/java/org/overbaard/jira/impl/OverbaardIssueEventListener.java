@@ -209,6 +209,7 @@ public class OverbaardIssueEventListener implements InitializingBean, Disposable
         long eventTypeId = issueEvent.getEventTypeId();
         // if it's an event we're interested in, log it
 
+
         //There are no events for when updating linked issues. Instead we invalidate the boards every five minutes in
         //BoardManagerImpl which forces a full refresh of the board which will bring in linked issues
 
@@ -327,28 +328,39 @@ public class OverbaardIssueEventListener implements InitializingBean, Disposable
             if (field.equals(CHANGE_LOG_ISSUETYPE)) {
                 issueType = issue.getIssueTypeObject().getName();
                 oldIssueType = change.getString(CHANGE_LOG_OLD_STRING);
+                OverbaardLogger.LOGGER.debug("Changing Issue type {} to {}", oldIssueType, issueType);
             } else if (field.equals(CHANGE_LOG_PRIORITY)) {
                 priority = issue.getPriorityObject().getName();
+                OverbaardLogger.LOGGER.debug("Changing Priority to {}", priority);
             } else if (field.equals(CHANGE_LOG_SUMMARY)) {
                 summary = issue.getSummary();
+                OverbaardLogger.LOGGER.debug("Changing Summary to {}", summary);
             } else if (field.equals(CHANGE_LOG_ASSIGNEE)) {
                 assignee = issue.getAssignee();
                 if (assignee == null) {
                     assignee = OverbaardIssueEvent.UNASSIGNED;
                 }
+                OverbaardLogger.LOGGER.debug("Changing Assignee to {}", assignee);
             } else if (field.equals(CHANGE_LOG_STATUS)) {
                 state = issue.getStatusObject().getName();
                 oldState = change.getString(CHANGE_LOG_OLD_STRING);
+                OverbaardLogger.LOGGER.debug("Changing Issue type {} to {}", oldState, state);
             } else if (field.equals(CHANGE_LOG_RANK)) {
                 reranked = true;
+                OverbaardLogger.LOGGER.debug("Changing Rank");
             } else if (field.equals(CHANGE_LOG_COMPONENT)) {
                 components = issue.getComponentObjects();
+                OverbaardLogger.LOGGER.debug("Changing Components to {}", components);
             } else if (field.equals(CHANGE_LOG_LABELS)) {
                 labels = issue.getLabels();
+                OverbaardLogger.LOGGER.debug("Changing Labels to {}", labels);
             } else if (field.equals(CHANGE_LOG_FIX_VERSIONS)) {
                 fixVersions = issue.getFixVersions();
+                OverbaardLogger.LOGGER.debug("Changing Fix Versions to {}", fixVersions);
             } else if (change.get(CHANGE_LOG_FIELDTYPE).equals(CHANGE_LOG_CUSTOM)) {
+                OverbaardLogger.LOGGER.debug("Changing Custom Field {}", field);
                 Set<CustomFieldConfig> customFieldConfigs = boardManager.getCustomFieldsForUpdateEvent(issue.getProjectObject().getKey(), field);
+                OverbaardLogger.LOGGER.debug("Got custom field configs {}", customFieldConfigs);
                 if (customFieldConfigs.size() > 0) {
                     if (customFieldValues == null) {
                         customFieldValues = new HashMap<>();
@@ -363,6 +375,7 @@ public class OverbaardIssueEventListener implements InitializingBean, Disposable
 
                 Set<ParallelTaskCustomFieldConfig> parallelTaskConfigs
                         = boardManager.getParallelTaskFieldsForUpdateEvent(issue.getProjectObject().getKey(), issue.getIssueType().getName(), field);
+                OverbaardLogger.LOGGER.debug("Got parallel task configs {}", customFieldConfigs);
                 if (parallelTaskConfigs.size() > 0) {
                     if (customFieldValues == null) {
                         customFieldValues = new HashMap<>();
@@ -481,7 +494,7 @@ public class OverbaardIssueEventListener implements InitializingBean, Disposable
 
     private void passEventToBoardManagerOrDelay(OverbaardIssueEvent event) throws IndexException {
         if (event.isRecalculateState()) {
-            OverbaardLogger.LOGGER.debug("Possible delayed event {}", event.getIssueKey());
+            OverbaardLogger.LOGGER.debug("Possible delayed event {}", event);
             //Possible delay
             OverbaardEventWrapper wrapper = delayedEvents.get();
             if (wrapper == null) {
@@ -490,7 +503,7 @@ public class OverbaardIssueEventListener implements InitializingBean, Disposable
                 wrapper = new OverbaardEventWrapper(false);
                 wrapper.issueEvent = event;
                 delayedEvents.set(wrapper);
-                OverbaardLogger.LOGGER.debug("Delaying event {}", event.getIssueKey());
+                OverbaardLogger.LOGGER.debug("Delaying event {}", event);
             } else {
                 //We already have an event wrapper. The only thing which would have put it here is if a ranking op was done
                 //so that the LexoRankBalanceEvent was triggered.
@@ -498,14 +511,14 @@ public class OverbaardIssueEventListener implements InitializingBean, Disposable
                 wrapper.issueEvent = event;
                 if (wrapper.isComplete()) {
                     //It is complete
-                    OverbaardLogger.LOGGER.debug("Handle delayed event {}", event.getIssueKey());
+                    OverbaardLogger.LOGGER.debug("Handle delayed event {}", event);
                     boardManager.handleEvent(event, nextRankedIssueUtil);
                     delayedEvents.remove();
                 }
             }
         } else {
             //We can handle the event right away
-            OverbaardLogger.LOGGER.debug("Handling immediate event {}", event.getIssueKey());
+            OverbaardLogger.LOGGER.debug("Handling immediate event {}", event);
             boardManager.handleEvent(event, nextRankedIssueUtil);
         }
     }

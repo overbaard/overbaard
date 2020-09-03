@@ -36,22 +36,27 @@ public class OverbaardLogger {
     }
 
     public void trace(String msg, Object...params) {
-        logger.trace(msg, params);
+        log(msg, params, () -> logger.trace(msg, params));
     }
 
     public void debug(String msg, Object...params) {
-        logger.debug(msg, params);
+        log(msg, params, () -> logger.debug(msg, params));
     }
 
     public void info(String msg, Object...params) {
-        logger.info(msg, params);
+        log(msg, params, () -> logger.info(msg, params));
     }
 
     public void warn(String msg, Object...params) {
-        logger.warn(msg, params);
+        log(msg, params, () -> logger.warn(msg, params));
+
     }
 
     public void error(String msg, Object... params) {
-        logger.error(msg, params);
+        log(msg, params, () -> logger.error(msg, params));
+    }
+
+    private void log(String msg, Object[] params, Runnable runnable) {
+        runnable.run();
     }
 }

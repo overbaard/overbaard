@@ -28,9 +28,9 @@ import com.atlassian.jira.issue.fields.CustomField;
  * @author Kabir Khan
  */
 abstract class CustomFieldConfigImpl implements CustomFieldConfig {
-    private final String name;
-    private final Type type;
-    private final CustomField customField;
+    protected final String name;
+    protected final Type type;
+    protected final CustomField customField;
 
     protected CustomFieldConfigImpl(String name, Type type, CustomField customField) {
         this.name = name;
@@ -166,5 +166,14 @@ abstract class CustomFieldConfigImpl implements CustomFieldConfig {
         result = 31 * result + type.hashCode();
         result = 31 * result + customField.getIdAsLong().intValue();
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "CustomFieldConfigImpl{" +
+                "\nname='" + name + '\'' +
+                ",\ntype=" + type +
+                ",\ncustomField=" + customField +
+                '}';
     }
 }

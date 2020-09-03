@@ -21,6 +21,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.overbaard.jira.OverbaardLogger;
+
 /**
  * @author Kabir Khan
  */
@@ -54,6 +56,7 @@ public class CustomFieldRegistry<C extends CustomFieldConfig> {
     }
 
     public C getForJiraName(String name) {
+        OverbaardLogger.LOGGER.trace("Getting custom field configs for jira name {}. All configs{}", name, customFieldConfigsByJiraName);
         return customFieldConfigsByJiraName.get(name);
     }
 
@@ -67,5 +70,14 @@ public class CustomFieldRegistry<C extends CustomFieldConfig> {
 
     public int size() {
         return customFieldConfigsByOverbaardName.size();
+    }
+
+    @Override
+    public String toString() {
+        return "CustomFieldRegistry{" +
+                "\ncustomFieldConfigsByOverbaardName=" + customFieldConfigsByOverbaardName +
+                ",\ncustomFieldConfigsByJiraId=" + customFieldConfigsByJiraId +
+                ",\ncustomFieldConfigsByJiraName=" + customFieldConfigsByJiraName +
+                '}';
     }
 }

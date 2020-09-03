@@ -141,4 +141,12 @@ public class ProjectParallelTaskGroupsConfig {
         return configs;
     }
 
+    @Override
+    public String toString() {
+        return "ProjectParallelTaskGroupsConfig{" +
+                "\nconfigs=" + configs +
+                ",\nconfigGroups=" + configGroups +
+                ",\ngroupIndices=" + groupIndices +
+                '}';
+    }
 }

@@ -248,9 +248,11 @@ public class BoardProjectConfig extends ProjectConfig<BoardProjectStateMapper> {
     }
 
     public ProjectParallelTaskGroupsConfig getParallelTaskGroupsConfig(String issueType) {
+        OverbaardLogger.LOGGER.trace("Getting parallel task groups config for project {} and issue type {}. Project level configs {}", getCode(), issueType, parallelTaskGroupsConfig);
         if (issueTypeOverrideConfig != null) {
             ProjectParallelTaskGroupsConfig config = issueTypeOverrideConfig.getParallelTaskGroupsConfig(issueType);
             if (config != null) {
+                OverbaardLogger.LOGGER.trace("Found issue type parallel task group config override {}", config);
                 return config == ProjectParallelTaskGroupsConfig.EMPTY_OVERRIDE ? null : config;
             }
         }

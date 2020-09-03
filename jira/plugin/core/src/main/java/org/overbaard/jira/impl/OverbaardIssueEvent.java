@@ -58,14 +58,7 @@ public class OverbaardIssueEvent {
         StringBuilder sb = new StringBuilder("OverbaardIssueEvent{type="
                 + type + ";key=" + issueKey + ";project=" + projectCode);
         if (detail != null) {
-            sb.append("Detail{");
-            sb.append("issueType=" + detail.issueType);
-            sb.append(";priority=" + detail.priority);
-            sb.append(";summary=" + detail.summary);
-            sb.append(";assignee=" + (detail.assignee != null ? detail.assignee.getName() : "null"));
-            sb.append(";state=" + detail.state);
-            sb.append(";reorder=" + detail.reranked);
-            sb.append("}}");
+            sb.append("detail=" + detail);
         } else {
             sb.append("}");
         }
@@ -94,7 +87,9 @@ public class OverbaardIssueEvent {
                                                         String state, Map<Long, String> customFieldValues) {
         Detail detail = new Detail(issueType, priority, summary, assignee, components, labels, fixVersions,
                 null, state, true, customFieldValues);
-        return new OverbaardIssueEvent(Type.CREATE, issueKey, projectCode, detail);
+        OverbaardIssueEvent event = new OverbaardIssueEvent(Type.CREATE, issueKey, projectCode, detail);
+
+        return event;
     }
 
     public static OverbaardIssueEvent createUpdateEvent(String issueKey, String projectCode,
@@ -105,7 +100,9 @@ public class OverbaardIssueEvent {
                                                         Map<Long, String> customFieldValues) {
         Detail detail = new Detail(issueType, priority, summary, assignee, components, labels, fixVersions,
                 oldState, state, reranked, customFieldValues);
-        return new OverbaardIssueEvent(Type.UPDATE, issueKey, projectCode, detail);
+        OverbaardIssueEvent event = new OverbaardIssueEvent(Type.UPDATE, issueKey, projectCode, detail);
+
+        return event;
     }
 
     public boolean isRecalculateState() {
@@ -201,6 +198,23 @@ public class OverbaardIssueEvent {
 
         public Map<Long, String> getCustomFieldValues() {
             return customFieldValues;
+        }
+
+        @Override
+        public String toString() {
+            return "Detail{" +
+                    "\nissueType='" + issueType + '\'' +
+                    ",\npriority='" + priority + '\'' +
+                    ",\nsummary='" + summary + '\'' +
+                    ",\nassignee=" + assignee +
+                    ",\ncomponents=" + components +
+                    ",\nlabels=" + labels +
+                    ",\nfixVersions=" + fixVersions +
+                    ",\noldState='" + oldState + '\'' +
+                    ",\nstate='" + state + '\'' +
+                    ",\nreranked=" + reranked +
+                    ",\ncustomFieldValues=" + customFieldValues +
+                    '}';
         }
     }
 

@@ -361,7 +361,8 @@ public class BoardManagerImpl implements BoardManager, InitializingBean, Disposa
             }
         }
         Set<T> result = null;
-        for (String boardCode : boardCodes) {
+        OverbaardLogger.LOGGER.trace("Active boards for project code {}: {}", projectCode, activeBoards);
+        for (String boardCode : activeBoards) {
             BoardConfig boardConfig = null;
             try {
                 boardConfig = boardConfigurationManager.getBoardConfig(boardCode);

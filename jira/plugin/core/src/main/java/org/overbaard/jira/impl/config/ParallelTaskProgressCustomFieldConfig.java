@@ -54,4 +54,14 @@ class ParallelTaskProgressCustomFieldConfig extends CustomFieldConfigImpl implem
         result = 31 * result + code.hashCode();
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "ParallelTaskProgressCustomFieldConfig{" +
+                "\ncode='" + code + '\'' +
+                ",\nname='" + name + '\'' +
+                ",\ntype=" + type +
+                ",\ncustomField=" + customField +
+                '}';
+    }
 }
