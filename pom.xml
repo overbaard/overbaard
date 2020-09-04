@@ -57,11 +57,13 @@
         <version.internal.atlassian.spring.scanner>1.2.13</version.internal.atlassian.spring.scanner>
 
         <!-- My plugin versions -->
+        <version.build-helper-plugin>3.2.0</version.build-helper-plugin>
         <version.checkstyle>8.18</version.checkstyle>
         <version.checkstyle.plugin>3.0.0</version.checkstyle.plugin>
         <version.clean-plugin>3.0.0</version.clean-plugin>
         <version.frontend-maven-plugin>1.6</version.frontend-maven-plugin>
-        <version.resources-plugin>3.0.2</version.resources-plugin>
+        <version.resources-plugin>3.2.0</version.resources-plugin>
+
 
         <!-- Node and Yarn versions -->
         <version.yarn>v1.17.3</version.yarn>
@@ -209,6 +211,11 @@
                             </configuration>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>${version.build-helper-plugin}</version>
                 </plugin>
                 <!-- Used to bundle the front-end build -->
                 <plugin>
