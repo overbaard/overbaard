@@ -55,18 +55,27 @@
     </dependencyManagement>
 
     <dependencies>
+        <!--
+            Make these internal module dependencies provided.
+            We will use the build-helper-maven-plugin later to add their source folders
+        -->
         <dependency>
             <groupId>org.overbaard</groupId>
             <artifactId>overbaard-jira-api-adapter-spi</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.overbaard</groupId>
             <artifactId>overbaard-jira-api-adapter-jira7</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.overbaard</groupId>
             <artifactId>overbaard-jira-plugin-core</artifactId>
+            <scope>provided</scope>
         </dependency>
+        <!-- Internal - END -->
+
         <dependency>
             <groupId>com.atlassian.jira</groupId>
             <artifactId>jira-api</artifactId>
@@ -254,20 +263,65 @@
                     </execution>
                 </executions>
             </plugin>
+            <!--
+                Copy the webapp files
+                (for some reason this does not seem to work with the build-helper-maven-plugin below
+            -->
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>${version.resources-plugin}</version>
                 <executions>
                     <execution>
-                        <id>copy-plugin-configuration-resources</id>
+                        <id>copy-resources</id>
                         <!-- here the phase you need -->
                         <phase>process-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/classes</outputDirectory>
+                            <outputDirectory>${basedir}/target/classes/webapp</outputDirectory>
                             <resources>
+                                <resource>
+                                    <directory>../../../webapp/target</directory>
+                                    <!-- TODO exclude the rest/ directory -->
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-other-modules-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>../../api-adapter/jira7/src/main/java</source>
+                                <source>../../api-adapter/spi/src/main/java</source>
+                                <source>../core/src/main/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-other-modules-resources</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>add-resource</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>../../api-adapter/jira7/src/main/resources</directory>
+                                </resource>
+                                <resource>
+                                    <directory>../../api-adapter/spi/src/main/resources</directory>
+                                </resource>
                                 <resource>
                                     <directory>../core/src/main/resources</directory>
                                     <filtering>true</filtering>
