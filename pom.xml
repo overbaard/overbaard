@@ -41,7 +41,7 @@
     <properties>
         <!-- Non Jira dependency versions -->
         <version.jboss-dmr>1.3.0.Final</version.jboss-dmr>
-        <version.junit>4.10</version.junit>
+        <version.junit>4.13.1</version.junit>
 
         <!--
             Jira 7 and Jira8 versions of versions that are used both by dependencies (bom)
