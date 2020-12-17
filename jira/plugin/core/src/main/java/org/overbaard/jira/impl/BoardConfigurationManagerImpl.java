@@ -557,19 +557,16 @@ public class BoardConfigurationManagerImpl implements BoardConfigurationManager 
 
     //Permission methods
     private boolean canEditBoard(ApplicationUser user, ModelNode boardConfig) {
-        System.out.println("Check canEdit");
         return hasPermissionBoard(user, boardConfig, ProjectPermissions.ADMINISTER_PROJECTS);
     }
 
     private boolean canViewBoard(ApplicationUser user, ModelNode boardConfig) {
         //A wild guess at a reasonable permission needed to view the boards
-        System.out.println("Check canView");
         return hasPermissionBoard(user, boardConfig, ProjectPermissions.TRANSITION_ISSUES);
     }
 
     private boolean canViewBoard(ApplicationUser user, BoardConfig boardConfig) {
         //A wild guess at a reasonable permission needed to view the boards
-        System.out.println("Check canView 2");
         return hasPermissionBoard(user, boardConfig, ProjectPermissions.TRANSITION_ISSUES);
     }
 
@@ -589,7 +586,6 @@ public class BoardConfigurationManagerImpl implements BoardConfigurationManager 
 
 
     private boolean hasPermissionBoard(ApplicationUser user, ModelNode boardConfig, ProjectPermissionKey...permissions) {
-        System.out.println("Cheking permission for " + boardConfig);
         if (isJiraAdministrator(user)) {
             return true;
         }
