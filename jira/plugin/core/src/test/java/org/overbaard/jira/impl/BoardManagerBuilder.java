@@ -106,6 +106,7 @@ public class BoardManagerBuilder {
                 avatarService,
                 configurationManagerInjectables.getCustomFieldManager(),
                 configurationManagerInjectables.getGlobalPermissionManager(),
+                configurationManagerInjectables.getGroupManager(),
                 issueService,
                 issueLinkManager,
                 configurationManagerInjectables.getIssueTypeManager(),

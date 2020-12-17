@@ -52,6 +52,7 @@ import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.project.version.VersionManager;
 import com.atlassian.jira.security.GlobalPermissionManager;
 import com.atlassian.jira.security.PermissionManager;
+import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.sal.api.ApplicationProperties;
 import com.atlassian.sal.api.transaction.TransactionCallback;
 
@@ -60,6 +61,7 @@ import net.java.ao.Query;
 import net.java.ao.RawEntity;
 import ut.org.overbaard.jira.mock.CustomFieldManagerBuilder;
 import ut.org.overbaard.jira.mock.GlobalPermissionManagerBuilder;
+import ut.org.overbaard.jira.mock.GroupManagerBuilder;
 import ut.org.overbaard.jira.mock.IssueTypeManagerBuilder;
 import ut.org.overbaard.jira.mock.PermissionManagerBuilder;
 import ut.org.overbaard.jira.mock.PriorityManagerBuilder;
@@ -77,6 +79,7 @@ public class BoardConfigurationManagerBuilder implements ConfigurationManagerInj
     private PriorityManager priorityManager = PriorityManagerBuilder.getDefaultPriorityManager();
     private PermissionManager permissionManager = PermissionManagerBuilder.getAllowsAll();
     private GlobalPermissionManager globalPermissionManager = GlobalPermissionManagerBuilder.getAllowsAll();
+    private GroupManager groupManager = GroupManagerBuilder.getAllowsAll();
     private CustomFieldManager customFieldManager = CustomFieldManagerBuilder.getDefaultCustomFieldManager();
 
     private Map<String, ModelNode> activeObjectEntries = new HashMap<>();
@@ -124,6 +127,11 @@ public class BoardConfigurationManagerBuilder implements ConfigurationManagerInj
         return globalPermissionManager;
     }
 
+    @Override
+    public GroupManager getGroupManager() {
+        return groupManager;
+    }
+
     public BoardConfigurationManagerBuilder addConfigActiveObjectsFromModel(ModelNode entry) throws IOException {
         addConfigActiveObject(entry.get(CODE).asString(), entry);
         return this;
@@ -158,6 +166,11 @@ public class BoardConfigurationManagerBuilder implements ConfigurationManagerInj
 
     public BoardConfigurationManagerBuilder setGlobalPermissionManager(GlobalPermissionManager globalPermissionManager) {
         this.globalPermissionManager = globalPermissionManager;
+        return this;
+    }
+
+    public BoardConfigurationManagerBuilder setGroupManager(GroupManager groupManager) {
+        this.groupManager = groupManager;
         return this;
     }
 
@@ -211,6 +224,7 @@ public class BoardConfigurationManagerBuilder implements ConfigurationManagerInj
                 avatarService,
                 customFieldManager,
                 globalPermissionManager,
+                groupManager,
                 issueService,
                 issueLinkManager,
                 issueTypeManager,

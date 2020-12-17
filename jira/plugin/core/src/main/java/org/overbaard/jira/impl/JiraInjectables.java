@@ -35,6 +35,7 @@ import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.project.version.VersionManager;
 import com.atlassian.jira.security.GlobalPermissionManager;
 import com.atlassian.jira.security.PermissionManager;
+import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.ApplicationProperties;
@@ -58,6 +59,9 @@ public class JiraInjectables {
 
     @ComponentImport
     private final GlobalPermissionManager globalPermissionManager;
+
+    @ComponentImport
+    private final GroupManager groupManager;
 
     @ComponentImport
     private final IssueService issueService;
@@ -100,7 +104,9 @@ public class JiraInjectables {
     @Inject
     public JiraInjectables(final ActiveObjects activeObjects, final ApplicationProperties applicationProperties,
                            final AvatarService avatarService, final CustomFieldManager customFieldManager,
-                           final GlobalPermissionManager globalPermissionManager, final IssueService issueService,
+                           final GlobalPermissionManager globalPermissionManager,
+                           final GroupManager groupManager,
+                           final IssueService issueService,
                            final IssueLinkManager issueLinkManager, final IssueTypeManager issueTypeManager,
                            final OptionsManager optionsManager,
                            final PermissionManager permissionManager, final ProjectManager projectManager,
@@ -113,6 +119,7 @@ public class JiraInjectables {
         this.avatarService = avatarService;
         this.customFieldManager = customFieldManager;
         this.globalPermissionManager = globalPermissionManager;
+        this.groupManager = groupManager;
         this.issueService = issueService;
         this.issueLinkManager = issueLinkManager;
         this.issueTypeManager = issueTypeManager;
@@ -144,6 +151,10 @@ public class JiraInjectables {
 
     public GlobalPermissionManager getGlobalPermissionManager() {
         return globalPermissionManager;
+    }
+
+    public GroupManager getGroupManager() {
+        return groupManager;
     }
 
     public IssueService getIssueService() {

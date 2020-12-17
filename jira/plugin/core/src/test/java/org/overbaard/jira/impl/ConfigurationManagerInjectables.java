@@ -7,6 +7,7 @@ import com.atlassian.jira.issue.CustomFieldManager;
 import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.security.GlobalPermissionManager;
 import com.atlassian.jira.security.PermissionManager;
+import com.atlassian.jira.security.groups.GroupManager;
 
 /**
  * Mock Injectables configured in the BoarcConfigurationManager that should also
@@ -28,4 +29,6 @@ public interface ConfigurationManagerInjectables {
     PriorityManager getPriorityManager();
 
     GlobalPermissionManager getGlobalPermissionManager();
+
+    GroupManager getGroupManager();
 }

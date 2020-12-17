@@ -62,6 +62,7 @@ import com.atlassian.jira.project.Project;
 import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.security.GlobalPermissionManager;
 import com.atlassian.jira.security.PermissionManager;
+import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.security.plugin.ProjectPermissionKey;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.sal.api.transaction.TransactionCallback;
@@ -76,6 +77,7 @@ import net.java.ao.Query;
 public class BoardConfigurationManagerImpl implements BoardConfigurationManager {
 
     private static final int HISTORY_LIMIT = 50;
+    private static final String OVERBAARD_ADMINS = "Overbaard Admins";
 
     private volatile Map<String, BoardConfig> boardConfigs = new ConcurrentHashMap<>();
 
@@ -555,16 +557,19 @@ public class BoardConfigurationManagerImpl implements BoardConfigurationManager 
 
     //Permission methods
     private boolean canEditBoard(ApplicationUser user, ModelNode boardConfig) {
+        System.out.println("Check canEdit");
         return hasPermissionBoard(user, boardConfig, ProjectPermissions.ADMINISTER_PROJECTS);
     }
 
     private boolean canViewBoard(ApplicationUser user, ModelNode boardConfig) {
         //A wild guess at a reasonable permission needed to view the boards
+        System.out.println("Check canView");
         return hasPermissionBoard(user, boardConfig, ProjectPermissions.TRANSITION_ISSUES);
     }
 
     private boolean canViewBoard(ApplicationUser user, BoardConfig boardConfig) {
         //A wild guess at a reasonable permission needed to view the boards
+        System.out.println("Check canView 2");
         return hasPermissionBoard(user, boardConfig, ProjectPermissions.TRANSITION_ISSUES);
     }
 
@@ -584,9 +589,14 @@ public class BoardConfigurationManagerImpl implements BoardConfigurationManager 
 
 
     private boolean hasPermissionBoard(ApplicationUser user, ModelNode boardConfig, ProjectPermissionKey...permissions) {
+        System.out.println("Cheking permission for " + boardConfig);
         if (isJiraAdministrator(user)) {
             return true;
         }
+        if (isOverbaardAdmin(user)) {
+            return true;
+        }
+
         if (!boardConfig.hasDefined(PROJECTS)) {
             //The project is empty, start checking once they add something
             return true;
@@ -604,6 +614,10 @@ public class BoardConfigurationManagerImpl implements BoardConfigurationManager 
         if (isJiraAdministrator(user)) {
             return true;
         }
+        if (isOverbaardAdmin(user)) {
+            return true;
+        }
+
         final ProjectManager projectManager = jiraInjectables.getProjectManager();
         final PermissionManager permissionManager = jiraInjectables.getPermissionManager();
 
@@ -620,5 +634,14 @@ public class BoardConfigurationManagerImpl implements BoardConfigurationManager 
         final GlobalPermissionManager globalPermissionManager = jiraInjectables.getGlobalPermissionManager();
 
         return globalPermissionManager.hasPermission(GlobalPermissionKey.ADMINISTER, user);
+    }
+
+    private boolean isOverbaardAdmin(ApplicationUser user) {
+        final GroupManager groupManager = jiraInjectables.getGroupManager();
+
+        if (groupManager.isUserInGroup(user, OVERBAARD_ADMINS)) {
+            return true;
+        }
+        return false;
     }
 }
