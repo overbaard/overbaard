@@ -35,7 +35,7 @@
     <description>Nicer views on the Jira Agile boards</description>
 
     <properties>
-        <version.amps>8.0.2</version.amps>
+        <version.amps>8.1.0</version.amps>
         <version.atlassian.spring.scanner>${version.internal.atlassian.spring.scanner}</version.atlassian.spring.scanner>
         <version.jira>${version.internal.jira7}</version.jira>
 
@@ -79,35 +79,43 @@
         <dependency>
             <groupId>com.atlassian.jira</groupId>
             <artifactId>jira-api</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.atlassian.plugin</groupId>
             <artifactId>atlassian-spring-scanner-annotation</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.atlassian.plugin</groupId>
             <artifactId>atlassian-spring-scanner-runtime</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.atlassian.templaterenderer</groupId>
             <artifactId>atlassian-template-renderer-api</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.atlassian.activeobjects</groupId>
             <artifactId>activeobjects-plugin</artifactId>
+            <scope>provided</scope>
         </dependency>
         <!-- SAL, the Active Objects plugin uses SAL's API for transactions -->
         <dependency>
             <groupId>com.atlassian.sal</groupId>
             <artifactId>sal-api</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss</groupId>
@@ -116,6 +124,7 @@
         <dependency>
             <groupId>com.atlassian.jira.plugins</groupId>
             <artifactId>jira-greenhopper-plugin</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -137,6 +146,7 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
+            <scope>provided</scope>
         </dependency>
         <!-- Uncomment to use TestKit in your project. Details at https://bitbucket.org/atlassian/jira-testkit -->
         <!-- You can read more about TestKit at https://developer.atlassian.com/display/JIRADEV/Plugin+Tutorial+-+Smarter+integration+testing+with+TestKit -->
@@ -196,21 +206,31 @@
                     </pluginArtifacts>
                     -->
                     <enableQuickReload>true</enableQuickReload>
+
+                    <!-- See here for an explanation of default instructions: -->
+                    <!-- https://developer.atlassian.com/docs/advanced-topics/configuration-of-instructions-in-atlassian-plugins -->
                     <instructions>
                         <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
-                        <!-- Add package to export here -->
-                        <Export-Package>org.overbaard.jira.api,</Export-Package>
-                        <!-- Add package import here -->
-                        <Import-Package>org.springframework.osgi.*;resolution:="optional",
-                            org.eclipse.gemini.blueprint.*;resolution:="optional", *
-                        </Import-Package>
-                        <!-- Ensure plugin is spring powered - see https://extranet.atlassian.com/x/xBS9hQ  -->
-                        <Spring-Context>*</Spring-Context>
-                    </instructions>
 
-                    <!-- TODO Get rid of this (compression causes some problems I don't want to look at now) -->
-                    <compressResources>false</compressResources>
-                    <jvmArgs>-Xms1g -Xmx2g -XX:MaxPermSize=1g -XX:-UseGCOverheadLimit -server</jvmArgs>
+                        <!-- Add package to export here -->
+                        <Export-Package>
+                            org.overbaard.jira.api,
+                        </Export-Package>
+
+                        <!-- Add package import here -->
+                        <Import-Package>
+                            org.springframework.osgi.*;resolution:="optional",
+                            org.eclipse.gemini.blueprint.*;resolution:="optional",
+                            *
+                        </Import-Package>
+
+                        <!-- Ensure plugin is spring powered -->
+                        <Spring-Context>*</Spring-Context>
+
+                        <!-- TODO Get rid of this (compression causes some problems I don't want to look at now) -->
+                        <compressResources>false</compressResources>
+                        <jvmArgs>-Xms1g -Xmx2g -XX:MaxPermSize=1g -XX:-UseGCOverheadLimit -server</jvmArgs>
+                    </instructions>
                 </configuration>
             </plugin>
             <plugin>
