@@ -29,7 +29,7 @@
   <parent>
     <groupId>org.overbaard</groupId>
     <artifactId>overbaard-parent</artifactId>
-    <version>2021.001-SNAPSHOT</version>
+    <version>2021.001</version>
     <relativePath>..</relativePath>
   </parent>
   <name>Overbård Web Application</name>
