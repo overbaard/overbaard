@@ -67,7 +67,7 @@
 
         <!-- Node and Yarn versions -->
         <version.yarn>v1.17.3</version.yarn>
-        <version.node>v12.10.0</version.node>
+        <version.node>v12.22.3</version.node>
 
 
         <!-- Other stuff needed for atlassian-plugin.xml -->
