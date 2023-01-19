@@ -1,4 +1,3 @@
-
 #! /bin/bash
 
 # From https://github.com/scheib/chromium-latest-linux/tree/master which in turn I found at

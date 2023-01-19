@@ -54,6 +54,7 @@
         -->
         <version.internal.jira7>7.5.0</version.internal.jira7>
         <version.internal.jira8>8.13.5</version.internal.jira8>
+        <version.amps>8.1.2</version.amps>
         <version.internal.atlassian.spring.scanner>2.1.7</version.internal.atlassian.spring.scanner>
 
         <!-- My plugin versions -->
