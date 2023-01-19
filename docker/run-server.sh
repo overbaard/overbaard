@@ -13,4 +13,5 @@ docker run --rm -it \
   -p 8080:8080 \
   -p 2990:2990 \
   -p 5005:5005 \
+  -p 4200:4200 \
   quay.io/overbaard/overbaard-dev-env bash

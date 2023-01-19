@@ -16,7 +16,27 @@ RUN yum install -y java-1.8.0-openjdk-devel --nodocs && \
     yum -y install make gcc-c++ && \
     yum -y install wget
 
+
+#Checks the atlas-debug for the bad line mentioned in
+# https://ecosystem.atlassian.net/browse/ATLASSDK-220
+# and adjusts it to work
 RUN /patch-atlas-debug.sh
+
+# The atlassian-plugin-sdk doesn't seem to pull in the right maven version. Add it ourselves where it
+# expects it
+RUN wget https://dlcdn.apache.org/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz && \
+    tar xvf apache-maven-3.5.4-bin.tar.gz && \
+    mv apache-maven-3.5.4 /usr/ && \
+    # Some commands such as atlas-debug are not using the settings.xml that comes from the
+    # plugin sdk, but rather use the one from maven itself, which breaks things. Copy the SDK
+    # one to the maven one
+    # NB! THe sdk one has the version in its path. May need updating if we renew the sdk
+    cp /usr/share/atlassian-plugin-sdk-8.2.8/apache-maven-3.5.4/conf/settings.xml /usr/apache-maven-3.5.4/conf/settings.xml
+
+
+# # We need the repository installed by the
+# COPY resource/settings.xml /usr/apache-maven-3.5.4/conf/settings.xml
+
 
 # We are using older node and yarn versions. Install 'n' to switch node version, and specify the
 # yarn version.
