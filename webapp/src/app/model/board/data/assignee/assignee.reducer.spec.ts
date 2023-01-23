@@ -1,4 +1,4 @@
-import {async} from '@angular/core/testing';
+import { waitForAsync } from '@angular/core/testing';
 import {Assignee, AssigneeState, initialAssigneeState} from './assignee.model';
 import {AssigneeActions, assigneeMetaReducer} from './assignee.reducer';
 import {cloneObject} from '../../../../common/object-util';
@@ -27,7 +27,7 @@ export function getTestAssigneeState(): AssigneeState {
 
 describe('Assignee reducer tests', () => {
   let assigneeState: AssigneeState;
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     assigneeState = getTestAssigneeState();
   }));
 

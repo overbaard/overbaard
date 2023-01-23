@@ -1,4 +1,4 @@
-import {async} from '@angular/core/testing';
+import { waitForAsync } from '@angular/core/testing';
 import {initialIssueTypeState, IssueType, IssueTypeState} from './issue-type.model';
 import {IssueTypeActions, issueTypeMetaReducer} from './issue-type.reducer';
 import {cloneObject} from '../../../../common/object-util';
@@ -27,7 +27,7 @@ export function getTestIssueTypeState(): IssueTypeState {
 
 describe('IssueType reducer tests', () => {
   let state: IssueTypeState;
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     state = getTestIssueTypeState();
   }));
 
