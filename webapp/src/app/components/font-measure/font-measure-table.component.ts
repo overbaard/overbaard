@@ -30,7 +30,7 @@ export class FontMeasureTableComponent implements OnInit, AfterViewInit {
   // Leave this commented out so we can easily reenable
   // testStrings: string[] = ['One', 'Two', 'One Two', 'WFCORE-1234'];
 
-  @ViewChild('myCanvas') myCanvas;
+  @ViewChild('myCanvas', { static: true }) myCanvas;
 
   constructor() {
   }
