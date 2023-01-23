@@ -47,7 +47,7 @@ RUN npm install -g n && \
     # used to run some of the dependencies
     npm config set python "/usr/bin/python2.7" && \
     # Also, we need to install the angular cli so that 'ng serve' etc works when we try to develop
-    yarn global add @angular/cli@11.2.19
+    yarn global add @angular/cli@12.2.18
 
 
 # corepack enable
