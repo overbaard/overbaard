@@ -1,6 +1,7 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {AbstractControl, FormControl, FormGroup, FormGroupDirective, NgForm, ValidationErrors} from '@angular/forms';
-import {ErrorStateMatcher, MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
+import { ErrorStateMatcher } from '@angular/material/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import {IssueQlUtil} from '../../../common/parsers/issue-ql/issue-ql.util';
 import * as issueQlParser from '../../../common/parsers/issue-ql/pegjs/issue-ql.generated';
 

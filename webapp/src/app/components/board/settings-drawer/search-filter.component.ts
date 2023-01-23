@@ -15,7 +15,10 @@ import {
 import {FormControl, FormGroup} from '@angular/forms';
 import {Subject} from 'rxjs';
 import {startWith, takeUntil} from 'rxjs/operators';
-import {MatAutocompleteSelectedEvent, MatChipInputEvent, MatDialog, MatSlideToggleChange} from '@angular/material';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { MatChipInputEvent } from '@angular/material/chips';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import {SPACE} from '@angular/cdk/keycodes';
 import {IssueState} from '../../../model/board/data/issue/issue.model';
 import {Set} from 'immutable';

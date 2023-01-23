@@ -34,7 +34,8 @@ import {BoardProject, ParallelTask} from '../../../model/board/data/project/proj
 import {UserSettingActions} from '../../../model/board/user/user-setting.reducer';
 import {UserSettingState} from '../../../model/board/user/user-setting';
 import {BoardViewMode} from '../../../model/board/user/board-view-mode';
-import {MatCheckboxChange, MatSliderChange} from '@angular/material';
+import { MatCheckboxChange } from '@angular/material/checkbox';
+import { MatSliderChange } from '@angular/material/slider';
 import {toIssueSummaryLevel} from '../../../model/board/user/issue-summary-level';
 import {FilterFormEntry} from '../../../common/filter-form-entry';
 import {debounceTime, map, take, takeUntil} from 'rxjs/operators';

@@ -16,7 +16,7 @@ import {BoardQueryParamsService} from '../../services/board-query-params.service
 import {UpdateParallelTaskEvent} from '../../events/update-parallel-task.event';
 import {BlacklistState, BlacklistUtil} from '../../model/board/data/blacklist/blacklist.model';
 import {ProgressLogActions, progressLogCurrentMessageSelector} from '../../model/global/progress-log/progress-log.reducer';
-import {MatDialog} from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import {BlacklistDialogComponent} from './blacklist/blacklist-dialog.component';
 import {filter, take, takeUntil} from 'rxjs/operators';
 import {IssueState} from '../../model/board/data/issue/issue.model';

@@ -9,7 +9,7 @@ import {
   progressLogCurrentMessageSelector,
   progressLogLoadingSelector
 } from './model/global/progress-log/progress-log.reducer';
-import {MatSnackBar, MatSnackBarConfig, MatSnackBarRef, SimpleSnackBar} from '@angular/material';
+import { MatSnackBar, MatSnackBarConfig, MatSnackBarRef, SimpleSnackBar } from '@angular/material/snack-bar';
 import {TOOLBAR_HEIGHT} from './common/view-constants';
 import {VersionService} from './services/version.service';
 import {UrlService} from './services/url.service';
