@@ -77,7 +77,6 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
             "browserTarget": "overbaard:build",
-            "_comments": "--host 0.0.0.0 binds to 0.0.0.0, which allows access from outside the docker container",
             "host": "0.0.0.0"
           },
           "configurations": {
