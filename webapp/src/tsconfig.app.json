@@ -5,11 +5,14 @@
     "baseUrl": "",
     "types": []
   },
-  "exclude": [
-    "test.ts",
-    "**/*.spec.ts"
-  ],
   "angularCompilerOptions": {
     "preserveWhitespaces": false
-  }
+  },
+  "files": [
+    "main.ts",
+    "polyfills.ts"
+  ],
+  "include": [
+    "src/**/*.d.ts"
+  ]
 }

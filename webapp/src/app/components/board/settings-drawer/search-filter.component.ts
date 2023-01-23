@@ -51,7 +51,7 @@ export class SearchFilterComponent implements OnInit, OnChanges, OnDestroy {
   @Output()
   hideNonMatches: EventEmitter<boolean> = new EventEmitter<boolean>();
 
-  @ViewChild('searchIssueIdInput', { static: false }) searchIssueIdInput: ElementRef;
+  @ViewChild('searchIssueIdInput') searchIssueIdInput: ElementRef;
 
 
   // Set/read by the template
