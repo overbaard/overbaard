@@ -40,13 +40,19 @@ RUN yum -y install maven-1:3.5.4 && \
 # We are using older node and yarn versions. Install 'n' to switch node version, and specify the
 # yarn version.
 RUN npm install -g n && \
-    n 12.22.3 && \
-    npm install -g yarn@1.17.3 && \
+    #n 12.22.3 && \
+    n 14.17.0 && \
+    npm install -g yarn@1.22.19 && \
     # We need to point npm/node to use the python version we installed above since it registry
     # used to run some of the dependencies
     npm config set python "/usr/bin/python2.7" && \
     # Also, we need to install the angular cli so that 'ng serve' etc works when we try to develop
     yarn global add @angular/cli@7.3.9
+
+
+# corepack enable
+# corepack prepare yarn@3.3.0 --activate
+
 
 # We need chrome for the tests to work - see the script for where this came from
 # COPY --chmod=755 resources/get-chromium.sh /chrome/get-chromium.sh
