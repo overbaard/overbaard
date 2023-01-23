@@ -18,10 +18,14 @@ RUN yum install -y java-1.8.0-openjdk-devel --nodocs && \
     #Checks the atlas-debug for the bad line mentioned in
     # https://ecosystem.atlassian.net/browse/ATLASSDK-220
     # and adjusts it to work
-    /patch-atlas-debug.sh
+    /patch-atlas-debug.sh && \
+    # The Angular tests need a browser, install Chromium
+    yum install -y epel-release && \
+    yum install -y chromium
 
-# The atlassian-plugin-sdk doesn't seem to pull in the right maven version. Add it ourselves where it
-# expects it
+
+# The atlassian-plugin-sdk installed with yum doesn't seem to pull in the right maven version (unlike with Homebrew on
+# Mac). Add it ourselves where it expects it
 RUN yum -y install maven-1:3.5.4 && \
     mkdir -p /usr/apache-maven-3.5.4/bin/ && \
     ln -s /usr/bin/mvn /usr/apache-maven-3.5.4/bin/mvn && \
@@ -32,9 +36,6 @@ RUN yum -y install maven-1:3.5.4 && \
     mkdir -p /usr/apache-maven-3.5.4/conf/ && \
     cp /usr/share/atlassian-plugin-sdk-8.2.8/apache-maven-3.5.4/conf/settings.xml /usr/apache-maven-3.5.4/conf/settings.xml
 
-
-# # We need the repository installed by the
-# COPY resource/settings.xml /usr/apache-maven-3.5.4/conf/settings.xml
 
 # We are using older node and yarn versions. Install 'n' to switch node version, and specify the
 # yarn version.

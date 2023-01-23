@@ -7,7 +7,8 @@
     "start": "ng serve",
     "build": "ng build",
     "test": "ng test",
-    "test:travis-headless": "ng test --watch=false --browsers=ChromeHeadless",
+    "test:docker": "ng test --watch=false --browsers=ChromiumHeadlessDocker",
+    "test:docker-watch": "ng test --browsers=ChromiumHeadlessDocker",
     "lint": "ng lint",
     "e2e": "ng e2e",
     "issue-ql": "pegjs  --format commonjs -o src/app/common/parsers/issue-ql/pegjs/issue-ql.generated.js src/app/common/parsers/issue-ql/pegjs/issue-ql.source.pegjs"
