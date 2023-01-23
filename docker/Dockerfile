@@ -41,7 +41,7 @@ RUN yum -y install maven-1:3.5.4 && \
 # yarn version.
 RUN npm install -g n && \
     #n 12.22.3 && \
-    n 14.17.0 && \
+    n 14.21.0 && \
     npm install -g yarn@1.22.19 && \
     # We need to point npm/node to use the python version we installed above since it registry
     # used to run some of the dependencies
