@@ -2,7 +2,7 @@ import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, OnIn
 import {AppState} from '../../../app-store';
 import {Store} from '@ngrx/store';
 import {Dictionary} from '../../../common/dictionary';
-import {AbstractControl, FormControl, FormGroup} from '@angular/forms';
+import {AbstractControl, UntypedFormControl, UntypedFormGroup} from '@angular/forms';
 import {Observable, Subject} from 'rxjs';
 import {boardProjectsSelector, linkedProjectsSelector} from '../../../model/board/data/project/project.reducer';
 import {BoardFilterState} from '../../../model/board/user/board-filter/board-filter.model';
@@ -70,9 +70,9 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
   @Output()
   switchViewMode: EventEmitter<null> = new EventEmitter<null>();
 
-  viewModeForm: FormGroup;
-  swimlaneForm: FormGroup;
-  filterForm: FormGroup;
+  viewModeForm: UntypedFormGroup;
+  swimlaneForm: UntypedFormGroup;
+  filterForm: UntypedFormGroup;
 
   swimlaneList: FilterFormEntry[];
   filterList: FilterAttributes[] = [];
@@ -107,12 +107,12 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
 
     this.filterList = filterList;
 
-    this.viewModeForm = new FormGroup({});
-    this.swimlaneForm = new FormGroup({});
-    this.filterForm = new FormGroup({});
+    this.viewModeForm = new UntypedFormGroup({});
+    this.swimlaneForm = new UntypedFormGroup({});
+    this.filterForm = new UntypedFormGroup({});
 
-    this.viewModeForm.addControl('viewMode', new FormControl(this.getViewModeString(this.userSettings.viewMode)));
-    this.swimlaneForm.addControl('swimlane', new FormControl(this.userSettings.swimlane));
+    this.viewModeForm.addControl('viewMode', new UntypedFormControl(this.getViewModeString(this.userSettings.viewMode)));
+    this.swimlaneForm.addControl('swimlane', new UntypedFormControl(this.userSettings.swimlane));
 
     this.createGroupFromObservable(this._store.select(boardProjectsSelector), PROJECT_ATTRIBUTES,
       project => project.map(p => FilterFormEntry(p.key, p.key)).toArray(),
@@ -251,7 +251,7 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
         boardProjects => {
           const filterFormEntryDictionary: Dictionary<FilterFormEntry> = {};
           const filterFormEntries: FilterFormEntry[] = [];
-          const parallelTasksGroup: FormGroup = new FormGroup({});
+          const parallelTasksGroup: UntypedFormGroup = new UntypedFormGroup({});
 
           const flattenedTasks: List<ParallelTask> = new ParallelTaskFlattener(boardProjects).flattenParallelTasks();
 
@@ -264,12 +264,12 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
             }
 
             const options: FilterFormEntry[] = new Array<FilterFormEntry>(parallelTask.options.size);
-            const taskGroup: FormGroup = new FormGroup({});
+            const taskGroup: UntypedFormGroup = new UntypedFormGroup({});
 
             parallelTask.options.forEach((option, i) => {
               options[i] = FilterFormEntry(option.name, option.name);
               const filteredOptions: Set<string> = filterState.parallelTask.get(parallelTask.display);
-              taskGroup.addControl(option.name, new FormControl(!!filteredOptions && filteredOptions.contains(option.name)));
+              taskGroup.addControl(option.name, new UntypedFormControl(!!filteredOptions && filteredOptions.contains(option.name)));
             });
 
             const entry = FilterFormEntry(parallelTask.display, parallelTask.name, options);
@@ -301,10 +301,10 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
       set = Set<string>();
     }
     const filterFormEntryDictionary: Dictionary<FilterFormEntry> = {};
-    const group: FormGroup = new FormGroup({});
+    const group: UntypedFormGroup = new UntypedFormGroup({});
     filterFormEntries.forEach(entry => {
       filterFormEntryDictionary[entry.key] = entry;
-      const control: FormControl = new FormControl(set.contains(entry.key));
+      const control: UntypedFormControl = new UntypedFormControl(set.contains(entry.key));
       group.addControl(entry.key, control);
     });
 
@@ -351,7 +351,7 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
     // This gets cleared by processFormValueChanges
     this.bulkUpdateFilter = filterAttributes;
     const set: Set<string> = getNonParallelTaskSet(this.userSettings.filters, filterAttributes);
-    const group: FormGroup = <FormGroup>this.filterForm.controls[filterAttributes.key];
+    const group: UntypedFormGroup = <UntypedFormGroup>this.filterForm.controls[filterAttributes.key];
     if (set) {
       set.forEach(k => {
         const control: AbstractControl = group.controls[k];
@@ -363,7 +363,7 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
 
     if (filterAttributes === PARALLEL_TASK_ATTRIBUTES) {
       this.userSettings.filters.parallelTask.forEach((ptSet, key) => {
-        const taskGroup: FormGroup = <FormGroup>group.controls[key];
+        const taskGroup: UntypedFormGroup = <UntypedFormGroup>group.controls[key];
         ptSet.forEach(k => {
           const control: AbstractControl = taskGroup.controls[k];
           if (control) {
@@ -376,18 +376,18 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
 
   private onInvertFilter(filterAttributes: FilterAttributes) {
     this.bulkUpdateFilter = filterAttributes;
-    const group: FormGroup = <FormGroup>this.filterForm.controls[filterAttributes.key];
+    const group: UntypedFormGroup = <UntypedFormGroup>this.filterForm.controls[filterAttributes.key];
     if (filterAttributes !== PARALLEL_TASK_ATTRIBUTES) {
       this.invertSelection(group);
     } else {
       this.userSettings.filters.parallelTask.forEach((ptSet, key) => {
-        const taskGroup: FormGroup = <FormGroup>group.controls[key];
+        const taskGroup: UntypedFormGroup = <UntypedFormGroup>group.controls[key];
         this.invertSelection(taskGroup);
       });
     }
   }
 
-  private invertSelection(group: FormGroup) {
+  private invertSelection(group: UntypedFormGroup) {
     for (const name of Object.keys(group.controls)) {
       const control: AbstractControl = group.controls[name];
       const value: boolean = control.value;
@@ -397,18 +397,18 @@ export class BoardSettingsDrawerComponent implements OnInit, OnDestroy {
 
   private onSelectAllFilter(filterAttributes: FilterAttributes) {
     this.bulkUpdateFilter = filterAttributes;
-    const group: FormGroup = <FormGroup>this.filterForm.controls[filterAttributes.key];
+    const group: UntypedFormGroup = <UntypedFormGroup>this.filterForm.controls[filterAttributes.key];
     if (filterAttributes !== PARALLEL_TASK_ATTRIBUTES) {
       this.selectAll(group);
     } else {
       this.userSettings.filters.parallelTask.forEach((ptSet, key) => {
-        const taskGroup: FormGroup = <FormGroup>group.controls[key];
+        const taskGroup: UntypedFormGroup = <UntypedFormGroup>group.controls[key];
         this.selectAll(taskGroup);
       });
     }
   }
 
-  private selectAll(group: FormGroup) {
+  private selectAll(group: UntypedFormGroup) {
     for (const name of Object.keys(group.controls)) {
       group.controls[name].setValue(true);
     }

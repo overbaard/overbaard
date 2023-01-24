@@ -3,7 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import {BoardIssueView} from '../../../view-model/board/board-issue-view';
 import {Store} from '@ngrx/store';
 import {AppState} from '../../../app-store';
-import {FormControl, FormGroup} from '@angular/forms';
+import {UntypedFormControl, UntypedFormGroup} from '@angular/forms';
 import {userSettingSelector} from '../../../model/board/user/user-setting.reducer';
 import {BoardService} from '../../../services/board.service';
 import {take} from 'rxjs/operators';
@@ -17,7 +17,7 @@ import {take} from 'rxjs/operators';
 export class CommentIssueDialogComponent implements OnInit {
 
   issue: BoardIssueView;
-  commentForm: FormGroup;
+  commentForm: UntypedFormGroup;
   private _boardService: BoardService;
 
   constructor(
@@ -29,8 +29,8 @@ export class CommentIssueDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.commentForm = new FormGroup({
-      comment: new FormControl()
+    this.commentForm = new UntypedFormGroup({
+      comment: new UntypedFormControl()
     });
   }
 

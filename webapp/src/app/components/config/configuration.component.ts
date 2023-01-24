@@ -3,7 +3,7 @@ import {BoardsService} from '../../services/boards.service';
 import {AppHeaderService} from '../../services/app-header.service';
 import {BehaviorSubject, config, Observable, Observer, Subject} from 'rxjs';
 import {Iterator, OrderedMap} from 'immutable';
-import {FormControl, FormGroup, Validators} from '@angular/forms';
+import {UntypedFormControl, UntypedFormGroup, Validators} from '@angular/forms';
 import {map, take} from 'rxjs/operators';
 import {IssueQlUtil} from '../../common/parsers/issue-ql/issue-ql.util';
 import * as issueQlParser from '../../common/parsers/issue-ql/pegjs/issue-ql.generated';
@@ -36,11 +36,11 @@ export class ConfigurationComponent implements OnInit {
   editError: string;
 
   // For creating boards
-  createForm: FormGroup;
+  createForm: UntypedFormGroup;
   createError: string;
 
   // For saving the rank id
-  customFieldsForm: FormGroup;
+  customFieldsForm: UntypedFormGroup;
 
   fieldsRestApiUrl: string;
 
@@ -53,8 +53,8 @@ export class ConfigurationComponent implements OnInit {
 
   ngOnInit() {
     this.loadBoards();
-    this.createForm = new FormGroup({
-      createJson: new FormControl('', Validators.required)
+    this.createForm = new UntypedFormGroup({
+      createJson: new UntypedFormControl('', Validators.required)
     });
     this.fieldsRestApiUrl = this._urlService.caclulateRestUrl('rest/api/2/field');
   }
@@ -68,10 +68,10 @@ export class ConfigurationComponent implements OnInit {
       )
       .subscribe(
         value => {
-          this.customFieldsForm = new FormGroup({
-            rankCustomFieldId: new FormControl(value.rankCustomFieldId, Validators.pattern('[0-9]*')),
-            epicLinkCustomFieldId: new FormControl(value.epicLinkCustomFieldId, Validators.pattern('[0-9]*')),
-            epicNameCustomFieldId: new FormControl(value.epicNameCustomFieldId, Validators.pattern('[0-9]*'))
+          this.customFieldsForm = new UntypedFormGroup({
+            rankCustomFieldId: new UntypedFormControl(value.rankCustomFieldId, Validators.pattern('[0-9]*')),
+            epicLinkCustomFieldId: new UntypedFormControl(value.epicLinkCustomFieldId, Validators.pattern('[0-9]*')),
+            epicNameCustomFieldId: new UntypedFormControl(value.epicNameCustomFieldId, Validators.pattern('[0-9]*'))
           });
           this.config$.next(value);
         });

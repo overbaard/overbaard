@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {FormControl, FormGroup, Validators} from '@angular/forms';
+import {UntypedFormControl, UntypedFormGroup, Validators} from '@angular/forms';
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {AppHeaderService} from '../../services/app-header.service';
 import {UrlService} from '../../services/url.service';
@@ -14,14 +14,14 @@ import {take, timeout} from 'rxjs/operators';
     templateUrl: './db-explorer.component.html'
 })
 export class DbExplorerComponent {
-  sqlForm: FormGroup;
+  sqlForm: UntypedFormGroup;
   error$: Subject<string> = new BehaviorSubject<string>(null);
   result$: Subject<any> = new BehaviorSubject<any>(null);
 
   constructor(appHeaderService: AppHeaderService, private _urlService: UrlService, private _httpClient: HttpClient) {
     appHeaderService.setTitle('DB Explorer');
-    this.sqlForm = new FormGroup({
-      'sql': new FormControl(null, Validators.required)
+    this.sqlForm = new UntypedFormGroup({
+      'sql': new UntypedFormControl(null, Validators.required)
     });
   }
 

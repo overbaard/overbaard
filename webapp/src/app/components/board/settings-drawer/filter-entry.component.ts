@@ -4,7 +4,7 @@ import {List, Set} from 'immutable';
 import {Dictionary} from '../../../common/dictionary';
 import {FilterFormEntry} from '../../../common/filter-form-entry';
 import {BoardFilterState} from '../../../model/board/user/board-filter/board-filter.model';
-import {FormGroup} from '@angular/forms';
+import {UntypedFormGroup} from '@angular/forms';
 import {FilterEntryEvent} from './filter-entry.event';
 import {Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
@@ -32,7 +32,7 @@ export class FilterEntryComponent implements OnInit, OnDestroy {
   filterEntryDictionaryEntry: Dictionary<FilterFormEntry>;
 
   @Input()
-  filterForm: FormGroup;
+  filterForm: UntypedFormGroup;
 
   @Input()
   filterEntries: FilterFormEntry[];

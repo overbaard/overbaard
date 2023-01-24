@@ -26,9 +26,9 @@ run `docker ps` to find the container resulting from calling `run-server.sh` and
 `docker exec -it <id> bash` and you will have a second terminal.
 
 ### Running the tests from the command line
-From inside the container, from the `/source/webapp` directory, run `ng test --watch=false --browsers=ChromiumHeadlessDocker`. This will run the tests, and watch as you change the source code. This is useful during development as your changes get picked up.
+From inside the container, from the `/source/webapp` directory, run `ng test --watch=false --browsers=ChromiumHeadlessDocker`. This will run the tests, and watch as you change the source code. This is useful during development as your changes get picked up. There is also an alias for this, which does the same thing and might be easier to remember `yarn test:docker-watch`.
 
-If you want to run the tests just once, run `ng test --watch=false --browsers=ChromiumHeadlessDocker`.
+If you want to run the tests just once, run `ng test --watch=false --browsers=ChromiumHeadlessDocker`. There is also an alias for this, which does the same thing and might be easier to remember `yarn test:docker`
 
 You might see errors like this
 ```shell
