@@ -60,7 +60,7 @@ jobs:
           #platforms: linux/amd64,linux/arm/v7
           platforms: linux/amd64,linux/arm64
           #push: ${{ github.event_name != 'pull_request' }}
-          push: true
+          #push: true
           tags: ${{ steps.add-docker-metadata.outputs.tags }}
           labels: ${{ steps.add-docker-metadata.outputs.labels }}
           cache-from: type=local,src=/tmp/.buildx-cache
