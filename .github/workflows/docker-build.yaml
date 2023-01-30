@@ -41,6 +41,7 @@ jobs:
           # Docker tags based on the following events/attributes
           tags: |
             event=workflow_dispatch,type=sha
+            type=raw,value=latest
 #              type=schedule
 #              type=ref,event=branch
 #              type=ref,event=pr
