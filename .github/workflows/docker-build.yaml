@@ -3,7 +3,6 @@ name: Build MultiArch Docker Image
 # Controls when the workflow will run
 on:
   workflow_dispatch:
-  push:
 
 # permissions are needed if pushing to ghcr.io
 permissions:
