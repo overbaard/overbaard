@@ -4,12 +4,24 @@ import {cloneObject} from '../../../../common/object-util';
 describe('Assignee unit tests', () => {
 
   describe('Deserialize', () => {
+<<<<<<< Updated upstream
     const input: any = cloneObject({
       key : 'userA',
       email : 'UserA@examle.com',
       avatar : 'https://example.com/user-A.png',
       name : 'User A'
     });
+=======
+    let input: any;
+    beforeEach(() => {
+      input = cloneObject({
+            key : 'userA',
+            email : 'UserA@example.com',
+            avatar : 'https://example.com/user-A.png',
+            name : 'User A'
+          });
+    })
+>>>>>>> Stashed changes
 
     it('full record', () => {
       // Check the full record here. Other tests will check the initials calculated
