@@ -36,7 +36,7 @@ public class Assignee extends User {
 
     static Assignee create(ApplicationUser user, String avatarUrl) {
         return new Assignee(
-                user.getName(),
+                user.getKey(),
                 user.getEmailAddress(),
                 avatarUrl,
                 user.getDisplayName());
