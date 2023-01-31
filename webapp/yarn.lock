@@ -205,10 +205,10 @@
   resolved "https://registry.yarnpkg.com/@angular/core/-/core-9.0.0.tgz#227dc53e1ac81824f998c6e76000b7efc522641e"
   integrity sha512-6Pxgsrf0qF9iFFqmIcWmjJGkkCaCm6V5QNnxMy2KloO3SDq6QuMVRbN9RtC8Urmo25LP+eZ6ZgYqFYpdD8Hd9w==
 
-"@angular/core@^14.2.12":
-  version "14.2.12"
-  resolved "https://registry.yarnpkg.com/@angular/core/-/core-14.2.12.tgz#118467ec4e8ea082931a84e8cefe722a0e110dc9"
-  integrity sha512-sGQxU5u4uawwvJa6jOTmGoisJiQ5HIN/RoBw99CmoqZIVyUSg9IRJJC1KVdH8gbpWBNLkElZv21lwJTL/msWyg==
+"@angular/core@^15.0.0":
+  version "15.0.0"
+  resolved "https://registry.yarnpkg.com/@angular/core/-/core-15.0.0.tgz#82338ff7fc736997d5f6f5ec22644e8549194e5d"
+  integrity sha512-Hek8L/1XrU1LPN4qmKJiNdYz96ju/yPWvrFjqvrDHjWEenIfxjJohjRwL+ZzICZiEwfnR6y3QGvv4OBY96oTGw==
   dependencies:
     tslib "^2.3.0"
 
