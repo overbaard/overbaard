@@ -1,4 +1,4 @@
-import {async} from '@angular/core/testing';
+import { waitForAsync } from '@angular/core/testing';
 import {initialPriorityState, Priority, PriorityState} from './priority.model';
 import {PriorityActions, priorityMetaReducer} from './priority.reducer';
 import {cloneObject} from '../../../../common/object-util';
@@ -25,7 +25,7 @@ export function getTestPriorityState(): PriorityState {
 
 describe('Priority reducer tests', () => {
   let state: PriorityState;
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     state = getTestPriorityState();
   }));
 

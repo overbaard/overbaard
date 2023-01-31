@@ -99,13 +99,6 @@ export function getInitialAppState(): AppState {
     FontMeasureTableComponent,
     IssueQlDialogComponent
   ],
-  entryComponents: [
-    CommentIssueDialogComponent,
-    IssueQlDialogComponent,
-    MoveIssueDialogComponent,
-    ParallelTaskSelectorComponent,
-    RankIssueDialogComponent,
-    BlacklistDialogComponent],
   imports: [
     BrowserAnimationsModule,
     BrowserModule,

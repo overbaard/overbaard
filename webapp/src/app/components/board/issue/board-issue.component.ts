@@ -13,7 +13,7 @@ import {
 import {BoardIssueView} from '../../../view-model/board/board-issue-view';
 import {Assignee, NO_ASSIGNEE} from '../../../model/board/data/assignee/assignee.model';
 import {List, Set} from 'immutable';
-import {MatDialog} from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import {UpdateParallelTaskEvent} from '../../../events/update-parallel-task.event';
 import {IssueSummaryLevel} from '../../../model/board/user/issue-summary-level';
 import {IssueDetailState} from '../../../model/board/user/issue-detail/issue-detail.model';

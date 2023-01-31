@@ -21,7 +21,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.overbaard</groupId>
     <artifactId>overbaard-parent</artifactId>
-    <version>2021.001-SNAPSHOT</version>
+    <version>2023-001-SNAPSHOT</version>
     <packaging>pom</packaging>
     <organization>
         <url>https://github.com/overbaard/overbaard</url>
@@ -54,6 +54,7 @@
         -->
         <version.internal.jira7>7.5.0</version.internal.jira7>
         <version.internal.jira8>8.13.5</version.internal.jira8>
+        <version.amps>8.1.2</version.amps>
         <version.internal.atlassian.spring.scanner>2.1.7</version.internal.atlassian.spring.scanner>
 
         <!-- My plugin versions -->
@@ -66,8 +67,8 @@
 
 
         <!-- Node and Yarn versions -->
-        <version.yarn>v1.17.3</version.yarn>
-        <version.node>v12.10.0</version.node>
+        <version.yarn>v1.22.19</version.yarn>
+        <version.node>v14.21.0</version.node>
 
 
         <!-- Other stuff needed for atlassian-plugin.xml -->

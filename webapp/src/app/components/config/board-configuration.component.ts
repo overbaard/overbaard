@@ -10,7 +10,7 @@ import {
   SimpleChanges
 } from '@angular/core';
 import {BoardsService} from '../../services/boards.service';
-import {FormControl, FormGroup, Validators} from '@angular/forms';
+import {UntypedFormControl, UntypedFormGroup, Validators} from '@angular/forms';
 
 @Component({
   selector: 'app-board-configuration',
@@ -42,15 +42,15 @@ export class BoardConfigurationComponent implements OnInit, OnChanges {
   clearJsonError: EventEmitter<null> = new EventEmitter<null>();
 
   deleting = false;
-  deleteForm: FormGroup;
-  editForm: FormGroup;
+  deleteForm: UntypedFormGroup;
+  editForm: UntypedFormGroup;
 
   constructor() {
   }
 
   ngOnInit() {
-    this.editForm = new FormGroup({
-      editJson: new FormControl(this.configJson, Validators.required)
+    this.editForm = new UntypedFormGroup({
+      editJson: new UntypedFormControl(this.configJson, Validators.required)
     });
   }
 
@@ -64,8 +64,8 @@ export class BoardConfigurationComponent implements OnInit, OnChanges {
   onToggleDelete(event: Event) {
     this.deleting = !this.deleting;
     if (this.deleting) {
-      this.deleteForm = new FormGroup({
-        boardName: new FormControl('', Validators.compose([Validators.required, (control: FormControl) => {
+      this.deleteForm = new UntypedFormGroup({
+        boardName: new UntypedFormControl('', Validators.compose([Validators.required, (control: UntypedFormControl) => {
             if (this.boardName !== control.value) {
               return {'boardName' : true};
             }

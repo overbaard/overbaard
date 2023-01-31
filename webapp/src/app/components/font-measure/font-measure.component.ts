@@ -18,7 +18,7 @@ import {SAME_CHAR_WIDTH_LOOKUP_TABLE} from './lookup-table';
 })
 export class FontMeasureComponent implements OnInit, AfterViewInit {
 
-  @ViewChild('myCanvas') myCanvas: ElementRef;
+  @ViewChild('myCanvas', { static: true }) myCanvas: ElementRef;
 
   @ViewChildren('sizeExamples') sizeExamples: QueryList<ElementRef>;
 

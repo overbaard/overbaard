@@ -301,7 +301,7 @@ export class BoardService {
 
     if (this._changePoller) {
       this._changePoller.destroy();
-      this._changePoller = name;
+      this._changePoller = null;
     }
     this._changePoller =
       new ChangePoller(boardCode, backlog, this._store, this._restUrlService, this._http, this._progressLog, progressOnFirst);

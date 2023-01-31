@@ -1,6 +1,7 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {AbstractControl, FormControl, FormGroup, FormGroupDirective, NgForm, ValidationErrors} from '@angular/forms';
-import {ErrorStateMatcher, MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
+import {AbstractControl, UntypedFormControl, FormGroup, FormGroupDirective, NgForm, ValidationErrors} from '@angular/forms';
+import { ErrorStateMatcher } from '@angular/material/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import {IssueQlUtil} from '../../../common/parsers/issue-ql/issue-ql.util';
 import * as issueQlParser from '../../../common/parsers/issue-ql/pegjs/issue-ql.generated';
 
@@ -12,7 +13,7 @@ import * as issueQlParser from '../../../common/parsers/issue-ql/pegjs/issue-ql.
 export class IssueQlDialogComponent implements OnInit {
 
   issueQlInput: string;
-  issueQlControl: FormControl;
+  issueQlControl: UntypedFormControl;
   errorStateMatcher = new IssueQlErrorStateMatcher();
 
   constructor(
@@ -23,7 +24,7 @@ export class IssueQlDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.issueQlControl = new FormControl(this.issueQlInput, (control: AbstractControl): ValidationErrors | null => {
+    this.issueQlControl = new UntypedFormControl(this.issueQlInput, (control: AbstractControl): ValidationErrors | null => {
       const value = control.value.trim();
       let error: issueQlParser.SyntaxError;
       if (value.length > 0) {
@@ -44,7 +45,7 @@ export class IssueQlDialogComponent implements OnInit {
 }
 
 export class IssueQlErrorStateMatcher implements ErrorStateMatcher {
-  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
+  isErrorState(control: UntypedFormControl | null, form: FormGroupDirective | NgForm | null): boolean {
     const isSubmitted = form && form.submitted;
     return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
   }

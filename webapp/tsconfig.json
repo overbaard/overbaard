@@ -7,9 +7,8 @@
     "declaration": false,
     "downlevelIteration": true,
     "moduleResolution": "node",
-    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "target": "es5",
+    "target": "es2020",
     "typeRoots": [
       "node_modules/@types"
     ],
@@ -17,7 +16,7 @@
       "es2016",
       "dom"
     ],
-    "module": "es2015"
+    "module": "es2020"
   },
   "angularCompilerOptions": {
     "preserveWhitespaces": "off"

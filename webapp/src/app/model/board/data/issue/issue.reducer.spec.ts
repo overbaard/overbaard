@@ -1,6 +1,6 @@
 import {IssueActions, issueMetaReducer} from './issue.reducer';
 import {DeserializeIssueLookupParams, initialIssueState, IssueChange, IssueChangeInfo, IssueState} from './issue.model';
-import {async} from '@angular/core/testing';
+import { waitForAsync } from '@angular/core/testing';
 import {getTestAssigneeState} from '../assignee/assignee.reducer.spec';
 import {getTestIssueTypeState} from '../issue-type/issue-type.reducer.spec';
 import {getTestPriorityState} from '../priority/priority.reducer.spec';
@@ -67,7 +67,7 @@ describe('Issue reducer tests', () => {
   let issueState: IssueState;
   let issues: Map<string, BoardIssue>;
   let lookupParams: DeserializeIssueLookupParams;
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
 
     const projectState: ProjectState =
       projectMetaReducer(

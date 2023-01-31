@@ -12,10 +12,13 @@ import {
   SimpleChanges,
   ViewChild
 } from '@angular/core';
-import {FormControl, FormGroup} from '@angular/forms';
+import {UntypedFormControl, UntypedFormGroup} from '@angular/forms';
 import {Subject} from 'rxjs';
 import {startWith, takeUntil} from 'rxjs/operators';
-import {MatAutocompleteSelectedEvent, MatChipInputEvent, MatDialog, MatSlideToggleChange} from '@angular/material';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { MatChipInputEvent } from '@angular/material/chips';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import {SPACE} from '@angular/cdk/keycodes';
 import {IssueState} from '../../../model/board/data/issue/issue.model';
 import {Set} from 'immutable';
@@ -57,10 +60,10 @@ export class SearchFilterComponent implements OnInit, OnChanges, OnDestroy {
   // Set/read by the template
   selected: boolean;
 
-  searchForm: FormGroup;
-  searchIssueIdCtrl: FormControl;
-  searchContainingTextCtrl: FormControl;
-  searchIssueQlCtrl: FormControl;
+  searchForm: UntypedFormGroup;
+  searchIssueIdCtrl: UntypedFormControl;
+  searchContainingTextCtrl: UntypedFormControl;
+  searchIssueQlCtrl: UntypedFormControl;
 
   tooltip: string;
 
@@ -80,15 +83,15 @@ export class SearchFilterComponent implements OnInit, OnChanges, OnDestroy {
 
 
   ngOnInit(): void {
-    this.searchForm = new FormGroup({});
-    this.searchIssueIdCtrl = new FormControl();
+    this.searchForm = new UntypedFormGroup({});
+    this.searchIssueIdCtrl = new UntypedFormControl();
     this.searchForm.addControl('searchIssueId', this.searchIssueIdCtrl);
-    this.searchContainingTextCtrl = new FormControl(this.searchFilterState.containingText);
+    this.searchContainingTextCtrl = new UntypedFormControl(this.searchFilterState.containingText);
     this.searchForm.addControl('searchContainingText', this.searchContainingTextCtrl);
 
     // Although we don't really use this disabled text area for input, it seems easier to do it via a form control binding
     // than to auto resize programmatically when the text entered from the IssueQl dialog changes
-    this.searchIssueQlCtrl = new FormControl(this.searchFilterState.issueQl);
+    this.searchIssueQlCtrl = new UntypedFormControl(this.searchFilterState.issueQl);
     this.searchIssueQlCtrl.disable(); // disabling in the template gives a weird error
     this.searchForm.addControl('searchIssueQl', this.searchIssueQlCtrl);
 

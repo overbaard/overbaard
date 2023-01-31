@@ -5,7 +5,7 @@
     <parent>
         <artifactId>overbaard-jira-bom-parent</artifactId>
         <groupId>org.overbaard</groupId>
-        <version>2021.001-SNAPSHOT</version>
+        <version>2023-001-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 

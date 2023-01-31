@@ -4,19 +4,22 @@ import {cloneObject} from '../../../../common/object-util';
 describe('Assignee unit tests', () => {
 
   describe('Deserialize', () => {
-    const input: any = cloneObject({
-      key : 'userA',
-      email : 'UserA@examle.com',
-      avatar : 'https://example.com/user-A.png',
-      name : 'User A'
-    });
+    let input: any;
+    beforeEach(() => {
+      input = cloneObject({
+            key : 'userA',
+            email : 'UserA@example.com',
+            avatar : 'https://example.com/user-A.png',
+            name : 'User A'
+          });
+    })
 
     it('full record', () => {
       // Check the full record here. Other tests will check the initials calculated
       const assignee: Assignee = AssigneeUtil.fromJS(input);
       expect(assignee).toEqual(jasmine.anything());
       expect(assignee.key).toEqual('userA');
-      expect(assignee.email).toEqual('UserA@examle.com');
+      expect(assignee.email).toEqual('UserA@example.com');
       expect(assignee.avatar).toEqual('https://example.com/user-A.png');
       expect(assignee.name).toEqual('User A');
       expect(assignee.initials).toEqual('UA');
