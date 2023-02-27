@@ -104,4 +104,9 @@ public class MockProjectComponent implements ProjectComponent {
     public GenericValue getGenericValue() {
         return null;
     }
+
+    @Override
+    public boolean isArchived() {
+        return false;
+    }
 }

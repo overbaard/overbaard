@@ -80,7 +80,7 @@ public class SearchServiceBuilder {
 
     private SearchResults getSearchResults() {
         SearchResults searchResults = mock(SearchResults.class);
-        when(searchResults.getIssues()).thenAnswer(invocationOnMock -> {
+        when(searchResults.getResults()).thenAnswer(invocationOnMock -> {
             if (searchCallback != null) {
                 searchCallback.searching();
             }

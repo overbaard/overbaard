@@ -37,17 +37,17 @@
     <properties>
         <version.amps>8.0.2</version.amps>
         <version.atlassian.spring.scanner>${version.internal.atlassian.spring.scanner}</version.atlassian.spring.scanner>
-        <version.jira>${version.internal.jira7}</version.jira>
+        <version.jira>${version.internal.jira8}</version.jira>
 
         <location.checkstyle.xml>${project.basedir}/../../../checkstyle/checkstyle.xml</location.checkstyle.xml>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-            <!-- Just use the Jira 7 BOM here. The adapters should abstract out the changes for other versions -->
+            <!-- Just use the Jira 8 BOM here. The adapters should abstract out the changes for other versions -->
             <dependency>
                 <groupId>org.overbaard</groupId>
-                <artifactId>overbaard-jira7-bom</artifactId>
+                <artifactId>overbaard-jira8-bom</artifactId>
                 <version>${project.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
@@ -163,7 +163,7 @@
         -->
         <dependency>
             <groupId>org.overbaard</groupId>
-            <artifactId>overbaard-jira-api-adapter-jira7</artifactId>
+            <artifactId>overbaard-jira-api-adapter-jira8</artifactId>
             <scope>test</scope>
         </dependency>
 
