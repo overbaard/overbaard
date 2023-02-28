@@ -1,4 +1,4 @@
-package org.overbaard.jira.api.adapter.jira8;
+package org.overbaard.jira.api.adapter.jira9;
 
 import org.overbaard.jira.api.adapter.spi.JiraApiAdapter;
 import org.overbaard.jira.api.adapter.spi.JiraEnvironmentAdapter;
@@ -9,7 +9,7 @@ import org.overbaard.jira.api.adapter.spi.SearchResultsAdapter;
  */
 public class JiraApiAdapterImpl implements JiraApiAdapter {
 
-    private final JiraEnvironmentAdapter jiraEnvironmentAdapter = new org.overbaard.jira.api.adapter.jira8.JiraEnvironmentAdapterImpl();
+    private final JiraEnvironmentAdapter jiraEnvironmentAdapter = new org.overbaard.jira.api.adapter.jira9.JiraEnvironmentAdapterImpl();
     private final SearchResultsAdapter searchResultsAdapter = new SearchResultsAdapterImpl();
 
     /**

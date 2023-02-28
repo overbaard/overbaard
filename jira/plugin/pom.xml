@@ -49,5 +49,16 @@
                 <module>jira8</module>
             </modules>
         </profile>
+        <profile>
+            <id>jira9</id>
+            <activation>
+                <property>
+                    <name>ob.jira9</name>
+                </property>
+            </activation>
+            <modules>
+                <module>jira9</module>
+            </modules>
+        </profile>
     </profiles>
 </project>

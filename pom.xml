@@ -53,6 +53,7 @@
             and plugins (which are needed directly by the Jira plugin
         -->
         <version.internal.jira8>8.13.5</version.internal.jira8>
+        <version.internal.jira9>8.13.5</version.internal.jira9>
         <version.amps>8.1.2</version.amps>
         <version.internal.atlassian.spring.scanner>2.1.7</version.internal.atlassian.spring.scanner>
 
@@ -112,7 +113,17 @@
             </dependency>
             <dependency>
                 <groupId>org.overbaard</groupId>
+                <artifactId>overbaard-jira-api-adapter-jira9</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.overbaard</groupId>
                 <artifactId>overbaard-jira8-bom</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.overbaard</groupId>
+                <artifactId>overbaard-jira9-bom</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
