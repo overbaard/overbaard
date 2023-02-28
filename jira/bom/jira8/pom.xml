@@ -14,7 +14,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <version.atlassian.greenhopper>8.0.0-DAILY20190215023029</version.atlassian.greenhopper>
+        <version.atlassian.greenhopper>9.4.1</version.atlassian.greenhopper>
         <version.atlassian.spring.scanner>${version.internal.atlassian.spring.scanner}</version.atlassian.spring.scanner>
         <version.atlassian.templaterenderer>1.5.6</version.atlassian.templaterenderer>
         <version.atlassian.activeobjects>0.28.7</version.atlassian.activeobjects>
