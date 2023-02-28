@@ -15,6 +15,7 @@
  */
 package ut.org.overbaard.jira.mock;
 
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
@@ -49,7 +50,7 @@ public class PermissionManagerBuilder {
     }
 
     private PermissionManager build() {
-        when(permissionManager.hasPermission(any(ProjectPermissionKey.class), any(Project.class), any(ApplicationUser.class)))
+        when(permissionManager.hasPermission(any(ProjectPermissionKey.class), nullable(Project.class), nullable(ApplicationUser.class)))
                 .then(invocation -> callback.hasPermission(
                         (ProjectPermissionKey)invocation.getArguments()[0],
                         (Project) invocation.getArguments()[1],

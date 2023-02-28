@@ -123,6 +123,11 @@ public class SearchServiceBuilder {
                 searchIssueKey = (String)invocation.getArguments()[0];
                 return jqlClauseBuilder;
             });
+            when(jqlClauseBuilder.issue(anyString())).then(invocation -> {
+                // Duplicate of above block - how it matches signatures seems to have changed a bit
+                searchIssueKey = (String)invocation.getArguments()[0];
+                return jqlClauseBuilder;
+            });
             when(jqlClauseBuilder.and()).then(invocation -> jqlClauseBuilder);
             when(jqlClauseBuilder.not()).then(invocation -> jqlClauseBuilder);
             when(jqlClauseBuilder.status(anyString())).then(invocation -> {

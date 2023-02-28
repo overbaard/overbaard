@@ -15,6 +15,7 @@
  */
 package ut.org.overbaard.jira.mock;
 
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
@@ -48,10 +49,12 @@ public class GlobalPermissionManagerBuilder {
     }
 
     private GlobalPermissionManager build() {
-        when(permissionManager.hasPermission(any(GlobalPermissionKey.class), any(ApplicationUser.class)))
-                .then(invocation -> callback.hasPermission(
-                        (GlobalPermissionKey) invocation.getArguments()[0],
-                        (ApplicationUser) invocation.getArguments()[1]));
+        when(permissionManager.hasPermission(any(GlobalPermissionKey.class), nullable(ApplicationUser.class)))
+                .then(invocation -> {
+                    return callback.hasPermission(
+                            (GlobalPermissionKey) invocation.getArguments()[0],
+                            (ApplicationUser) invocation.getArguments()[1]);
+                });
         return permissionManager;
     }
 
