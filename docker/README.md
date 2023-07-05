@@ -1,8 +1,9 @@
 # Development Docker File
 
-TODO - how to build the docker image
 
 Since the development environment is quite fiddly to set up (See the [Developer guide](https://overbaard.github.io/docs/developer-guide.html) for examples), it is provided here as a Docker image.
+
+See the instructions later in this document how to [build the Docker image](#building-the-docker-image).
 
 To launch it, simply run the following command from this directory:
 ```shell
@@ -17,7 +18,7 @@ In order to not have to fetch all the dependencies every time you relaunch the i
 
 This simplifies the setup, while allowing you to work locally with your IDE, and building the code inside the Docker image.
 
-The steps to initialise the local Jira instance are contained in the [Developer guide](https://overbaard.github.io/docs/developer-guide.html), and everything works mostly the same.
+The steps to initialise the local Jira instance are contained in the [Developer guide](https://overbaard.github.io/docs/developer-guide.html), and everything works mostly the same. Some more detailed steps
 
 ## Differences from running locally
 There are a few subtle differences when running in the container from when running locally.
@@ -52,61 +53,81 @@ appearing in the browser.
 
 This is useful during development, and especially useful if you need to debug errors. You can do this from the developer tools inside your browser.
 
-# TODO - How to run things (copy from dev guide)
-- build
-- dev environment
-- 
+# Setting up the Jira instance
 
+The instructions are similar for Jira 8 and Jira 9. The Jira 8 ones are a bit longer just to add a bit more context. 
 
-# Notes
-I did 
+## Jira 8
+These instructions are kept short. See the 'First time setup' section in the [Developer guide](https://overbaard.github.io/docs/developer-guide.html) for more details.
 
-Jira 8
-------
-
-./run-server.sh, and in the resulting terminal
+In a terminal run
+```shell
+./run-server.sh
+```
+to start the Docker container, and once the container starts run:
+```shell
+# Build all the contained dependencies in the project
 atlas-mvn install
+# Start the Jira 8 server in debug mode with the jira8 plugin
 atlas-debug -pl jira/plugin/jira8 -Dob.jira8
+```
+Once the server has started fully, go to http://localhost:2990/jira from your normal browser and install the evaluation licenses for Jira Core and Jira Software.
 
-Then go to http://localhost:2990/jira and install the evaluation licenses for Jira Core and Jira Software.
+Get the ID of the container `docker ps``, and in terminal two:
 
-Get the ID of the first container, and in terminal two:
+```shell
 docker exec -it <container id> bash
-once in container
+#Once container starts, run this to build the application including the UI
+# -Dob.ui packages for production and is suitable for a release. But it takes
+# longer time. If you just want to do this for development, you can use
+# -Dob.ui.dev
 atlas-package -Dob.ui.deps -Dob.ui -Dob.jira8
+```
 
-Check output in original (./run-server.sh) terminal to make sure it deploys
-Go to http://localhost:2990/jira (refresh if necessary) and make sure that Overbård shows up in Boards menu
+Check output in the original (./run-server.sh) terminal to make sure it deploys.
 
-In a native (non-docker) terminal use https://github.com/overbaard/overbaard-jira-populator to populate Jira as mentioned in the dev guide. Also, do the setup of the Rank, Epic Link and Epic Name fields outlined there, and set up the board. 
+Go to http://localhost:2990/jira (refresh if necessary) and make sure that Overbård shows up in the Boards menu.
+
+In a native (non-docker) terminal use https://github.com/overbaard/overbaard-jira-populator to populate Jira as mentioned in the dev guide. Also, do the setup of the Rank, Epic Link and Epic Name fields outlined there, and set up the board. If you can't see those fields in the output, stop Jira and start it again in the `run-server.sh` container terminal. The command to start it again is the same as before: `atlas-debug -pl jira/plugin/jira8 -Dob.jira8`
 
 In Overbård/Boards check the board looks ok.
 
 Exit the containers.
 The resulting plugin jar should be in (local filesystem) ../jira/plugin/jira8/target
 
-Jira 9
-------
+## Jira 9
 Same steps as Jira 8, but substitute jira8 with jira9, so
 
-./run-server.sh, and in the resulting terminal
+```shell
+./run-server.sh
+```
+to start the Docker container, and once the container starts run:
+```shell
 atlas-mvn install
 atlas-debug -pl jira/plugin/jira9 -Dob.jira9
+```
 
 Install licenses as above
 
 In the second docker terminal:
+```shell
 atlas-package -Dob.ui.deps -Dob.ui -Dob.jira9
+```
 
 Populate Jira and configure Overbård as above, and check board looks ok.
 
 Exit the containers.
-The resulting plugin jar should be in (local filesystem) ../jira/plugin/jira8/target
+The resulting plugin jar should be in (local _filesystem_) ../jira/plugin/jira8/target
 
+# Building the docker image
+We need to build a multi-arch docker image. Install buildx as outlined in https://www.docker.com/blog/multi-arch-build-and-images-the-simple-way/
 
-
-
-
+Build the image with the following command
+```` shell
+docker buildx build --push --platform linux/arm64,linux/amd64  --tag quay.io/overbaard/overbaard-dev-env:latest .
+````
+`--push` seems to push to quay.io so you might need to change the username. If you want to just try local changes,
+use `--load` instead, and edit the `--platform` flag to only contain your architecture.
 
 
 
