@@ -54,6 +54,12 @@
             <groupId>com.atlassian.jira.plugins</groupId>
             <artifactId>jira-greenhopper-plugin</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.atlassian.jira</groupId>
+            <artifactId>jira-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
 
     </dependencies>
 
