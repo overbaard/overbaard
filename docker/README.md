@@ -1,5 +1,7 @@
 # Development Docker File
 
+TODO - how to build the docker image
+
 Since the development environment is quite fiddly to set up (See the [Developer guide](https://overbaard.github.io/docs/developer-guide.html) for examples), it is provided here as a Docker image.
 
 To launch it, simply run the following command from this directory:
@@ -49,4 +51,63 @@ on your local system (i.e. outside of the container). If you don't see any resul
 appearing in the browser.
 
 This is useful during development, and especially useful if you need to debug errors. You can do this from the developer tools inside your browser.
+
+# TODO - How to run things (copy from dev guide)
+- build
+- dev environment
+- 
+
+
+# Notes
+I did 
+
+Jira 8
+------
+
+./run-server.sh, and in the resulting terminal
+atlas-mvn install
+atlas-debug -pl jira/plugin/jira8 -Dob.jira8
+
+Then go to http://localhost:2990/jira and install the evaluation licenses for Jira Core and Jira Software.
+
+Get the ID of the first container, and in terminal two:
+docker exec -it <container id> bash
+once in container
+atlas-package -Dob.ui.deps -Dob.ui -Dob.jira8
+
+Check output in original (./run-server.sh) terminal to make sure it deploys
+Go to http://localhost:2990/jira (refresh if necessary) and make sure that Overbård shows up in Boards menu
+
+In a native (non-docker) terminal use https://github.com/overbaard/overbaard-jira-populator to populate Jira as mentioned in the dev guide. Also, do the setup of the Rank, Epic Link and Epic Name fields outlined there, and set up the board. 
+
+In Overbård/Boards check the board looks ok.
+
+Exit the containers.
+The resulting plugin jar should be in (local filesystem) ../jira/plugin/jira8/target
+
+Jira 9
+------
+Same steps as Jira 8, but substitute jira8 with jira9, so
+
+./run-server.sh, and in the resulting terminal
+atlas-mvn install
+atlas-debug -pl jira/plugin/jira9 -Dob.jira9
+
+Install licenses as above
+
+In the second docker terminal:
+atlas-package -Dob.ui.deps -Dob.ui -Dob.jira9
+
+Populate Jira and configure Overbård as above, and check board looks ok.
+
+Exit the containers.
+The resulting plugin jar should be in (local filesystem) ../jira/plugin/jira8/target
+
+
+
+
+
+
+
+
 
