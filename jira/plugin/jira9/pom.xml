@@ -219,7 +219,8 @@
                         <!-- Add package to export here -->
                         <Export-Package>org.overbaard.jira.api,</Export-Package>
                         <!-- Add package import here -->
-                        <Import-Package>org.springframework.osgi.*;resolution:="optional",
+                        <Import-Package>org.w3c.dom;resolution:=optional,
+                            org.springframework.osgi.*;resolution:="optional",
                             org.eclipse.gemini.blueprint.*;resolution:="optional", *
                         </Import-Package>
                         <!-- Ensure plugin is spring powered - see https://extranet.atlassian.com/x/xBS9hQ  -->
