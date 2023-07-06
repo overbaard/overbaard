@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.overbaard</groupId>
         <artifactId>overbaard-jira-parent</artifactId>
-        <version>2023.001</version>
+        <version>2023.002-SNAPSHOT</version>
     </parent>
     <artifactId>overbaard-jira-plugin-parent</artifactId>
     <packaging>pom</packaging>
@@ -39,17 +39,6 @@
 
     <profiles>
         <profile>
-            <id>jira7</id>
-            <activation>
-                <property>
-                    <name>ob.jira7</name>
-                </property>
-            </activation>
-            <modules>
-                <module>jira7</module>
-            </modules>
-        </profile>
-        <profile>
             <id>jira8</id>
             <activation>
                 <property>
@@ -58,6 +47,17 @@
             </activation>
             <modules>
                 <module>jira8</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>jira9</id>
+            <activation>
+                <property>
+                    <name>ob.jira9</name>
+                </property>
+            </activation>
+            <modules>
+                <module>jira9</module>
             </modules>
         </profile>
     </profiles>

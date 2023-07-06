@@ -17,6 +17,7 @@
 package ut.org.overbaard.jira.mock;
 
 import java.util.Collection;
+import java.util.Date;
 
 import javax.annotation.Nonnull;
 
@@ -144,6 +145,21 @@ public class MockProject implements Project {
 
     @Override
     public ProjectCategory getProjectCategory() {
+        return null;
+    }
+
+    @Override
+    public boolean isArchived() {
+        return false;
+    }
+
+    @Override
+    public ApplicationUser getArchivedBy() {
+        return null;
+    }
+
+    @Override
+    public Date getArchivedDate() {
         return null;
     }
 }

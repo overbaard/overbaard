@@ -80,7 +80,7 @@ public class SearchServiceBuilder {
 
     private SearchResults getSearchResults() {
         SearchResults searchResults = mock(SearchResults.class);
-        when(searchResults.getIssues()).thenAnswer(invocationOnMock -> {
+        when(searchResults.getResults()).thenAnswer(invocationOnMock -> {
             if (searchCallback != null) {
                 searchCallback.searching();
             }
@@ -120,6 +120,11 @@ public class SearchServiceBuilder {
                 return jqlClauseBuilder;
             });
             when(jqlClauseBuilder.issue(any(String[].class))).then(invocation -> {
+                searchIssueKey = (String)invocation.getArguments()[0];
+                return jqlClauseBuilder;
+            });
+            when(jqlClauseBuilder.issue(anyString())).then(invocation -> {
+                // Duplicate of above block - how it matches signatures seems to have changed a bit
                 searchIssueKey = (String)invocation.getArguments()[0];
                 return jqlClauseBuilder;
             });

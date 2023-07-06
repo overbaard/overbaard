@@ -5,7 +5,7 @@
     <parent>
         <artifactId>overbaard-jira-api-adapter</artifactId>
         <groupId>org.overbaard</groupId>
-        <version>2023.001</version>
+        <version>2023.002-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -18,10 +18,10 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- Just use the Jira 7 BOM here. The adapters should abstract out the changes for other versions -->
+            <!-- Just use the Jira 8 BOM here. The adapters should abstract out the changes for other versions -->
             <dependency>
                 <groupId>org.overbaard</groupId>
-                <artifactId>overbaard-jira7-bom</artifactId>
+                <artifactId>overbaard-jira8-bom</artifactId>
                 <version>${project.version}</version>
                 <type>pom</type>
                 <scope>import</scope>

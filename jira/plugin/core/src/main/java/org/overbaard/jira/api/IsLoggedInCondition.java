@@ -15,12 +15,12 @@
  */
 package org.overbaard.jira.api;
 
-import java.util.Map;
-
-import com.atlassian.jira.component.ComponentAccessor;
+import com.atlassian.jira.plugin.webfragment.JiraWebContext;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.web.Condition;
+
+import java.util.Map;
 
 /**
  * Reimplementation of com.atlassian.jira.plugin.webfragment.conditions.UserLoggedInCondition since Jira seems to be
@@ -37,12 +37,15 @@ public class IsLoggedInCondition implements Condition {
 
     @Override
     public boolean shouldDisplay(Map<String, Object> context) {
-        ApplicationUser appUser = (ApplicationUser)context.get("user");
-        if(appUser == null) {
-            String username = (String)context.get("username");
-            appUser = ComponentAccessor.getUserUtil().getUserByName(username);
-        }
-
+//        ApplicationUser appUser = (ApplicationUser)context.get("user");
+//        if(appUser == null) {
+//            String username = (String)context.get("username");
+//            appUser = ComponentAccessor.getUserUtil().getUserObject(username);
+//        }
+//
+        // The getUserObject() method used above seems deleted in Jira 9. Take the following from the
+        // UserLoggedInCondition mentioned in the class comment
+        ApplicationUser appUser = JiraWebContext.from(context).getUser().orElse(null);
         return appUser != null;
     }
 }

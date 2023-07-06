@@ -1,4 +1,4 @@
-package org.overbaard.jira.api.adapter.jira7;
+package org.overbaard.jira.api.adapter.jira9;
 
 import org.apache.felix.framework.BundleWiringImpl;
 import org.overbaard.jira.api.adapter.spi.JiraEnvironmentAdapter;

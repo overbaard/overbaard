@@ -27,17 +27,17 @@
     <parent>
         <groupId>org.overbaard</groupId>
         <artifactId>overbaard-jira-plugin-parent</artifactId>
-        <version>2023.001</version>
+        <version>2023.002-SNAPSHOT</version>
     </parent>
-    <artifactId>overbaard-jira-plugin-7</artifactId>
-    <name>Overbård Plugin for Jira 7.x</name>
+    <artifactId>overbaard-jira-plugin-9</artifactId>
+    <name>Overbård Plugin for Jira 9.x</name>
     <packaging>atlassian-plugin</packaging>
     <description>Nicer views on the Jira Agile boards</description>
 
     <properties>
         <version.amps>8.1.0</version.amps>
         <version.atlassian.spring.scanner>${version.internal.atlassian.spring.scanner}</version.atlassian.spring.scanner>
-        <version.jira>${version.internal.jira7}</version.jira>
+        <version.jira>${version.internal.jira9}</version.jira>
 
         <location.checkstyle.xml>${project.basedir}/../../../checkstyle/checkstyle.xml</location.checkstyle.xml>
     </properties>
@@ -46,7 +46,7 @@
         <dependencies>
             <dependency>
                 <groupId>org.overbaard</groupId>
-                <artifactId>overbaard-jira7-bom</artifactId>
+                <artifactId>overbaard-jira9-bom</artifactId>
                 <version>${project.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
@@ -66,7 +66,7 @@
         </dependency>
         <dependency>
             <groupId>org.overbaard</groupId>
-            <artifactId>overbaard-jira-api-adapter-jira7</artifactId>
+            <artifactId>overbaard-jira-api-adapter-jira9</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -79,6 +79,14 @@
         <dependency>
             <groupId>com.atlassian.jira</groupId>
             <artifactId>jira-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Add dependency on jira-core if you want access to JIRA implementation classes as well as the sanctioned API. -->
+        <!-- This is not normally recommended, but may be required eg when migrating a plugin originally developed against JIRA 4.x -->
+        <dependency>
+            <groupId>com.atlassian.jira</groupId>
+            <artifactId>jira-core</artifactId>
+            <version>${version.jira}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -206,31 +214,22 @@
                     </pluginArtifacts>
                     -->
                     <enableQuickReload>true</enableQuickReload>
-
-                    <!-- See here for an explanation of default instructions: -->
-                    <!-- https://developer.atlassian.com/docs/advanced-topics/configuration-of-instructions-in-atlassian-plugins -->
                     <instructions>
                         <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
-
                         <!-- Add package to export here -->
-                        <Export-Package>
-                            org.overbaard.jira.api,
-                        </Export-Package>
-
+                        <Export-Package>org.overbaard.jira.api,</Export-Package>
                         <!-- Add package import here -->
-                        <Import-Package>
+                        <Import-Package>org.w3c.dom;resolution:=optional,
                             org.springframework.osgi.*;resolution:="optional",
-                            org.eclipse.gemini.blueprint.*;resolution:="optional",
-                            *
+                            org.eclipse.gemini.blueprint.*;resolution:="optional", *
                         </Import-Package>
-
-                        <!-- Ensure plugin is spring powered -->
+                        <!-- Ensure plugin is spring powered - see https://extranet.atlassian.com/x/xBS9hQ  -->
                         <Spring-Context>*</Spring-Context>
-
-                        <!-- TODO Get rid of this (compression causes some problems I don't want to look at now) -->
-                        <compressResources>false</compressResources>
-                        <jvmArgs>-Xms1g -Xmx2g -XX:MaxPermSize=1g -XX:-UseGCOverheadLimit -server</jvmArgs>
                     </instructions>
+
+                    <!-- TODO Get rid of this (compression causes some problems I don't want to look at now) -->
+                    <compressResources>false</compressResources>
+                    <jvmArgs>-Xms1g -Xmx2g -XX:MaxPermSize=1g -XX:-UseGCOverheadLimit -server</jvmArgs>
                 </configuration>
             </plugin>
             <plugin>
@@ -286,7 +285,7 @@
             <!--
                 Copy the webapp files
                 (for some reason this does not seem to work with the build-helper-maven-plugin below
-            -->
+             -->
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
@@ -322,7 +321,7 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>../../api-adapter/jira7/src/main/java</source>
+                                <source>../../api-adapter/jira9/src/main/java</source>
                                 <source>../../api-adapter/spi/src/main/java</source>
                                 <source>../core/src/main/java</source>
                             </sources>
@@ -337,7 +336,7 @@
                         <configuration>
                             <resources>
                                 <resource>
-                                    <directory>../../api-adapter/jira7/src/main/resources</directory>
+                                    <directory>../../api-adapter/jira9/src/main/resources</directory>
                                 </resource>
                                 <resource>
                                     <directory>../../api-adapter/spi/src/main/resources</directory>

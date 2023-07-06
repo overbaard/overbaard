@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.overbaard</groupId>
         <artifactId>overbaard-jira-parent</artifactId>
-        <version>2023.001</version>
+        <version>2023.002-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -13,8 +13,8 @@
     <packaging>pom</packaging>
     <name>Jira Api Adapter Parent</name>
     <modules>
-        <module>jira7</module>
         <module>jira8</module>
+        <module>jira9</module>
         <module>spi</module>
     </modules>
 

@@ -250,6 +250,26 @@ public class MockIssue implements Issue {
     }
 
     @Override
+    public Timestamp getArchivedDate() {
+        return null;
+    }
+
+    @Override
+    public boolean isArchived() {
+        return false;
+    }
+
+    @Override
+    public ApplicationUser getArchivedByUser() {
+        return null;
+    }
+
+    @Override
+    public String getArchivedById() {
+        return null;
+    }
+
+    @Override
     public Object getCustomFieldValue(CustomField customField) {
         if (customField.getIdAsLong().equals(TestConstants.EPIC_LINK_CUSTOM_FIELD_ID) && epic != null) {
             return epic;
@@ -397,6 +417,8 @@ public class MockIssue implements Issue {
     public Status getStatus() {
         return state;
     }
+
+
 
     void setCustomField(Long customFieldId, Object value) {
         if (value == null) {

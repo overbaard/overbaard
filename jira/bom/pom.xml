@@ -5,7 +5,7 @@
     <parent>
         <artifactId>overbaard-jira-parent</artifactId>
         <groupId>org.overbaard</groupId>
-        <version>2023.001</version>
+        <version>2023.002-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -13,7 +13,7 @@
     <name>Jira BOM Parent</name>
     <packaging>pom</packaging>
     <modules>
-        <module>jira7</module>
         <module>jira8</module>
+        <module>jira9</module>
     </modules>
 </project>

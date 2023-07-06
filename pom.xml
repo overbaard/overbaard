@@ -21,7 +21,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.overbaard</groupId>
     <artifactId>overbaard-parent</artifactId>
-    <version>2023.001</version>
+    <version>2023.002-SNAPSHOT</version>
     <packaging>pom</packaging>
     <organization>
         <url>https://github.com/overbaard/overbaard</url>
@@ -52,8 +52,8 @@
             Jira 7 and Jira8 versions of versions that are used both by dependencies (bom)
             and plugins (which are needed directly by the Jira plugin
         -->
-        <version.internal.jira7>7.5.0</version.internal.jira7>
         <version.internal.jira8>8.13.5</version.internal.jira8>
+        <version.internal.jira9>9.4.1</version.internal.jira9>
         <version.amps>8.1.2</version.amps>
         <version.internal.atlassian.spring.scanner>2.1.7</version.internal.atlassian.spring.scanner>
 
@@ -108,22 +108,22 @@
             </dependency>
             <dependency>
                 <groupId>org.overbaard</groupId>
-                <artifactId>overbaard-jira-api-adapter-jira7</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.overbaard</groupId>
                 <artifactId>overbaard-jira-api-adapter-jira8</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.overbaard</groupId>
-                <artifactId>overbaard-jira7-bom</artifactId>
+                <artifactId>overbaard-jira-api-adapter-jira9</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.overbaard</groupId>
                 <artifactId>overbaard-jira8-bom</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.overbaard</groupId>
+                <artifactId>overbaard-jira9-bom</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

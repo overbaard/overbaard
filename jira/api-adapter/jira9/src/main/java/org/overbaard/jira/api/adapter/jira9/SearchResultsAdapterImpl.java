@@ -1,4 +1,4 @@
-package org.overbaard.jira.api.adapter.jira7;
+package org.overbaard.jira.api.adapter.jira9;
 
 import java.util.List;
 
@@ -13,6 +13,6 @@ import com.atlassian.jira.issue.search.SearchResults;
 public class SearchResultsAdapterImpl implements SearchResultsAdapter {
     @Override
     public List<Issue> getIssueResults(SearchResults searchResults) {
-        return searchResults.getIssues();
+        return (List<Issue>)searchResults.getResults();
     }
 }

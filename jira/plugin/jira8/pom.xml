@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.overbaard</groupId>
         <artifactId>overbaard-jira-plugin-parent</artifactId>
-        <version>2023.001</version>
+        <version>2023.002-SNAPSHOT</version>
     </parent>
     <artifactId>overbaard-jira-plugin-8</artifactId>
     <name>Overbård Plugin for Jira 8.x</name>
@@ -79,6 +79,14 @@
         <dependency>
             <groupId>com.atlassian.jira</groupId>
             <artifactId>jira-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Add dependency on jira-core if you want access to JIRA implementation classes as well as the sanctioned API. -->
+        <!-- This is not normally recommended, but may be required eg when migrating a plugin originally developed against JIRA 4.x -->
+        <dependency>
+            <groupId>com.atlassian.jira</groupId>
+            <artifactId>jira-core</artifactId>
+            <version>${version.jira}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -211,7 +219,8 @@
                         <!-- Add package to export here -->
                         <Export-Package>org.overbaard.jira.api,</Export-Package>
                         <!-- Add package import here -->
-                        <Import-Package>org.springframework.osgi.*;resolution:="optional",
+                        <Import-Package>org.w3c.dom;resolution:=optional,
+                            org.springframework.osgi.*;resolution:="optional",
                             org.eclipse.gemini.blueprint.*;resolution:="optional", *
                         </Import-Package>
                         <!-- Ensure plugin is spring powered - see https://extranet.atlassian.com/x/xBS9hQ  -->

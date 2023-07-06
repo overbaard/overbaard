@@ -6,3 +6,5 @@ JiraBackup.zip
 .classpath
 *.iml
 maven-repo-cache/
+.DS_Store
+
