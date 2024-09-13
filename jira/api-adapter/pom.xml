@@ -13,7 +13,6 @@
     <packaging>pom</packaging>
     <name>Jira Api Adapter Parent</name>
     <modules>
-        <module>jira8</module>
         <module>jira9</module>
         <module>spi</module>
     </modules>

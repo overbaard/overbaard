@@ -55,9 +55,9 @@ This is useful during development, and especially useful if you need to debug er
 
 # Setting up the Jira instance
 
-The instructions are similar for Jira 8 and Jira 9. The Jira 8 ones are a bit longer just to add a bit more context. 
+The instructions are similar for all supported Jira version (currently just) Jira 9. Just replace 'jira9' with 'jirax', where 'x' is the Jira version 
 
-## Jira 8
+## Jira 9
 These instructions are kept short. See the 'First time setup' section in the [Developer guide](https://overbaard.github.io/docs/developer-guide.html) for more details.
 
 In a terminal run
@@ -68,8 +68,8 @@ to start the Docker container, and once the container starts run:
 ```shell
 # Build all the contained dependencies in the project
 atlas-mvn install
-# Start the Jira 8 server in debug mode with the jira8 plugin
-atlas-debug -pl jira/plugin/jira8 -Dob.jira8
+# Start the Jira 9 server in debug mode with the jira9 plugin
+atlas-debug -pl jira/plugin/jira9 -Dob.jira9
 ```
 Once the server has started fully, go to http://localhost:2990/jira from your normal browser and install the evaluation licenses for Jira Core and Jira Software.
 
@@ -81,43 +81,60 @@ docker exec -it <container id> bash
 # -Dob.ui packages for production and is suitable for a release. But it takes
 # longer time. If you just want to do this for development, you can use
 # -Dob.ui.dev
-atlas-package -Dob.ui.deps -Dob.ui -Dob.jira8
+atlas-package -Dob.ui.deps -Dob.ui -Dob.jira9
 ```
 
 Check output in the original (./run-server.sh) terminal to make sure it deploys.
 
 Go to http://localhost:2990/jira (refresh if necessary) and make sure that Overbård shows up in the Boards menu.
 
-In a native (non-docker) terminal use https://github.com/overbaard/overbaard-jira-populator to populate Jira as mentioned in the dev guide. Also, do the setup of the Rank, Epic Link and Epic Name fields outlined there, and set up the board. If you can't see those fields in the output, stop Jira and start it again in the `run-server.sh` container terminal. The command to start it again is the same as before: `atlas-debug -pl jira/plugin/jira8 -Dob.jira8`
+In a native (non-docker) terminal use https://github.com/overbaard/overbaard-jira-populator to populate Jira as mentioned in the dev guide. Also, do the setup of the Rank, Epic Link and Epic Name fields outlined there, and set up the board. If you can't see those fields in the output, stop Jira and start it again in the `run-server.sh` container terminal. The command to start it again is the same as before: `atlas-debug -pl jira/plugin/jira9 -Dob.jira9`
 
 In Overbård/Boards check the board looks ok.
 
 Exit the containers.
-The resulting plugin jar should be in (local filesystem) ../jira/plugin/jira8/target
+The resulting plugin jar should be in (local filesystem) ../jira/plugin/jira9/target
 
-## Jira 9
-Same steps as Jira 8, but substitute jira8 with jira9, so
+[//]: # (## Jira 9)
 
-```shell
-./run-server.sh
-```
-to start the Docker container, and once the container starts run:
-```shell
-atlas-mvn install
-atlas-debug -pl jira/plugin/jira9 -Dob.jira9
-```
+[//]: # (Same steps as Jira 8, but substitute jira8 with jira9, so)
 
-Install licenses as above
+[//]: # ()
+[//]: # (```shell)
 
-In the second docker terminal:
-```shell
-atlas-package -Dob.ui.deps -Dob.ui -Dob.jira9
-```
+[//]: # (./run-server.sh)
 
-Populate Jira and configure Overbård as above, and check board looks ok.
+[//]: # (```)
 
-Exit the containers.
-The resulting plugin jar should be in (local _filesystem_) ../jira/plugin/jira8/target
+[//]: # (to start the Docker container, and once the container starts run:)
+
+[//]: # (```shell)
+
+[//]: # (atlas-mvn install)
+
+[//]: # (atlas-debug -pl jira/plugin/jira9 -Dob.jira9)
+
+[//]: # (```)
+
+[//]: # ()
+[//]: # (Install licenses as above)
+
+[//]: # ()
+[//]: # (In the second docker terminal:)
+
+[//]: # (```shell)
+
+[//]: # (atlas-package -Dob.ui.deps -Dob.ui -Dob.jira9)
+
+[//]: # (```)
+
+[//]: # ()
+[//]: # (Populate Jira and configure Overbård as above, and check board looks ok.)
+
+[//]: # ()
+[//]: # (Exit the containers.)
+
+[//]: # (The resulting plugin jar should be in &#40;local _filesystem_&#41; ../jira/plugin/jira9/target)
 
 # Building the docker image
 We need to build a multi-arch docker image. Install buildx as outlined in https://www.docker.com/blog/multi-arch-build-and-images-the-simple-way/

@@ -13,7 +13,6 @@
     <name>Jira BOM Parent</name>
     <packaging>pom</packaging>
     <modules>
-        <module>jira8</module>
         <module>jira9</module>
     </modules>
 </project>

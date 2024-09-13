@@ -109,4 +109,9 @@ public class MockProjectComponent implements ProjectComponent {
     public boolean isArchived() {
         return false;
     }
+
+    @Override
+    public boolean isDeleted() {
+        return false;
+    }
 }

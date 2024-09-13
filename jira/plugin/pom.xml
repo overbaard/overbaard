@@ -39,17 +39,6 @@
 
     <profiles>
         <profile>
-            <id>jira8</id>
-            <activation>
-                <property>
-                    <name>ob.jira8</name>
-                </property>
-            </activation>
-            <modules>
-                <module>jira8</module>
-            </modules>
-        </profile>
-        <profile>
             <id>jira9</id>
             <activation>
                 <property>
