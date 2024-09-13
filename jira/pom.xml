@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.overbaard</groupId>
         <artifactId>overbaard-parent</artifactId>
-        <version>2023.003-SNAPSHOT</version>
+        <version>2024.001</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
