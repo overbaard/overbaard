@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.overbaard</groupId>
         <artifactId>overbaard-jira-plugin-parent</artifactId>
-        <version>2024.001</version>
+        <version>2024.002-SNAPSHOT</version>
     </parent>
     <artifactId>overbaard-jira-plugin-core</artifactId>
     <name>Jira Plugin Core</name>
