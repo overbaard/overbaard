@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.overbaard</groupId>
         <artifactId>overbaard-jira-plugin-parent</artifactId>
-        <version>2024.002-SNAPSHOT</version>
+        <version>2024.003-SNAPSHOT</version>
     </parent>
     <artifactId>overbaard-jira-plugin-9</artifactId>
     <name>Overbård Plugin for Jira 9.x</name>
