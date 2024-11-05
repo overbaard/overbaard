@@ -147,7 +147,12 @@ public class BoardConfigurationManagerImpl implements BoardConfigurationManager 
 
     @Override
     public BoardConfig getBoardConfigForBoardDisplay(ApplicationUser user, final String code) {
-        BoardConfig boardConfig = getBoardConfig(code);
+        return getBoardConfigForBoardDisplay(user, code, false);
+    }
+
+    @Override
+    public BoardConfig getBoardConfigForBoardDisplay(ApplicationUser user, final String code, boolean forceReload) {
+        BoardConfig boardConfig = getBoardConfig(code, forceReload);
 
         if (boardConfig != null && !canViewBoard(user, boardConfig)) {
             throw new OverbaardPermissionException("Insufficient permissions to view board " +
@@ -156,8 +161,16 @@ public class BoardConfigurationManagerImpl implements BoardConfigurationManager 
         return boardConfig;
     }
 
+
     @Override
     public BoardConfig getBoardConfig(final String code) {
+        return getBoardConfig(code, false);
+    }
+
+    public BoardConfig getBoardConfig(final String code, final boolean forceReload) {
+        if (forceReload) {
+            boardConfigs.remove(code);
+        }
         BoardConfig boardConfig =  boardConfigs.get(code);
         if (boardConfig == null) {
             final ActiveObjects activeObjects = jiraInjectables.getActiveObjects();
