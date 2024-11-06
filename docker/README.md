@@ -7,7 +7,7 @@ See the instructions later in this document how to [build the Docker image](#bui
 
 To launch it, simply run the following command from this directory:
 ```shell
-./run-server.sh
+./run-container.sh
 ```
 In order to not have to fetch all the dependencies every time you relaunch the image, directories are mounted so that:
 * Java artifacts will be stored in the `target/` folders of each Maven module under the root checkout folder as if you were running the build locally.
@@ -62,7 +62,7 @@ These instructions are kept short. See the 'First time setup' section in the [De
 
 In a terminal run
 ```shell
-./run-server.sh
+./run-container.sh
 ```
 to start the Docker container, and once the container starts run:
 ```shell
@@ -73,10 +73,10 @@ atlas-debug -pl jira/plugin/jira9 -Dob.jira9
 ```
 Once the server has started fully, go to http://localhost:2990/jira from your normal browser and install the evaluation licenses for Jira Core and Jira Software.
 
-Get the ID of the container `docker ps``, and in terminal two:
+To connect to the Docker container from another terminal window, run the `exec-container.sh` script, and build the application.
 
 ```shell
-docker exec -it <container id> bash
+./exec-docker.sh
 #Once container starts, run this to build the application including the UI
 # -Dob.ui packages for production and is suitable for a release. But it takes
 # longer time. If you just want to do this for development, you can use
