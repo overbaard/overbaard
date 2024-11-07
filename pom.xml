@@ -21,7 +21,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.overbaard</groupId>
     <artifactId>overbaard-parent</artifactId>
-    <version>2024.003</version>
+    <version>2024.004-SNAPSHOT</version>
     <packaging>pom</packaging>
     <organization>
         <url>https://github.com/overbaard/overbaard</url>
