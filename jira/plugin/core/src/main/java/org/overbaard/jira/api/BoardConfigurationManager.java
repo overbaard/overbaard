@@ -73,6 +73,18 @@ public interface BoardConfigurationManager {
     BoardConfig getBoardConfigForBoardDisplay(ApplicationUser user, String code);
 
     /**
+     * Loads the board configuration. Permissions are checked to see if the user
+     * can update anything.
+     * @param user the user
+     * @param code the configuration code
+     * @param forceReload force a reload of the configuration
+     * @return the configuration
+     * @throws OverbaardPermissionException if the user does not have the correct permissions
+     * @throws OverbaardValidationException if the structure of the config is bad
+     */
+    BoardConfig getBoardConfigForBoardDisplay(ApplicationUser user, String code, boolean forceReload);
+
+    /**
      * Loads the board configuration without checking permissions
      *
      * @param code the configuration code

@@ -199,7 +199,9 @@ public class BoardManagerImpl implements BoardManager, InitializingBean, Disposa
                 if (board == null) {
 
                     //Use the logged in user to check if we are allowed to view the board
-                    final BoardConfig boardConfig = boardConfigurationManager.getBoardConfigForBoardDisplay(user, code);
+                    //Also, we force a refresh of the board config since we're doing a full load of the board
+                    //(either as a first load, or following a refresh)
+                    final BoardConfig boardConfig = boardConfigurationManager.getBoardConfigForBoardDisplay(user, code, true);
                     /*
                     Use the board owner to load the board data. The board is only loaded once, and shared amongst all
                     users.
